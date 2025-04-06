@@ -76,7 +76,7 @@ p{
     background: #563434;
 }
 .header{
-    background: radial-gradient(#fff, #ffd6d6);
+    background: radial-gradient(#fff, #07a4c0);
 }
 .header .row{
     margin-top: 70px;
@@ -145,7 +145,7 @@ h4{
 
 /*-----------------------offer -----------------------*/
 .offer{
-    background: radial-gradient(#fff, #ffd6d6);
+    background: radial-gradient(#fff, #07a4c0);
     margin-top: 80px;
     padding: 30px 0;
 }
