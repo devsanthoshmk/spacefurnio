@@ -14,6 +14,7 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <style>
     * {
@@ -48,7 +49,7 @@
       width: 100%;
       background-color: transparent;
       padding: 1rem 0;
-      z-index: 1000;
+      z-index: 500;
     }
 
     .nav-pill {
@@ -126,16 +127,13 @@
       color: #e67e22;
     }
 
-    .tagline-overlay {
-      position: absolute;
-      top: 46%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      text-align: center;
-    }
+  .tagline-overlay {
+   background-color: rgba(255, 255, 255, 0.9);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
 
     .tagline-overlay h1 {
       font-family: 'Playfair Display', serif;
@@ -170,6 +168,9 @@
       left: 1vh;
       top: 1vh;
       border-radius: 9px;
+        display: flex;
+  justify-content: center;
+  align-items: center;
     }
 
     .tagline-component::before {
@@ -281,7 +282,9 @@
 </head>
 <body>
 
-  <nav>
+  <nav data-aos-duration="500" data-aos="fade-down"
+     data-aos-duration="500" data-aos-easing="linear"
+     data-aos-duration="500" data-aos-duration="1500">
     <div class="nav-pill">
       <div class="nav-left">
         <div class="brand">SpaceFurnio</div>
@@ -300,7 +303,7 @@
       </ul>
 
       <div class="icons">
-        <i class="fas fa-search" aria-label="Search"></i>
+        <i class="fas fa-search" aria-label="Search" ></i>
         <i class="fas fa-user" aria-label="User Account"></i>
         <i class="fas fa-heart" aria-label="Like"></i>
         <i class="fas fa-shopping-cart" aria-label="Cart"></i>
@@ -309,8 +312,8 @@
   </nav>
 
   <section class="hero">
-    <div class="tagline-component">
-      <div class="tagline-overlay">
+    <div class="tagline-component" data-aos-duration="500" data-aos="fade-right" data-aos-duration="500" data-aos-duration="500">
+      <div class="tagline-overlay" data-aos="zoom-out" data-aos-delay="500">
         <h1>SpaceFurnio</h1>
         <p>"Creative Meets Living"</p>
       </div>
@@ -319,12 +322,16 @@
     <div class="new-arrivals">
       <h1>New Arrivals</h1>
       <div class="arrival-gallery">
-        <img src="https://placehold.co/400" alt="Arrival 1" />
-        <img src="https://placehold.co/400" alt="Arrival 2" />
-        <img src="https://placehold.co/400" alt="Arrival 3" />
+        <img src="https://placehold.co/400" alt="Arrival 1" data-aos-duration="500" data-aos="fade-left"/>
+        <img src="https://placehold.co/400" alt="Arrival 2" data-aos-duration="500" data-aos="fade-left"/>
+        <img src="https://placehold.co/400" alt="Arrival 3" data-aos-duration="500" data-aos="fade-left"/>
       </div>
     </div>
   </section>
 
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
 </body>
 </html>
