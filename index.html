@@ -17,6 +17,11 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <style>
+    @font-face {
+  font-family: 'Phitagate';
+  src: url('path/to/your/font/phitagate.woff') format('woff'); /* Replace with the actual path and file name */
+  }
+
     * {
       margin: 0;
       padding: 0;
@@ -31,7 +36,7 @@
       font-family: Arial, sans-serif;
       line-height: 1.5;
       color: #333;
-      background-color: #fafafa;
+      background-color: rgb(255,253,246);
     }
 
     a {
@@ -198,7 +203,7 @@
 
     .new-arrivals {
      margin-top: 50px;
-      background-color: #f9f9f9;
+      background-color: rgb(255,253,246);
       padding: 2rem 1.5rem;
       display: flex;
       flex-direction: column;
@@ -209,15 +214,15 @@
 
     .new-arrivals h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+      font-size: 1.7rem;
       color: #2c3e50;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.6rem;
       text-align: center;
     }
-    .arrival-gallery > :nth-child(2) {
+    /*.arrival-gallery > :nth-child(2) {
       position: relative;
       right: -46%;
-    }
+    }*/
 
     .arrival-gallery {
       display: grid;
@@ -277,14 +282,38 @@
         order: 2;
       }
     }
+
+    .tagline-overlay h1{
+      
+  font-family: 'Phitagate';
+    }
+    .img-class{
+          height: 152px;
+    width: 301px;
+    background-color: black;
+    border-radius: 5px;
+    }   
+    .ctr-newarr{
+      border-radius: 5px;
+    height: 50px;
+    width: 301px;
+    background-color: antiquewhite;
     
+    } 
+    .ctr-newarr h1 {
+          font-family: 'Playfair Display', serif;
+    font-size: 1.125rem;
+    color: #555;
+    font-style: italic;
+    margin: 0;
+    }
   </style>
 </head>
 <body>
 
-  <nav data-aos-duration="500" data-aos="fade-down"
-     data-aos-duration="500" data-aos-easing="linear"
-     data-aos-duration="500" data-aos-duration="1500">
+  <nav data-aos-duration="800" data-aos="fade-down"
+     data-aos-duration="800" data-aos-easing="linear"
+     data-aos-duration="800" data-aos-duration="800">
     <div class="nav-pill">
       <div class="nav-left">
         <div class="brand">SpaceFurnio</div>
@@ -312,8 +341,8 @@
   </nav>
 
   <section class="hero">
-    <div class="tagline-component" data-aos-duration="500" data-aos="fade-right" data-aos-duration="500" data-aos-duration="500">
-      <div class="tagline-overlay" data-aos="zoom-out" data-aos-delay="500">
+    <div class="tagline-component" data-aos-duration="400" data-aos="fade-right" data-aos-duration="800" data-aos-duration="800">
+      <div class="tagline-overlay" data-aos="zoom-in" data-aos-delay="800">
         <h1>SpaceFurnio</h1>
         <p>"Creative Meets Living"</p>
       </div>
@@ -322,9 +351,16 @@
     <div class="new-arrivals">
       <h1>New Arrivals</h1>
       <div class="arrival-gallery">
-        <img src="https://placehold.co/400" alt="Arrival 1" data-aos-duration="500" data-aos="fade-left"/>
-        <img src="https://placehold.co/400" alt="Arrival 2" data-aos-duration="500" data-aos="fade-left"/>
-        <img src="https://placehold.co/400" alt="Arrival 3" data-aos-duration="500" data-aos="fade-left"/>
+        <div class="img-class" data-aos-duration="800" data-aos="fade-left"></div>
+        <div class="img-class" data-aos-duration="800" data-aos="fade-left"></div>
+        <div class="img-class" data-aos-duration="800" data-aos="fade-left"></div>
+        <div class="ctr-newarr">
+          <h1>Design this good doesn't wait <br><a href="#">grab it now</a></h1>
+        </div>
+
+        <!-- <img src="https://placehold.co/400" alt="Arrival 1" data-aos-duration="800" data-aos="fade-left"/>
+        <img src="https://placehold.co/400" alt="Arrival 2" data-aos-duration="800" data-aos="fade-left"/>
+        <img src="https://placehold.co/400" alt="Arrival 3" data-aos-duration="800" data-aos="fade-left"/> -->
       </div>
     </div>
   </section>
