@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpaceFurnio</title>
+  <title>Spacefurnio</title>
 
   <!-- Load Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -28,11 +28,106 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ms+Madi&display=swap"
+    rel="stylesheet">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
 
   <style>
+    @keyframes slide-infinite {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    .animate-slide-infinite {
+      animation: slide-infinite 50s linear infinite;
+    }
+
+    /* Pause animation on hover */
+    .animate-slide-infinite:hover {
+      animation-play-state: paused;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .animate-slide-infinite {
+        animation-duration: 35s;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .animate-slide-infinite {
+        animation-duration: 30s;
+      }
+    }
+
+    /* Enhanced hover effects */
+    .brand-card:hover .brand-icon {
+      animation: pulse 2s infinite;
+      color: #e67e22 !important;
+    }
+
+    .brand-card:hover .brand-name {
+      color: #e67e22 !important;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+      }
+    }
+
+    /* Custom gradient backgrounds */
+    .bg-furniture-gradient {
+      background: linear-gradient(135deg, #fffdf6 0%, #f8f6f0 100%);
+    }
+
+    .stat-card-gradient {
+      background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, rgba(44, 62, 80, 0.1) 100%);
+    }
+  </style>
+
+  <style>
+    @layer utilities {
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+        margin-left: 5%;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 5px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background-color: #eee;
+      }
+
+      .inner-shadow-bottom {
+        box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+      }
+    }
+
     @font-face {
       font-family: 'Phitagate';
       src: url('/assets/fonts/Phitagate.otf') format('opentype');
@@ -67,22 +162,27 @@
     /* Navigation enhancements */
     .menu li {
       position: relative;
-      transition: color 0.2s ease;
     }
 
+    /* hide the default "bar" approach */
     .menu li::after {
       content: "";
       position: absolute;
-      left: 0;
-      bottom: -4px;
-      width: 0%;
-      height: 2px;
-      background-color: #e67e22;
-      transition: width 0.2s ease;
+      left: 50%;
+      bottom: -8px;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background-image: url(/assets/images/nav-img.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
 
+    /* show the image on hover */
     .menu li:hover::after {
-      width: 100%;
+      opacity: 1;
     }
 
     .icons i {
@@ -95,23 +195,28 @@
     }
 
     .tagline-overlay {
+      position: relative;
+      /* establish positioning context */
       background-color: rgba(255, 255, 255, 0.9);
       padding: 1rem 2rem;
       border-radius: 8px;
       text-align: center;
-      z-index: 20;
+      /* remove any z-index here so the ::before can sit behind the bg */
     }
 
+
+
+
     .tagline-overlay h1 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Phitagate';
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
       color: #e67e22;
     }
 
     .tagline-overlay p {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.125rem;
+      font-family: 'Phitagate';
+      font-size: 2.2rem;
       color: #555;
       font-style: italic;
       margin: 0;
@@ -131,10 +236,6 @@
       z-index: 2;
       text-align: center;
       color: #fff;
-    }
-
-    .tagline-overlay h1 {
-      font-family: 'Phitagate';
     }
 
     .img-class {
@@ -271,11 +372,11 @@
     /* For large screens */
     @media (min-width: 1200px) {
       .tagline-overlay h1 {
-        font-size: 3rem;
+        font-size: 5rem;
       }
 
       .tagline-overlay p {
-        font-size: 1.25rem;
+        font-size: 2.25rem;
       }
     }
   </style>
@@ -318,6 +419,155 @@
       height: 20px;
       transition: transform 0.3s ease;
     }
+
+    /* Replace your existing .products-grid block with: */
+    .products-grid {
+      position: sticky;
+      top: 0;
+      height: fit-content;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 2rem;
+      padding-top: 2rem;
+      margin: 0 auto;
+      max-width: 100%;
+      transition: filter 0.8s ease;
+    }
+
+    /* Optional: smooth scroll behavior and hide scrollbar */
+    .products-grid {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      /* Firefox */
+      -ms-overflow-style: none;
+      /* Internet Explorer 10+ */
+    }
+
+    .products-grid::-webkit-scrollbar {
+      display: none;
+      /* Chrome, Safari, Opera */
+    }
+
+    .products-grid::-webkit-scrollbar-thumb {
+      display: none;
+      /* Chrome, Safari, Opera */
+
+    }
+
+    /* To make each card “snap” centrally into view (nice UX): */
+    .product-card {
+      scroll-snap-align: center;
+      flex: 0 0 280px;
+      /* each card takes up at least 280px space */
+      /* if you want them to grow: flex: 0 1 280px; */
+    }
+
+    .product-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.1);
+    }
+
+    .product-info {
+      padding: 1.5rem;
+    }
+
+    .product-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-rating {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .star {
+      color: #ffd700;
+      font-size: 0.9rem;
+    }
+
+    .product-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e67e22;
+    }
+
+    .floating-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 100;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 6rem);
+      font-weight: 700;
+      color: #2c3e50;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(322deg, #415264 0%, #e67e22 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .floating-text.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+    }
+
+    .floating-text.slide-up {
+      transform: translate(-50%, -50%) translateY(-30px);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+      }
+
+      .floating-text {
+        font-size: clamp(2rem, 10vw, 4rem);
+        padding: 0 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    .logo:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: url('/assets/images/spacefurnio-Logo.png') center/contain no-repeat;
+      opacity: 0.2;
+      /* ← your watermark‑opacity (20%) */
+      z-index: -1;
+      /* push it behind the white background */
+    }
   </style>
 </head>
 
@@ -342,29 +592,26 @@
     </div>
   </div>
 
-  <section class="hero grid grid-cols-1 lg:grid-cols-5 mt-2 pb-8 px-4 lg:ps-2 lg:pe-0">
-    <div class="tagline-component lg:col-span-4 relative rounded-xl overflow-hidden" data-aos-duration="400"
-      data-aos="fade-right" style="background-image: url('/assets/images/taglinebg.png'); 
+  <section class="hero grid grid-cols-1 lg:grid-cols-5 mt-2 pb-2 px-4 lg:ps-2 lg:pe-0">
+    <div id="hero-section" class="tagline-component lg:col-span-4 relative rounded-xl overflow-hidden h-[97vh]"
+      data-aos-duration="400" data-aos="fade-right" style="background-image: url('/assets/images/taglinebg.png'); 
                   background-size: cover; 
                   background-position: center; 
                   min-height: 400px;">
-      <nav class="fixed top-0 w-full z-50 py-4 px-4" data-aos-duration="800" data-aos="fade-down">
+      <nav id="navbar" class="fixed top-0 w-full z-50 py-4 px-4" data-aos-duration="800" data-aos="fade-down">
         <div
           class="nav-pill bg-white rounded-full shadow-md mx-auto max-w-6xl px-6 py-2 flex items-center justify-between">
           <div class="nav-left flex items-center gap-3">
-            <div class="brand text-brandPrimary text-xl md:text-2xl font-bold">SpaceFurnio</div>
-            <div class="status-dots flex">
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </div>
-          </div>
+            <img src="/assets/images/Spacefurnio-Logo.png" alt="spacefurnio logo" class="img h-[35px] w-[25px]">
 
-          <ul class="menu hidden md:flex items-center space-x-4 lg:space-x-8 flex-1 justify-center">
+          </div>
+          <ul class="menu hidden md:flex items-center space-x-4 lg:space-x-8 flex-1 justify-center text-sm">
             <li><a href="#home" class="hover:text-brandPrimary transition-colors">Home</a></li>
-            <li><a href="#shop" class="hover:text-brandPrimary transition-colors">Shop</a></li>
-            <li><a href="#products" class="hover:text-brandPrimary transition-colors">Products</a></li>
-            <li><a href="#blog" class="hover:text-brandPrimary transition-colors">Blog</a></li>
-            <li><a href="#featured" class="hover:text-brandPrimary transition-colors">Featured</a></li>
+            <li><a href="#shop" class="hover:text-brandPrimary transition-colors">About Us</a></li>
+            <li><a href="#shop" class="hover:text-brandPrimary transition-colors">SF x Collabs</a></li>
+            <li><a href="#products" class="hover:text-brandPrimary transition-colors">Shopping</a></li>
+            <li><a href="#blog" class="hover:text-brandPrimary transition-colors"> Portfolio</a></li>
+            <li><a href="#featured" class="hover:text-brandPrimary transition-colors">Ongoing Projects</a></li>
           </ul>
 
           <div class="hidden md:block">
@@ -383,30 +630,40 @@
       </nav>
       <div class="relative z-10 w-full h-full flex items-center justify-center p-4">
         <div class="tagline-overlay lg:mb-[125px]" data-aos="zoom-in" data-aos-delay="800">
-          <h1>SpaceFurnio</h1>
+          <h1>Spacefurnio</h1>
           <p>"Creative Meets Living"</p>
         </div>
       </div>
     </div>
 
-    <div class="new-arrivals lg:col-span-1 bg-brandLight rounded-lg p-4 flex flex-col">
-      <h1 class="text-brandSecondary font-bold text-2xl mt-4 mb-4 text-center">New Arrivals</h1>
-      <div class="arrival-gallery flex lg:flex-col items-center gap-4 overflow-x-auto lg:overflow-visible pb-4">
-        <!-- Replace these with your actual furniture images -->
-        <img
-          src="https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
-        <img
-          src="https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="New arrival 2" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
-        <img
-          src="https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="New arrival 3" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+    <div class="new-arrivals lg:col-span-1 bg-brandLight rounded-lg pb-4 px-4 flex flex-col">
+      <h1 class="text-brandSecondary font-bold text-2xl mt-4 mb-4 text-center "
+        style="font-family: Montserrat; font-size:larger">New
+        Arrivals</h1>
+      <div class="arrival-gallery flex lg:flex-col items-center gap-1.5 overflow-x-auto lg:overflow-visible">
+
+        <div
+          class="flex lg:flex-col items-center gap-2 overflow-y-auto lg:overflow-y-scroll h-[68vh] custom-scrollbar inner-shadow-bottom">
+          <!-- Replace these with your actual furniture images -->
+          <img
+            src="https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+          <img
+            src="https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="New arrival 2" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+          <img
+            src="https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="New arrival 3" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+          <img
+            src="https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+        </div>
 
         <div class="ambient-glow"></div>
-        <div class="cta-text text-center mt-6">
-          <p class="text-xl md:text-2xl font-semibold text-brandSecondary tracking-tight mb-3 font-outfit">
-            Design this good doesn't wait —
+        <div class="cta-text text-center">
+          <p class="text-xl md:text-2xl font-semibold font-[inherit] text-brandSecondary tracking-tight font-outfit flex items-center justify-between"
+            style="font-family:Montserrat; font-size:larger;">
+            Design this good<br>doesn't wait
           </p>
           <button class="cta-button group">
             <span>Grab it now!</span>
@@ -422,6 +679,483 @@
     </div>
   </section>
 
+  <!--<section class="slogan-section" style="top: 0;position: sticky;">
+
+    <div id="brand-slogan" class="tagline-component lg:col-span-4 relative rounded-xl overflow-hidden h-[97vh]"
+      data-aos-duration="400" data-aos="fade-right" style="background-image: url('/assets/images/taglinebg.png'); 
+                    background-size: cover; 
+                    background-position: center; 
+                    min-height: 400px;">
+
+    </div>
+  </section>-->
+  <section class="slogan-section">
+    <div id="brand-slogan" class="tagline-component relative rounded-xl overflow-hidden h-[97vh] bg-cover bg-center"
+      style="background-image: url('/assets/images/taglinebg.png');">
+      <!-- Floating Text Elements -->
+      <div id="text-1" class="floating-text" style="z-index: 1000;">Where lines meet light</div>
+      <div id="text-2" class="floating-text" style="z-index: 1000;">and functions meet soul</div>
+      <div id="text-3" class="floating-text" style="z-index: 1000;">you'll find us</div>
+    </div>
+  </section>
+
+  <style>
+    .floating-text {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      font-size: 2rem;
+      color: white;
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #text-1 {
+      top: 30%;
+    }
+
+    #text-2 {
+      top: 45%;
+    }
+
+    #text-3 {
+      top: 60%;
+    }
+
+    .floating-text.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .floating-text.slide-up {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-50px);
+    }
+
+    /* Blur the background when any text is animating */
+    .blurred #brand-slogan {
+      filter: blur(4px);
+      transition: filter 0.3s ease;
+    }
+  </style>
+
+  <script>
+    const sloganSection = document.querySelector('.slogan-section');
+    const brandSlogan = document.getElementById('brand-slogan');
+    const text = [
+      document.getElementById('text-1'),
+      document.getElementById('text-2'),
+      document.getElementById('text-3'),
+    ];
+
+    function updateTextAnimation() {
+      const rect = sloganSection.getBoundingClientRect();
+      const sectionHeight = sloganSection.offsetHeight;
+      const viewportHeight = window.innerHeight;
+
+      // 0→1 scroll progress through the sticky section
+      const scrollProgress = Math.max(
+        0,
+        Math.min(1, -rect.top / (sectionHeight - viewportHeight))
+      );
+
+      // blur when in middle of scroll
+      if (scrollProgress > 0.1 && scrollProgress < 0.9) {
+        sloganSection.classList.add('blurred');
+      } else {
+        sloganSection.classList.remove('blurred');
+      }
+
+      // decide which line to show
+      const breakpoints = [0.2, 0.5, 0.8];
+      let active = -1;
+      for (let i = 0; i < breakpoints.length; i++) {
+        const start = breakpoints[i];
+        const end = breakpoints[i + 1] ?? 1;
+        if (scrollProgress >= start && scrollProgress < end) {
+          active = i;
+          break;
+        }
+      }
+
+      // toggle classes
+      text.forEach((el, idx) => {
+        if (idx === active) {
+          el.classList.add('visible');
+          el.classList.remove('slide-up');
+        } else if (idx < active) {
+          el.classList.remove('visible');
+          el.classList.add('slide-up');
+        } else {
+          el.classList.remove('visible', 'slide-up');
+        }
+      });
+    }
+
+    // throttle via rAF
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateTextAnimation();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', updateTextAnimation);
+  </script>
+
+  <!-- Products Section -->
+  <section id="products" class="products-section">
+    <!-- Floating Text Elements -->
+    <div id="text-1" class="floating-text">Where lines meet light</div>
+    <div id="text-2" class="floating-text">and functions meet soul</div>
+    <div id="text-3" class="floating-text">you'll find us</div>
+
+    <!-- Products Grid -->
+    <div id="products-grid" class="products-grid">
+      <!-- Product 1 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop"
+          alt="Modern Sofa" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Luxurious Modern Sofa</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$899</div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop"
+          alt="Minimalist Chair" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Minimalist Dining Chair</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$249</div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop"
+          alt="Coffee Table" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Scandinavian Coffee Table</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$449</div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop"
+          alt="Floor Lamp" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Designer Floor Lamp</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$199</div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop"
+          alt="Bookshelf" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Modern Bookshelf</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$329</div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop"
+          alt="Side Table" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Elegant Side Table</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$179</div>
+        </div>
+      </div>
+
+      <!-- Product 7 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop"
+          alt="Accent Chair" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Luxury Accent Chair</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$599</div>
+        </div>
+      </div>
+
+      <!-- Product 8 -->
+      <div class="product-card" onclick="selectProduct(this)">
+        <img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop"
+          alt="Ottoman" class="product-image">
+        <div class="product-info">
+          <h3 class="product-title">Contemporary Ottoman</h3>
+          <div class="product-rating">
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+            <span class="star">★</span>
+          </div>
+          <div class="product-price">$149</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="py-16 overflow-hidden">
+    <div class="container mx-auto px-4">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-bold text-brandSecondary mb-6"
+          style="font-family: 'Playfair Display', serif;">
+          Trusted Furniture Partners
+        </h2>
+        <p class="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
+          style="font-family: 'Outfit', sans-serif;">
+          Discover premium furniture from renowned brands that define quality, craftsmanship, and timeless design for
+          your
+          perfect living space
+        </p>
+      </div>
+
+      <!-- Brand Slider Container -->
+      <div class="relative mb-16">
+        <!-- Gradient Overlays for smooth fade effect -->
+        <div class="absolute left-0 top-0 w-24 h-full bg-gradient-to-r from-brandLight to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-brandLight to-transparent z-10"></div>
+
+        <!-- Sliding Track -->
+        <div class="flex animate-slide-infinite">
+          <!-- First set of brands -->
+          <div class="flex items-center justify-center min-w-0 shrink-0" id="brands-container-1">
+            <!-- Brands will be populated by JavaScript -->
+          </div>
+
+          <!-- Duplicate set for seamless loop -->
+          <div class="flex items-center justify-center min-w-0 shrink-0" id="brands-container-2">
+            <!-- Duplicate brands will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div
+          class="text-center p-6 rounded-2xl stat-card-gradient border border-brandPrimary/20 hover:shadow-lg transition-all duration-300">
+          <div class="text-3xl md:text-4xl font-bold text-brandPrimary mb-2"
+            style="font-family: 'Playfair Display', serif;">500+</div>
+          <div class="text-sm md:text-base text-brandSecondary font-medium" style="font-family: 'Outfit', sans-serif;">
+            Happy Customers</div>
+        </div>
+        <div
+          class="text-center p-6 rounded-2xl stat-card-gradient border border-brandPrimary/20 hover:shadow-lg transition-all duration-300">
+          <div class="text-3xl md:text-4xl font-bold text-brandPrimary mb-2"
+            style="font-family: 'Playfair Display', serif;">25+</div>
+          <div class="text-sm md:text-base text-brandSecondary font-medium" style="font-family: 'Outfit', sans-serif;">
+            Premium Brands</div>
+        </div>
+        <div
+          class="text-center p-6 rounded-2xl stat-card-gradient border border-brandPrimary/20 hover:shadow-lg transition-all duration-300">
+          <div class="text-3xl md:text-4xl font-bold text-brandPrimary mb-2"
+            style="font-family: 'Playfair Display', serif;">98%</div>
+          <div class="text-sm md:text-base text-brandSecondary font-medium" style="font-family: 'Outfit', sans-serif;">
+            Satisfaction Rate</div>
+        </div>
+        <div
+          class="text-center p-6 rounded-2xl stat-card-gradient border border-brandPrimary/20 hover:shadow-lg transition-all duration-300">
+          <div class="text-3xl md:text-4xl font-bold text-brandPrimary mb-2"
+            style="font-family: 'Playfair Display', serif;">24/7</div>
+          <div class="text-sm md:text-base text-brandSecondary font-medium" style="font-family: 'Outfit', sans-serif;">
+            Design Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Furniture brand data with appropriate icons and names
+    const furnitureBrands = [
+      {
+        name: "LuxeCraft Living",
+        icon: "fas fa-couch",
+        category: "Premium Sofas"
+      },
+      {
+        name: "Nordic Design Co.",
+        icon: "fas fa-chair",
+        category: "Scandinavian Style"
+      },
+      {
+        name: "Artisan Woodworks",
+        icon: "fas fa-tree",
+        category: "Handcrafted Tables"
+      },
+      {
+        name: "ModernSpace Studios",
+        icon: "fas fa-cube",
+        category: "Contemporary Furniture"
+      },
+      {
+        name: "Heritage Furnishings",
+        icon: "fas fa-home",
+        category: "Classic Designs"
+      },
+      {
+        name: "EcoComfort Solutions",
+        icon: "fas fa-leaf",
+        category: "Sustainable Furniture"
+      },
+      {
+        name: "UrbanLoft Designs",
+        icon: "fas fa-building",
+        category: "City Living"
+      },
+      {
+        name: "Comfort Zone Seating",
+        icon: "fas fa-user-friends",
+        category: "Ergonomic Chairs"
+      },
+      {
+        name: "Illuminate Lighting",
+        icon: "fas fa-lightbulb",
+        category: "Designer Lamps"
+      },
+      {
+        name: "Storage Masters",
+        icon: "fas fa-archive",
+        category: "Organization Solutions"
+      },
+      {
+        name: "DreamRest Beds",
+        icon: "fas fa-bed",
+        category: "Sleep Solutions"
+      },
+      {
+        name: "Kitchen & Dining Co.",
+        icon: "fas fa-utensils",
+        category: "Dining Furniture"
+      }
+    ];
+
+    // Function to create brand card HTML
+    function createBrandCard(brand, index) {
+      return `
+          <div class="mx-6 flex items-center justify-center transform transition-all duration-300 hover:scale-110 hover:shadow-xl brand-card">
+            <div class="bg-white hover:bg-brandLight/80 p-8 rounded-2xl border-2 border-gray-100 hover:border-brandPrimary/30 transition-all duration-300 w-64 h-32 flex items-center justify-center group shadow-lg hover:shadow-2xl">
+              <div class="text-center">
+                <i class="brand-icon ${brand.icon} text-5xl text-brandSecondary group-hover:text-brandPrimary mb-3 transition-all duration-300"></i>
+                <p class="brand-name text-base font-bold text-brandSecondary group-hover:text-brandPrimary transition-colors duration-300 mb-1" style="font-family: 'Outfit', sans-serif;">
+                  ${brand.name}
+                </p>
+                <p class="text-xs text-gray-600 group-hover:text-brandPrimary/80 transition-colors duration-300" style="font-family: 'Outfit', sans-serif;">
+                  ${brand.category}
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    // Populate brand containers
+    function populateBrands() {
+      const container1 = document.getElementById('brands-container-1');
+      const container2 = document.getElementById('brands-container-2');
+
+      let brandsHTML = '';
+      furnitureBrands.forEach((brand, index) => {
+        brandsHTML += createBrandCard(brand, index);
+      });
+
+      container1.innerHTML = brandsHTML;
+      container2.innerHTML = brandsHTML; // Duplicate for seamless loop
+    }
+
+    // Initialize the component when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      populateBrands();
+      console.log('Furniture brands slider initialized');
+    });
+
+    // Add intersection observer for animations (optional enhancement)
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe stats cards for entrance animation
+    document.addEventListener('DOMContentLoaded', function () {
+      const statsCards = document.querySelectorAll('.stat-card-gradient');
+      statsCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(card);
+      });
+    });
+  </script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
@@ -459,7 +1193,183 @@
         navPill.classList.remove('shadow-lg', 'bg-opacity-95');
       }
     });
+
   </script>
+  <!-- product grid rtransition -->
+  <!-- <script>
+    
+      // Products Section Scroll Animation
+      const productsSection = document.querySelector('.products-section');
+      const productsGrid = document.getElementById('products-grid');
+      const text1 = document.getElementById('text-1');
+      const text2 = document.getElementById('text-2');
+      const text3 = document.getElementById('text-3');
+
+      let currentTextIndex = 0;
+      const texts = [text1, text2, text3];
+
+      function updateTextAnimation() {
+        const rect = productsSection.getBoundingClientRect();
+        const sectionHeight = productsSection.offsetHeight;
+        const viewportHeight = window.innerHeight;
+
+        // Calculate scroll progress within the products section
+        const scrollProgress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - viewportHeight)));
+
+        // Apply blur to products grid when text is visible
+        if (scrollProgress > 0.1 && scrollProgress < 0.9) {
+          productsGrid.classList.add('blurred');
+        } else {
+          productsGrid.classList.remove('blurred');
+        }
+
+        // Text animation logic
+        const textTransitionPoints = [0.2, 0.5, 0.8];
+        let newTextIndex = -1;
+
+        for (let i = 0; i < textTransitionPoints.length; i++) {
+          if (scrollProgress >= textTransitionPoints[i] && scrollProgress < (textTransitionPoints[i + 1] || 1)) {
+            newTextIndex = i;
+            break;
+          }
+        }
+
+        // Update text visibility
+        texts.forEach((text, index) => {
+          if (index === newTextIndex) {
+            text.classList.add('visible');
+            text.classList.remove('slide-up');
+          } else if (index < newTextIndex) {
+            text.classList.remove('visible');
+            text.classList.add('slide-up');
+          } else {
+            text.classList.remove('visible', 'slide-up');
+          }
+        });
+
+        currentTextIndex = newTextIndex;
+      }
+
+      // Smooth scroll handling with throttling
+      let ticking = false;
+      function handleScroll(e) {
+        e.preventDefault()
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            updateTextAnimation();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', handleScroll);
+
+      // Product selection functionality
+      function selectProduct(card) {
+        // Remove previous selection
+        document.querySelectorAll('.product-card').forEach(c => {
+          c.classList.remove('selected');
+        });
+
+        // Add selection to clicked card
+        card.classList.add('selected');
+
+        // Add a subtle pulse effect
+        card.style.transform = 'translateY(-10px) scale(1.05)';
+        setTimeout(() => {
+          card.style.transform = '';
+        }, 200);
+
+        // You can add more functionality here like opening a modal, etc.
+        console.log('Product selected:', card.querySelector('.product-title').textContent);
+      }
+
+      // Enhanced hover effects for product cards
+      document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          // Remove blur from this specific card when hovered
+          card.style.filter = 'blur(0px)';
+          card.style.zIndex = '20';
+        });
+
+        card.addEventListener('mouseleave', () => {
+          // Reset filter and z-index
+          card.style.filter = '';
+          card.style.zIndex = '';
+        });
+      });
+
+      // Initialize on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        updateTextAnimation();
+      });
+
+  </script> -->
+
+  <script>
+    let triggeredDown = false;
+    let triggeredUp = false;
+    let isFirst = true;
+    const navbar = document.getElementById('navbar');
+    const hero = document.getElementById('hero-section');
+    function navtosection() {
+
+      hero.prepend(navbar); // Move one at a time
+    }
+    function navtobody() {
+      document.body.prepend(navbar); // Move one at a time
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const triggerPoint = window.innerHeight * 0.2;
+
+      // When scroll reaches or passes 20%
+      if (scrollY >= triggerPoint && !triggeredDown) {
+        navtobody()
+        console.log('Scrolled 20% of screen');
+        // call your scroll-down function here
+        triggeredDown = true;
+        triggeredUp = false;
+      }
+
+      // When scroll goes back to top (below 20%)
+      if (scrollY < triggerPoint && !triggeredUp) {
+        if (isFirst !== true) {
+          navtosection();
+          console.log('Scrolled back to top (less than 20%)');
+          // call your scroll-up function here
+          triggeredUp = true;
+          triggeredDown = false;
+        } else isFirst = false;
+      }
+    });
+
+  </script>
+
+  <!-- product grid -->
+  <script>
+    const container = document.querySelector('#products-grid');
+
+    // Clone all cards for seamless loop
+    container.innerHTML += container.innerHTML;
+
+    let scrollAmount = 0;
+    const speed = 1; // Adjust for faster/slower scroll
+
+    function autoScroll() {
+      scrollAmount += speed;
+      if (scrollAmount >= container.scrollWidth / 2) {
+        scrollAmount = 0; // reset without jump
+      }
+      container.scrollLeft = scrollAmount;
+    }
+
+    setInterval(autoScroll, 2.0);
+
+  </script>
+
 </body>
 
 </html>
