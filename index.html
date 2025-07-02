@@ -710,46 +710,59 @@
     </div>
 
     <div class="new-arrivals lg:col-span-1 bg-brandLight rounded-lg pb-4 px-4 flex flex-col">
-      <h1 class="text-brandSecondary font-bold text-2xl mt-4 mb-4 text-center "
-        style="font-family: Montserrat; font-size:larger">New
-        Arrivals</h1>
-      <div class="arrival-gallery flex lg:flex-col items-center gap-1.5 overflow-x-auto lg:overflow-visible">
+      <h1 class="text-brandSecondary font-bold text-2xl mt-4 mb-4 text-center"
+        style="font-family: Montserrat; font-size: larger">
+        New Arrivals
+      </h1>
 
+      <!-- gallery wrapper: row on small, col on lg+ -->
+      <div
+        class="arrival-gallery flex flex-row lg:flex-col items-start lg:items-center gap-1.5 overflow-x-auto lg:overflow-visible">
+
+        <!-- images container: row on small, col + fixed height + vertical scroll on lg+ -->
         <div
-          class="flex lg:flex-col items-center gap-2 overflow-y-auto lg:overflow-y-scroll h-[68vh] custom-scrollbar inner-shadow-bottom">
+          class="flex flex-row lg:flex-col items-center gap-2 w-max lg:w-auto lg:h-[68vh] overflow-x-auto lg:overflow-y-scroll custom-scrollbar inner-shadow-bottom">
           <!-- Replace these with your actual furniture images -->
           <img
             src="https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+            alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left" />
           <img
             src="https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="New arrival 2" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+            alt="New arrival 2" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left" />
           <img
             src="https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="New arrival 3" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+            alt="New arrival 3" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left" />
           <img
             src="https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="New arrival 1" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left">
+            alt="New arrival 4" class="img-class object-cover" data-aos-duration="800" data-aos="fade-left" />
         </div>
 
         <div class="ambient-glow"></div>
+
         <div class="cta-text text-center">
           <p class="text-xl md:text-2xl font-semibold font-[inherit] text-brandSecondary tracking-tight font-outfit flex items-center justify-between"
-            style="font-family:Montserrat; font-size:larger;">
-            Design this good<br>doesn't wait
+            style="font-family: Montserrat; font-size: larger;">
+            Design this good<br />doesn't wait
           </p>
-          <button class="cta-button group">
+          <button class="cta-button group
+                   w-full sm:w-auto            /* full width on xs, auto on sm+ */
+                   px-4 sm:px-6                /* smaller padding on xs */
+                   py-3
+                   text-base md:text-lg        /* base text on xs, larger on md+ */
+                   inline-flex items-center justify-center">
             <span>Grab it now!</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="cta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              class="ml-2 w-5 h-5 sm:w-6 sm:h-6 transition-transform transform group-hover:translate-x-1">
               <path fill="currentColor"
                 d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" />
             </svg>
           </button>
+
         </div>
 
       </div>
     </div>
-    </div>
+
   </section>
 
   <section id="products" class="products-section">
