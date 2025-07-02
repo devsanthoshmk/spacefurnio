@@ -679,135 +679,22 @@
     </div>
   </section>
 
-  <!--<section class="slogan-section" style="top: 0;position: sticky;">
-
-    <div id="brand-slogan" class="tagline-component lg:col-span-4 relative rounded-xl overflow-hidden h-[97vh]"
-      data-aos-duration="400" data-aos="fade-right" style="background-image: url('/assets/images/taglinebg.png'); 
-                    background-size: cover; 
-                    background-position: center; 
-                    min-height: 400px;">
-
-    </div>
-  </section>-->
   <section class="slogan-section">
-    <div id="brand-slogan" class="tagline-component relative rounded-xl overflow-hidden h-[97vh] bg-cover bg-center"
-      style="background-image: url('/assets/images/taglinebg.png');">
+    <div class="tagline-component relative rounded-xl overflow-hidden h-[97vh] bg-cover bg-center"
+      style="background-image: url('/assets/images/taglinebg.png'); top: 0;position: sticky;">
       <!-- Floating Text Elements -->
-      <div id="text-1" class="floating-text" style="z-index: 1000;">Where lines meet light</div>
       <div id="text-2" class="floating-text" style="z-index: 1000;">and functions meet soul</div>
       <div id="text-3" class="floating-text" style="z-index: 1000;">you'll find us</div>
     </div>
+
+    <div class="tagline-component relative rounded-xl overflow-hidden h-[97vh] bg-cover bg-center"
+      style="; top: 0;position: sticky;">
+      <div id="text-1" class="floating-text" style="z-index: 1000;">Where lines meet light</div>
+    </div>
   </section>
 
-  <style>
-    .floating-text {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      font-size: 2rem;
-      color: white;
-      opacity: 0;
-      transition: transform 0.6s ease, opacity 0.6s ease;
-      pointer-events: none;
-      white-space: nowrap;
-    }
 
-    #text-1 {
-      top: 30%;
-    }
 
-    #text-2 {
-      top: 45%;
-    }
-
-    #text-3 {
-      top: 60%;
-    }
-
-    .floating-text.visible {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .floating-text.slide-up {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-50px);
-    }
-
-    /* Blur the background when any text is animating */
-    .blurred #brand-slogan {
-      filter: blur(4px);
-      transition: filter 0.3s ease;
-    }
-  </style>
-
-  <script>
-    const sloganSection = document.querySelector('.slogan-section');
-    const brandSlogan = document.getElementById('brand-slogan');
-    const text = [
-      document.getElementById('text-1'),
-      document.getElementById('text-2'),
-      document.getElementById('text-3'),
-    ];
-
-    function updateTextAnimation() {
-      const rect = sloganSection.getBoundingClientRect();
-      const sectionHeight = sloganSection.offsetHeight;
-      const viewportHeight = window.innerHeight;
-
-      // 0→1 scroll progress through the sticky section
-      const scrollProgress = Math.max(
-        0,
-        Math.min(1, -rect.top / (sectionHeight - viewportHeight))
-      );
-
-      // blur when in middle of scroll
-      if (scrollProgress > 0.1 && scrollProgress < 0.9) {
-        sloganSection.classList.add('blurred');
-      } else {
-        sloganSection.classList.remove('blurred');
-      }
-
-      // decide which line to show
-      const breakpoints = [0.2, 0.5, 0.8];
-      let active = -1;
-      for (let i = 0; i < breakpoints.length; i++) {
-        const start = breakpoints[i];
-        const end = breakpoints[i + 1] ?? 1;
-        if (scrollProgress >= start && scrollProgress < end) {
-          active = i;
-          break;
-        }
-      }
-
-      // toggle classes
-      text.forEach((el, idx) => {
-        if (idx === active) {
-          el.classList.add('visible');
-          el.classList.remove('slide-up');
-        } else if (idx < active) {
-          el.classList.remove('visible');
-          el.classList.add('slide-up');
-        } else {
-          el.classList.remove('visible', 'slide-up');
-        }
-      });
-    }
-
-    // throttle via rAF
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateTextAnimation();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', updateTextAnimation);
-  </script>
 
   <!-- Products Section -->
   <section id="products" class="products-section">
@@ -1195,7 +1082,7 @@
     });
 
   </script>
-  <!-- product grid rtransition -->
+  <!-- product grid transition -->
   <!-- <script>
     
       // Products Section Scroll Animation
@@ -1305,7 +1192,75 @@
         updateTextAnimation();
       });
 
-  </script> -->
+  </script> 
+  <script>
+      const sloganSection = document.querySelector('.slogan-section');
+      const brandSlogan = document.getElementById('brand-slogan');
+      const text = [
+        document.getElementById('text-1'),
+        document.getElementById('text-2'),
+        document.getElementById('text-3'),
+      ];
+  
+      function updateTextAnimation() {
+        const rect = sloganSection.getBoundingClientRect();
+        const sectionHeight = sloganSection.offsetHeight;
+        const viewportHeight = window.innerHeight;
+  
+        // 0→1 scroll progress through the sticky section
+        const scrollProgress = Math.max(
+          0,
+          Math.min(1, -rect.top / (sectionHeight - viewportHeight))
+        );
+  
+        // blur when in middle of scroll
+        if (scrollProgress > 0.1 && scrollProgress < 0.9) {
+          sloganSection.classList.add('blurred');
+        } else {
+          sloganSection.classList.remove('blurred');
+        }
+  
+        // decide which line to show
+        const breakpoints = [0.2, 0.5, 0.8];
+        let active = -1;
+        for (let i = 0; i < breakpoints.length; i++) {
+          const start = breakpoints[i];
+          const end = breakpoints[i + 1] ?? 1;
+          if (scrollProgress >= start && scrollProgress < end) {
+            active = i;
+            break;
+          }
+        }
+  
+        // toggle classes
+        text.forEach((el, idx) => {
+          if (idx === active) {
+            el.classList.add('visible');
+            el.classList.remove('slide-up');
+          } else if (idx < active) {
+            el.classList.remove('visible');
+            el.classList.add('slide-up');
+          } else {
+            el.classList.remove('visible', 'slide-up');
+          }
+        });
+      }
+  
+      // throttle via rAF
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            updateTextAnimation();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+  
+      document.addEventListener('DOMContentLoaded', updateTextAnimation);
+    </script>
+  -->
 
   <script>
     let triggeredDown = false;
@@ -1369,6 +1324,8 @@
     setInterval(autoScroll, 2.0);
 
   </script>
+
+  <!-- slogan vertical sliding -->
 
 </body>
 
