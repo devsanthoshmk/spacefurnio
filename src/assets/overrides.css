@@ -1,0 +1,12 @@
+:root {
+  /* your carrot-orange base */
+  --primary-color: #e67e22;
+  /* hover / active states: slightly darker */
+  --primary-color-hover: #cc6c1d;
+  /* text on primary: white for contrast */
+  --primary-color-text: #ffffff;
+
+  /* if you see other primaries in the theme, override too */
+  --primary-light: #f3904c; /* lighter shade */
+  --primary-dark: #b85e17; /* darker shade */
+}
