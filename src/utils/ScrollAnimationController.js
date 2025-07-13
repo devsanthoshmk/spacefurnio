@@ -13,9 +13,9 @@ export default class ScrollAnimationController {
 
     // Using your actual images
     this.images = [
-      '/public/images/linemeetslight.png',
-      '/public/images/functionmeetsoul.png',
-      '/public/images/taglinebg.png',
+      '/images/linemeetslight.png',
+      '/images/functionmeetsoul.png',
+      '/images/taglinebg.png',
     ]
 
     this.currentImageIndex = 0

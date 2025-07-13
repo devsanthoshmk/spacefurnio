@@ -54,7 +54,7 @@ const handleGrabNow = () => {
         ref="heroRef"
         class="lg:col-span-4 relative rounded-xl overflow-hidden h-[98vh]"
         :style="{
-          backgroundImage: `url('/public/images/taglinebg.png')`,
+          backgroundImage: `url('/images/taglinebg.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }"
@@ -188,7 +188,7 @@ const handleGrabNow = () => {
 <style scoped>
 @font-face {
   font-family: 'Phitagate';
-  src: url('/public/fonts/Phitagate.otf') format('opentype');
+  src: url('/fonts/Phitagate.otf') format('opentype');
 }
 
 .phitagate-font {
