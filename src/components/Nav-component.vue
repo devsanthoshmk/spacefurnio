@@ -3,11 +3,11 @@
     <div class="nav-pill bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg mx-auto max-w-5xl px-8 py-3 flex items-center justify-between">
 
       <div class="nav-left flex items-center me-2">
-        <img src="/images/Spacefurnio-Logo.png" alt="spacefurnio logo" class="h-8 w-6 object-contain">
+        <img src="/images/Spacefurnio-Logo.png" alt="spacefurnio logo" class="h-9 w-7 object-contain">
       </div>
 
       <!-- Desktop Menu - Centered -->
-      <ul class="menu hidden md:flex items-center flex-1 justify-center text-xs font-medium tracking-wide">
+      <ul class="menu hidden md:flex items-center flex-1 justify-center text-sm font-medium tracking-wide">
         <li>
           <router-link to="/" class="nav-link flex text-center
  relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
