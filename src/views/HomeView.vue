@@ -70,10 +70,10 @@ const handleGrabNow = () => {
         <div class="relative z-20 w-full h-full flex items-center justify-center p-4">
           <div
             ref="taglineRef"
-            class="text-center lg:mb-32"
+            class="text-center lg:mb-55"
             v-animateonscroll="{ enterClass: 'animate-zoomin', leaveClass: 'animate-zoomout', delay: 600 }"
           >
-            <h1 class="phitagate-font text-[clamp(2.5rem,14vw,7rem)] font-bold text-white mb-4 drop-shadow-2xl">
+            <h1 class="phitagate-font text-[clamp(2.5rem,14vw,7rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl">
               Spacefurnio
             </h1>
             <p class="phitagate-font text-[clamp(1.25rem,3vw,2rem)] text-white italic drop-shadow-xl">
