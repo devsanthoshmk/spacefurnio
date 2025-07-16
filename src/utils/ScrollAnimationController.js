@@ -12,11 +12,7 @@ export default class ScrollAnimationController {
     this.fadeOverlay = el.querySelector('#fade-overlay')
 
     // Using your actual images
-    this.images = [
-      '/images/linemeetslight.png',
-      '/images/functionmeetsoul.png',
-      '/images/taglinebg.png',
-    ]
+    this.images = ['/images/linemeetslight.png', '/images/functionmeetsoul.png', '/images/f2.png']
 
     this.currentImageIndex = 0
     this.currentLayerIndex = 0
