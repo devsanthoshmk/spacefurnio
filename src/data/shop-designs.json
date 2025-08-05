@@ -1,0 +1,146 @@
+{
+  "spaceSpecific": [
+    {
+      "id": 1,
+      "name": "Foyer",
+      "slug": "foyer",
+      "type": "space",
+      "description": "Create a welcoming entryway that sets the tone for your home."
+    },
+    {
+      "id": 2,
+      "name": "Living",
+      "slug": "living",
+      "type": "space",
+      "description": "Design the perfect living room for relaxation and entertainment."
+    },
+    {
+      "id": 3,
+      "name": "Dining",
+      "slug": "dining",
+      "type": "space",
+      "description": "Craft a stylish dining area for memorable meals and gatherings."
+    },
+    {
+      "id": 4,
+      "name": "Kitchen",
+      "slug": "kitchen",
+      "type": "space",
+      "description": "Build a functional and beautiful kitchen for culinary adventures."
+    },
+    {
+      "id": 5,
+      "name": "Home office",
+      "slug": "home-office",
+      "type": "space",
+      "description": "Set up a productive workspace that inspires focus and creativity."
+    },
+    {
+      "id": 6,
+      "name": "Bedroom",
+      "slug": "bedroom",
+      "type": "space",
+      "description": "Transform your bedroom into a peaceful sanctuary for rest."
+    },
+    {
+      "id": 7,
+      "name": "Bathroom",
+      "slug": "bathroom",
+      "type": "space",
+      "description": "Design a spa-like bathroom for relaxation and rejuvenation."
+    },
+    {
+      "id": 8,
+      "name": "Balcony",
+      "slug": "balcony",
+      "type": "space",
+      "description": "Create an inviting outdoor nook for fresh air and views."
+    },
+    {
+      "id": 9,
+      "name": "Lounge",
+      "slug": "lounge",
+      "type": "space",
+      "description": "Style a cozy lounge area perfect for unwinding and socializing."
+    },
+    {
+      "id": 10,
+      "name": "Poolside",
+      "slug": "poolside",
+      "type": "space",
+      "description": "Design a stylish poolside retreat for sun, swim, and fun."
+    }
+  ],
+  "styleSpecific": [
+    {
+      "id": 11,
+      "name": "Brutalist",
+      "slug": "brutalist",
+      "type": "style",
+      "description": "Explore stark forms, raw materials, and bold architectural statements."
+    },
+    {
+      "id": 12,
+      "name": "Minimalist",
+      "slug": "minimalist",
+      "type": "style",
+      "description": "Embrace simple forms, uncluttered spaces, and a ‘less is more’ ethos."
+    },
+    {
+      "id": 13,
+      "name": "Sustainable",
+      "slug": "sustainable",
+      "type": "style",
+      "description": "Discover eco-friendly materials and energy-efficient design solutions."
+    },
+    {
+      "id": 14,
+      "name": "Parametric",
+      "slug": "parametric",
+      "type": "style",
+      "description": "Leverage algorithmic shapes and fluid geometries for cutting-edge spaces."
+    },
+    {
+      "id": 15,
+      "name": "Wabi sabi",
+      "slug": "wabi-sabi",
+      "type": "style",
+      "description": "Celebrate imperfection, natural textures, and organic simplicity."
+    },
+    {
+      "id": 16,
+      "name": "Traditional",
+      "slug": "traditional",
+      "type": "style",
+      "description": "Honor classic motifs, ornate details, and time-tested craftsmanship."
+    },
+    {
+      "id": 17,
+      "name": "Vintage/Retro",
+      "slug": "vintage-retro",
+      "type": "style",
+      "description": "Mix nostalgic pieces and period-inspired accents for a timeless vibe."
+    },
+    {
+      "id": 18,
+      "name": "Victorian",
+      "slug": "victorian",
+      "type": "style",
+      "description": "Indulge in opulent fabrics, intricate moldings, and historic elegance."
+    },
+    {
+      "id": 19,
+      "name": "Japandi",
+      "slug": "japandi",
+      "type": "style",
+      "description": "Blend Japanese minimalism with Scandinavian warmth and function."
+    },
+    {
+      "id": 20,
+      "name": "Moroccan",
+      "slug": "moroccan",
+      "type": "style",
+      "description": "Incorporate vibrant colors, geometric patterns, and exotic textures."
+    }
+  ]
+}

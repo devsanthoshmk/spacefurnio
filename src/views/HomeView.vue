@@ -191,14 +191,6 @@ const handleGrabNow = () => {
 </template>
 
 <style scoped>
-@font-face {
-  font-family: 'Phitagate';
-  src: url('/fonts/Phitagate.otf') format('opentype');
-}
-
-.phitagate-font {
-  font-family: 'Phitagate', serif;
-}
 
 /* Custom scrollbar for desktop */
 .custom-scrollbar::-webkit-scrollbar {

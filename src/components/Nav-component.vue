@@ -27,7 +27,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/shopping" class="nav-link flex text-center
+          <router-link to="/shop" class="nav-link flex text-center
  relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
             Shopping
           </router-link>

@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router';
 import { ref, onMounted, onUnmounted } from 'vue';
 import NavComponent from './components/Nav-component.vue';
+import FooterComponent from './components/Footer-component.vue';
 
 
 const showNav = ref(false);
@@ -32,6 +33,10 @@ onUnmounted(() => {
   <main>
     <RouterView />
   </main>
+
+  <footer>
+    <FooterComponent />
+  </footer>
 
 </template>
 

@@ -254,14 +254,9 @@
       />
     </div>
   </div>
-
-  <section>
-    <FooterComponent />
-  </section>
 </template>
 
 <script setup>
-import FooterComponent from '@/components/Footer-component.vue'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 
