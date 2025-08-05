@@ -82,66 +82,60 @@ const router = useRouter()
 const route = useRoute()
 
 // Reactive state
-const activeTab = ref('category')
+const activeTab     = ref('category')
 const categoryItems = ref([])
-const designItems = ref([])
-const loading = ref(false)
-const error = ref('')
+const designItems   = ref([])
+const loading       = ref(false)
+const error         = ref('')
 
 // Initialize active tab from route
 const initializeTab = () => {
-  if (route.path.includes('/design')) {
-    activeTab.value = 'design'
-  } else {
-    activeTab.value = 'category'
-  }
+  activeTab.value = route.path.includes('/design') ? 'design' : 'category'
 }
 
 // Switch between tabs
 const switchTab = (tab) => {
   if (activeTab.value === tab) return
-
   activeTab.value = tab
-  const newPath = `/shop/${tab}`
-  router.push(newPath)
+  router.push(`/shop/${tab}`)
 }
 
-// Load data
+// Load data via fetch from public/data/
 const loadData = async () => {
   loading.value = true
   error.value = ''
 
   try {
-       // Dynamically import JSON files at runtime
-    const [categoryModule, designModule] = await Promise.all([
-      import('@/data/shop-categories.json'),
-      import('@/data/shop-designs.json')
+    const [catRes, desRes] = await Promise.all([
+      fetch('/data/shop-categories.json'),
+      fetch('/data/shop-designs.json'),
     ])
 
-    // Access the default export from modules
-    categoryItems.value = categoryModule.default
-    designItems.value = designModule.default
+    if (!catRes.ok) throw new Error(`Failed to load categories (${catRes.status})`)
+    if (!desRes.ok) throw new Error(`Failed to load designs (${desRes.status})`)
 
-  } catch (err) {
+    categoryItems.value = await catRes.json()
+    designItems.value   = await desRes.json()
+  }
+  catch (err) {
     error.value = err.message
-    console.error('Error loading shop data:', err, categoryItems.value, designItems.value)
-  } finally {
+    console.error('Error loading shop data:', err)
+  }
+  finally {
     loading.value = false
   }
 }
 
-// Animation handlers
+// Animation handlers (unchanged)
 const onEnter = (el) => {
   el.style.opacity = '0'
   el.style.transform = 'translateY(20px)'
-
   requestAnimationFrame(() => {
     el.style.transition = 'all 0.4s ease-out'
     el.style.opacity = '1'
     el.style.transform = 'translateY(0)'
   })
 }
-
 const onLeave = (el) => {
   el.style.transition = 'all 0.3s ease-in'
   el.style.opacity = '0'
@@ -149,9 +143,7 @@ const onLeave = (el) => {
 }
 
 // Watch route changes
-watch(() => route.path, () => {
-  initializeTab()
-})
+watch(() => route.path, initializeTab)
 
 // Initialize on mount
 onMounted(() => {
@@ -159,6 +151,7 @@ onMounted(() => {
   loadData()
 })
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');

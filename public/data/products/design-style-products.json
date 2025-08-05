@@ -7,14 +7,17 @@
     "style": "brutalist",
     "room": "Living Room",
     "material": "Concrete",
-    "colors": ["Gray", "Charcoal"],
+    "colors": [
+      "Gray",
+      "Charcoal"
+    ],
     "rating": 4.3,
     "reviews": 76,
     "popularity": 82,
     "createdAt": "2024-01-20",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Raw concrete block coffee table",
-    "href": "#"
+    "href": "./201"
   },
   {
     "id": 202,
@@ -24,14 +27,17 @@
     "style": "brutalist",
     "room": "Study",
     "material": "Steel & Wood",
-    "colors": ["Black Steel", "Raw Steel"],
+    "colors": [
+      "Black Steel",
+      "Raw Steel"
+    ],
     "rating": 4.5,
     "reviews": 123,
     "popularity": 89,
     "createdAt": "2024-02-01",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Brutalist steel frame bookshelf",
-    "href": "#"
+    "href": "./202"
   },
   {
     "id": 203,
@@ -41,14 +47,17 @@
     "style": "minimalist",
     "room": "Dining Room",
     "material": "White Oak",
-    "colors": ["Natural", "White Stain"],
+    "colors": [
+      "Natural",
+      "White Stain"
+    ],
     "rating": 4.7,
     "reviews": 189,
     "popularity": 95,
     "createdAt": "2024-01-15",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Minimalist oak dining table",
-    "href": "#"
+    "href": "./203"
   },
   {
     "id": 204,
@@ -58,14 +67,17 @@
     "style": "minimalist",
     "room": "Bedroom",
     "material": "Plywood",
-    "colors": ["Natural", "White"],
+    "colors": [
+      "Natural",
+      "White"
+    ],
     "rating": 4.2,
     "reviews": 145,
     "popularity": 78,
     "createdAt": "2024-02-08",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Clean minimalist storage bench",
-    "href": "#"
+    "href": "./204"
   },
   {
     "id": 205,
@@ -75,14 +87,17 @@
     "style": "sustainable",
     "room": "Living Room",
     "material": "Reclaimed Wood",
-    "colors": ["Natural Reclaimed", "Weathered Gray"],
+    "colors": [
+      "Natural Reclaimed",
+      "Weathered Gray"
+    ],
     "rating": 4.6,
     "reviews": 167,
     "popularity": 91,
     "createdAt": "2024-01-28",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Sustainable reclaimed wood console",
-    "href": "#"
+    "href": "./205"
   },
   {
     "id": 206,
@@ -92,14 +107,16 @@
     "style": "sustainable",
     "room": "Home Office",
     "material": "Bamboo",
-    "colors": ["Natural Bamboo"],
+    "colors": [
+      "Natural Bamboo"
+    ],
     "rating": 4.4,
     "reviews": 234,
     "popularity": 86,
     "createdAt": "2024-02-12",
     "imageSrc": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop",
     "imageAlt": "Eco-friendly bamboo desk organizer",
-    "href": "#"
+    "href": "./206"
   },
   {
     "id": 207,
@@ -109,14 +126,18 @@
     "style": "parametric",
     "room": "Living Room",
     "material": "3D Printed Polymer",
-    "colors": ["White", "Black", "Metallic"],
+    "colors": [
+      "White",
+      "Black",
+      "Metallic"
+    ],
     "rating": 4.1,
     "reviews": 45,
     "popularity": 73,
     "createdAt": "2024-01-25",
     "imageSrc": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=500&fit=crop",
     "imageAlt": "Parametric algorithmic wall sculpture",
-    "href": "#"
+    "href": "./207"
   },
   {
     "id": 208,
@@ -126,14 +147,18 @@
     "style": "parametric",
     "room": "Open Space",
     "material": "Metal",
-    "colors": ["White", "Gold", "Black"],
+    "colors": [
+      "White",
+      "Gold",
+      "Black"
+    ],
     "rating": 4.3,
     "reviews": 67,
     "popularity": 79,
     "createdAt": "2024-02-05",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Parametric geometric room divider",
-    "href": "#"
+    "href": "./208"
   },
   {
     "id": 209,
@@ -143,14 +168,17 @@
     "style": "wabi-sabi",
     "room": "Any Room",
     "material": "Stoneware",
-    "colors": ["Earth Tone", "Matte Black"],
+    "colors": [
+      "Earth Tone",
+      "Matte Black"
+    ],
     "rating": 4.5,
     "reviews": 198,
     "popularity": 88,
     "createdAt": "2024-01-18",
     "imageSrc": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop",
     "imageAlt": "Handmade imperfect ceramic vase",
-    "href": "#"
+    "href": "./209"
   },
   {
     "id": 210,
@@ -160,14 +188,16 @@
     "style": "wabi-sabi",
     "room": "Any Room",
     "material": "Aged Wood",
-    "colors": ["Natural Weathered"],
+    "colors": [
+      "Natural Weathered"
+    ],
     "rating": 4.2,
     "reviews": 112,
     "popularity": 75,
     "createdAt": "2024-02-14",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Rustic weathered wood stool",
-    "href": "#"
+    "href": "./210"
   },
   {
     "id": 211,
@@ -177,14 +207,17 @@
     "style": "traditional",
     "room": "Living Room",
     "material": "Mahogany",
-    "colors": ["Rich Mahogany", "Cherry"],
+    "colors": [
+      "Rich Mahogany",
+      "Cherry"
+    ],
     "rating": 4.8,
     "reviews": 89,
     "popularity": 94,
     "createdAt": "2024-01-12",
     "imageSrc": "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500&h=500&fit=crop",
     "imageAlt": "Traditional ornate wooden armchair",
-    "href": "#"
+    "href": "./211"
   },
   {
     "id": 212,
@@ -194,14 +227,17 @@
     "style": "traditional",
     "room": "Living Room",
     "material": "Wool",
-    "colors": ["Red & Gold", "Blue & Cream"],
+    "colors": [
+      "Red & Gold",
+      "Blue & Cream"
+    ],
     "rating": 4.6,
     "reviews": 156,
     "popularity": 87,
     "createdAt": "2024-02-03",
     "imageSrc": "https://images.unsplash.com/photo-1586227740560-8cf2732c1531?w=500&h=500&fit=crop",
     "imageAlt": "Traditional Persian-style area rug",
-    "href": "#"
+    "href": "./212"
   },
   {
     "id": 213,
@@ -211,14 +247,17 @@
     "style": "vintage-retro",
     "room": "Dining Room",
     "material": "Brass & Glass",
-    "colors": ["Brass", "Chrome"],
+    "colors": [
+      "Brass",
+      "Chrome"
+    ],
     "rating": 4.4,
     "reviews": 134,
     "popularity": 83,
     "createdAt": "2024-01-30",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Mid-century modern bar cart",
-    "href": "#"
+    "href": "./213"
   },
   {
     "id": 214,
@@ -228,14 +267,17 @@
     "style": "vintage-retro",
     "room": "Living Room",
     "material": "Metal & Mirror",
-    "colors": ["Gold", "Bronze"],
+    "colors": [
+      "Gold",
+      "Bronze"
+    ],
     "rating": 4.3,
     "reviews": 178,
     "popularity": 81,
     "createdAt": "2024-02-09",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Vintage sunburst wall mirror",
-    "href": "#"
+    "href": "./214"
   },
   {
     "id": 215,
@@ -245,14 +287,18 @@
     "style": "victorian",
     "room": "Living Room",
     "material": "Velvet & Carved Wood",
-    "colors": ["Burgundy", "Forest Green", "Navy"],
+    "colors": [
+      "Burgundy",
+      "Forest Green",
+      "Navy"
+    ],
     "rating": 4.7,
     "reviews": 67,
     "popularity": 92,
     "createdAt": "2024-01-22",
     "imageSrc": "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=500&h=500&fit=crop",
     "imageAlt": "Elegant Victorian velvet sofa",
-    "href": "#"
+    "href": "./215"
   },
   {
     "id": 216,
@@ -262,14 +308,16 @@
     "style": "victorian",
     "room": "Bedroom",
     "material": "Carved Wood & Gold Leaf",
-    "colors": ["Antique Gold"],
+    "colors": [
+      "Antique Gold"
+    ],
     "rating": 4.5,
     "reviews": 89,
     "popularity": 78,
     "createdAt": "2024-02-07",
     "imageSrc": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
     "imageAlt": "Victorian ornate gilded mirror",
-    "href": "#"
+    "href": "./216"
   },
   {
     "id": 217,
@@ -279,14 +327,17 @@
     "style": "japandi",
     "room": "Bedroom",
     "material": "Oak & Linen",
-    "colors": ["Natural Oak", "White Oak"],
+    "colors": [
+      "Natural Oak",
+      "White Oak"
+    ],
     "rating": 4.6,
     "reviews": 203,
     "popularity": 93,
     "createdAt": "2024-01-15",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Japandi style platform bed",
-    "href": "#"
+    "href": "./217"
   },
   {
     "id": 218,
@@ -296,14 +347,17 @@
     "style": "japandi",
     "room": "Living Room",
     "material": "Ash Wood",
-    "colors": ["Natural Ash", "White Stain"],
+    "colors": [
+      "Natural Ash",
+      "White Stain"
+    ],
     "rating": 4.4,
     "reviews": 167,
     "popularity": 85,
     "createdAt": "2024-02-11",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Simple Japanese-inspired tea table",
-    "href": "#"
+    "href": "./218"
   },
   {
     "id": 219,
@@ -313,14 +367,18 @@
     "style": "moroccan",
     "room": "Living Room",
     "material": "Leather",
-    "colors": ["Tan", "Black", "Burgundy"],
+    "colors": [
+      "Tan",
+      "Black",
+      "Burgundy"
+    ],
     "rating": 4.3,
     "reviews": 245,
     "popularity": 87,
     "createdAt": "2024-01-28",
     "imageSrc": "https://images.unsplash.com/photo-1586227740560-8cf2732c1531?w=500&h=500&fit=crop",
     "imageAlt": "Handcrafted Moroccan leather pouf",
-    "href": "#"
+    "href": "./219"
   },
   {
     "id": 220,
@@ -330,13 +388,16 @@
     "style": "moroccan",
     "room": "Living Room",
     "material": "Ceramic Tile & Metal",
-    "colors": ["Blue & White", "Black & Gold"],
+    "colors": [
+      "Blue & White",
+      "Black & Gold"
+    ],
     "rating": 4.5,
     "reviews": 132,
     "popularity": 89,
     "createdAt": "2024-02-13",
     "imageSrc": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
     "imageAlt": "Moroccan geometric tile side table",
-    "href": "#"
+    "href": "./220"
   }
 ]

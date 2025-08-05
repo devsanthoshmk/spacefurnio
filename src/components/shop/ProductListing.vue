@@ -147,7 +147,7 @@
           <div class="mt-4 flex justify-between">
             <div>
               <h3 class="text-sm text-gray-700">
-                <a :href="product.href" class="hover:text-gray-900">
+                <a :href="`./${route.params.category}/${product.id}`" class="hover:text-gray-900">
                   {{ product.name }}
                 </a>
               </h3>
@@ -176,25 +176,25 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-
-// Reactive data
-const selectedBrand = ref('')
-const selectedColor = ref('')
-const selectedPriceRange = ref('')
-const selectedMaterial = ref('')
-const selectedRoom = ref('')
-const sortBy = ref('popular')
 const products = ref([])
 
-// Computed properties
-const currentShopType = computed(() => {
-  return route.path.includes('/shop/design') ? 'design' : 'category'
-})
+// Filters & sort state
+const selectedBrand      = ref('')
+const selectedColor      = ref('')
+const selectedPriceRange = ref('')
+const selectedMaterial   = ref('')
+const selectedRoom       = ref('')
+const sortBy             = ref('popular')
 
-const currentCategory = computed(() => {
-  return route.params.category || route.query.category || 'all'
-})
+// Derive shop type & category/design from the URL
+const currentShopType = computed(() =>
+  route.path.includes('/shop/design') ? 'design' : 'category'
+)
+const currentCategory = computed(() =>
+  route.params.category || route.query.category || 'all'
+)
 
+// Available filter options
 const availableBrands = computed(() => {
   const brands = [...new Set(products.value.map(p => p.brand))].filter(Boolean)
   return brands.sort()
@@ -215,50 +215,48 @@ const availableRooms = computed(() => {
   return rooms.sort()
 })
 
-const hasActiveFilters = computed(() => {
-  return selectedBrand.value || selectedColor.value || selectedPriceRange.value ||
-         selectedMaterial.value || selectedRoom.value
-})
+const hasActiveFilters = computed(() =>
+  selectedBrand.value ||
+  selectedColor.value ||
+  selectedPriceRange.value ||
+  selectedMaterial.value ||
+  selectedRoom.value
+)
 
+// Filter + sort pipeline
 const filteredProducts = computed(() => {
   let filtered = [...products.value]
 
-  // Apply filters
   if (selectedBrand.value) {
     filtered = filtered.filter(p => p.brand === selectedBrand.value)
   }
-
   if (selectedColor.value) {
-    filtered = filtered.filter(p => p.colors && p.colors.includes(selectedColor.value))
+    filtered = filtered.filter(p => p.colors?.includes(selectedColor.value))
   }
-
   if (selectedPriceRange.value) {
     const [min, max] = selectedPriceRange.value.split('-').map(v => v.replace('+', ''))
     filtered = filtered.filter(p => {
       const price = parseFloat(p.price)
-      if (max) {
-        return price >= parseFloat(min) && price <= parseFloat(max)
-      } else {
-        return price >= parseFloat(min)
-      }
+      return max
+        ? price >= parseFloat(min) && price <= parseFloat(max)
+        : price >= parseFloat(min)
     })
   }
-
   if (selectedMaterial.value) {
     filtered = filtered.filter(p => p.material === selectedMaterial.value)
   }
-
   if (selectedRoom.value) {
     filtered = filtered.filter(p => p.room === selectedRoom.value)
   }
 
-  // Apply sorting
   switch (sortBy.value) {
     case 'rating':
       filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
       break
     case 'newest':
-      filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+      filtered.sort((a, b) =>
+        new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+      )
       break
     case 'price-low':
       filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
@@ -269,13 +267,12 @@ const filteredProducts = computed(() => {
     case 'popular':
     default:
       filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-      break
   }
 
   return filtered
 })
 
-// Methods
+// Clear all filters
 const clearAllFilters = () => {
   selectedBrand.value = ''
   selectedColor.value = ''
@@ -284,76 +281,81 @@ const clearAllFilters = () => {
   selectedRoom.value = ''
 }
 
+// Human-friendly titles
 const getCurrentCategoryName = () => {
-  const categoryMap = {
-    'furniture': 'Furniture',
+  const map = {
+    furniture: 'Furniture',
     'wall-art': 'Wall Art',
-    'decor': 'Decor',
-    'lights': 'Lights'
+    decor: 'Decor',
+    lights: 'Lights'
   }
-  return categoryMap[currentCategory.value] || 'All Products'
+  return map[currentCategory.value] || 'All Products'
 }
 
 const getCurrentDesignName = () => {
-  const designMap = {
-    'foyer': 'Foyer Design',
-    'living': 'Living Room Design',
-    'dining': 'Dining Room Design',
-    'kitchen': 'Kitchen Design',
+  const map = {
+    foyer: 'Foyer Design',
+    living: 'Living Room Design',
+    dining: 'Dining Room Design',
+    kitchen: 'Kitchen Design',
     'home-office': 'Home Office Design',
-    'bedroom': 'Bedroom Design',
-    'bathroom': 'Bathroom Design',
-    'balcony': 'Balcony Design',
-    'lounge': 'Lounge Design',
-    'poolside': 'Poolside Design',
-    'brutalist': 'Brutalist Style',
-    'minimalist': 'Minimalist Style',
-    'sustainable': 'Sustainable Style',
-    'parametric': 'Parametric Style',
+    bedroom: 'Bedroom Design',
+    bathroom: 'Bathroom Design',
+    balcony: 'Balcony Design',
+    lounge: 'Lounge Design',
+    poolside: 'Poolside Design',
+    brutalist: 'Brutalist Style',
+    minimalist: 'Minimalist Style',
+    sustainable: 'Sustainable Style',
+    parametric: 'Parametric Style',
     'wabi-sabi': 'Wabi Sabi Style',
-    'traditional': 'Traditional Style',
+    traditional: 'Traditional Style',
     'vintage-retro': 'Vintage/Retro Style',
-    'victorian': 'Victorian Style',
-    'japandi': 'Japandi Style',
-    'moroccan': 'Moroccan Style'
+    victorian: 'Victorian Style',
+    japandi: 'Japandi Style',
+    moroccan: 'Moroccan Style'
   }
-  return designMap[currentCategory.value] || 'Design Collection'
+  return map[currentCategory.value] || 'Design Collection'
 }
 
-const loadProducts = async () => {
+// Runtime JSON loader (from public/data/products/)
+async function loadProducts() {
   try {
-    let dataFile = ''
+    const spaceSpecific = [
+      'foyer','living','dining','kitchen','home-office',
+      'bedroom','bathroom','balcony','lounge','poolside'
+    ]
 
-    if (currentShopType.value === 'category') {
-      dataFile = '/data/category-products.json'
-    } else if (currentShopType.value === 'design') {
-      // Check if it's a space-specific or style-specific design
-      const spaceSpecific = ['foyer', 'living', 'dining', 'kitchen', 'home-office', 'bedroom', 'bathroom', 'balcony', 'lounge', 'poolside']
-      if (spaceSpecific.includes(currentCategory.value)) {
-        dataFile = '/data/design-space-products.json'
-      } else {
-        dataFile = '/data/design-style-products.json'
-      }
+    const fileBase =
+      currentShopType.value === 'category'
+        ? 'category-products'
+        : spaceSpecific.includes(currentCategory.value)
+        ? 'design-space-products'
+        : 'design-style-products'
+
+    // Ensure we hit the static public/ folder
+    const base = import.meta.env.BASE_URL || '/'
+    const url = `${base}data/products/${fileBase}.json`
+
+    const res = await fetch(url)
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} fetching ${url}`)
     }
 
-    if (dataFile) {
-      const response = await fetch(dataFile)
-      const data = await response.json()
+    let data = await res.json()
 
-      // Filter products by current category if specified
-      if (currentCategory.value && currentCategory.value !== 'all') {
-        products.value = data.filter(p =>
-          p.category === currentCategory.value ||
-          p.space === currentCategory.value ||
-          p.style === currentCategory.value
-        )
-      } else {
-        products.value = data
-      }
+    if (currentCategory.value !== 'all') {
+      data = data.filter(p =>
+        p.category === currentCategory.value ||
+        p.space    === currentCategory.value ||
+        p.style    === currentCategory.value
+      )
     }
-  } catch (error) {
-    console.error('Error loading products:', error)
-    // Fallback to sample data
+
+    products.value = data
+  } catch (err) {
+    console.error('Error fetching products JSON:', err)
+    // Fallback example item
     products.value = [
       {
         id: 1,
@@ -362,12 +364,13 @@ const loadProducts = async () => {
         brand: 'Nordic Home',
         category: 'furniture',
         material: 'Oak Wood',
-        colors: ['Natural', 'Dark Brown'],
+        colors: ['Natural','Dark Brown'],
         rating: 4.5,
         reviews: 128,
         popularity: 95,
         createdAt: '2024-01-15',
-        imageSrc: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500',
+        imageSrc:
+          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500',
         imageAlt: 'Modern oak dining table',
         href: '#'
       }
@@ -375,7 +378,6 @@ const loadProducts = async () => {
   }
 }
 
-onMounted(() => {
-  loadProducts()
-})
+onMounted(loadProducts)
 </script>
+

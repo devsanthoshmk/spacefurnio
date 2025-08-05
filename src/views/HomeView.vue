@@ -7,7 +7,6 @@ import Button from 'primevue/button';
 
 // PrimeVue v4 animate on scroll
 import { usePrimeVue } from 'primevue/config';
-import FooterComponent from '@/components/Footer-component.vue';
 const PrimeVue = usePrimeVue();
 
 const heroRef = ref(null);
@@ -185,9 +184,6 @@ const handleGrabNow = () => {
     <ProductSection />
   </section>
 
-  <section>
-    <FooterComponent />
-  </section>
 </template>
 
 <style scoped>
