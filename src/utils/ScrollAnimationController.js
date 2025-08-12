@@ -1,319 +1,458 @@
 export default class ScrollAnimationController {
   constructor(el) {
-    console.log('ScrollAnimationController initialized with element:', el)
-    this.productsSection = el
-    this.productsGrid = el.querySelector('#products-grid')
+    if (!el) throw new Error('Element is required')
+
+    // Core elements
+    this.section = el
+    this.grid = el.querySelector('#products-grid')
     this.texts = [
       el.querySelector('#text-1'),
       el.querySelector('#text-2'),
       el.querySelector('#text-3'),
-    ]
-    this.bgLayers = [el.querySelector('#bg-layer-1'), el.querySelector('#bg-layer-2')]
-    this.fadeOverlay = el.querySelector('#fade-overlay')
+    ].filter(Boolean)
 
-    // Using your actual images
+    // Use existing background layers
+    this.bgLayers = [el.querySelector('#bg-layer-1'), el.querySelector('#bg-layer-2')].filter(
+      Boolean,
+    )
+
+    this.overlay = el.querySelector('#fade-overlay')
     this.images = ['/images/linemeetslight.png', '/images/functionmeetsoul.png', '/images/f2.png']
 
-    this.currentImageIndex = 0
-    this.currentLayerIndex = 0
-    this.currentTextIndex = -1
-    // this.isTransitioning = false;
-    this.lastScrollProgress = 0
-    //this.transitionLock = false;
+    // Simple state management
+    this.state = {
+      currentStep: -1,
+      activeImageIndex: -1,
+      isTransitioning: false,
+      scrollProgress: 0,
+      lastScrollTime: 0,
+      scrollVelocity: 0,
+      transitionDuration: 1000, // Track transition duration
+    }
+
+    // Performance tracking
+    this.performance = {
+      ticking: false,
+      rafId: null,
+    }
+
+    // Cached measurements
+    this.measurements = {
+      sectionHeight: 0,
+      viewportHeight: 0,
+      lastUpdate: 0,
+    }
 
     this.init()
   }
 
   init() {
-    // Set initial background
-    this.bgLayers[0].style.backgroundImage = `url('${this.images[0]}')`
-    this.bgLayers[1].style.backgroundImage = `url('${this.images[1]}')`
-
-    // Bind scroll handler
-    this.handleScroll = this.handleScroll.bind(this)
-    window.addEventListener('scroll', this.handleScroll)
-
-    // Initial update
-    this.updateAnimation()
-  }
-
-  handleScroll() {
-    if (!this.ticking) {
-      requestAnimationFrame(() => {
-        this.updateAnimation()
-        this.ticking = false
+    this.preloadImages()
+      .then(() => {
+        this.setupInitialState()
+        this.bindEvents()
+        this.handleScroll() // Initial check
       })
-      this.ticking = true
-    }
+      .catch((err) => console.error('Failed to preload images:', err))
   }
 
-  updateAnimation() {
-    const rect = this.productsSection.getBoundingClientRect()
-    const sectionHeight = this.productsSection.offsetHeight
-    const viewportHeight = window.innerHeight
+  preloadImages() {
+    console.log('Preloading images...')
+    const promises = this.images.map((src, index) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => {
+          console.log(`Image ${index + 1} loaded: ${src}`)
+          resolve(src)
+        }
+        img.onerror = () => {
+          console.error(`Failed to load image: ${src}`)
+          reject(src)
+        }
+        img.src = src
+      })
+    })
 
-    // Calculate smooth scroll progress
-    const scrollProgress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - viewportHeight)))
-
-    // Prevent rapid scroll issues by checking for major jumps
-    const progressDiff = Math.abs(scrollProgress - this.lastScrollProgress)
-    if (progressDiff > 0.1) {
-      // Reset transition state if there's a major scroll jump
-      this.resetTransitionState()
-    }
-    this.lastScrollProgress = scrollProgress
-
-    // Define animation phases with smoother transitions
-    const phases = [
-      { start: 0, end: 0.12, type: 'image', index: 0, blur: false }, // Image 1 clear
-      { start: 0.12, end: 0.18, type: 'blur-in', index: 0 }, // Start blur
-      { start: 0.18, end: 0.28, type: 'text', index: 0, textIndex: 0 }, // Text 1 appears
-      { start: 0.28, end: 0.35, type: 'text-out', index: 0, textIndex: 0 }, // Text 1 disappears
-      { start: 0.35, end: 0.42, type: 'transition', from: 0, to: 1 }, // Transition to image 2
-
-      { start: 0.42, end: 0.54, type: 'image', index: 1, blur: false }, // Image 2 clear
-      { start: 0.54, end: 0.6, type: 'blur-in', index: 1 }, // Start blur
-      { start: 0.6, end: 0.7, type: 'text', index: 1, textIndex: 1 }, // Text 2 appears
-      { start: 0.7, end: 0.77, type: 'text-out', index: 1, textIndex: 1 }, // Text 2 disappears
-      { start: 0.77, end: 0.84, type: 'transition', from: 1, to: 2 }, // Transition to image 3
-
-      { start: 0.84, end: 0.96, type: 'image', index: 2, blur: false }, // Image 3 clear
-      { start: 0.96, end: 1, type: 'text', index: 2, textIndex: 2 }, // Final text
-    ]
-
-    // Find current phase
-    const currentPhase =
-      phases.find((phase) => scrollProgress >= phase.start && scrollProgress < phase.end) ||
-      phases[phases.length - 1]
-
-    this.executePhase(currentPhase, scrollProgress)
+    return Promise.all(promises).then(() => console.log('All images preloaded successfully'))
   }
 
-  executePhase(phase, scrollProgress) {
-    const phaseProgress = (scrollProgress - phase.start) / (phase.end - phase.start)
+  setupInitialState() {
+    console.log('Setting up initial state...')
 
-    switch (phase.type) {
-      case 'image':
-        this.showImage(phase.index, false)
-        this.hideAllTexts()
-        break
-
-      case 'blur-in':
-        this.showImage(phase.index, true, phaseProgress)
-        break
-
-      case 'text':
-        this.showImage(phase.index, true)
-        this.showText(phase.textIndex, phaseProgress)
-        break
-
-      case 'text-out':
-        this.showImage(phase.index, true)
-        this.hideText(phase.textIndex, phaseProgress)
-        break
-
-      case 'transition':
-        // simple crossfade, no locks
-        this.transitionImage(phase.from, phase.to, phaseProgress)
-        this.hideAllTexts()
-        break
-    }
-  }
-
-  showImage(index, blur = false, blurProgress = 1) {
-    if (this.currentImageIndex !== index) {
-      this.switchToImage(index)
-    }
-
-    const currentLayer = this.bgLayers[this.currentLayerIndex]
-
-    if (blur) {
-      const blurAmount = 15 * blurProgress
-      const brightness = 0.7 + 0.3 * (1 - blurProgress)
-      currentLayer.style.filter = `blur(${blurAmount}px) brightness(${brightness})`
-      currentLayer.style.transform = `scale(${1 + 0.05 * blurProgress})`
-
-      this.fadeOverlay.style.opacity = blurProgress * 0.3
-    } else {
-      currentLayer.style.filter = 'blur(0px) brightness(1)'
-      currentLayer.style.transform = 'scale(1)'
-      this.fadeOverlay.style.opacity = '0'
-    }
-  }
-
-  switchToImage(index) {
-    if (this.currentImageIndex === index) {
+    if (this.bgLayers.length < 2) {
+      console.error('Need at least 2 background layers')
       return
     }
 
-    // toggle which <div> is on top
-    const oldLayerIndex = this.currentLayerIndex
-    const newLayerIndex = 1 - oldLayerIndex
-    this.currentLayerIndex = newLayerIndex
-    this.currentImageIndex = index
+    // Setup primary layer (always visible)
+    this.bgLayers[0].style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('${this.images[0]}');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 1;
+      z-index: 2;
+      transform: translate3d(0, 0, 0) scale(1);
+      filter: blur(0px) brightness(1);
+      transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, filter;
+      backface-visibility: hidden;
+    `
 
-    const oldLayer = this.bgLayers[oldLayerIndex]
-    const newLayer = this.bgLayers[newLayerIndex]
+    // Setup secondary layer (for transitions)
+    this.bgLayers[1].style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;  // Fixed typo: no-range -> no-repeat
+      opacity: 0;
+      z-index: 1;
+      transform: translate3d(0, 0, 0) scale(1.1);
+      filter: blur(0px) brightness(1);
+      transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, filter, opacity;
+      backface-visibility: hidden;
+    `
 
-    // prepare the new layer off‑screen/hidden
-    newLayer.style.backgroundImage = `url('${this.images[index]}')`
-    newLayer.style.opacity = '0'
-    newLayer.style.transform = 'scale(1.1)'
-    newLayer.style.filter = 'blur(15px) brightness(0.7)'
+    this.state.activeImageIndex = 0
+    console.log('First image set:', this.images[0])
 
-    // force a reflow so the browser registers the starting point
-    void newLayer.offsetWidth
+    // Setup text elements
+    this.texts.forEach((text, index) => {
+      if (text) {
+        text.style.cssText = `
+          opacity: 0;
+          visibility: hidden;
+          transform: translate3d(-50%, -50%, 0) translateY(30px) scale(0.9);
+          filter: blur(0px);
+          transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform, opacity, filter;
+          backface-visibility: hidden;
+        `
+      }
+    })
 
-    // fade the old one out & blur it
-    oldLayer.classList.remove('current')
-    oldLayer.classList.add('blurred')
-    oldLayer.style.opacity = '0'
+    // Setup overlay
+    if (this.overlay) {
+      this.overlay.style.cssText = `
+        opacity: 0;
+        transition: opacity 0.6s ease-out;
+        will-change: opacity;
+      `
+    }
 
-    // fade the new one in
-    newLayer.classList.remove('next')
-    newLayer.classList.add('current')
-    newLayer.style.opacity = '1'
-    newLayer.style.transform = 'scale(1)'
-    newLayer.style.filter = 'blur(0px) brightness(1)'
-
-    // after the CSS transition finishes, clean up classes
-    setTimeout(() => {
-      oldLayer.classList.remove('blurred')
-      oldLayer.classList.add('next')
-    }, 1500)
+    console.log('Initial state setup complete')
   }
 
-  resetTransitionState() {
-    //this.isTransitioning = false;
-    //                this.transitionLock = false;
+  bindEvents() {
+    let lastScrollY = window.scrollY // Use scrollY instead of pageYOffset
 
-    // Reset both layers to known states
-    this.bgLayers.forEach((layer, index) => {
-      layer.style.opacity = index === this.currentLayerIndex ? '1' : '0'
-      layer.style.transform = 'scale(1)'
-      layer.style.filter = 'blur(0px)'
+    this.scrollHandler = () => {
+      const currentScrollY = window.scrollY // Use scrollY instead of pageYOffset
+      const scrollDelta = currentScrollY - lastScrollY
+
+      // Calculate scroll velocity for fast scroll detection
+      const now = performance.now()
+      const timeDelta = now - this.state.lastScrollTime
+      this.state.scrollVelocity = Math.abs(scrollDelta) / Math.max(timeDelta, 1)
+      this.state.lastScrollTime = now
+
+      lastScrollY = currentScrollY
+
+      if (!this.performance.ticking) {
+        this.performance.ticking = true
+        this.performance.rafId = requestAnimationFrame(() => {
+          this.handleScroll()
+          this.performance.ticking = false
+        })
+      }
+    }
+
+    window.addEventListener('scroll', this.scrollHandler, { passive: true })
+  }
+
+  updateMeasurements() {
+    const now = performance.now()
+    if (now - this.measurements.lastUpdate > 100) {
+      this.measurements.sectionHeight = this.section.offsetHeight
+      this.measurements.viewportHeight = window.innerHeight
+      this.measurements.lastUpdate = now
+    }
+  }
+
+  handleScroll() {
+    this.updateMeasurements()
+
+    const rect = this.section.getBoundingClientRect()
+    const { sectionHeight, viewportHeight } = this.measurements
+
+    // Early exit if section not visible
+    if (rect.top > viewportHeight || rect.top < -sectionHeight) {
+      return
+    }
+
+    // Calculate progress (0 to 1)
+    const progress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - viewportHeight)))
+    this.state.scrollProgress = progress
+
+    // Map to 9 distinct steps for 3 cycles (image → blur → text) × 3
+    const step = Math.floor(progress * 9)
+
+    if (step !== this.state.currentStep) {
+      console.log(
+        `Step changed: ${this.state.currentStep} → ${step} (progress: ${progress.toFixed(3)})`,
+      )
+      this.state.currentStep = step
+      this.executeStep(step)
+    }
+  }
+
+  executeStep(step) {
+    console.log(`Executing step ${step}`)
+
+    // Handle fast scrolling - reduce transition times
+    const isFastScrolling = this.state.scrollVelocity > 2
+    const transitionSpeed = isFastScrolling ? '0.3s' : '1s'
+    this.state.transitionDuration = isFastScrolling ? 300 : 1000 // Store duration in ms
+
+    // Update transition speeds for fast scrolling
+    this.updateTransitionSpeeds(transitionSpeed)
+
+    switch (step) {
+      case 0: // Image 1 clear
+        this.showImage(0, false)
+        this.hideAllTexts()
+        break
+
+      case 1: // Image 1 blur
+        this.showImage(0, true)
+        this.hideAllTexts()
+        break
+
+      case 2: // Image 1 + Text 1
+        this.showImage(0, true)
+        this.showText(0)
+        break
+
+      case 3: // Transition to Image 2 + clear
+        this.transitionToImage(1)
+        this.hideAllTexts()
+        break
+
+      case 4: // Image 2 blur
+        this.showImage(1, true)
+        this.hideAllTexts()
+        break
+
+      case 5: // Image 2 + Text 2
+        this.showImage(1, true)
+        this.showText(1)
+        break
+
+      case 6: // Transition to Image 3 + clear
+        this.transitionToImage(2)
+        this.hideAllTexts()
+        break
+
+      case 7: // Image 3 blur
+        this.showImage(2, true)
+        this.hideAllTexts()
+        break
+
+      case 8: // Image 3 + Text 3 (final state)
+        this.showImage(2, true)
+        this.showText(2)
+        break
+    }
+
+    // Reset transition speeds after fast scrolling
+    if (isFastScrolling) {
+      setTimeout(() => {
+        this.updateTransitionSpeeds('1s')
+        this.state.transitionDuration = 1000
+      }, 300)
+    }
+  }
+
+  updateTransitionSpeeds(speed) {
+    this.bgLayers.forEach((layer) => {
+      if (layer) {
+        layer.style.transition = `all ${speed} cubic-bezier(0.4, 0, 0.2, 1)`
+      }
+    })
+
+    this.texts.forEach((text) => {
+      if (text) {
+        text.style.transition = `all ${speed} cubic-bezier(0.4, 0, 0.2, 1)`
+      }
     })
   }
 
-  /**
-   * Crossfade from `fromIndex` → `toIndex` based purely on `progress` [0–1].
-   * Works in both directions automatically.
-   */
-  transitionImage(fromIndex, toIndex, progress) {
-    const oldLayer = this.bgLayers[this.currentLayerIndex]
-    const newLayer = this.bgLayers[1 - this.currentLayerIndex]
+  showImage(imageIndex, blur = false) {
+    console.log(`Showing image ${imageIndex}, blur: ${blur}`)
 
-    // ensure the "next" layer has the correct image
-    newLayer.style.backgroundImage = `url('${this.images[toIndex]}')`
+    // Ensure correct image is loaded
+    if (this.state.activeImageIndex !== imageIndex && !this.state.isTransitioning) {
+      this.setActiveImage(imageIndex)
+    }
 
-    // easing
-    const t = this.easeInOutCubic(progress)
+    const activeLayer = this.bgLayers[0]
+    if (!activeLayer) return
 
-    // fade out old, fade in new
-    oldLayer.style.opacity = `${1 - t}`
-    newLayer.style.opacity = `${t}`
-
-    // add a little blur/scale flavor
-    oldLayer.style.filter = `blur(${8 * t}px) brightness(${0.8 + 0.2 * (1 - t)})`
-    oldLayer.style.transform = `scale(${1 + 0.05 * t})`
-
-    newLayer.style.filter = `blur(${8 * (1 - t)}px) brightness(${0.7 + 0.3 * t})`
-    newLayer.style.transform = `scale(${1.1 - 0.05 * t})`
-
-    // once we’ve fully transitioned, swap the “currentLayerIndex”
-    if (progress >= 1) {
-      this.currentLayerIndex = 1 - this.currentLayerIndex
-      this.currentImageIndex = toIndex
+    // Apply effects
+    if (blur) {
+      activeLayer.style.filter = 'blur(8px) brightness(0.8)'
+      activeLayer.style.transform = 'translate3d(0, 0, 0) scale(1.05)'
+      if (this.overlay) {
+        this.overlay.style.opacity = '0.3'
+      }
+    } else {
+      activeLayer.style.filter = 'blur(0px) brightness(1)'
+      activeLayer.style.transform = 'translate3d(0, 0, 0) scale(1)'
+      if (this.overlay) {
+        this.overlay.style.opacity = '0'
+      }
     }
   }
 
-  updateImageTransition(progress) {
-    const currentLayer = this.bgLayers[this.currentLayerIndex]
-    const nextLayer = this.bgLayers[1 - this.currentLayerIndex]
+  setActiveImage(imageIndex) {
+    console.log(`Setting active image to ${imageIndex}: ${this.images[imageIndex]}`)
 
-    // Smooth easing function
-    const easeProgress = this.easeInOutCubic(progress)
+    if (imageIndex < 0 || imageIndex >= this.images.length) return
 
-    // Fade out current, fade in next
-    currentLayer.style.opacity = 1 - easeProgress
-    nextLayer.style.opacity = easeProgress
-    nextLayer.style.transform = `scale(${1.1 - 0.1 * easeProgress})`
+    this.state.activeImageIndex = imageIndex
 
-    // Add subtle blur transition
-    const blurAmount = 3 * (1 - Math.abs(0.5 - easeProgress) * 2)
-    nextLayer.style.filter = `blur(${blurAmount}px)`
+    const activeLayer = this.bgLayers[0]
+    if (activeLayer) {
+      activeLayer.style.backgroundImage = `url('${this.images[imageIndex]}')`
+      activeLayer.style.opacity = '1'
+      console.log('Image set on layer:', activeLayer.style.backgroundImage)
+    }
   }
 
-  completeImageTransition(toIndex) {
-    const nextLayerIndex = 1 - this.currentLayerIndex
-    const nextLayer = this.bgLayers[nextLayerIndex]
-    const currentLayer = this.bgLayers[this.currentLayerIndex]
+  transitionToImage(imageIndex) {
+    console.log(`Transitioning to image ${imageIndex}`)
 
-    // Finalize transition
-    nextLayer.style.opacity = '1'
-    nextLayer.style.transform = 'scale(1)'
-    nextLayer.style.filter = 'blur(0px)'
-
-    // Hide previous layer
-    currentLayer.style.opacity = '0'
-
-    // Switch active layer
-    this.currentLayerIndex = nextLayerIndex
-    this.currentImageIndex = toIndex
-    // this.isTransitioning = false;
-
-    // Add small delay before allowing next transition
-    setTimeout(() => {
-      //this.transitionLock = false;
-    }, 100)
-  }
-
-  showText(index, progress) {
-    const text = this.texts[index]
-    const easeProgress = this.easeOutCubic(progress)
-
-    if (this.currentTextIndex !== index) {
-      this.hideAllTexts()
-      this.currentTextIndex = index
+    if (
+      this.state.isTransitioning ||
+      this.state.activeImageIndex === imageIndex ||
+      imageIndex < 0 ||
+      imageIndex >= this.images.length
+    ) {
+      return
     }
 
-    text.classList.remove('entering', 'leaving')
-    text.classList.add('appear', 'breathing')
-    text.style.opacity = easeProgress
-    text.style.transform = `translate(-50%, -50%) translateY(${60 * (1 - easeProgress)}px) scale(${0.8 + 0.2 * easeProgress})`
-    text.style.filter = `blur(${3 * (1 - easeProgress)}px)`
+    this.state.isTransitioning = true
+
+    const frontLayer = this.bgLayers[0] // Current visible layer
+    const backLayer = this.bgLayers[1] // Layer for new image
+    const duration = this.state.transitionDuration
+
+    // Setup new image on back layer
+    backLayer.style.backgroundImage = `url('${this.images[imageIndex]}')`
+    backLayer.style.opacity = '0'
+    backLayer.style.transform = 'translate3d(0, 0, 0) scale(1.1)'
+    backLayer.style.filter = 'blur(0px) brightness(1)'
+    backLayer.style.zIndex = '1'
+
+    // Ensure front layer is on top
+    frontLayer.style.zIndex = '2'
+
+    // Force reflow
+    backLayer.offsetHeight
+
+    // Start transition
+    requestAnimationFrame(() => {
+      // Fade in new image
+      backLayer.style.opacity = '1'
+      backLayer.style.transform = 'translate3d(0, 0, 0) scale(1)'
+
+      // Fade out current image after slight delay
+      setTimeout(() => {
+        frontLayer.style.opacity = '0'
+        frontLayer.style.transform = 'translate3d(0, 0, 0) scale(0.95)'
+      }, 100)
+
+      // Complete transition
+      setTimeout(() => {
+        // Swap layers
+        frontLayer.style.backgroundImage = `url('${this.images[imageIndex]}')`
+        frontLayer.style.opacity = '1'
+        frontLayer.style.transform = 'translate3d(0, 0, 0) scale(1)'
+        frontLayer.style.filter = 'blur(0px) brightness(1)'
+        frontLayer.style.zIndex = '2'
+
+        // Reset back layer
+        backLayer.style.opacity = '0'
+        backLayer.style.transform = 'translate3d(0, 0, 0) scale(1.1)'
+        backLayer.style.zIndex = '1'
+
+        this.state.activeImageIndex = imageIndex
+        this.state.isTransitioning = false
+
+        console.log(`Transition to image ${imageIndex} completed`)
+      }, 100 + duration) // Use dynamic duration
+    })
   }
 
-  hideText(index, progress) {
-    const text = this.texts[index]
-    const easeProgress = this.easeInCubic(progress)
+  showText(textIndex) {
+    console.log(`Showing text ${textIndex}`)
 
-    text.classList.remove('appear', 'breathing')
-    text.classList.add('leaving')
-    text.style.opacity = 1 - easeProgress
-    text.style.transform = `translate(-50%, -50%) translateY(${-60 * easeProgress}px) scale(${1 + 0.1 * easeProgress})`
-    text.style.filter = `blur(${5 * easeProgress}px)`
+    if (textIndex < 0 || textIndex >= this.texts.length) return
+
+    const text = this.texts[textIndex]
+    if (!text) return
+
+    // Hide all other texts first
+    this.hideAllTexts()
+
+    // Show target text
+    text.style.opacity = '1'
+    text.style.visibility = 'visible'
+    text.style.transform = 'translate3d(-50%, -50%, 0) translateY(0px) scale(1)'
+    text.style.filter = 'blur(0px)'
+
+    console.log(`Text ${textIndex} shown: "${text.textContent?.substring(0, 30)}..."`)
   }
 
   hideAllTexts() {
-    this.texts.forEach((text) => {
-      text.classList.remove('appear', 'breathing')
-      text.classList.add('entering')
-      text.style.opacity = '0'
+    this.texts.forEach((text, index) => {
+      if (text && text.style.opacity !== '0') {
+        text.style.opacity = '0'
+        text.style.visibility = 'hidden'
+        text.style.transform = 'translate3d(-50%, -50%, 0) translateY(30px) scale(0.9)'
+        text.style.filter = 'blur(0px)'
+      }
     })
-    this.currentTextIndex = -1
   }
 
-  // Easing functions
-  easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
-  }
+  destroy() {
+    // Cancel pending animations
+    if (this.performance.rafId) {
+      cancelAnimationFrame(this.performance.rafId)
+    }
 
-  easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3)
-  }
+    // Remove event listeners
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler)
+    }
 
-  easeInCubic(t) {
-    return t * t * t
+    // Clear references
+    this.section = null
+    this.grid = null
+    this.texts = null
+    this.bgLayers = null
+    this.overlay = null
+
+    console.log('ScrollAnimationController destroyed')
   }
 }
