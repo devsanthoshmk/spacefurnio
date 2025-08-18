@@ -1,26 +1,53 @@
 <script setup>
-import { RouterView } from 'vue-router';
-import { ref, onMounted, onUnmounted } from 'vue';
-import NavComponent from './components/Nav-component.vue';
-import FooterComponent from './components/Footer-component.vue';
+import { RouterView, useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import NavComponent from './components/Nav-component.vue'
+import FooterComponent from './components/Footer-component.vue'
 
-
-const showNav = ref(false);
+const route = useRoute()
+const showNav = ref(false)
 
 const handleScroll = () => {
-  const scrollY = window.scrollY;
-  const screenHeight = window.innerHeight;
-  showNav.value = scrollY >= screenHeight * 0.2; // 20% of viewport height
-};
+  const scrollY = window.scrollY
+  const screenHeight = window.innerHeight
+  showNav.value = scrollY >= screenHeight * 0.2
+}
 
+function setupScrollForHome() {
+  window.addEventListener('scroll', handleScroll)
+  handleScroll() // check once on load
+}
+
+function cleanupScroll() {
+  window.removeEventListener('scroll', handleScroll)
+}
+
+// ✅ run once on mount
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-  handleScroll(); // Run once to check on load
-});
+  if (route.path === '/') {
+    setupScrollForHome()
+  } else {
+    showNav.value = true
+  }
+})
 
+// ✅ clean up
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-});
+  cleanupScroll()
+})
+
+// ✅ react when route changes (SPA navigation)
+watch(
+  () => route.path,
+  (newPath) => {
+    cleanupScroll()
+    if (newPath === '/') {
+      setupScrollForHome()
+    } else {
+      showNav.value = true
+    }
+  }
+)
 
 </script>
 

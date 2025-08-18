@@ -347,4 +347,14 @@ const handleGrabNow = () => {
   }
 }
 
+@font-face {
+  font-family: 'Phitagate';
+  src: url('/fonts/Phitagate.otf') format('opentype');
+}
+
+.phitagate-font {
+  font-family: 'Phitagate', serif;
+}
+
+
 </style>

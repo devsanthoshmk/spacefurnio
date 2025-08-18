@@ -194,7 +194,8 @@ const handleScroll = () => {
 }
 
 const selectProduct = (product) => {
-  console.log('Selected product:', product)
+  console.log(`Selected product: ${product.title}`)
+  window.location.href = `/shop`
   // Add your product selection logic here
 }
 

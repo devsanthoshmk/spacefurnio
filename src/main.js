@@ -1,36 +1,30 @@
 import './assets/main.css'
-import './assets/overrides.css'
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+
 import PrimeVue from 'primevue/config'
+import Aura from '@primeuix/themes/aura' // ✅ Aura preset (light/dark built-in)
 
-// v4+ static themes live here:
-import Lara from '@primeuix/themes/lara'
-import AnimateOnScroll from 'primevue/animateonscroll'
-
-// main.js or main.ts
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 import 'primeicons/primeicons.css'
 
-// import AOS from 'aos'
-// import 'aos/dist/aos.css' // Import AOS CSS
-
-// // In your main Vue file, within the app initialization
-// AOS.init()
-
 const app = createApp(App)
+
 app.use(router)
 app.use(PrimeVue, {
   theme: {
-    preset: Lara,
+    preset: Aura, // Aura supports multiple color schemes (light/dark)
     options: {
       prefix: 'p',
-      darkModeSelector: 'light',
+      darkModeSelector: 'dark', // you can toggle light/dark by adding/removing "dark" class to <html>
       cssLayer: false,
     },
   },
 })
 
-app.directive('animateonscroll', AnimateOnScroll)
-
 app.mount('#app')
+
+AOS.init()
