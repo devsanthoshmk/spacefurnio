@@ -94,94 +94,43 @@
           <div class="w-24 h-1 bg-orange-500 mx-auto mt-6 rounded-full"></div>
         </div>
 
-      <!-- Netflix-style Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        <div
-          v-for="(member) in teamMembers"
-          :key="member.id"
-          class="netflix-card relative group cursor-pointer transition-all duration-300 ease-out"
-          :class="{
-            'z-50': hoveredCard === member.id,
-            'z-10': hoveredCard && hoveredCard !== member.id,
-            'z-20': !hoveredCard
-          }"
-          :style="{
-            transform: hoveredCard === member.id
-              ? 'scale(1.08) translateZ(0)'
-              : hoveredCard
-                ? 'scale(0.97) translateZ(0)'
-                : 'scale(1) translateZ(0)',
-            transformOrigin: 'center center'
-          }"
-          @mouseenter="hoveredCard = member.id"
-          @mouseleave="hoveredCard = null"
-        >
-          <!-- Card Container -->
+        <!-- Netflix-style Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 px-4">
           <div
-            class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden transition-all duration-300 ease-out"
+            v-for="member in teamMembers"
+            :key="member.id"
+            class="netflix-card relative group cursor-pointer transition-all duration-300 ease-out"
             :class="{
-              'shadow-2xl shadow-orange-500/20 ring-2 ring-orange-500/30': hoveredCard === member.id,
-              'shadow-lg shadow-black/20': hoveredCard !== member.id
+              'z-50 scale-110': hoveredCard === member.id,
+              'z-10 scale-95': hoveredCard && hoveredCard !== member.id,
+              'scale-100 z-20': !hoveredCard
             }"
+            @mouseenter="hoveredCard = member.id"
+            @mouseleave="hoveredCard = null"
           >
-            <!-- Image Section -->
-            <div class="relative h-64 overflow-hidden bg-gradient-to-br from-orange-100 to-orange-200">
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center">
-                  <div class="w-12 h-12 bg-white rounded-full"></div>
+            <!-- Card -->
+            <div
+              class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-300">
+              <!-- Avatar Circle -->
+              <div class="h-40 flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200">
+                <div class="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center">
+                  <div class="w-10 h-10 bg-white rounded-full"></div>
                 </div>
               </div>
 
-              <!-- Overlay on hover -->
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300"
-                :class="{
-                  'opacity-100': hoveredCard === member.id,
-                  'opacity-0': hoveredCard !== member.id
-                }"
-              />
-            </div>
-
-            <!-- Content Section -->
-            <div class="p-6 space-y-3">
-              <h3 class="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors duration-300">
-                {{ member.name }}
-              </h3>
-              <p class="text-orange-400 font-medium text-sm uppercase tracking-wider">
-                {{ member.role }}
-              </p>
-              <p class="text-gray-300 text-sm leading-relaxed">
-                {{ member.description }}
-              </p>
-
-              <!-- Action buttons - only show on hover -->
-              <div
-                class="flex space-x-2 pt-4 transition-all duration-300"
-                :class="{
-                  'opacity-100 transform translate-y-0': hoveredCard === member.id,
-                  'opacity-0 transform translate-y-2': hoveredCard !== member.id
-                }"
-              >
-                <button class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-                  View Profile
-                </button>
-                <button class="px-4 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-all duration-200">
-                  Contact
-                </button>
+              <!-- Content -->
+              <div class="p-4 text-center space-y-2">
+                <h3 class="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors duration-300">
+                  {{ member.name }}
+                </h3>
+                <p class="text-orange-400 text-xs uppercase font-medium tracking-wider">
+                  {{ member.role }}
+                </p>
+                <p class="text-gray-300 text-sm">{{ member.description }}</p>
               </div>
             </div>
           </div>
-
-          <!-- Glow effect -->
-          <div
-            class="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
-            :class="{
-              'bg-gradient-to-r from-orange-500/10 via-orange-400/5 to-orange-500/10 blur-xl': hoveredCard === member.id
-            }"
-            style="transform: scale(1.1)"
-          />
         </div>
-      </div>
       </div>
     </section>
   </div>
@@ -200,61 +149,21 @@ const missionItems = ref([
 ])
 
 const manifesto = ref([
-  {
-    title: 'Innovation First',
-    description: 'We constantly push boundaries to create breakthrough solutions that redefine industry standards and drive meaningful change.'
-  },
-  {
-    title: 'Client-Centric',
-    description: 'Our success is measured by our clients\' achievements. Every decision we make puts your goals and satisfaction at the forefront.'
-  },
-  {
-    title: 'Radical Transparency',
-    description: 'Honest communication builds lasting partnerships. We believe in open dialogue and clear expectations at every step.'
-  },
-  {
-    title: 'Sustainable Growth',
-    description: 'We design solutions that scale responsibly, ensuring long-term value for your business and positive impact on society.'
-  },
-  {
-    title: 'Collaborative Excellence',
-    description: 'Great minds achieve more together. We foster an environment where diverse perspectives create innovative solutions.'
-  },
-  {
-    title: 'Future-Ready',
-    description: 'We anticipate trends and emerging technologies to keep you ahead of the curve in an ever-evolving digital landscape.'
-  }
+  { title: 'Innovation First', description: 'We constantly push boundaries...' },
+  { title: 'Client-Centric', description: 'Our success is measured...' },
+  { title: 'Radical Transparency', description: 'Honest communication builds...' },
+  { title: 'Sustainable Growth', description: 'We design solutions that scale...' },
+  { title: 'Collaborative Excellence', description: 'Great minds achieve more together...' },
+  { title: 'Future-Ready', description: 'We anticipate trends and emerging...' }
 ])
 
-// Reactive state for hover tracking
 const hoveredCard = ref(null)
 
-// Team members data
 const teamMembers = ref([
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "Creative Director",
-    description: "Visionary leader with 15+ years in furniture design"
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    role: "Lead Designer",
-    description: "Innovative designer specializing in sustainable materials"
-  },
-  {
-    id: 3,
-    name: "Emma Rodriguez",
-    role: "Product Manager",
-    description: "Strategic thinker ensuring quality and customer satisfaction"
-  },
-  {
-    id: 4,
-    name: "David Kim",
-    role: "Head of Engineering",
-    description: "Technical expert driving manufacturing excellence"
-  }
+  { id: 1, name: "Sarah Johnson", role: "Creative Director", description: "Visionary leader with 15+ years in furniture design" },
+  { id: 2, name: "Michael Chen", role: "Lead Designer", description: "Innovative designer specializing in sustainable materials" },
+  { id: 3, name: "Emma Rodriguez", role: "Product Manager", description: "Strategic thinker ensuring quality and customer satisfaction" },
+  { id: 4, name: "David Kim", role: "Head of Engineering", description: "Technical expert driving manufacturing excellence" }
 ])
 
 onMounted(() => {
@@ -266,18 +175,10 @@ onMounted(() => {
     disable: 'phone'
   })
 })
-onMounted(() => {
-  const elements = document.querySelectorAll('.animate-fade-in-up')
-  elements.forEach((el, index) => {
-    setTimeout(() => {
-      el.style.opacity = '1'
-      el.style.transform = 'translateY(0)'
-    }, index * 100)
-  })
-})
 </script>
 
 <style scoped>
+/* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @font-face {
@@ -288,91 +189,43 @@ onMounted(() => {
 
 .phitagate-font {
   font-family: 'Phitagate', serif;
-  font-feature-settings: 'kern' 1, 'liga' 1;
 }
 
+/* Smooth text */
 * {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: all 0.3s ease-out;
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ea580c; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f97316; }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ea580c;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #f97316;
-}
-
-/* Smooth transitions */
-* {
-  transition-property: transform, opacity, background-color, border-color, color, box-shadow;
-  transition-duration: 300ms;
-  transition-timing-function: ease-out;
-}
-</style>
-<style scoped>
 /* Netflix-style card animations */
-.netflix-card {
-  /* Hardware acceleration for smooth animations */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
-}
+.netflix-card { transform: translateZ(0); will-change: transform; }
+.netflix-card:hover { transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
-/* Smooth hover transitions */
-.netflix-card:hover {
-  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Enhanced shadow effects */
 .shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
-              0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25),
+              0 0 0 1px rgba(255,255,255,0.05);
 }
 
-/* Custom glow animation */
 @keyframes netflix-glow {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1.05);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
+  0%, 100% { opacity: 0.5; transform: scale(1.05); }
+  50% { opacity: 0.8; transform: scale(1.1); }
 }
 
 .netflix-card:hover .blur-xl {
   animation: netflix-glow 2s ease-in-out infinite;
 }
 
-/* Ensure smooth transitions */
-* {
-  transition-timing-function: cubic-bezier(0.23, 1, 0.320, 1);
-}
+button:focus { outline: 2px solid #f97316; outline-offset: 2px; }
 
-/* Enhanced focus states */
-button:focus {
-  outline: 2px solid #f97316;
-  outline-offset: 2px;
-}
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
-  .netflix-card:hover {
-    transform: scale(1.05) !important;
-  }
+  .netflix-card:hover { transform: scale(1.05) !important; }
 }
 </style>
