@@ -23,10 +23,10 @@
       <div
         class="panel h-screen w-full sticky top-0 flex items-center justify-center bg-[url('/images/taglinebg.png')] bg-cover bg-center rounded-xl">
       </div>
-      <div id="text-3"
+      <!-- <div id="text-3"
         class="floating-text italic  h-screen w-full text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4">
         You'll find us
-      </div>
+      </div> -->
     </div>
   </section>
 </template>

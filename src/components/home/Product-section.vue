@@ -1,4 +1,6 @@
 <template>
+  <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center my-8
+           text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]" data-aos="fade-up">You'll find us</h2>
   <div class="product-gallery-container">
     <!-- Navigation Controls -->
     <div class="scroll-controls">
@@ -215,6 +217,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'Phitagate';
+  src: url('/fonts/Phitagate.otf') format('opentype');
+}
+
+.phitagate-font {
+  font-family: 'Phitagate', serif !important;
+}
 .product-gallery-container {
   position: relative;
   width: 100%;
