@@ -1,52 +1,67 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- Hero Section -->
-    <section class="min-h-screen flex items-center justify-center px-8 py-20 relative overflow-hidden">
-      <!-- Background Elements -->
-      <div class="absolute inset-0">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-orange-100/30 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-orange-50/40 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-orange-200/20 rounded-full blur-2xl animate-float"></div>
-        <div class="absolute bottom-1/3 left-1/4 w-48 h-48 bg-orange-300/15 rounded-full blur-xl animate-float-reverse"></div>
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden w-full h-full">
+      <!-- Background Image -->
+      <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style="background-image: url('images/11zon_compressed/f6_2_11zon.png')" data-aos="zoom-in"
+        data-aos-duration="1200"></div>
+
+      <!-- Gradient Overlay for better readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 max-w-4xl px-6 sm:px-8 lg:px-12 text-center flex flex-col justify-center min-h-screen">
+        <!-- Heading -->
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 tracking-wide
+      bg-gradient-to-r from-gray-200 via-gray-300 to-gray-100 bg-clip-text text-transparent
+      drop-shadow-[0_2px_6px_rgba(26,29,43,0.7)]" data-aos="fade-up" data-aos-duration="1000">
+          ABOUT US
+        </h1>
+
+        <!-- Paragraph with frosted-text effect -->
+        <p class="relative text-lg sm:text-xl md:text-2xl leading-relaxed font-medium font-inter
+      text-gray-200 drop-shadow-[0_1px_4px_rgba(26,29,43,0.6)]" data-aos="fade-up" data-aos-duration="1200"
+          data-aos-delay="200">
+          <span class="relative z-10">
+            At Spacefurnio, we are passionate about shaping spaces that reflect purpose, personality, and precision.
+            We offer an integrated approach to architecture, construction, interior design, and custom furniture,
+            making us a one-stop destination for complete spatial solutions. From drawing board to delivery,
+            <span class="font-bold">we handle everything!</span>
+          </span>
+
+          <!-- Blurred aura behind the text -->
+          <span class="absolute inset-0 blur-md opacity-30 text-white" aria-hidden="true">
+            At Spacefurnio, we are passionate about shaping spaces that reflect purpose, personality, and precision.
+            We offer an integrated approach to architecture, construction, interior design, and custom furniture,
+            making us a one-stop destination for complete spatial solutions. From drawing board to delivery,
+            we handle everything!
+          </span>
+        </p>
       </div>
 
-      <!-- Main Content -->
-      <img
-  src="/images/aboutus/image-1.jpg"
-  alt="About Us"
-  class="w-full h-full object-cover object-center"
-/>
-
-      <!-- Scroll Indicator -->
-      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2" data-aos="fade-up" data-aos-delay="600">
-        <div class="w-6 h-10 border-2 border-orange-300 rounded-full flex justify-center">
-          <div class="w-1 h-3 bg-orange-500 rounded-full mt-2 animate-bounce"></div>
-        </div>
-      </div>
+      <!-- Mobile bottom gradient -->
+      <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 to-transparent sm:hidden"></div>
     </section>
+
+    <section class="py-4 px-4 bg-[rgba(253,243,232,255)]"></section>
 
     <!-- Our Story Section -->
-    <section class="py-20 px-4 bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
-      <img
-        src="/images/aboutus/image-2.jpg"
-        alt="Our Story"
-        class="w-full h-full object-cover object-center"
-      />
-    </section>
-
-    <!-- Mission & Values Section -->
-    <section class="py-20 px-4 bg-white">
-      <img
-        src="/images/aboutus/image-3.jpg"
-        alt="Mission & Values"
-        class="w-full h-full object-cover object-center"
-      />
+    <section class="bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
+      <img src="/images/aboutus/image-2.jpg" alt="Our Story" class="w-full h-full object-cover object-center"
+        data-aos="zoom-in" data-aos-duration="1200" />
     </section>
 
     <!-- Brand Manifesto Section -->
-    <section class="py-20 px-4 bg-gradient-to-br from-orange-50 to-white">
+    <section class="py-4 px-4 bg-[rgba(253,243,232,255)]">
 
     </section>
+    <!-- Mission & Values Section -->
+    <section class="bg-white">
+      <img src="/images/aboutus/image-3.jpg" alt="Mission & Values" class="w-full h-full object-cover object-center"
+        data-aos="zoom-in" data-aos-duration="1200" />
+    </section>
+
 
     <!-- Team Section -->
     <section class="py-20 px-6 bg-gradient-to-br from-orange-50 to-white">
@@ -55,7 +70,8 @@
         <div class="text-center mb-16" data-aos="fade-up">
           <span class="text-orange-500 font-medium text-sm uppercase tracking-wider">Meet Our Experts</span>
           <h2 class="text-4xl md:text-5xl font-light text-gray-900 mt-3 tracking-tight">
-            <span class="phitagate-font bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 bg-clip-text text-transparent">
+            <span
+              class="phitagate-font bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 bg-clip-text text-transparent">
               Our Team
             </span>
           </h2>
@@ -67,24 +83,26 @@
 
         <!-- Team Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div v-for="(member) in teamMembers" :key="member.id"
-            data-aos="fade-up" :data-aos-delay="100 * (member.id)">
-            <div class="team-card-wrapper relative"
-                 @mouseenter="handleMouseEnter(member.id)"
-                 @mouseleave="handleMouseLeave">
+          <div v-for="(member) in teamMembers" :key="member.id" data-aos="fade-up" :data-aos-delay="100 * (member.id)">
+            <div class="team-card-wrapper relative" @mouseenter="handleMouseEnter(member.id)"
+              @mouseleave="handleMouseLeave">
               <!-- Card -->
-              <div class="group relative bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl">
+              <div
+                class="group relative bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl">
                 <!-- Card Top with Pattern -->
                 <div class="h-32 bg-gradient-to-r from-orange-400 to-orange-500 relative overflow-hidden">
                   <div class="absolute inset-0 opacity-10">
-                    <div class="absolute top-0 left-0 w-full h-full bg-repeat" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB...'); background-size: 20px 20px;"></div>
+                    <div class="absolute top-0 left-0 w-full h-full bg-repeat"
+                      style="background-image: url('data:image/svg+xml;base64,PHN2ZyB...'); background-size: 20px 20px;">
+                    </div>
                   </div>
                 </div>
 
                 <!-- Profile Image -->
                 <div class="flex justify-center -mt-12 relative z-10">
                   <div class="w-24 h-24 rounded-full bg-white p-1 shadow-md">
-                    <div class="w-full h-full rounded-full bg-gradient-to-br from-orange-200 to-orange-300 flex items-center justify-center">
+                    <div
+                      class="w-full h-full rounded-full bg-gradient-to-br from-orange-200 to-orange-300 flex items-center justify-center">
                       <div class="w-12 h-12 bg-white rounded-full"></div>
                     </div>
                   </div>
@@ -103,7 +121,8 @@
                   </p>
 
                   <!-- Social Links -->
-                  <div class="flex justify-center space-x-3 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div
+                    class="flex justify-center space-x-3 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <!-- socials -->
                   </div>
                 </div>
@@ -111,15 +130,16 @@
 
               <!-- Detailed Tooltip -->
               <div v-show="hoveredMember === member.id"
-                   class="absolute z-50 w-[500px] bg-white rounded-xl shadow-2xl border border-orange-100 overflow-hidden"
-                   :class="getTooltipPosition(member.id)"
-                   data-aos="fade-up">
+                class="absolute z-50 w-[500px] bg-white rounded-xl shadow-2xl border border-orange-100 overflow-hidden"
+                :class="getTooltipPosition(member.id)" data-aos="fade-up">
                 <div class="flex flex-col md:flex-row h-full">
                   <!-- Left side -->
-                  <div class="w-full md:w-1/3 bg-gradient-to-br from-orange-100 to-orange-200 flex flex-col items-center justify-center p-6">
+                  <div
+                    class="w-full md:w-1/3 bg-gradient-to-br from-orange-100 to-orange-200 flex flex-col items-center justify-center p-6">
                     <div class="mb-4 text-center">
                       <div class="w-32 h-32 rounded-full bg-white p-2 shadow-lg mx-auto mb-4">
-                        <div class="w-full h-full rounded-full bg-gradient-to-br from-orange-300 to-orange-400 flex items-center justify-center">
+                        <div
+                          class="w-full h-full rounded-full bg-gradient-to-br from-orange-300 to-orange-400 flex items-center justify-center">
                           <span class="text-white text-3xl font-bold">{{ getInitials(member.name) }}</span>
                         </div>
                       </div>
@@ -131,7 +151,8 @@
                   <!-- Right side -->
                   <div class="w-full md:w-2/3 p-6 overflow-y-auto max-h-[400px] custom-scrollbar">
                     <div class="prose prose-sm max-w-none">
-                      <div class="whitespace-pre-line text-gray-700 leading-relaxed" v-html="formatBio(member.detailedBio)"></div>
+                      <div class="whitespace-pre-line text-gray-700 leading-relaxed"
+                        v-html="formatBio(member.detailedBio)"></div>
                     </div>
                   </div>
                 </div>
@@ -152,10 +173,14 @@
           Discover our collection and find the perfect pieces that reflect your style and personality.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
-          <button class="px-8 py-3 bg-white text-orange-600 font-medium rounded-lg hover:bg-orange-50 transition-colors duration-300 shadow-md" @click="() => window.location.href = '/shop'">
+          <button
+            class="px-8 py-3 bg-white text-orange-600 font-medium rounded-lg hover:bg-orange-50 transition-colors duration-300 shadow-md"
+            @click="() => window.location.href = '/shop'">
             Explore Our Collection
           </button>
-          <button class="px-8 py-3 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors duration-300" @click="() => window.location.href = '/shop'">
+          <button
+            class="px-8 py-3 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors duration-300"
+            @click="() => window.location.href = '/shop'">
             Contact Our Team
           </button>
         </div>
@@ -227,9 +252,9 @@ watch(hoveredMember, (newVal) => {
 // Format bio text for better display
 const formatBio = (bio) => {
   return bio.replace(/\n\n/g, '</p><p class="mt-4">')
-            .replace(/\n/g, '<br>')
-            .replace(/^(.+)$/gm, '<p>$1</p>')
-            .replace(/<p>Architectural Perspective:<\/p>/g, '<h4 class="font-semibold text-orange-600 mt-6 mb-2">Architectural Perspective:</h4>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.+)$/gm, '<p>$1</p>')
+    .replace(/<p>Architectural Perspective:<\/p>/g, '<h4 class="font-semibold text-orange-600 mt-6 mb-2">Architectural Perspective:</h4>')
 }
 
 // Get initials from name
@@ -240,7 +265,7 @@ const getInitials = (name) => {
 // Get tooltip position based on member ID
 const getTooltipPosition = (id) => {
   // Position tooltips in different locations to avoid screen edge issues
-  switch(id) {
+  switch (id) {
     case 1:
       return 'left-full top-0 ml-4' // Right side
     case 2:
@@ -265,7 +290,21 @@ onMounted(() => {
 
 <style scoped>
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.stroke {
+  -webkit-text-stroke: 1px #ffffff;
+  color: #e67e2200;
+}
 
 /* Font Face Definition */
 @font-face {
@@ -313,10 +352,13 @@ onMounted(() => {
 
 /* Custom Animations */
 @keyframes pulse-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.6;
     transform: scale(1.05);
@@ -324,30 +366,40 @@ onMounted(() => {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
   }
+
   25% {
     transform: translateY(-10px) translateX(5px);
   }
+
   50% {
     transform: translateY(0) translateX(10px);
   }
+
   75% {
     transform: translateY(10px) translateX(5px);
   }
 }
 
 @keyframes float-reverse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
   }
+
   25% {
     transform: translateY(10px) translateX(-5px);
   }
+
   50% {
     transform: translateY(0) translateX(-10px);
   }
+
   75% {
     transform: translateY(-10px) translateX(-5px);
   }
@@ -434,6 +486,7 @@ button:focus {
 
 /* Ensure tooltip stays within viewport and is accessible */
 @media (min-width: 1024px) {
+
   /* For right-side tooltips */
   .team-card-wrapper .absolute.z-50.left-full {
     left: 100%;
@@ -486,7 +539,9 @@ button:focus {
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .animate-float, .animate-float-reverse {
+
+  .animate-float,
+  .animate-float-reverse {
     animation-duration: 20s;
   }
 }
