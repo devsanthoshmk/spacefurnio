@@ -48,7 +48,7 @@
 
     <!-- Our Story Section -->
     <section class="bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
-      <img src="/images/aboutus/image-2.jpg" alt="Our Story" class="w-full h-full object-cover object-center"
+      <img src="/images/aboutus/image-2.svg" alt="Our Story" class="w-full h-full object-cover object-center"
         data-aos="zoom-in" data-aos-duration="1200" />
     </section>
 
@@ -58,7 +58,7 @@
     </section>
     <!-- Mission & Values Section -->
     <section class="bg-white">
-      <img src="/images/aboutus/image-3.jpg" alt="Mission & Values" class="w-full h-full object-cover object-center"
+      <img src="/images/aboutus/image-3.svg" alt="Mission & Values" class="w-full h-full object-cover object-center"
         data-aos="zoom-in" data-aos-duration="1200" />
     </section>
 
