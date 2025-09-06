@@ -48,7 +48,7 @@
 
     <!-- Our Story Section -->
     <section class="bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
-      <img src="/images/aboutus/image-2.svg" alt="Our Story" class="w-full h-full object-cover object-center"
+      <img src="/images/aboutus/image-2.jpg" alt="Our Story" class="w-full h-full object-cover object-center"
         data-aos="zoom-in" data-aos-duration="1200" />
     </section>
 
@@ -58,7 +58,7 @@
     </section>
     <!-- Mission & Values Section -->
     <section class="bg-white">
-      <img src="/images/aboutus/image-3.svg" alt="Mission & Values" class="w-full h-full object-cover object-center"
+      <img src="/images/aboutus/image-3.jpg" alt="Mission & Values" class="w-full h-full object-cover object-center"
         data-aos="zoom-in" data-aos-duration="1200" />
     </section>
 
@@ -83,7 +83,11 @@
 
         <!-- Team Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div v-for="(member) in teamMembers" :key="member.id" data-aos="fade-up" :data-aos-delay="100 * (member.id)">
+          <div v-for="(member, index) in teamMembers"
+     :key="index"
+     data-aos="fade-up"
+     :data-aos-delay="100 * index">
+
             <div class="team-card-wrapper relative" @mouseenter="handleMouseEnter(member.id)"
               @mouseleave="handleMouseLeave">
               <!-- Card -->
@@ -212,6 +216,45 @@ For me, architecture is all about creating smart, simple spaces that work well a
   },
   {
     id: 2,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `Hello, I'm Jeffy
+
+I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.
+
+Architectural Perspective:
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 3,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `Hello, I'm Jeffy
+
+I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.
+
+Architectural Perspective:
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 4,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `Hello, I'm Jeffy
+
+I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.
+
+Architectural Perspective:
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 5,
     name: "J. Jeffrina",
     nickname: "Jeffy",
     role: "Co-Founder & Financial Manager",
