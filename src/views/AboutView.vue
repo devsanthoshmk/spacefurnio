@@ -231,12 +231,90 @@
 
 </section>
 
+
+<section class="our-team max-w-7xl mx-auto px-6 py-16">
+    <!-- Heading -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl md:text-5xl font-bold text-[#5A4A42] relative inline-block">
+        Our Team
+        <span class="block h-[2px] w-16 bg-[#5A4A42] mx-auto mt-4"></span>
+      </h2>
+    </div>
+
+    <!-- Team list -->
+    <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+      <li
+        v-for="member in ourteam"
+        :key="member.id"
+        class="flex flex-col items-center text-center"
+      >
+        <img
+          :src="member.image"
+          :alt="member.name"
+          class="w-full aspect-square object-cover rounded-lg shadow-lg"
+        />
+        <div class="mt-4">
+          <h3 class="text-lg font-medium text-gray-800">{{ member.name }}</h3>
+          <p class="text-sm font-semibold text-[#5A4A42]">
+            {{ member.role }}
+          </p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+<section class="max-w-6xl mx-auto px-6 py-16">
+  <!-- Section Heading -->
+  <div class="text-center mb-16">
+    <h2 class="text-4xl md:text-5xl font-bold text-[#5A4A42] relative inline-block">
+      Our Clientele
+      <span class="block h-[3px] w-20 bg-[#5A4A42] mx-auto mt-4"></span>
+    </h2>
+  </div>
+
+  <!-- Clients Grid -->
+  <div class="grid md:grid-cols-2 gap-16">
+    <!-- Client 1 -->
+    <div class="flex flex-col items-center text-center">
+      <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
+        <img
+          src="https://placehold.co/300x120"
+          alt="Zentropy Logo"
+          class="max-h-28 object-contain"
+        />
+      </div>
+      <p class="mt-6 text-lg text-gray-600">Mr. Shankar</p>
+      <p class="text-xl font-semibold text-gray-900">Zentropy Pvt. Ltd.</p>
+    </div>
+
+    <!-- Client 2 -->
+    <div class="flex flex-col items-center text-center">
+      <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
+        <img
+          src="https://placehold.co/300x120"
+          alt="Genius Kidz Logo"
+          class="max-h-28 object-contain"
+        />
+      </div>
+      <p class="mt-6 text-lg text-gray-600">Mr. Mohd Zaman</p>
+      <p class="text-xl font-semibold text-gray-900">Genius Kidz.ai</p>
+    </div>
+  </div>
+</section>
+
+
+
 </template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Dancing+Script:wght@500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap");
+
+.our-team {
+  font-family: "Nunito Sans", sans-serif;
+}
 @font-face {
   font-family: 'Phitagate';
   src: url('/fonts/Phitagate.otf') format('opentype');
@@ -267,10 +345,9 @@
 </style>
 
 <script setup>
-import { ref } from 'vue'
 
 // Team members data
-const teamMembers = ref([
+const teamMembers = [
   {
     id: 1,
     name: "Ar. Thaini Jentra",
@@ -321,6 +398,44 @@ I don't come from an architecture background, but I've always been fascinated by
 Architectural_Perspective:`
 I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
   }
-])
+]
+const ourteam = [
+  {
+    id: 1,
+    name: "Ar. Nagaraj",
+    role: "Architect",
+    image: "https://placehold.co/400x400",
+  },
+  {
+    id: 2,
+    name: "Mr. Gowtham",
+    role: "Interior Designer",
+    image: "https://placehold.co/400x400",
+  },
+  {
+    id: 3,
+    name: "Ms. Kaviya Arulthilagam",
+    role: "Product Designer",
+    image: "https://placehold.co/400x400",
+  },
+  {
+    id: 4,
+    name: "Rajkumar P",
+    role: "Senior Civil Engineer",
+    image: "https://placehold.co/400x400",
+  },
+  {
+    id: 5,
+    name: "Mr. Rajesh",
+    role: "Fabrication Team Lead",
+    image: "https://placehold.co/400x400",
+  },
+  {
+    id: 6,
+    name: "Mr. Madhan",
+    role: "Structural Engineer",
+    image: "https://placehold.co/400x400",
+  },
+];
 </script>
 
