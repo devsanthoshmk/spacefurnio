@@ -184,7 +184,50 @@
     </div>
 
   </div>
-<section>
+<section class="max-w-7xl mx-auto px-6 py-16 team-section">
+
+<section class="max-w-7xl mx-auto px-6 py-16 team-section">
+  <div
+    v-for="(member, index) in teamMembers"
+    :key="member.id"
+    class="teammem grid md:grid-cols-2 gap-12 items-center my-4"
+  >
+    <!-- Image -->
+    <div
+      class="relative w-full"
+      :class="[ index % 2 === 1 ? 'md:order-2' : 'md:order-1' ]"
+    >
+      <img
+        src="https://placehold.co/600x600"
+        alt="Profile Image"
+        class="w-full h-auto rounded-2xl shadow-xl object-cover"
+      />
+
+      <div class="absolute bottom-4 bg-gray-900/90 text-white px-5 py-3 rounded-lg shadow-lg" :class="index % 2 === 1 ? 'left-4' : 'right-4' ">
+        <h3 class="text-lg font-semibold">{{ member.name }}</h3>
+        <p class="text-sm">{{ member.role }}</p>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div
+      class="text-gray-700 space-y-6"
+      :class="[ index % 2 === 1 ? 'md:order-1' : 'md:order-2' ]"
+    >
+      <h1 class="text-3xl font-bold text-gray-900">Hello, I'm {{ member.nickname }}</h1>
+      <p class="leading-relaxed">{{ member.detailedBio }}</p>
+
+      <div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Architectural Perspective</h2>
+        <p class="leading-relaxed">{{ member.Architectural_Perspective }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
 
 </section>
 
@@ -224,6 +267,60 @@
 </style>
 
 <script setup>
+import { ref } from 'vue'
 
+// Team members data
+const teamMembers = ref([
+  {
+    id: 1,
+    name: "Ar. Thaini Jentra",
+    nickname: "Jeni",
+    role: "Managing Partner & Founder",
+    description: "Architect with 3 years of experience in design",
+    detailedBio: `I'm an architect with 3 years of experience in this field, and I genuinely enjoy the hands-on side of design, especially bringing ideas to life through thoughtful execution. I'm a naturally curious person, always exploring new tools, materials, and ways to improve what I do. I love turning creative concepts into practical, buildable solutions that are both smart and meaningful.`,
+Architectural_Perspective:`
+For me, architecture is all about creating smart, simple spaces that work well and feel good to live in. I'm drawn to designs that are minimalist, budget-friendly, and kind to the environment. I believe that with the right ideas and materials, we can build spaces that are both beautiful and practical, without overcomplicating things. Sometimes, the simplest designs speak the loudest—when they're made with care and purpose.`
+  },
+  {
+    id: 2,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
+Architectural_Perspective:`
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 3,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
+Architectural_Perspective:`
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 4,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
+Architectural_Perspective:`
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  },
+    {
+    id: 5,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for business growth",
+    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
+Architectural_Perspective:`
+I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
+  }
+])
 </script>
 
