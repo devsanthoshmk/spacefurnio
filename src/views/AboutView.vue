@@ -2,21 +2,28 @@
   <!-- hero section -->
   <section class="">
   <!-- container -->
-  <div class="h-screen w-full relative">
+  <div class="h-[125vh]  w-full relative">
 
     <!-- top solid block -->
-    <div class="top-0 left-0 w-full h-1/3 bg-[#fff4ec]"></div>
+    <div class="top-0 left-0 w-full h-[calc(25%)] bg-[#fff4ec]"></div>
 
     <!-- background image block -->
-    <div class="bg-[url('/images/aboutus/hero.png')] bg-cover bg-center h-2/3"></div>
+    <div class="bg-[url('/images/aboutus/herom.webp')] bg-cover bg-bottom h-[75%]"></div>
 
     <!-- foreground text -->
-    <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center px-4" style="     top: calc(0.29 * 100%);">
-      <h2 class="text-4xl md:text-5xl text-black font-bold mb-4 font-serif">
+    <div class="bg-white/28 backdrop-blur-lg px-4 py-2 rounded-lg absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center" style="     top: calc(0.18 * 100%);">
+      <!-- client approval awaiting -->
+      <!-- <h2 class="text-4xl md:text-5xl text-[#ff7700] font-extrabold mb-4 tracking-widest phitagate-font" style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
         ABOUT US
-      </h2>
-      <p class="max-w-2xl text-sm md:text-base text-gray-800 leading-relaxed">
-        At <span class="font-semibold">Spacefurnio</span>, we are passionate about shaping spaces that reflect purpose,
+      </h2> -->
+
+            <h1 class="text-4xl md:text-5xl text-black font-serif font-extrabold mb-4 tracking-widest" style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
+        ABOUT US
+      </h1>
+
+
+      <p class="text-sm md:text-base text-gray-800 leading-relaxed">
+        At <span class="font-bold">Spacefurnio</span>, we are passionate about shaping spaces that reflect purpose,
         personality, and precision. We offer an integrated approach to architecture,
         construction, interior design, and custom furniture, making us a one-stop
         destination for complete spatial solutions. From drawing board to delivery,
@@ -44,7 +51,7 @@
   }"
 >
   <h2
-    class="font-serif text-[clamp(1rem,2vw,1.5rem)] md:text-[clamp(1.2rem,2.5vw,2rem)] leading-snug text-gray-800"
+    class="font-serif text-[clamp(0.8rem,1.6vw,1.3rem)] md:text-[clamp(1rem,2vw,1.6rem)] leading-snug text-gray-800"
   >
     Where lines meet light,<br />
     and function meets soul,<br />
@@ -54,23 +61,28 @@
   </h2>
 
   <p
-    class="mt-2 text-[clamp(0.9rem,1.8vw,1.25rem)] text-gray-700 leading-snug"
+    class="mt-2 text-[clamp(1rem,2vw,1.35rem)] text-gray-700 leading-snug"
   >
     Every corner crafted.<br />
     Every piece with purpose.<br />
     Because your space deserves<br />
     more than structure,<br />
-    <span class="font-script italic">it deserves a story.</span>
+    <span class="font-script italic text-[clamp(0.8rem,1.6vw,1.3rem)] md:text-[clamp(1rem,2vw,1.6rem)] font-bold">it deserves a story.</span>
   </p>
 </div>
 
 
     <!-- Left side rotated label -->
-    <div
-      class="phitagate-font absolute left-0 -translate-y-1/2 -rotate-90 origin-top-left text-black font-semibold text-8xl top-full px-4 py-6"
-    >
-      Brand Manifesto
-    </div>
+<div class="relative h-[calc(100vh+109.5px)] w-full">
+  <div
+    class="phitagate-font text-black font-semibold text-8xl absolute left-0 top-1/2 whitespace-nowrap origin-top-left"
+    style="transform: rotate(-90deg) translateY(35%) translateX(-35%);"
+  >
+    Brand Manifesto
+  </div>
+</div>
+
+
   </section>
   <section class="relative w-full h-screen overflow-hidden">
   <!-- Background -->
@@ -113,11 +125,14 @@
 
 
   <!-- Right side rotated label -->
-  <div
-    class="phitagate-font absolute right-0 -translate-y-1/2 rotate-90 origin-top-right text-black font-semibold text-8xl top-full px-4 py-6"
-  >
-    Mission Statement
-  </div>
+   <div class="relative h-[calc(100vh)] w-full">
+    <div
+      class="phitagate-font text-black font-semibold text-8xl absolute right-0 top-1/2 whitespace-nowrap origin-top-right"
+      style="transform: rotate(90deg) translateY(45%) translateX(50%);"
+    >
+      Mission Statement
+    </div>
+   </div>
 </section>
   <div class="h-screen w-full relative">
 
@@ -129,7 +144,7 @@
 
     <!-- foreground text -->
     <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center px-4" style="     top: calc(0.25 * 100%);">
-      <h2 class="phitagate-font text-7xl font-bold mb-4 text-[#e67e22]">
+      <h2 class="phitagate-font text-7xl font-bold mb-4 text-black">
         What we do?
       </h2>
 <div class="w-[75vw] mx-auto mt-7">
@@ -242,7 +257,7 @@
     </div>
 
     <!-- Team list -->
-    <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+    <ul class="grid grid-cols-2 md:grid-cols-3  gap-10">
       <li
         v-for="member in ourteam"
         :key="member.id"
