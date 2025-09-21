@@ -49,18 +49,19 @@
           <div class="space-y-3">
             <address class="not-italic">
               <div class="text-gray-300">
-                1234 Street Name<br>
-                City, Country
+                90/1, North Beach Road
+                Tuticorin,<br>
+                Chennai – 628001.
               </div>
             </address>
             <div>
-              <a href="tel:+00123456789" class="text-gray-300 hover:text-white transition-colors duration-300">
-                (+00) 123-456-7890
+              <a href="tel:+919751112025" class="text-gray-300 hover:text-white transition-colors duration-300">
+                +91 9751112025
               </a>
             </div>
             <div>
-              <a href="mailto:info@example.com" class="text-gray-300 hover:text-white transition-colors duration-300">
-                info@example.com
+              <a href="mailto:info.spacefurnio@gmail.com" class="text-gray-300 hover:text-white transition-colors duration-300">
+                info.spacefurnio@gmail.com
               </a>
             </div>
           </div>
