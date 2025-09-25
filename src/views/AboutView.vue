@@ -5,13 +5,13 @@
   <div class="h-[125vh]  w-full relative">
 
     <!-- top solid block -->
-    <div class="top-0 left-0 w-full h-[calc(25%)] bg-[#fff4ec]"></div>
+    <div class="top-0 left-0 w-full h-[calc(20%)] bg-[#fff4ec]"></div>
 
     <!-- background image block -->
-    <div class="bg-[url('/images/aboutus/herom.webp')] bg-cover bg-bottom h-[75%]"></div>
+    <div class="bg-[url('/images/aboutus/hero.png')] bg-cover bg-bottom h-[80%]"></div>
 
     <!-- foreground text -->
-    <div class="bg-white/28 backdrop-blur-lg px-4 py-2 rounded-lg absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center" style="     top: calc(0.18 * 100%);">
+    <div class="px-4 py-2 rounded-lg absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center" style="     top: calc(0.16 * 100%);">
       <!-- client approval awaiting -->
       <!-- <h2 class="text-4xl md:text-5xl text-[#ff7700] font-extrabold mb-4 tracking-widest phitagate-font" style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
         ABOUT US
