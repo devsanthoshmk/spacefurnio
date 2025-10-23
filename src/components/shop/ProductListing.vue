@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white">
     <!-- Filter Section -->
-    <div class="bg-gray-50 border-b border-gray-200">
+    <div class="bg-gray-50 border-b border-gray-200 pt-25">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <!-- Main Category Filters -->
