@@ -79,14 +79,14 @@ const router = createRouter({
     //     title: (route) => `${route.params.category} - Shop by Category - Space Furnio`,
     //   },
     // },
-    // {
-    //   path: '/shop/design/space/:category',
-    //   name: 'DesignSpaceProducts',
-    //   component: () => import('@/components/shop/ProductListing.vue'),
-    //   meta: {
-    //     title: (route) => `${route.params.category} Design - Shop by Design - Space Furnio`,
-    //   },
-    // },
+    {
+      path: '/shop/design/space/:category',
+      name: 'DesignSpaceProducts',
+      component: () => import('@/components/shop/ProductListing.vue'),
+      meta: {
+        title: (route) => `${route.params.category} Design - Shop by Design - Space Furnio`,
+      },
+    },
     // {
     //   path: '/shop/design/style/:category',
     //   name: 'DesignStyleProducts',
