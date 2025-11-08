@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Page Scroll</title>
+    <style>
+        /* 1. Core styles to prevent native browser scrolling */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* This is the key to hijacking the scroll */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+        }
+
+        /* 2. The scroll wrapper holds all sections. 
+           This is the element we will move with 'transform'.
+           It's the equivalent of your original '#inner' */
+        #scroll-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            /* Using a longer, smoother transition for full-page moves */
+        }
+
+        /* 3. Each '.section' is a full-page slide.
+           This is the equivalent of your original '<p>' tag. */
+        .section {
+            width: 100%;
+            height: 100vh;
+            /* Each section is 100% of the viewport height */
+            display: flex;
+            overflow: hidden;
+            /* Hide content overflow within a section */
+        }
+
+        .section:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        /* 4. The two-column layout you requested */
+        .image-side,
+        .content-side {
+            width: 50%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .image-side {
+            background-size: cover;
+            background-position: center;
+        }
+
+        .content-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .content-side h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .content-side p {
+            font-size: 1.2rem;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* 5. Active state, just like your original '.active' class */
+        .content-side h2,
+        .content-side p {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+        }
+
+        .section.active .content-side h2,
+        .section.active .content-side p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 6. Navigation dots (optional but helpful) */
+        .nav-slider-container {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-track {
+            position: relative;
+            width: 4px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .thumbnail-preview {
+            position: absolute;
+            right: 40px;
+            width: 200px;
+            height: 150px;
+            background: #222;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .thumbnail-preview.visible {
+            opacity: 1;
+        }
+
+        .thumbnail-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-preview .preview-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .section-markers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .section-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .section-marker.active {
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="scroll-wrapper">
+
+        <section class="section" id="section-0" style="height: 150vh;">
+            <div class="image-side"
+                style="background-image: url('https://picsum.photos/1200/900?image=1011'); height: 100%;"></div>
+            <div class="content-side">
+                <h2>Section One</h2>
+                <p>Welcome to the full-page scroller. Use your mouse wheel, keyboard, or touch to navigate.</p>
+            </div>
+        </section>
+
+        <section class="section" id="section-1" style="height: 150vh;">
+            <div class="image-side"
+                style="background-image: url('https://picsum.photos/1200/900?image=1012'); height: 100%;"></div>
+            <div class="content-side">
+                <h2>Section Two</h2>
+                <p>The logic is identical to your original code, but we use `window.innerHeight` as the scroll distance.
+                </p>
+            </div>
+        </section>
+
+        <section class="section" id="section-2">
+            <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1013')"></div>
+            <div class="content-side">
+                <h2>Section Three</h2>
+                <p>We use an `isScrolling` flag based on the `transitionend` event for robust control.</p>
+            </div>
+        </section>
+
+        <section class="section" id="section-3">
+            <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1014')"></div>
+            <div class="content-side">
+                <h2>Section Four</h2>
+                <p>This layout also adapts to window resizing, recalculating heights and positions.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav-slider-container" id="nav-slider">
+        <div class="slider-track" id="slider-track">
+            <div class="section-markers" id="section-markers"></div>
+            <div class="slider-thumb" id="slider-thumb"></div>
+        </div>
+        <div class="thumbnail-preview" id="thumbnail-preview">
+            <img id="preview-image" src="" alt="Section preview">
+            <div class="preview-label" id="preview-label">Section 1</div>
+        </div>
+    </div>
+
+
+    <script>
+        const wrapper = document.getElementById('scroll-wrapper');
+        const navSliderContainer = document.getElementById('nav-slider');
+        const sliderTrack = document.getElementById('slider-track');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sectionMarkers = document.getElementById('section-markers');
+        const thumbnailPreview = document.getElementById('thumbnail-preview');
+        const previewImage = document.getElementById('preview-image');
+        const previewLabel = document.getElementById('preview-label');
+        const child_elms = Array.from(wrapper.children)
+        const itemCount = wrapper.children.length;
+        let isDragging = false;
+        let trackHeight;
+        let thumbHeight;
+        let thumbPosition;
+
+        let offset = 0;
+        // Compute correct bounds
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const maxOffset = 0;
+        const minOffset = -(wrapper.scrollHeight - viewportHeight);
+
+        // Throttle remains the same
+        let lastScrollTime = 0;
+        const scrollDelay = 400;
+        let currentIndex = 0;
+
+        wrapper.style.transition = `transform ${scrollDelay}ms cubic-bezier(0.5, 0, 0.2, 1)`;
+
+        function updateSliderThumb() {
+            trackHeight = sliderTrack.clientHeight;
+            thumbHeight = trackHeight / itemCount;
+            thumbPosition = thumbHeight * currentIndex;
+
+            sliderThumb.style.height = `${thumbHeight}px`;
+            sliderThumb.style.transform = `translateY(${thumbPosition}px)`;
+        }
+
+        function createSectionMarkers() {
+            sectionMarkers.innerHTML = '';
+            const totalHeight = wrapper.scrollHeight;
+            let cumulativeHeight = 0;
+
+            child_elms.forEach((section, index) => {
+                const marker = document.createElement('div');
+                marker.classList.add('section-marker');
+                marker.dataset.index = index;
+
+                // Calculate marker position as percentage
+                const sectionHeight = section.offsetHeight;
+                const position = (cumulativeHeight / totalHeight) * 100;
+                marker.style.top = `${position}%`;
+
+                cumulativeHeight += sectionHeight;
+                sectionMarkers.appendChild(marker);
+            });
+        }
+
+        function updateSliderPosition() {
+            const totalHeight = wrapper.scrollHeight - viewportHeight;
+            const percentage = Math.abs(offset) / totalHeight;
+            const position = percentage * trackHeight;
+            sliderThumb.style.top = `${position}px`;
+
+            // Update active marker
+            const markers = document.querySelectorAll('.section-marker');
+            markers.forEach((marker, index) => {
+                marker.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        function getSectionAtPosition(thumbPosition) {
+            const percentage = thumbPosition / trackHeight;
+            const scrollPosition = percentage * (wrapper.scrollHeight - viewportHeight);
+
+            let cumulativeHeight = 0;
+            for (let i = 0; i < child_elms.length; i++) {
+                const sectionHeight = child_elms[i].offsetHeight;
+                if (scrollPosition < cumulativeHeight + sectionHeight) {
+                    return i;
+                }
+                cumulativeHeight += sectionHeight;
+            }
+            return child_elms.length - 1;
+        }
+
+        function showThumbnailPreview(sectionIndex) {
+            const section = child_elms[sectionIndex];
+            const imageElement = section.querySelector('.image-side');
+
+            if (imageElement) {
+                const bgImage = window.getComputedStyle(imageElement).backgroundImage;
+                const imageUrl = bgImage.slice(5, -2); // Extract URL from url("...")
+                previewImage.src = imageUrl;
+            }
+
+            previewLabel.textContent = `Section ${sectionIndex + 1}`;
+
+            // Position preview next to thumb
+            const thumbRect = sliderThumb.getBoundingClientRect();
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const previewTop = thumbRect.top - trackRect.top - 60; // Center preview on thumb
+            thumbnailPreview.style.top = `${previewTop}px`;
+            thumbnailPreview.classList.add('visible');
+        }
+
+        function hideThumbnailPreview() {
+            thumbnailPreview.classList.remove('visible');
+        }
+
+        function scrollToSection(sectionIndex) {
+            let heights = 0;
+            child_elms.slice(0, sectionIndex).forEach(section => {
+                heights += section.offsetHeight;
+            });
+            offset = -heights;
+            wrapper.style.transform = `translateY(${offset}px)`;
+            currentIndex = sectionIndex;
+            highlightActiveSection();
+            updateSliderPosition();
+        }
+
+        // Slider drag functionality
+        sliderThumb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            sliderThumb.style.transition = 'none';
+            showThumbnailPreview(currentIndex);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const trackRect = sliderTrack.getBoundingClientRect();
+            let newTop = e.clientY - trackRect.top;
+            newTop = Math.max(0, Math.min(trackHeight, newTop));
+
+            sliderThumb.style.top = `${newTop}px`;
+
+            const sectionIndex = getSectionAtPosition(newTop);
+            showThumbnailPreview(sectionIndex);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+
+            isDragging = false;
+            sliderThumb.style.transition = '';
+
+            const thumbTop = parseFloat(sliderThumb.style.top);
+            const sectionIndex = getSectionAtPosition(thumbTop);
+
+            scrollToSection(sectionIndex);
+            hideThumbnailPreview();
+        });
+
+        // Click on track to jump to position
+        sliderTrack.addEventListener('click', (e) => {
+            if (e.target === sliderThumb) return;
+
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const clickPosition = e.clientY - trackRect.top;
+            const sectionIndex = getSectionAtPosition(clickPosition);
+
+            scrollToSection(sectionIndex);
+        });
+
+        // Update highlightActiveSection to also update slider
+        const originalHighlightActiveSection = highlightActiveSection;
+        function highlightActiveSection() {
+            child_elms.forEach((section, index) => {
+                if (index === currentIndex) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            updateSliderPosition();
+        }
+
+        // Initialize
+        createSectionMarkers();
+        updateSliderPosition();
+        highlightActiveSection();
+
+        // Update on window resize
+        window.addEventListener('resize', () => {
+            trackHeight = sliderTrack.offsetHeight;
+            createSectionMarkers();
+            updateSliderPosition();
+        });
+
+        // Update the scrollUp and scrollDown functions to call updateSliderPosition
+        function scrollUp() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+
+            if (currentIndex === 0 && offset >= maxOffset) {
+                // bounce at top
+                const h = wrapper.children[currentIndex].offsetHeight;
+                wrapper.style.transform = `translateY(${offset + 100}px)`;
+                lastScrollTime = now;
+                setTimeout(() => {
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    lastScrollTime = now;
+                }, 250);
+                return;
+            }
+
+            const rect = wrapper.children[currentIndex].getBoundingClientRect();
+
+            if (rect.top < 0) {
+                const scrollAmount = Math.min(viewportHeight, Math.abs(rect.top));
+                offset += scrollAmount;
+                wrapper.style.transform = `translateY(${offset}px)`;
+                lastScrollTime = now;
+                updateSliderPosition(); // Add this
+                return;
+            }
+
+            if (currentIndex > 0) {
+                const h = wrapper.children[currentIndex - 1].offsetHeight;
+
+                if (h > viewportHeight) {
+                    offset += viewportHeight;
+                } else {
+                    offset += h;
+                }
+
+                wrapper.style.transform = `translateY(${offset}px)`;
+                currentIndex = Math.max(0, currentIndex - 1);
+                highlightActiveSection();
+                lastScrollTime = now;
+            }
+        }
+
+        function scrollDown() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+
+            const h = wrapper.children[currentIndex].offsetHeight;
+
+            if (currentIndex === itemCount - 1 && offset <= minOffset) {
+                // bounce at bottom
+                wrapper.style.transform = `translateY(${offset - 100}px)`;
+                lastScrollTime = now;
+                setTimeout(() => {
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    lastScrollTime = now;
+                }, 250);
+                return;
+            }
+
+            const rect = wrapper.children[currentIndex].getBoundingClientRect();
+
+            if (rect.bottom > viewportHeight) {
+                const scrollAmount = Math.min(viewportHeight, rect.bottom - viewportHeight);
+                offset -= scrollAmount;
+                wrapper.style.transform = `translateY(${offset}px)`;
+                lastScrollTime = now;
+                updateSliderPosition(); // Add this
+                return;
+            }
+
+            if (currentIndex < itemCount - 1) {
+                const nextH = wrapper.children[currentIndex + 1].offsetHeight;
+
+                if (nextH > viewportHeight) {
+                    offset -= viewportHeight;
+                } else {
+                    offset -= nextH;
+                }
+
+                wrapper.style.transform = `translateY(${offset}px)`;
+                currentIndex = Math.min(itemCount - 1, currentIndex + 1);
+                highlightActiveSection();
+                lastScrollTime = now;
+            }
+        }
+    </script>
+</body>
+
+</html>

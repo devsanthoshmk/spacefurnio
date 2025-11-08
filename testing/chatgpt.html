@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Full-Page Scroll</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #111;
+            color: #fff;
+        }
+
+        .page-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .scroll-wrapper {
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            width: 100%;
+            height: 100%;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100vh;
+            padding: 50px;
+            background: #111;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+            transition: background-color 0.5s;
+        }
+
+        .section.active {
+            background: linear-gradient(135deg, #0ff1, #111);
+        }
+
+        .section:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .image-side {
+            flex: 1;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .content-side {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 1.4rem;
+            line-height: 1.6;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #0ff;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+
+        button:hover {
+            background: #0dd;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <div class="scroll-wrapper" id="scrollWrapper">
+            <section class="section" style="--bg:url('https://picsum.photos/900/900?1')">
+                <div class="image-side" style="background-image:url('https://picsum.photos/900/900?1');"></div>
+                <div class="content-side">
+                    <h1>Section 1</h1>
+                    <p>Welcome to the smooth full-page scrolling demo. Scroll to explore.</p>
+                </div>
+            </section>
+            <section class="section">
+                <div class="image-side" style="background-image:url('https://picsum.photos/900/900?2');"></div>
+                <div class="content-side">
+                    <h1>Section 2</h1>
+                    <p>Each scroll moves gently by one section, using CSS transitions.</p>
+                </div>
+            </section>
+            <section class="section">
+                <div class="image-side" style="background-image:url('https://picsum.photos/900/900?3');"></div>
+                <div class="content-side">
+                    <h1>Section 3</h1>
+                    <p>Touch and wheel events are throttled for consistent smoothness.</p>
+                </div>
+            </section>
+            <section class="section">
+                <div class="image-side" style="background-image:url('https://picsum.photos/900/900?4');"></div>
+                <div class="content-side">
+                    <h1>Section 4</h1>
+                    <p>Use Arrow keys, PageUp, PageDown, Home, and End as well.</p>
+                </div>
+            </section>
+            <section class="section">
+                <div class="image-side" style="background-image:url('https://picsum.photos/900/900?5');"></div>
+                <div class="content-side">
+                    <h1>Section 5</h1>
+                    <p>This is the final section. Smooth transitions make it feel natural.</p>
+                </div>
+            </section>
+        </div>
+
+        <div class="controls">
+            <button onclick="scrollUp()">▲ Scroll Up</button>
+            <button onclick="scrollDown()">▼ Scroll Down</button>
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('scrollWrapper');
+        const sections = document.querySelectorAll('.section');
+        let currentIndex = 0;
+        const totalSections = sections.length;
+        const scrollDelay = 500; // ms
+        let lastScrollTime = 0;
+
+        function updateScroll() {
+            const translateY = -(currentIndex * window.innerHeight);
+            wrapper.style.transform = `translateY(${translateY}px)`;
+            sections.forEach((sec, i) => sec.classList.toggle('active', i === currentIndex));
+        }
+
+        function scrollUp() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateScroll();
+                lastScrollTime = now;
+            }
+        }
+
+        function scrollDown() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+            if (currentIndex < totalSections - 1) {
+                currentIndex++;
+                updateScroll();
+                lastScrollTime = now;
+            }
+        }
+
+        // Wheel
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY > 0) scrollDown();
+            else scrollUp();
+        }, { passive: false });
+
+        // Touch
+        let touchStartY = 0;
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+            if (Math.abs(deltaY) > 50) {
+                if (deltaY > 0) scrollDown();
+                else scrollUp();
+                touchStartY = touchY;
+            }
+        }, { passive: false });
+
+        // Keyboard
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'PageUp':
+                    scrollUp();
+                    break;
+                case 'ArrowDown':
+                case 'PageDown':
+                    scrollDown();
+                    break;
+                case 'Home':
+                    currentIndex = 0;
+                    updateScroll();
+                    break;
+                case 'End':
+                    currentIndex = totalSections - 1;
+                    updateScroll();
+                    break;
+            }
+        });
+
+        updateScroll(); // initialize
+    </script>
+</body>
+
+</html>

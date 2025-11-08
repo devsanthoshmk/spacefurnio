@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Scroll Control</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #222, #444);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .scroll-box {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .scroll-inner {
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 10px;
+        }
+
+        .scroll-inner p {
+            padding: 12px;
+            margin: 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .scroll-inner p:last-child {
+            border-bottom: none;
+        }
+
+        .scroll-inner p.active {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: #0ff;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #0ff;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        button:hover {
+            background: #0dd;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+            max-width: 500px;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #0ff;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #0ff;
+            height: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .scroll-box {
+                height: 180px;
+            }
+
+            .controls {
+                gap: 10px;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="scroll-box" id="box">
+            <div class="scroll-inner" id="inner">
+                <p>Line 1 - Welcome to the smooth scrolling demo</p>
+                <p>Line 2 - Use wheel, touch, or keyboard to navigate</p>
+                <p>Line 3 - Each scroll action moves gently by one line</p>
+                <p>Line 4 - CSS transitions create smooth animation</p>
+                <p>Line 5 - Scroll events are throttled for consistency</p>
+                <p>Line 6 - Try different input methods to see the effect</p>
+                <p>Line 7 - This is the last line of content</p>
+            </div>
+        </div>
+        <div class="controls">
+            <button onclick="scrollUp()">▲ Scroll Up</button>
+            <button onclick="scrollDown()">▼ Scroll Down</button>
+        </div>
+
+    </div>
+
+    <script>
+        let offset = 0;
+        const inner = document.getElementById('inner');
+        const itemHeight = inner.children[0].offsetHeight;
+        console.log('Item height:', itemHeight);
+        const maxOffset = 0; // Can't scroll above the top
+        const minOffset = -((inner.children.length - 4) * itemHeight); // Can't scroll below the last item
+
+        // Throttling variables
+        let lastScrollTime = 0;
+        const scrollDelay = 100; // milliseconds between scroll actions
+
+
+        function highlightActiveLine() {
+            const activeIndex = Math.abs(offset / itemHeight);
+            const lines = inner.children;
+
+            // Remove active class from all lines
+            for (let line of lines) {
+                line.classList.remove('active');
+            }
+
+            // Add active class to the current line
+            if (lines[activeIndex]) {
+                lines[activeIndex].classList.add('active');
+            }
+        }
+
+        function scrollUp() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+            if (offset > maxOffset) return;
+            else if (offset === maxOffset) {
+                offset += itemHeight;
+                inner.style.transform = `translateY(${offset}px)`;
+                setTimeout(() => {
+                    offset -= itemHeight;
+                    inner.style.transform = `translateY(${offset}px)`;
+                    highlightActiveLine();
+                    lastScrollTime = now;
+                }, 100);
+                return;
+            }
+            offset += itemHeight;
+            inner.style.transform = `translateY(${offset}px)`;
+            highlightActiveLine();
+            lastScrollTime = now;
+        }
+
+        function scrollDown() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+            if (offset < minOffset) return;
+            else if (offset === minOffset) {
+                offset -= itemHeight;
+                inner.style.transform = `translateY(${offset}px)`;
+                setTimeout(() => {
+                    offset += itemHeight;
+                    inner.style.transform = `translateY(${offset}px)`;
+                    highlightActiveLine();
+                    lastScrollTime = now;
+                }, 100);
+                return;
+            }
+
+            offset -= itemHeight;
+            inner.style.transform = `translateY(${offset}px)`;
+            highlightActiveLine();
+            lastScrollTime = now;
+        }
+
+        // Wheel event listener
+        document.getElementById('box').addEventListener('wheel', function (e) {
+            e.preventDefault();
+
+            if (e.deltaY < 0) {
+                scrollUp();
+            } else {
+                scrollDown();
+            }
+        }, { passive: false });
+
+        // Touch event listeners
+        let touchStartY = 0;
+
+        document.getElementById('box').addEventListener('touchstart', function (e) {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.getElementById('box').addEventListener('touchmove', function (e) {
+            e.preventDefault();
+
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+
+            // Only trigger scroll if the touch movement is significant enough
+            if (Math.abs(deltaY) > 30) {
+                if (deltaY > 0) {
+                    scrollDown();
+                } else {
+                    scrollUp();
+                }
+                touchStartY = touchY; // Reset start position to prevent continuous scrolling
+            }
+        }, { passive: false });
+
+        // Keyboard event listener
+        document.addEventListener('keydown', function (e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'PageUp':
+                    e.preventDefault();
+                    scrollUp();
+                    break;
+                case 'ArrowDown':
+                case 'PageDown':
+                    e.preventDefault();
+                    scrollDown();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    // Scroll to top
+                    offset = maxOffset;
+                    inner.style.transform = `translateY(${offset}px)`;
+                    highlightActiveLine();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    // Scroll to bottom
+                    offset = minOffset;
+                    inner.style.transform = `translateY(${offset}px)`;
+                    highlightActiveLine();
+                    break;
+            }
+        });
+
+        // Initialize by highlighting the first line
+        highlightActiveLine();
+    </script>
+</body>
+
+</html>
