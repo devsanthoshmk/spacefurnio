@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Page Scroll</title>
+    <style>
+        /* 1. Core styles to prevent native browser scrolling */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* This is the key to hijacking the scroll */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+        }
+
+        /* 2. The scroll wrapper holds all sections. 
+           This is the element we will move with 'transform'.
+           It's the equivalent of your original '#inner' */
+        #scroll-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            /* Using a longer, smoother transition for full-page moves */
+        }
+
+        /* 3. Each '.section' is a full-page slide.
+           This is the equivalent of your original '<p>' tag. */
+        .section {
+            width: 100%;
+            height: 100vh;
+            /* Each section is 100% of the viewport height */
+            display: flex;
+            overflow: hidden;
+            /* Hide content overflow within a section */
+        }
+
+        .section:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        /* 4. The two-column layout you requested */
+        .image-side,
+        .content-side {
+            width: 50%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .image-side {
+            background-size: cover;
+            background-position: center;
+        }
+
+        .content-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .content-side h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .content-side p {
+            font-size: 1.2rem;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* 5. Active state, just like your original '.active' class */
+        .content-side h2,
+        .content-side p {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+        }
+
+        .section.active .content-side h2,
+        .section.active .content-side p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 6. Navigation dots (optional but helpful) */
+        .nav-dots {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border: 1px solid #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dot.active {
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="scroll-wrapper">
+
+        <section class="section" id="section-0" style="height: 150vh;">
+            <div class="image-side"
+                style="background-image: url('https://picsum.photos/1200/900?image=1011'); height: 100%;"></div>
+            <div class="content-side">
+                <h2>Section One</h2>
+                <p>Welcome to the full-page scroller. Use your mouse wheel, keyboard, or touch to navigate.</p>
+            </div>
+        </section>
+
+        <section class="section" id="section-1" style="height: 150vh;">
+            <div class="image-side"
+                style="background-image: url('https://picsum.photos/1200/900?image=1012'); height: 100%;"></div>
+            <div class="content-side">
+                <h2>Section Two</h2>
+                <p>The logic is identical to your original code, but we use `window.innerHeight` as the scroll distance.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <section class="section" id="section-2">
+                <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1013')">
+                </div>
+                <div class="content-side">
+                    <h2>Section Three</h2>
+                    <p>We use an `isScrolling` flag based on the `transitionend` event for robust control.</p>
+                </div>
+            </section>
+
+            <section class="section" id="section-3">
+                <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1014')">
+                </div>
+                <div class="content-side">
+                    <h2>Section Four</h2>
+                    <p>This layout also adapts to window resizing, recalculating heights and positions.</p>
+                </div>
+            </section>
+        </section>
+
+        <section class="section" id="section-4">
+            <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1014')"></div>
+            <div class="content-side">
+                <h2>Section Four</h2>
+                <p>This layout also adapts to window resizing, recalculating heights and positions.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav-dots" id="nav-dots"></div>
+
+
+    <script>
+        const wrapper = document.getElementById('scroll-wrapper');
+        const navDotsContainer = document.getElementById('nav-dots');
+        const child_elms = Array.from(wrapper.querySelectorAll('.section'));
+        const itemCount = child_elms.length;
+
+        let offset = 0;
+        // Compute correct bounds
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const maxOffset = 0;
+        const minOffset = -(wrapper.scrollHeight - viewportHeight);
+
+        // Throttle remains the same
+        let lastScrollTime = 0;
+        const scrollDelay = 400;
+        let currentIndex = 0;
+
+        wrapper.style.transition = `transform ${scrollDelay}ms cubic-bezier(0.5, 0, 0.2, 1)`;
+
+        function createNavDots() {
+            navDotsContainer.innerHTML = ''; // Clear existing dots
+            for (let i = 0; i < itemCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                dot.addEventListener('click', () => {
+                    // add move logic here
+                    let heights = 0;
+                    child_elms.slice(0, i).forEach(section => {
+                        heights += section.offsetHeight;
+                    });
+                    offset = -heights;
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    currentIndex = i;
+                    highlightActiveSection();
+
+                });
+                navDotsContainer.appendChild(dot);
+            }
+        }
+
+        // Optional: derive active index from offset if needed
+        function highlightActiveSection() {
+            // ...update classes/dots using currentIndex...
+            child_elms.forEach((section, index) => {
+                if (index === currentIndex) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        function scrollUp() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+
+            if (currentIndex === 0 && offset >= maxOffset) {
+                // bounce at top
+                const h = child_elms[currentIndex].offsetHeight;
+                wrapper.style.transform = `translateY(${offset + 100}px)`;
+                lastScrollTime = now;
+                setTimeout(() => {
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    lastScrollTime = now;
+                }, 250);
+                return;
+            }
+
+            const rect = child_elms[currentIndex].getBoundingClientRect();
+            console.log('Current rect in scrollup:', rect);
+
+            // If current section's top is below viewport top, scroll within current section
+            if (rect.top < 0) {
+                const scrollAmount = Math.min(viewportHeight, Math.abs(rect.top));
+                offset += scrollAmount;
+                console.log('Scrolling up within section, offset:', offset);
+                wrapper.style.transform = `translateY(${offset}px)`;
+                lastScrollTime = now;
+                return;
+            }
+
+            // Move to previous section
+            if (currentIndex > 0) {
+                const h = child_elms[currentIndex - 1].offsetHeight;
+
+                // If previous section is taller than viewport, go to its bottom
+                if (h > viewportHeight) {
+                    offset += viewportHeight;
+                } else {
+                    offset += h;
+                }
+
+                wrapper.style.transform = `translateY(${offset}px)`;
+                currentIndex = Math.max(0, currentIndex - 1);
+                highlightActiveSection();
+                lastScrollTime = now;
+            }
+        }
+
+        function scrollDown() {
+            const now = Date.now();
+            if (now - lastScrollTime < scrollDelay) return;
+
+            const h = child_elms[currentIndex].offsetHeight;
+            console.log('Current index:', currentIndex, 'Item count:', itemCount, 'Height:', h, "offset:", offset);
+
+            if (currentIndex === itemCount - 1 && offset <= minOffset) {
+                // bounce at bottom
+                wrapper.style.transform = `translateY(${offset - 100}px)`;
+                lastScrollTime = now;
+                setTimeout(() => {
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    lastScrollTime = now;
+                }, 250);
+                return;
+            }
+
+            const rect = child_elms[currentIndex].getBoundingClientRect();
+            console.log('Current rect:', rect);
+
+            // If current section's bottom is below viewport bottom, scroll within current section
+            if (rect.bottom > viewportHeight) {
+                const scrollAmount = Math.min(viewportHeight, rect.bottom - viewportHeight);
+                offset -= scrollAmount;
+                console.log('Scrolling down within section, offset:', offset);
+                wrapper.style.transform = `translateY(${offset}px)`;
+                lastScrollTime = now;
+                return;
+            }
+
+            // Move to next section
+            if (currentIndex < itemCount - 1) {
+                const nextH = child_elms[currentIndex + 1].offsetHeight;
+
+                // If next section is taller than viewport, just scroll one viewport height
+                if (nextH > viewportHeight) {
+                    offset -= viewportHeight;
+                } else {
+                    offset -= nextH;
+                }
+
+                wrapper.style.transform = `translateY(${offset}px)`;
+                currentIndex = Math.min(itemCount - 1, currentIndex + 1);
+                highlightActiveSection();
+                lastScrollTime = now;
+            }
+        }
+
+        createNavDots();
+        highlightActiveSection();
+
+
+        // Wheel event listener
+        wrapper.addEventListener('wheel', function (e) {
+            e.preventDefault();
+
+            if (e.deltaY < 0) {
+                scrollUp();
+            } else {
+                scrollDown();
+            }
+        }, { passive: false });
+
+        // Touch event listeners
+        let touchStartY = 0;
+
+        wrapper.addEventListener('touchstart', function (e) {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        wrapper.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+
+            // Only trigger scroll if the touch movement is significant enough
+            if (Math.abs(deltaY) > 30) {
+                if (deltaY > 0) {
+                    scrollDown();
+                } else {
+                    scrollUp();
+                }
+                touchStartY = touchY; // Reset start position to prevent continuous scrolling
+            }
+        }, { passive: false });
+
+        // Keyboard event listener
+        document.addEventListener('keydown', function (e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'PageUp':
+                    e.preventDefault();
+                    scrollUp();
+                    break;
+                case 'ArrowDown':
+                case 'PageDown':
+                    e.preventDefault();
+                    scrollDown();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    // Scroll to top
+                    offset = maxOffset;
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    currentIndex = 0;
+                    highlightActiveSection();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    // Scroll to bottom
+                    offset = minOffset;
+                    wrapper.style.transform = `translateY(${offset}px)`;
+                    currentIndex = itemCount - 1;
+                    highlightActiveSection();
+                    break;
+            }
+        });
+    </script>
+</body>
+
+</html>
