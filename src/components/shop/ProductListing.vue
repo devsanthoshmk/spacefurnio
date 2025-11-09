@@ -137,6 +137,7 @@
 
       <div v-else class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         <div v-for="product in filteredProducts" :key="product.id" class="group">
+          <a :href="`./${route.params.category}/${product.id}`" class="hover:text-gray-900">
           <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-200 group-hover:opacity-75">
             <img
               :src="product.imageSrc"
@@ -147,9 +148,9 @@
           <div class="mt-4 flex justify-between">
             <div>
               <h3 class="text-sm text-gray-700">
-                <a :href="`./${route.params.category}/${product.id}`" class="hover:text-gray-900">
+
                   {{ product.name }}
-                </a>
+
               </h3>
               <p class="mt-1 text-sm text-gray-500">{{ product.brand }}</p>
               <div v-if="product.rating" class="mt-1 flex items-center">
@@ -165,6 +166,7 @@
             </div>
             <p class="text-lg font-medium text-gray-900">${{ product.price }}</p>
           </div>
+          </a>
         </div>
       </div>
     </div>

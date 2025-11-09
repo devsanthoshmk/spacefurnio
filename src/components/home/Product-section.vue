@@ -1,91 +1,93 @@
 <template>
-  <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center my-8
-           text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]" data-aos="fade-up">You'll find us</h2>
-  <div class="product-gallery-container">
-    <!-- Navigation Controls -->
-    <div class="scroll-controls">
-      <Button
-        @click="scrollLeft"
-        icon="pi pi-chevron-left"
-        class="scroll-btn scroll-btn-left"
-        severity="secondary"
-        outlined
-        :disabled="isAtStart"
-      />
-      <Button
-        @click="scrollRight"
-        icon="pi pi-chevron-right"
-        class="scroll-btn scroll-btn-right"
-        severity="secondary"
-        outlined
-        :disabled="isAtEnd"
-      />
-    </div>
+<section class="scroll-section h-screen">
+      <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center
+            text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]">You'll find us</h2>
+    <div class="product-gallery-container">
+      <!-- Navigation Controls -->
+      <div class="scroll-controls">
+        <Button
+          @click="scrollLeft"
+          icon="pi pi-chevron-left"
+          class="scroll-btn scroll-btn-left"
+          severity="secondary"
+          outlined
+          :disabled="isAtStart"
+        />
+        <Button
+          @click="scrollRight"
+          icon="pi pi-chevron-right"
+          class="scroll-btn scroll-btn-right"
+          severity="secondary"
+          outlined
+          :disabled="isAtEnd"
+        />
+      </div>
 
-    <!-- Products Grid Section -->
-    <section class="products-section" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
-      <div
-        ref="productsGrid"
-        class="products-grid"
-        @scroll="handleScroll"
-      >
+      <!-- Products Grid Section -->
+      <section class="products-section" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
         <div
-          v-for="(product, index) in products"
-          :key="product.id"
-          class="product-card"
-          @click="selectProduct(product)"
-          v-animateonscroll="{
-            enterClass: 'animate__fadeInUp',
-            delay: index * 100
-          }"
+          ref="productsGrid"
+          class="products-grid"
+          @scroll="handleScroll"
         >
-          <div class="product-image-container">
-            <img
-              :src="product.image"
-              :alt="product.title"
-              class="product-image"
-            />
-            <div class="product-overlay">
-              <Button
-                icon="pi pi-heart"
-                class="favorite-btn"
-                severity="secondary"
-                outlined
-                rounded
+          <div
+            v-for="(product, index) in products"
+            :key="product.id"
+            class="product-card"
+            @click="selectProduct(product)"
+            v-animateonscroll="{
+              enterClass: 'animate__fadeInUp',
+              delay: index * 100
+            }"
+          >
+            <div class="product-image-container">
+              <img
+                :src="product.image"
+                :alt="product.title"
+                class="product-image"
               />
-              <Button
-                icon="pi pi-shopping-cart"
-                class="cart-btn !text-black hover:!text-white"
-                severity="success"
-                rounded
-              />
+              <div class="product-overlay">
+                <Button
+                  icon="pi pi-heart"
+                  class="favorite-btn"
+                  severity="secondary"
+                  outlined
+                  rounded
+                />
+                <Button
+                  icon="pi pi-shopping-cart"
+                  class="cart-btn !text-black hover:!text-white"
+                  severity="success"
+                  rounded
+                />
+              </div>
             </div>
-          </div>
 
-          <div class="product-info">
-            <h3 class="product-title">{{ product.title }}</h3>
-            <div class="product-rating">
-              <Rating
-                v-model="product.rating"
-                readonly
-                :stars="5"
-                class="custom-rating"
-              />
+            <div class="product-info">
+              <h3 class="product-title">{{ product.title }}</h3>
+              <div class="product-rating">
+                <Rating
+                  v-model="product.rating"
+                  readonly
+                  :stars="5"
+                  class="custom-rating"
+                />
+              </div>
+              <div class="product-price">${{ product.price }}</div>
             </div>
-            <div class="product-price">${{ product.price }}</div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Scroll Indicator -->
-    <div class="scroll-indicator">
-      <div
-        class="scroll-progress"
-        :style="{ width: scrollProgress + '%' }"
-      ></div>
+      <!-- Scroll Indicator -->
+      <div class="scroll-indicator">
+        <div
+          class="scroll-progress"
+          :style="{ width: scrollProgress + '%' }"
+        ></div>
+      </div>
     </div>
-  </div>
+</section>
 </template>
 
 <script setup>

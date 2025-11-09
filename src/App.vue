@@ -62,7 +62,7 @@ watch(
   </main>
 
   <footer>
-    <FooterComponent />
+    <FooterComponent v-if="showNav" />
   </footer>
 
 </template>
