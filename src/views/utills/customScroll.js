@@ -1,4 +1,3 @@
-
 /**
  * Section-based scrolling utility that synchronizes wheel, touch, and keyboard navigation
  * while managing optional navigation dots. Designed for full-height layouts where each
@@ -30,6 +29,8 @@ const DEFAULT_OPTIONS = Object.freeze({
   transitionTiming: 'cubic-bezier(0.5, 0, 0.2, 1)',
   enableResizeListener: true
 })
+// Add pixel snap tolerance
+const ALIGN_EPSILON = 2
 
 /**
  * Normalises a DOM element reference that may be passed directly or via a ref-like wrapper
@@ -138,7 +139,8 @@ const updateActiveState = state => {
  * @param {number} nextOffset
  */
 const applyOffset = (state, nextOffset) => {
-  state.offset = clamp(nextOffset, state.minOffset, state.maxOffset)
+  // Snap to integer to avoid sub-pixel accumulation (-772.4 -> -773)
+  state.offset = Math.round(clamp(nextOffset, state.minOffset, state.maxOffset))
   state.wrapperEl.style.transform = `translateY(${state.offset}px)`
 }
 
@@ -273,14 +275,26 @@ const scrollWithinSection = (state, direction) => {
   const section = state.childElements[state.currentIndex]
   const rect = section.getBoundingClientRect()
 
+  // Near top boundary when scrolling up: treat as aligned and allow section transition
   if (direction === SCROLL_DIRECTION.UP && rect.top < 0) {
+    if (rect.top > -ALIGN_EPSILON) {
+      // Snap precisely, then let performDirectionalScroll proceed to moveToAdjacentSection
+      applyOffset(state, getOffsetForIndex(state, state.currentIndex))
+      return false
+    }
     const scrollAmount = Math.min(state.viewportHeight, Math.abs(rect.top))
     applyOffset(state, state.offset + scrollAmount)
     return true
   }
 
+  // Near bottom boundary when scrolling down
   if (direction === SCROLL_DIRECTION.DOWN && rect.bottom > state.viewportHeight) {
-    const scrollAmount = Math.min(state.viewportHeight, rect.bottom - state.viewportHeight)
+    const overflow = rect.bottom - state.viewportHeight
+    if (overflow < ALIGN_EPSILON) {
+      applyOffset(state, getOffsetForIndex(state, state.currentIndex))
+      return false
+    }
+    const scrollAmount = Math.min(state.viewportHeight, overflow)
     applyOffset(state, state.offset - scrollAmount)
     return true
   }
@@ -300,11 +314,12 @@ const moveToAdjacentSection = (state, direction) => {
   const nextIndex = state.currentIndex + direction
   if (nextIndex < 0 || nextIndex >= state.itemCount) return false
 
-  const sectionHeight = state.childElements[nextIndex].offsetHeight
+  const sectionHeight = state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex].offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
   const delta = sectionHeight > state.viewportHeight ? state.viewportHeight : sectionHeight
   const nextOffset = state.offset - delta * direction
 
   applyOffset(state, nextOffset)
+  console.log("sectionHeight:", sectionHeight, "viewportHeight:", state.viewportHeight, "delta:", delta, "nextOffset:", nextOffset, "OFFSET:", state.offset, "direction:", direction);
   state.currentIndex = nextIndex
   updateActiveState(state)
   return true
@@ -315,6 +330,7 @@ const moveToAdjacentSection = (state, direction) => {
  * @returns {Element}
  */
 
+// eslint-disable-next-line no-unused-vars
 function getNextElement(node) {
   if (!(node instanceof Element)) {
     throw new TypeError('getNextElement: argument must be a DOM Element');
@@ -346,24 +362,12 @@ const performDirectionalScroll = (state, direction) => {
 
   const now = Date.now()
 
-  if (direction === SCROLL_DIRECTION.UP && isAtBoundary(state, direction)) {
+  if (isAtBoundary(state, direction)) {
     bounce(state, direction)
     state.lastScrollTime = now
     return
   }
-  if (direction === SCROLL_DIRECTION.DOWN && isAtBoundary(state, direction)) {
-    if (state.offset < state.minOffset) {
 
-      return
-    }
-    const next = getNextElement(state.wrapperEl);
-    console.log("next element:", next);
-    const rect = next.getBoundingClientRect();
-    const scrollY = window.scrollY + rect.bottom - window.innerHeight;
-    window.scrollTo({ top: scrollY, behavior: 'smooth' });
-    state.lastScrollTime = now;
-    return
-  }
   if (scrollWithinSection(state, direction)) {
     state.lastScrollTime = now;
     return
