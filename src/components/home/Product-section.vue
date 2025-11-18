@@ -80,12 +80,12 @@
       </section>
 
       <!-- Scroll Indicator -->
-      <div class="scroll-indicator">
+      <!-- <div class="scroll-indicator">
         <div
           class="scroll-progress"
           :style="{ width: scrollProgress + '%' }"
         ></div>
-      </div>
+      </div> -->
     </div>
 </section>
 </template>
@@ -231,6 +231,7 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .scroll-controls {
@@ -285,6 +286,7 @@ onUnmounted(() => {
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overflow-y: visible;
 }
 
 .products-grid::-webkit-scrollbar {
@@ -301,6 +303,7 @@ onUnmounted(() => {
   transition: all 0.4s ease;
   cursor: pointer;
   position: relative;
+  z-index: 1;
 }
 
 .product-card:hover {
