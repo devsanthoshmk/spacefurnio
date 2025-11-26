@@ -42,7 +42,7 @@
 
     <section class="scroll-section relative w-full h-screen overflow-hidden">
       <!-- Background -->
-      <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.svg')]"></div>
+      <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.png')]"></div>
 
       <!-- Overlay text (permanently placed inside curve) -->
       <div class="absolute text-center px-3 py-2 rounded-lg" :style="{
@@ -75,7 +75,7 @@
       <div class="relative h-[calc(100vh+109.5px)] w-full">
         <div
           class="phitagate-font text-black font-semibold text-[19vh] absolute left-0 top-1/2 whitespace-nowrap origin-top-left"
-          style="transform: rotate(-90deg) translateY(25%) translateX(-42%)">
+          style="transform: rotate(-90deg) translateY(25%) translateX(-44%)">
           Brand Manifesto
         </div>
       </div>
@@ -84,7 +84,7 @@
     </section>
     <section class="scroll-section relative w-full h-screen overflow-hidden">
       <!-- Background -->
-      <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/3.svg')]"></div>
+      <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/3.png')]"></div>
 
       <!-- Overlay text (permanently placed inside curve) -->
       <div class="absolute text-center px-3 py-2 rounded-lg" :style="{

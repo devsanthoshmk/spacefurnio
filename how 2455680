@@ -1,0 +1,23 @@
+[33mf5b7b6c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: rebase (finish): returning to refs/heads/main
+[33mf5b7b6c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{1}: rebase (pick): removing .psd files
+[33m719fed1[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: rebase (start): checkout HEAD~5
+[33m2455680[m HEAD@{3}: rebase (abort): returning to refs/heads/main
+[33md364cf6[m HEAD@{4}: rebase (pick): removing .psd files
+[33m719fed1[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{5}: rebase (start): checkout HEAD~5
+[33m2455680[m HEAD@{6}: commit: feat: add TeamMembers component to showcase team profiles with detailed bios and architectural perspectives
+[33mcbd5aae[m HEAD@{7}: commit: removing .psd files
+[33m5c9729c[m HEAD@{8}: commit: Remove PSD files from tracking
+[33mcc7d4c6[m HEAD@{9}: commit: docs on spacefurnio
+[33m719fed1[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{10}: commit: fixed and implemented scroling for every sections
+[33m8f0fe05[m HEAD@{11}: commit: optimized custom scroll.js
+[33ma6010bc[m HEAD@{12}: commit: implement full-page scroll functionality with navigation dots
+[33mc9e8011[m HEAD@{13}: commit: scroll section home page implemented with ducktape sol
+[33md433d90[m HEAD@{14}: checkout: moving from main to main
+[33md433d90[m HEAD@{15}: checkout: moving from 13300809cf519aaf6d0624282affda1613308ff0 to main
+[33m1330080[m HEAD@{16}: checkout: moving from main to 13300809cf519aaf6d0624282affda1613308ff0
+[33md433d90[m HEAD@{17}: checkout: moving from main to main
+[33md433d90[m HEAD@{18}: commit: testing done
+[33m1330080[m HEAD@{19}: commit: prev commit follow up
+[33m516425d[m HEAD@{20}: commit: temp showcase for moodboard
+[33mb3314cd[m HEAD@{21}: commit: fixing nav-starting div conflict issue
+[33m0aee620[m HEAD@{22}: clone: from https://github.com/devsanthoshmk/spacefurnio.git
