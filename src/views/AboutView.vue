@@ -11,11 +11,11 @@
         <div class="top-0 left-0 w-full h-[calc(20%)] bg-[#fff4ec]"></div>
 
         <!-- background image block -->
-        <div class="bg-[url('/images/aboutus/hero.png')] bg-cover bg-bottom h-[80%]"></div>
+        <div class="bg-[url('/images/aboutus/hero_main.webp')] bg-cover bg-bottom h-[80%]"></div>
 
         <!-- foreground text -->
         <div class="px-4 py-2 rounded-lg absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center w-[50vw]"
-          style="     top: calc(0.204 * 100vh);">
+          style="     top: calc(0.21 * 100vh);">
           <!-- client not asked -->
           <!-- <h2 class="text-4xl md:text-5xl text-[#ff7700] font-extrabold mb-4 tracking-widest phitagate-font" style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
           ABOUT US
@@ -27,7 +27,7 @@
           </h1>
 
 
-          <p class="text-sm md:text-base text-gray-800 leading-relaxed w-[55vw]">
+          <p class="text-sm md:text-base text-gray-800 leading-relaxed w-[27vw] pt-[34px] ps-[6px]">
             At <span class="font-bold">Spacefurnio</span>, we are passionate about shaping spaces that reflect purpose,
             personality, and precision. We offer an integrated approach to architecture,
             construction, interior design, and custom furniture, making us a one-stop
@@ -185,51 +185,14 @@
       </div>
 
     </div>
-    <section class="max-w-7xl mx-auto px-6 py-16 team-section">
+    <div class="team-section">
 
-      <section class="max-w-7xl mx-auto px-6 py-16 team-section">
-        <div v-for="(member, index) in teamMembers" :key="member.id"
-          class="scroll-section teammem grid md:grid-cols-2 gap-12 items-center my-4">
-          <!-- Image -->
-          <div class="border-animate-wrapper relative w-full" :class="[index % 2 === 1 ? 'md:order-2' : 'md:order-1']"
-            data-aos="fade-up">
-            <img src="https://placehold.co/600x600" alt="Profile Image"
-              class="w-full h-auto rounded-2xl shadow-xl object-cover" />
+      <TeamMembers />
 
-            <!-- Border follows image -->
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-              <rect x="1.5" y="1.5" width="97" height="97" rx="0" ry="0" class="border-animate-path" />
-            </svg>
-
-            <div class="absolute bottom-4 bg-gray-900/90 text-white px-5 py-3 rounded-lg shadow-lg"
-              :class="index % 2 === 1 ? 'left-4' : 'right-4'">
-              <h3 class="text-lg font-semibold">{{ member.name }}</h3>
-              <p class="text-sm">{{ member.role }}</p>
-            </div>
-          </div>
+    </div>
 
 
-          <!-- Text -->
-          <div class="text-gray-700 space-y-6" :class="[index % 2 === 1 ? 'md:order-1' : 'md:order-2']">
-            <h1 class="text-3xl font-bold text-gray-900">Hello, I'm {{ member.nickname }}</h1>
-            <p class="leading-relaxed">{{ member.detailedBio }}</p>
-
-            <div>
-              <h2 class="text-xl font-semibold text-gray-900 mb-2">Architectural Perspective</h2>
-              <p class="leading-relaxed">{{ member.Architectural_Perspective }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-
-
-    </section>
-
-
-    <section class="scroll-section our-team max-w-7xl mx-auto px-6 py-16">
+  <section id="our-team" class="scroll-section our-team max-w-7xl mx-auto px-6 pt-28 md:pt-36 pb-16 scroll-mt-24 md:scroll-mt-36">
       <!-- Heading -->
       <div class="text-center mb-12">
         <h2 class="text-4xl md:text-5xl font-bold text-[#5A4A42] relative inline-block">
@@ -241,7 +204,12 @@
       <!-- Team list -->
       <ul class="grid grid-cols-2 md:grid-cols-3  gap-10">
         <li v-for="member in ourteam" :key="member.id" class="flex flex-col items-center text-center">
-          <img :src="member.image" :alt="member.name" class="w-full aspect-square object-cover rounded-lg shadow-lg" />
+          <div v-if="member.image && !member.image.includes('placehold.co')" class="w-full h-40 md:h-44 lg:h-48 xl:h-52 rounded-lg shadow-lg overflow-hidden">
+            <img :src="member.image" :alt="member.name" class="w-full h-full object-cover" />
+          </div>
+          <div v-else class="w-full h-40 md:h-44 lg:h-48 xl:h-52 bg-[#e8ddd4] rounded-lg shadow-lg flex items-center justify-center">
+            <span class="text-4xl md:text-5xl font-bold text-[#5A4A42] font-serif">{{ getInitials(member.name) }}</span>
+          </div>
           <div class="mt-4">
             <h3 class="text-lg font-medium text-gray-800">{{ member.name }}</h3>
             <p class="text-sm font-semibold text-[#5A4A42]">
@@ -266,7 +234,7 @@
         <!-- Client 1 -->
         <div class="flex flex-col items-center text-center">
           <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
-            <img src="https://placehold.co/300x120" alt="Zentropy Logo" class="max-h-28 object-contain" />
+            <img src="/images/aboutus/clients/zentrophy.png" alt="Zentropy Logo" class="max-h-28 object-contain" />
           </div>
           <!-- <p class="mt-6 text-lg text-gray-600">Mr. Shankar</p> -->
           <p class="text-xl font-semibold text-gray-900 mt-6">Zentropy Pvt. Ltd.</p>
@@ -275,63 +243,22 @@
         <!-- Client 2 -->
         <div class="flex flex-col items-center text-center">
           <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
-            <img src="https://placehold.co/300x120" alt="Genius Kidz Logo" class="max-h-28 object-contain" />
+            <img src="/images/aboutus/clients/gk.png" alt="Genius Kidz Logo" class="max-h-28 object-contain" />
           </div>
           <!-- <p class="mt-6 text-lg text-gray-600">Mr. Mohd Zaman</p> -->
           <p class="text-xl font-semibold text-gray-900 mt-6">Genius Kidz.ai</p>
         </div>
       </div>
     </section>
+    <footer class="scroll-section ">
+      <FooterComponent />
+    </footer>
     </div>
   </div>
 
 
-
 </template>
-<style>
-.border-animate-wrapper {
-  position: relative;
-  display: inline-block;
-  border-radius: 1rem;
-  /* matches rounded-2xl */
-}
 
-.border-animate-wrapper img {
-  display: block;
-  border-radius: 1rem;
-  /* keep corners smooth */
-}
-
-.border-animate-wrapper svg {
-position: absolute;
-  top: -6px;
-  left: -6px;
-  width: 102%;
-  height: 102%;
-  overflow: visible;
-  border-radius: 1rem;
-  pointer-events: none;
-}
-
-.border-animate-path {
-  fill: none;
-  stroke: #f97316;
-  /* Tailwind orange-500 */
-  stroke-width: 1;
-  /* thinner border */
-  stroke-dasharray: 400;
-  /* dynamically covers path */
-  stroke-dashoffset: 400;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 2.5s ease-out;
-}
-
-/* Trigger when visible */
-.aos-animate .border-animate-path {
-  stroke-dashoffset: 0;
-}
-</style>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
@@ -393,6 +320,8 @@ position: absolute;
 <script setup>
 import { ref,onMounted,onBeforeUnmount } from 'vue';
 import { scroller } from './utills/customScroll';
+import FooterComponent from '@/components/Footer-component.vue';
+import TeamMembers from '@/components/about/TeamMembers.vue';
 
 const wrapper = ref(null);
 
@@ -400,59 +329,15 @@ onMounted(() => {
   const cleanup = scroller(wrapper, 'scroll-section')
   onBeforeUnmount(cleanup)
 })
+
+const getInitials = (name) => {
+  let cleanName = name.replace(/^(Ar\.|Mr\.|Ms\.|Mrs\.|Dr\.|Er\.)\s+/i, '');
+  const parts = cleanName.trim().split(' ');
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
 // Team members data
-const teamMembers = [
-  {
-    id: 1,
-    name: "Ar. Thaini Jentra",
-    nickname: "Jeni",
-    role: "Managing Partner & Founder",
-    description: "Architect with 3 years of experience in design",
-    detailedBio: `I'm an architect with 3 years of experience in this field, and I genuinely enjoy the hands-on side of design, especially bringing ideas to life through thoughtful execution. I'm a naturally curious person, always exploring new tools, materials, and ways to improve what I do. I love turning creative concepts into practical, buildable solutions that are both smart and meaningful.`,
-    Architectural_Perspective: `
-For me, architecture is all about creating smart, simple spaces that work well and feel good to live in. I'm drawn to designs that are minimalist, budget-friendly, and kind to the environment. I believe that with the right ideas and materials, we can build spaces that are both beautiful and practical, without overcomplicating things. Sometimes, the simplest designs speak the loudest—when they're made with care and purpose.`
-  },
-  {
-    id: 2,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for business growth",
-    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
-    Architectural_Perspective: `
-I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
-  },
-  {
-    id: 3,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for business growth",
-    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
-    Architectural_Perspective: `
-I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
-  },
-  {
-    id: 4,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for business growth",
-    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
-    Architectural_Perspective: `
-I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
-  },
-  {
-    id: 5,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for business growth",
-    detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
-    Architectural_Perspective: `
-I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`
-  }
-]
 const ourteam = [
   {
     id: 1,
@@ -470,7 +355,7 @@ const ourteam = [
     id: 3,
     name: "Ms. Kaviya Arulthilagam",
     role: "Product Designer",
-    image: "https://placehold.co/400x400",
+    image: "/images/aboutus/team-main/our-team/Kaviya.png",
   },
   {
     id: 4,

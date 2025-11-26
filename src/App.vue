@@ -6,6 +6,7 @@ import FooterComponent from './components/Footer-component.vue'
 
 const route = useRoute()
 const showNav = ref(false)
+const showfooter = ref(false)
 
 const handleScroll = () => {
   const scrollY = window.scrollY
@@ -46,6 +47,11 @@ watch(
     } else {
       showNav.value = true
     }
+    if (newPath !== '/about') {
+      showfooter.value = true
+    } else {
+      showfooter.value = false
+    }
   }
 )
 
@@ -62,7 +68,7 @@ watch(
   </main>
 
   <footer>
-    <FooterComponent v-if="showNav" />
+    <FooterComponent v-if="showfooter" />
   </footer>
 
 </template>
