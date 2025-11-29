@@ -4,9 +4,9 @@
     <div
       v-for="(person, index) in team"
       :key="person.id"
-      class="scroll-section team-member-block min-h-screen flex items-center "
+      class="scroll-section team-member-block min-h-screen flex items-center justify-center"
     >
-    <div class="max-w-[1400px] mx-auto px-6 sm:px-12 relative">
+    <div class="w-full max-w-[1400px] mx-auto px-[6.1vw] sm:px-12 relative">
 
         <!-- Page heading displayed once below the navbar -->
         <!-- <div v-if="index === 0" class="pb-10 sm:pt-6 sm:pb-12">
@@ -18,7 +18,7 @@
                   </div>
         </div> -->
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-y-12 lg:gap-x-16 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-y-12 lg:gap-x-16 items-center">
 
           <div :class="['lg:col-span-6 relative flex flex-col', index % 2 === 1 ? 'lg:order-2' : 'lg:order-1']">
 
@@ -71,7 +71,7 @@
             </div>
           </div>
 
-          <div :class="['lg:col-span-5 flex flex-col justify-center h-full space-y-8', index % 2 === 1 ? 'lg:order-1' : 'lg:order-2']">
+          <div :class="['lg:col-span-6 flex flex-col justify-center h-full space-y-8', index % 2 === 1 ? 'lg:order-1' : 'lg:order-2']">
 
   <div class="prose prose-lg max-w-none text-orange-950/80 font-light leading-relaxed">
     <p class="whitespace-pre-line">{{ person.detailedBio }}</p>
