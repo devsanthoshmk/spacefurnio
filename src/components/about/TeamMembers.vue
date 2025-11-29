@@ -25,13 +25,16 @@
             <div class="relative w-full">
               <!-- HELLO text positioned half inside/half outside at top -->
               <h2
-                class="z-10 font-serif text-6xl sm:text-8xl text-gray-800 leading-none absolute select-none"
-                style="top: 0px;
-                left: -5.3rem;
-                transform: translateY(-53%);"
+                class="z-10 font-serif text-6xl sm:text-8xl bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent leading-none absolute select-none"
+                :style="{
+                  top: '0px',
+                  left: index % 2 === 1 ? 'auto' : '-5.3rem',
+                  right: index % 2 === 1 ? '0.8rem' : 'auto',
+                  transform: 'translateY(-53%)'
+                }"
                 aria-hidden="true"
               >
-                HELLO.
+                Hello!
               </h2>
 
               <div class="w-full max-w-md lg:max-w-lg overflow-hidden bg-gray-300">
@@ -44,11 +47,19 @@
               </div>
 
               <!-- Name and role positioned at bottom-right: name half in/out, role below image -->
-              <div class="mt-8 lg:mt-0 text-left lg:text-right lg:absolute z-10" style="bottom: 0; right: 1rem;" :style="{ transform: index===0?'translateY(70%) translateX(-10px)':'translateY(75%) translateX(-10px)' }">
-                <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-gray-900 leading-none mb-2 whitespace-nowrap">
-                  I'M <span class="text-gray-800">{{ person.nickname || firstName(person.name) }}</span>
+              <div
+                :class="['mt-8 lg:mt-0 text-left lg:absolute z-10', index % 2 === 1 ? 'lg:text-left' : 'lg:text-right']"
+                :style="{
+                  bottom: '0',
+                  right: index % 2 === 1 ? 'auto' : '1.8rem',
+                  left: index % 2 === 1 ? '-4.4rem' : 'auto',
+                  transform: index===0?'translateY(73%) translateX(-10px)':'translateY(73%) translateX(-10px)'
+                }"
+              >
+                <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl leading-none mb-2 whitespace-nowrap">
+                  <span class="bg-gradient-to-br from-orange-600 to-orange-800 bg-clip-text text-transparent">I'm</span> <span class="bg-gradient-to-r from-orange-500 to-orange-700 bg-clip-text text-transparent">{{ person.nickname || firstName(person.name) }}</span>
                 </h1>
-                <div class="text-xs sm:text-sm font-bold tracking-[0.2em] text-gray-600 uppercase flex flex-col items-start lg:items-end space-y-1">
+                <div :class="['text-xs sm:text-sm font-bold tracking-[0.2em] text-orange-800 uppercase flex flex-col space-y-1', index % 2 === 1 ? 'items-start' : 'items-start lg:items-end']">
                   <span >
                     {{ person.name }}
                   </span>
@@ -62,13 +73,13 @@
 
           <div :class="['lg:col-span-5 flex flex-col justify-center h-full space-y-8', index % 2 === 1 ? 'lg:order-1' : 'lg:order-2']">
 
-  <div class="prose prose-lg max-w-none text-gray-700 font-light leading-relaxed">
+  <div class="prose prose-lg max-w-none text-orange-950/80 font-light leading-relaxed">
     <p class="whitespace-pre-line">{{ person.detailedBio }}</p>
   </div>
 
   <div v-if="person.Architectural_Perspective" class="pt-4">
-    <h4 class="font-bold text-gray-900 text-lg mb-3 font-serif tracking-wide">Architectural Perspective:</h4>
-    <p class="text-gray-700 italic pl-6 border-l-2 border-gray-400 leading-relaxed font-light">
+    <h4 class="font-bold text-lg mb-3 font-serif tracking-wide bg-gradient-to-r from-orange-800 to-orange-600 bg-clip-text text-transparent">Architectural Perspective:</h4>
+    <p class="text-orange-900 italic pl-6 border-l-2 border-orange-300 leading-relaxed font-light">
       "{{ person.Architectural_Perspective }}"
     </p>
   </div>
