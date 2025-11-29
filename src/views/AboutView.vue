@@ -67,7 +67,7 @@
       <div class="relative h-[calc(100vh+109.5px)] w-full">
         <div
           class="phitagate-font text-black font-semibold text-[19vh] absolute left-0 top-1/2 whitespace-nowrap origin-top-left"
-          style="transform: rotate(-90deg) translateY(25%) translateX(-44%)">
+          :style="{ transform: `rotate(-90deg) translateY(${brandManifestoTranslateY}) translateX(-44%)` }">
           Brand Manifesto
         </div>
       </div>
@@ -109,7 +109,7 @@
       <!-- Right side rotated label -->
       <div class="relative h-[calc(100vh)] w-full">
         <div class="phitagate-font text-black font-semibold absolute right-0 top-1/2 whitespace-nowrap origin-top-right"
-          style="transform: rotate(90deg) translateY(20%) translateX(50%); font-size: 17.5vh;">
+          :style="{ transform: `rotate(90deg) translateY(${missionStatementTranslateY}) translateX(50%)`, fontSize: '17.5vh' }">
           Mission Statement
         </div>
       </div>
@@ -317,9 +317,34 @@ import TeamMembers from '@/components/about/TeamMembers.vue';
 
 const wrapper = ref(null);
 
+const brandManifestoTranslateY = ref('34.5%');
+const missionStatementTranslateY = ref('26.6%');
+
+const updateBrandManifestoPosition = () => {
+  const width = window.innerWidth;
+  // Brand Manifesto
+  // Base: 1920px -> 34.5% (converted from 3.69vw)
+  // Change: 40px -> 3.75% (converted from 0.4vw)
+  const brandValue = 24 + (width - 1920) * (1.5 / 40);
+  brandManifestoTranslateY.value = `${brandValue}%`;
+
+  // Mission Statement
+  // Base: 1920px -> 26.6%
+  // Change: 40px -> 0.1%
+  const missionValue = 26.6 + (width - 1920) * (1.2 / 40);
+  missionStatementTranslateY.value = `${missionValue}%`;
+};
+
 onMounted(() => {
   const cleanup = scroller(wrapper, 'scroll-section')
   onBeforeUnmount(cleanup)
+
+  updateBrandManifestoPosition();
+  window.addEventListener('resize', updateBrandManifestoPosition);
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateBrandManifestoPosition);
 })
 
 const getInitials = (name) => {
