@@ -14,30 +14,22 @@
         <div class="bg-[url('/images/aboutus/hero_main.webp')] bg-cover bg-bottom h-[80%]"></div>
 
         <!-- foreground text -->
-        <div class="px-4 py-2 rounded-lg absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center w-[50vw]"
-          style="     top: calc(0.21 * 100vh);">
-          <!-- client not asked -->
-          <!-- <h2 class="text-4xl md:text-5xl text-[#ff7700] font-extrabold mb-4 tracking-widest phitagate-font" style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
-          ABOUT US
-        </h2> -->
+        <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center w-[90%] md:w-[70%] lg:w-[50%] z-10"
+          style="top: 20%;">
 
-          <h1 class="text-4xl md:text-5xl text-black font-serif font-extrabold mb-4 tracking-widest"
-            style="text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 156, 156, 0.6);">
-            ABOUT US
+          <h1 class="absolute top-0 w-full text-center text-5xl md:text-7xl text-black font-serif font-extrabold tracking-widest uppercase drop-shadow-md leading-none -translate-y-[55%]">
+            About Us
           </h1>
 
-
-          <p class="text-sm md:text-base text-gray-800 leading-relaxed w-[27vw] pt-[34px] ps-[6px]">
+          <p class="text-base md:text-xl text-black font-medium leading-relaxed w-full px-4 drop-shadow-sm mt-[7vh]">
             At <span class="font-bold">Spacefurnio</span>, we are passionate about shaping spaces that reflect purpose,
             personality, and precision. We offer an integrated approach to architecture,
             construction, interior design, and custom furniture, making us a one-stop
             destination for complete spatial solutions. From drawing board to delivery,
-            <br>
+            <br class="hidden md:block">
             <span class="font-bold">we handle everything!</span>
           </p>
-        </div>
-
-      </div>
+        </div>      </div>
     </section>
 
     <section class="scroll-section relative w-full h-screen overflow-hidden">
