@@ -1,58 +1,43 @@
 <template>
   <section class="team-section bg-[#f4f2ed] min-h-screen" aria-label="Meet the Team">
 
+    <!-- Desktop/Large Screen Layout (lg and up) -->
     <div
-      v-for="(person, index) in team"
+      v-for="person in team"
       :key="person.id"
-      class="scroll-section team-member-block min-h-screen flex items-center justify-center"
+      class="scroll-section team-member-block min-h-screen hidden lg:flex items-center justify-center"
     >
-    <div class="w-full max-w-[1400px] mx-auto px-[6.1vw] sm:px-12 relative">
+      <div class="team-content-wrapper w-full mx-auto relative">
 
-        <!-- Page heading displayed once below the navbar -->
-        <!-- <div v-if="index === 0" class="pb-10 sm:pt-6 sm:pb-12">
-                  <div class="text-center mb-12">
-                    <h2 class="text-4xl md:text-5xl font-bold text-[#5A4A42] relative inline-block">
-                      Our Team
-                      <span class="block h-[2px] w-16 bg-[#5A4A42] mx-auto mt-4"></span>
-                    </h2>
-                  </div>
-        </div> -->
+        <div class="team-grid items-center">
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-y-12 lg:gap-x-16 items-center">
-
-          <div class="lg:col-span-6 relative flex flex-col lg:order-1">
+          <div class="image-column relative flex flex-col">
 
             <div class="relative w-full">
               <!-- HELLO text positioned half inside/half outside at top -->
               <h2
-                class="z-10 font-serif text-black bg-clip-text leading-none absolute select-none"
-                style="top: 0px; left: 3.5rem; transform: translateY(23.6%); font-size: 3.1vw;"
+                class="hello-text z-10 font-serif text-black bg-clip-text leading-none absolute select-none"
                 aria-hidden="true"
               >
                 HELLO,
               </h2>
 
-              <div class="inline-block w-full max-w-md lg:max-w-lg overflow-hidden bg-white border border-gray-200 shadow-lg" style="padding:45px 45px 137px">
+              <div class="photo-frame inline-block w-full overflow-hidden bg-white border border-gray-200 shadow-lg">
                 <img
                   :src="person.image || defaultImage(person.id)"
                   :alt="person.name"
-                  class="w-full h-auto max-h-[500px] lg:max-h-[550px] object-cover object-center filter transition-all duration-700 ease-in-out"
+                  class="team-photo w-full h-auto object-cover object-center filter transition-all duration-700 ease-in-out"
                   loading="lazy"
                 />
               </div>
 
               <!-- Name and role positioned at bottom-right: name half in/out, role below image -->
-              <div
-                class="mt-8 lg:mt-0 text-left lg:absolute z-10 lg:text-right"
-                style="bottom: 0; right: 1.8rem; transform: translateY(-13%) translateX(-122px);"
-              >
-                <h1 class="font-serif text-[2.8vw] sm:text-5xl md:text-6xl leading-none mb-2 whitespace-nowrap">
+              <div class="name-block absolute z-10 text-right">
+                <h1 class="name-title font-serif leading-none mb-2 whitespace-nowrap">
                   <span class="text-black">I'M</span> <span>{{ person.nickname.toUpperCase() || firstName(person.name) }}</span>
                 </h1>
-                <div class="text-xs sm:text-sm font-bold tracking-[0.2em] text-black uppercase flex flex-col space-y-1 items-start lg:items-end">
-                  <span>
-                    {{ person.name }}
-                  </span>
+                <div class="role-text font-bold tracking-[0.2em] text-black uppercase flex flex-col space-y-1 items-end">
+                  <span>{{ person.name }}</span>
                   <span v-for="(rolePart, i) in splitRole(person.role)" :key="i">
                     {{ rolePart }}
                   </span>
@@ -61,41 +46,80 @@
             </div>
           </div>
 
-          <div class="lg:col-span-6 flex flex-col justify-center h-full space-y-8 lg:order-2">
-<!-- text-orange-950/80 -->
-  <div class="prose prose-lg max-w-none text-black font-light leading-relaxed">
-    <p class="whitespace-pre-line">{{ person.detailedBio }}</p>
-  </div>
+          <div class="content-column flex flex-col justify-center h-full">
+            <div class="bio-text prose max-w-none text-black font-light leading-relaxed">
+              <p class="whitespace-pre-line">{{ person.detailedBio }}</p>
+            </div>
 
-  <div v-if="person.Architectural_Perspective" class="pt-4">
-    <!-- bg-gradient-to-r from-orange-800 to-orange-600 bg-clip-text text-transparent -->
-    <h4 class="font-bold text-lg mb-3 font-serif tracking-wide text-black">Architectural Perspective:</h4>
-    <p class="text-black-900 italic pl-6 border-l-2 border-orange-300 leading-relaxed font-light">
-      "{{ person.Architectural_Perspective }}"
-    </p>
-  </div>
-
-  <!-- <div class="flex gap-6 pt-6">
-    <a href="#" class="text-gray-400 hover:text-gray-900 transition-colors duration-300">
-      <span class="sr-only">Facebook</span>
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"/>
-      </svg>
-    </a>
-    <a href="#" class="text-gray-400 hover:text-gray-900 transition-colors duration-300">
-      <span class="sr-only">Instagram</span>
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772 4.902 4.902 0 011.772-1.153c.636-.247 1.363-.416 2.427-.465C9.673 2.013 10.03 2 12.48 2h.165zm-1.92 6.29A2.32 2.32 0 119.3 9.38a2.32 2.32 0 011.095-1.09z" clip-rule="evenodd"/>
-      </svg>
-    </a>
-  </div> -->
-
-</div>
+            <div v-if="person.Architectural_Perspective" class="perspective-section">
+              <h4 class="perspective-title font-bold font-serif tracking-wide text-black">Architectural Perspective:</h4>
+              <p class="perspective-quote text-black-900 italic border-l-2 border-orange-300 leading-relaxed font-light">
+                "{{ person.Architectural_Perspective }}"
+              </p>
+            </div>
+          </div>
 
         </div>
-        <div v-if="index < team.length - 1" class="absolute bottom-0 left-6 right-6 h-px bg-gray-300 lg:hidden"></div>
       </div>
     </div>
+
+    <!-- Mobile/Tablet Layout (below lg) -->
+   <div v-if="false">
+      <div
+        v-for="person in team"
+        :key="'mobile-' + person.id"
+        class="team-member-block-mobile lg:hidden min-h-screen flex flex-col"
+      >
+        <!-- Full viewport card layout for mobile -->
+        <div class="flex-1 flex flex-col">
+          <!-- Image section - takes up about 45% of viewport -->
+          <div class="relative h-[45vh] overflow-hidden">
+            <img
+              :src="person.image || defaultImage(person.id)"
+              :alt="person.name"
+              class="w-full h-full object-cover object-[center_20%]"
+              loading="lazy"
+            />
+            <!-- Name overlay on image -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 sm:p-6">
+              <h2 class="font-serif text-3xl sm:text-4xl text-white leading-tight">
+                I'M {{ person.nickname.toUpperCase() || firstName(person.name) }}
+              </h2>
+              <p class="text-white/90 text-sm sm:text-base font-bold tracking-wider uppercase mt-2">
+                {{ person.name }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Content section - fills remaining space -->
+          <div class="flex-1 p-5 sm:p-8 overflow-y-auto bg-white">
+            <!-- Role badges -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span
+                v-for="(rolePart, i) in splitRole(person.role)"
+                :key="i"
+                class="text-xs font-semibold tracking-wide uppercase bg-[#f4f2ed] text-gray-700 px-3 py-1.5 rounded-full"
+              >
+                {{ rolePart }}
+              </span>
+            </div>
+
+            <!-- Bio -->
+            <p class="text-gray-700 text-sm sm:text-base leading-relaxed mb-5">
+              {{ person.detailedBio }}
+            </p>
+
+            <!-- Architectural Perspective -->
+            <div v-if="person.Architectural_Perspective">
+              <h4 class="font-bold text-sm sm:text-base font-serif tracking-wide text-black mb-2">Architectural Perspective:</h4>
+              <p class="text-gray-600 text-sm sm:text-base italic pl-4 border-l-2 border-orange-300 leading-relaxed">
+                "{{ person.Architectural_Perspective }}"
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
 
   </section>
 </template>
@@ -176,10 +200,345 @@ function splitRole(roleString) {
   font-family: 'Playfair Display', serif; /* Fallback to any available serif */
 }
 
-
 /* Ensure smooth font rendering */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* =====================================================
+   RESPONSIVE SCALING SYSTEM
+   Reference viewport: 1920px x 927px
+   All values are calculated as proportions of 1920px
+   ===================================================== */
+
+/* Base scale factor - everything scales relative to 1920px */
+:root {
+  --base-width: 1920;
+  --scale: calc(100vw / var(--base-width));
+}
+
+/* Content wrapper - scales max-width proportionally */
+.team-content-wrapper {
+  max-width: calc(1400 * var(--scale));
+  padding-left: calc(117 * var(--scale)); /* 6.1vw at 1920 = ~117px */
+  padding-right: calc(117 * var(--scale));
+}
+
+/* Grid layout */
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(64 * var(--scale)); /* lg:gap-x-16 = 64px */
+}
+
+.image-column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HELLO text - scales with viewport */
+.hello-text {
+  top: 0;
+  left: calc(56 * var(--scale)); /* 3.5rem = 56px */
+  transform: translateY(23.6%);
+  font-size: calc(59.52 * var(--scale)); /* 3.1vw at 1920 = 59.52px */
+}
+
+/* Photo frame - padding scales proportionally */
+.photo-frame {
+  max-width: calc(512 * var(--scale)); /* lg:max-w-lg = 512px */
+  padding: calc(45 * var(--scale)) calc(45 * var(--scale)) calc(137 * var(--scale));
+}
+
+/* Team photo */
+.team-photo {
+  max-height: calc(550 * var(--scale)); /* lg:max-h-[550px] */
+}
+
+/* Name block positioning - aligned to photo frame's right edge */
+.name-block {
+  bottom: 0;
+  right: calc(45 * var(--scale)); /* Match photo-frame's right padding */
+  transform: translateY(-13%);
+}
+
+/* Name title */
+.name-title {
+  font-size: calc(53.76 * var(--scale)); /* 2.8vw at 1920 = 53.76px */
+}
+
+/* Role text */
+.role-text {
+  font-size: calc(14 * var(--scale)); /* sm:text-sm = 14px */
+}
+
+/* Content column */
+.content-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  gap: calc(32 * var(--scale)); /* space-y-8 = 32px */
+}
+
+/* Bio text */
+.bio-text {
+  font-size: calc(18 * var(--scale)); /* prose-lg base = 18px */
+  line-height: 1.75;
+}
+
+/* Perspective section */
+.perspective-section {
+  padding-top: calc(16 * var(--scale)); /* pt-4 = 16px */
+}
+
+.perspective-title {
+  font-size: calc(18 * var(--scale)); /* text-lg = 18px */
+  margin-bottom: calc(12 * var(--scale)); /* mb-3 = 12px */
+}
+
+.perspective-quote {
+  padding-left: calc(24 * var(--scale)); /* pl-6 = 24px */
+  font-size: calc(16 * var(--scale));
+}
+
+/* =====================================================
+   BREAKPOINT ADJUSTMENTS
+   Ensure minimum readability at smaller large screens
+   ===================================================== */
+
+/* For screens between 1024px and 1440px - slight adjustments */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .team-content-wrapper {
+    max-width: 95%;
+    padding-left: 4vw;
+    padding-right: 4vw;
+  }
+
+  .team-grid {
+    gap: 3vw;
+  }
+
+  .hello-text {
+    font-size: 3.1vw;
+    left: 3vw;
+  }
+
+  .photo-frame {
+    max-width: 100%;
+    padding: 2.5vw 2.5vw 7vw;
+  }
+
+  .team-photo {
+    max-height: 30vw;
+  }
+
+  .name-block {
+    right: 2.5vw; /* Match photo-frame's right padding */
+    transform: translateY(-13%);
+  }
+
+  .name-title {
+    font-size: 3vw;
+  }
+
+  .role-text {
+    font-size: 0.75vw;
+  }
+
+  .bio-text {
+    font-size: 1vw;
+  }
+
+  .perspective-title {
+    font-size: 1vw;
+  }
+
+  .perspective-quote {
+    font-size: 0.9vw;
+    padding-left: 1.25vw;
+  }
+
+  .content-column {
+    gap: 1.5vw;
+  }
+
+  .perspective-section {
+    padding-top: 0.8vw;
+  }
+}
+
+/* For screens 1441px to 1919px */
+@media (min-width: 1441px) and (max-width: 1919px) {
+  .team-content-wrapper {
+    max-width: calc(1400px * (100vw / 1920px));
+    padding-left: 6.1vw;
+    padding-right: 6.1vw;
+  }
+
+  .hello-text {
+    font-size: 3.1vw;
+    left: 3.5rem;
+  }
+
+  .photo-frame {
+    max-width: calc(512px * (100vw / 1920px));
+    padding: calc(45px * (100vw / 1920px)) calc(45px * (100vw / 1920px)) calc(137px * (100vw / 1920px));
+  }
+
+  .team-photo {
+    max-height: calc(550px * (100vw / 1920px));
+  }
+
+  .name-title {
+    font-size: 2.8vw;
+  }
+
+  .role-text {
+    font-size: calc(14px * (100vw / 1920px));
+  }
+
+  .bio-text {
+    font-size: calc(18px * (100vw / 1920px));
+  }
+
+  .perspective-title {
+    font-size: calc(18px * (100vw / 1920px));
+  }
+
+  .perspective-quote {
+    font-size: calc(16px * (100vw / 1920px));
+  }
+}
+
+/* For screens 1920px and above - use exact pixel values */
+@media (min-width: 1920px) {
+  .team-content-wrapper {
+    max-width: 1400px;
+    padding-left: 117px;
+    padding-right: 117px;
+  }
+
+  .team-grid {
+    gap: 64px;
+  }
+
+  .hello-text {
+    font-size: 59.52px;
+    left: 56px;
+  }
+
+  .photo-frame {
+    /* max-width: 512px; */
+    padding: 45px 45px 137px;
+  }
+
+  .team-photo {
+    max-height: 550px;
+  }
+
+  .name-block {
+    right: 45px; /* Match photo-frame's right padding */
+    transform: translateY(-13%);
+  }
+
+  .name-title {
+    font-size: 53.76px;
+  }
+
+  .role-text {
+    font-size: 14px;
+  }
+
+  .content-column {
+    gap: 32px;
+  }
+
+  .bio-text {
+    font-size: 18px;
+  }
+
+  .perspective-section {
+    padding-top: 16px;
+  }
+
+  .perspective-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .perspective-quote {
+    padding-left: 24px;
+    font-size: 16px;
+  }
+}
+
+/* For very large screens (2K, 4K) - scale up proportionally */
+@media (min-width: 2560px) {
+  .team-content-wrapper {
+    max-width: calc(1400px * (100vw / 1920px));
+    padding-left: calc(117px * (100vw / 1920px));
+    padding-right: calc(117px * (100vw / 1920px));
+  }
+
+  .team-grid {
+    gap: calc(64px * (100vw / 1920px));
+  }
+
+  .hello-text {
+    font-size: calc(59.52px * (100vw / 1920px));
+    left: calc(56px * (100vw / 1920px));
+  }
+
+  .photo-frame {
+    max-width: calc(512px * (100vw / 1920px));
+    padding: calc(45px * (100vw / 1920px)) calc(45px * (100vw / 1920px)) calc(137px * (100vw / 1920px));
+  }
+
+  .team-photo {
+    max-height: calc(550px * (100vw / 1920px));
+  }
+
+  .name-block {
+    right: calc(45px * (100vw / 1920px)); /* Match photo-frame's right padding */
+    transform: translateY(-13%);
+  }
+
+  .name-title {
+    font-size: calc(53.76px * (100vw / 1920px));
+  }
+
+  .role-text {
+    font-size: calc(14px * (100vw / 1920px));
+  }
+
+  .content-column {
+    gap: calc(32px * (100vw / 1920px));
+  }
+
+  .bio-text {
+    font-size: calc(18px * (100vw / 1920px));
+  }
+
+  .perspective-section {
+    padding-top: calc(16px * (100vw / 1920px));
+  }
+
+  .perspective-title {
+    font-size: calc(18px * (100vw / 1920px));
+    margin-bottom: calc(12px * (100vw / 1920px));
+  }
+
+  .perspective-quote {
+    padding-left: calc(24px * (100vw / 1920px));
+    font-size: calc(16px * (100vw / 1920px));
+  }
+}
+
+/* Mobile card styling */
+.team-member-block-mobile {
+  min-height: auto;
 }
 </style>
