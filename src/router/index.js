@@ -104,6 +104,7 @@ const router = createRouter({
       },
     },
     { path: '/shop', name: 'shop', component: comingSoon },
+    { path: '/shopping', name: 'shopping', component: comingSoon },
     { path: '/collabs', name: 'collabs', component: comingSoon },
     { path: '/portfolio', name: 'portfolio', component: comingSoon },
     { path: '/projects', name: 'projects', component: comingSoon },
