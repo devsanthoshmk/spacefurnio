@@ -16,7 +16,7 @@
             <div class="relative w-full">
               <!-- HELLO text positioned half inside/half outside at top -->
               <h2
-                class="hello-text z-10 font-serif text-black bg-clip-text leading-none absolute select-none"
+                class="hello-text z-10 cinzel-font text-black bg-clip-text leading-none absolute select-none"
                 aria-hidden="true"
               >
                 HELLO,
@@ -33,7 +33,7 @@
 
               <!-- Name and role positioned at bottom-right: name half in/out, role below image -->
               <div class="name-block absolute z-10 text-right">
-                <h1 class="name-title font-serif leading-none mb-2 whitespace-nowrap">
+                <h1 class="name-title cinzel-font leading-none mb-2 whitespace-nowrap" style="font-weight: 450;">
                   <span class="text-black">I'M</span> <span>{{ person.nickname.toUpperCase() || firstName(person.name) }}</span>
                 </h1>
                 <div class="role-text font-bold tracking-[0.2em] text-black uppercase flex flex-col space-y-1 items-end">
@@ -190,6 +190,17 @@ function splitRole(roleString) {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+
+.cinzel-font {
+  font-family: "Cinzel", serif;
+  font-optical-sizing: auto;
+  font-weight: lighter;
+  font-style: normal;
+}
+
+
 /* IMPORTANT: For this design to work correctly, you must have a serif font
   like 'Playfair Display' or 'Merriweather' imported in your main index.html file.
   Example:
@@ -210,26 +221,28 @@ body {
    RESPONSIVE SCALING SYSTEM
    Reference viewport: 1920px x 927px
    All values are calculated as proportions of 1920px
+
+   NOTE: --scale variable approach (calc(100vw / 1920)) doesn't work in CSS
+   because you cannot divide a length by a unitless number.
+   Instead, we use direct vw calculations: value * (100 / 1920) = value * 0.05208vw
+
+   FUTURE MODIFICATION: If CSS supports unit division in calc(),
+   you can restore --scale: calc(100vw / 1920) and use calc(value * var(--scale))
    ===================================================== */
 
-/* Base scale factor - everything scales relative to 1920px */
-:root {
-  --base-width: 1920;
-  --scale: calc(100vw / var(--base-width));
-}
-
 /* Content wrapper - scales max-width proportionally */
+/* --scale equivalent: calc(1400 * var(--scale)) → 72.917vw */
 .team-content-wrapper {
-  max-width: calc(1400 * var(--scale));
-  padding-left: calc(117 * var(--scale)); /* 6.1vw at 1920 = ~117px */
-  padding-right: calc(117 * var(--scale));
+  max-width: 72.917vw; /* 1400 / 1920 * 100 */
+  padding-left: 6.094vw; /* 117 / 1920 * 100 - was calc(117 * var(--scale)) */
+  padding-right: 6.094vw; /* 117 / 1920 * 100 - was calc(117 * var(--scale)) */
 }
 
 /* Grid layout */
 .team-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: calc(64 * var(--scale)); /* lg:gap-x-16 = 64px */
+  gap: 3.333vw; /* 64 / 1920 * 100 - was calc(64 * var(--scale)) - lg:gap-x-16 = 64px */
 }
 
 .image-column {
@@ -239,69 +252,81 @@ body {
 }
 
 /* HELLO text - scales with viewport */
+/* --scale equivalent: was calc(56 * var(--scale)) and calc(59.52 * var(--scale)) */
 .hello-text {
   top: 0;
-  left: calc(56 * var(--scale)); /* 3.5rem = 56px */
-  transform: translateY(23.6%);
-  font-size: calc(59.52 * var(--scale)); /* 3.1vw at 1920 = 59.52px */
+  left: 2.917vw; /* 56 / 1920 * 100 - was calc(56 * var(--scale)) - 3.5rem = 56px */
+  transform: translateY(33.6%);
+  /* Use clamp() so text doesn't become tiny on smaller laptop screens */
+  font-size: clamp(2rem, 3.1vw, 3.75rem); /* ~32px min, ~60px @1920, ~60px cap */
 }
 
 /* Photo frame - padding scales proportionally */
+/* --scale equivalent: was calc(512 * var(--scale)), calc(45 * var(--scale)), calc(137 * var(--scale)) */
 .photo-frame {
-  max-width: calc(512 * var(--scale)); /* lg:max-w-lg = 512px */
-  padding: calc(45 * var(--scale)) calc(45 * var(--scale)) calc(137 * var(--scale));
+  max-width: 26.667vw; /* 512 / 1920 * 100 - was calc(512 * var(--scale)) - lg:max-w-lg = 512px */
+  padding: 2.344vw 2.344vw 7.135vw; /* 45/1920, 45/1920, 137/1920 - was calc(45 * var(--scale)) calc(45 * var(--scale)) calc(137 * var(--scale)) */
 }
 
 /* Team photo */
+/* --scale equivalent: was calc(550 * var(--scale)) */
 .team-photo {
-  max-height: calc(550 * var(--scale)); /* lg:max-h-[550px] */
+  max-height: 28.646vw; /* 550 / 1920 * 100 - was calc(550 * var(--scale)) - lg:max-h-[550px] */
 }
 
 /* Name block positioning - aligned to photo frame's right edge */
+/* --scale equivalent: was calc(45 * var(--scale)) */
 .name-block {
   bottom: 0;
-  right: calc(45 * var(--scale)); /* Match photo-frame's right padding */
-  transform: translateY(-13%);
+  right: 4.2vw; /* 45 / 1920 * 100 - was calc(45 * var(--scale)) - Match photo-frame's right padding */
+  transform: translateY(-8.5%);
 }
 
 /* Name title */
+/* --scale equivalent: was calc(53.76 * var(--scale)) */
 .name-title {
-  font-size: calc(53.76 * var(--scale)); /* 2.8vw at 1920 = 53.76px */
+  font-size: clamp(1.75rem, 2.8vw, 3.375rem); /* ~28px min, ~54px @1920 */
 }
 
 /* Role text */
+/* --scale equivalent: was calc(14 * var(--scale)) */
 .role-text {
-  font-size: calc(14 * var(--scale)); /* sm:text-sm = 14px */
+  font-size: clamp(0.8rem, 0.729vw, 0.95rem); /* ~12.8px min, ~14px @1920 */
 }
 
 /* Content column */
+/* --scale equivalent: was calc(32 * var(--scale)) */
 .content-column {
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  gap: calc(32 * var(--scale)); /* space-y-8 = 32px */
+  gap: 1.667vw; /* 32 / 1920 * 100 - was calc(32 * var(--scale)) - space-y-8 = 32px */
 }
 
 /* Bio text */
+/* --scale equivalent: was calc(18 * var(--scale)) */
 .bio-text {
-  font-size: calc(18 * var(--scale)); /* prose-lg base = 18px */
+  font-size: clamp(1rem, 0.938vw, 1.125rem); /* ~16px min, ~18px @1920 */
   line-height: 1.75;
 }
 
 /* Perspective section */
+/* --scale equivalent: was calc(16 * var(--scale)) */
 .perspective-section {
-  padding-top: calc(16 * var(--scale)); /* pt-4 = 16px */
+  padding-top: 0.833vw; /* 16 / 1920 * 100 - was calc(16 * var(--scale)) - pt-4 = 16px */
 }
 
+/* --scale equivalent: was calc(18 * var(--scale)) and calc(12 * var(--scale)) */
 .perspective-title {
-  font-size: calc(18 * var(--scale)); /* text-lg = 18px */
-  margin-bottom: calc(12 * var(--scale)); /* mb-3 = 12px */
+  font-size: clamp(1rem, 0.938vw, 1.125rem); /* ~16px min, ~18px @1920 */
+  margin-bottom: 0.625vw; /* 12 / 1920 * 100 - was calc(12 * var(--scale)) - mb-3 = 12px */
 }
 
+/* --scale equivalent: was calc(24 * var(--scale)) and calc(16 * var(--scale)) */
 .perspective-quote {
-  padding-left: calc(24 * var(--scale)); /* pl-6 = 24px */
-  font-size: calc(16 * var(--scale));
+  padding-left: 1.25vw; /* 24 / 1920 * 100 - was calc(24 * var(--scale)) - pl-6 = 24px */
+  font-size: clamp(0.95rem, 0.833vw, 1rem); /* ~15px min, ~16px @1920 */
 }
 
 /* =====================================================
@@ -322,7 +347,7 @@ body {
   }
 
   .hello-text {
-    font-size: 3.1vw;
+    font-size: clamp(2.25rem, 3.1vw, 3.75rem);
     left: 3vw;
   }
 
@@ -337,27 +362,26 @@ body {
 
   .name-block {
     right: 2.5vw; /* Match photo-frame's right padding */
-    transform: translateY(-13%);
   }
 
   .name-title {
-    font-size: 3vw;
+    font-size: clamp(1.9rem, 2.4vw, 3.375rem);
   }
 
   .role-text {
-    font-size: 0.75vw;
+    font-size: clamp(0.85rem, 0.75vw, 0.95rem);
   }
 
   .bio-text {
-    font-size: 1vw;
+    font-size: clamp(1.05rem, 1vw, 1.125rem);
   }
 
   .perspective-title {
-    font-size: 1vw;
+    font-size: clamp(1.05rem, 1vw, 1.125rem);
   }
 
   .perspective-quote {
-    font-size: 0.9vw;
+    font-size: clamp(1rem, 0.9vw, 1.05rem);
     padding-left: 1.25vw;
   }
 
@@ -373,43 +397,43 @@ body {
 /* For screens 1441px to 1919px */
 @media (min-width: 1441px) and (max-width: 1919px) {
   .team-content-wrapper {
-    max-width: calc(1400px * (100vw / 1920px));
+    max-width: calc(1400 * (100vw / 1920));
     padding-left: 6.1vw;
     padding-right: 6.1vw;
   }
 
   .hello-text {
-    font-size: 3.1vw;
+    font-size: clamp(2rem, 3.1vw, 3.75rem);
     left: 3.5rem;
   }
 
   .photo-frame {
-    max-width: calc(512px * (100vw / 1920px));
-    padding: calc(45px * (100vw / 1920px)) calc(45px * (100vw / 1920px)) calc(137px * (100vw / 1920px));
+    max-width: calc(512 * (100vw / 1920));
+    padding: calc(45 * (100vw / 1920)) calc(45 * (100vw / 1920)) calc(137 * (100vw / 1920));
   }
 
   .team-photo {
-    max-height: calc(550px * (100vw / 1920px));
+    max-height: calc(550 * (100vw / 1920));
   }
 
   .name-title {
-    font-size: 2.8vw;
+    font-size: clamp(1.75rem, 2.8vw, 3.375rem);
   }
 
   .role-text {
-    font-size: calc(14px * (100vw / 1920px));
+    font-size: clamp(0.8rem, 0.729vw, 0.95rem);
   }
 
   .bio-text {
-    font-size: calc(18px * (100vw / 1920px));
+    font-size: clamp(1rem, 0.938vw, 1.125rem);
   }
 
   .perspective-title {
-    font-size: calc(18px * (100vw / 1920px));
+    font-size: clamp(1rem, 0.938vw, 1.125rem);
   }
 
   .perspective-quote {
-    font-size: calc(16px * (100vw / 1920px));
+    font-size: clamp(0.95rem, 0.833vw, 1rem);
   }
 }
 
@@ -440,8 +464,7 @@ body {
   }
 
   .name-block {
-    right: 45px; /* Match photo-frame's right padding */
-    transform: translateY(-13%);
+    right: 82px; /* Match photo-frame's right padding */
   }
 
   .name-title {
@@ -503,7 +526,6 @@ body {
 
   .name-block {
     right: calc(45px * (100vw / 1920px)); /* Match photo-frame's right padding */
-    transform: translateY(-13%);
   }
 
   .name-title {
