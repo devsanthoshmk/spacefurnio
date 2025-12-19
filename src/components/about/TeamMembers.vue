@@ -140,16 +140,6 @@ const teamMembers =[
   },
   {
     id: 2,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for driving business growth through strategic financial planning",
-    detailedBio: `I’m an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we’re on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
-    Architectural_Perspective: `I don’t come from an architecture background, but I’ve always been fascinated by the way spaces make us feel. To me, architecture isn’t just about buildings or blueprints—it’s about stories. Every wall, every window, every curve has a purpose, even if you don’t see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It’s like listening to a song in a language you don’t speak—you may not know every word, but you feel its meaning.`,
-    image: "/images/aboutus/team-main/jenita.png"
-  },
-  {
-    id: 3,
     name: "Peter Cintra R",
     nickname: "Cintra",
     role: "Co-Founder & HR Executive",
@@ -159,7 +149,7 @@ const teamMembers =[
     image: "/images/aboutus/team-main/cintra.png"
   },
   {
-    id: 4,
+    id: 3,
     name: "Ar. Srimonisha",
     nickname: "Monisha",
     role: "Co-Founder & Design Lead",
@@ -167,7 +157,18 @@ const teamMembers =[
     detailedBio: `I’m an architect and the Design Lead at Spacefurnio, where I shape every product with a balance of function and aesthetics. My journey began with sketches in the margins of my notebooks and has grown into creating purposeful spaces that fulfill both design intent and functional needs. From the first line I draw, my focus is clear — to capture every requirement with precision and embed it into our work, ensuring the foundation of every project is laid right from the very beginning.`,
     Architectural_Perspective: `To me, architecture is more than design — it is the art of translating dreams into spaces that tell stories and serve a purpose. It begins with listening — to people, to place, and to intent. I see it as a soulful practice where emotion, function, and aesthetics come together in harmony. True architecture is not just admired; it is felt, lived in, and cherished — evolving with the lives it touches.`,
     image: "/images/aboutus/team-main/monisha.png"
+  },
+  {
+    id: 4,
+    name: "J. Jeffrina",
+    nickname: "Jeffy",
+    role: "Co-Founder & Financial Manager",
+    description: "MBA graduate with a passion for driving business growth through strategic financial planning",
+    detailedBio: `I’m an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we’re on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
+    Architectural_Perspective: `I don’t come from an architecture background, but I’ve always been fascinated by the way spaces make us feel. To me, architecture isn’t just about buildings or blueprints—it’s about stories. Every wall, every window, every curve has a purpose, even if you don’t see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It’s like listening to a song in a language you don’t speak—you may not know every word, but you feel its meaning.`,
+    image: "/images/aboutus/team-main/jenita.png"
   }
+
 ]
 
 const team = ref(teamMembers)
