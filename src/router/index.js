@@ -103,9 +103,16 @@ const router = createRouter({
         title: (route) => `${route.params.category} - Shop by Design - Space Furnio`,
       },
     },
+    {
+      path: '/collabs',
+      name: 'collabs',
+      component: () => import('@/views/sfCollabs.vue'),
+      meta: {
+        title: 'SF Collabs - Spacefurnio',
+      },
+    },
     { path: '/shop', name: 'shop', component: comingSoon },
     { path: '/shopping', name: 'shopping', component: comingSoon },
-    { path: '/collabs', name: 'collabs', component: comingSoon },
     { path: '/portfolio', name: 'portfolio', component: comingSoon },
     { path: '/projects', name: 'projects', component: comingSoon },
   ],
