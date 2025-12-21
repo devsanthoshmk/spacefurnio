@@ -30,19 +30,19 @@ onMounted(() => {
             </div>
             <div class="relative z-10 text-center flex flex-col items-center max-w-5xl px-6 sm:px-8 animate-fadeIn">
                 <!-- Logo -->
-                <div class="mb-1 sm:mb-2 w-25 sm:w-28 md:w-26 lg:w-34 transition-all duration-700 hover:scale-105">
+                <div class="-mb-8 md:-mb-10 xl:-mb-10 w-25 sm:w-28 md:w-26 lg:w-34 transition-all duration-700 hover:scale-105">
                     <img alt="Spacefurnio Monogram" class="w-full h-auto drop-shadow-2xl" src="/images/Spacefurnio-Logo.png"/>
                 </div>
 
                 <!-- Main Title -->
                 <h1 class="font-display mb-0 sm:mb-1 tracking-tight text-gray-900 flex flex-col items-center gap-0">
-                    <span class="phitagate-font font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent text-8xl xl:text-9xl leading-tight ps-1">
+                    <span class="phitagate-font bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-8xl xl:text-9xl leading-tight ps-1 text-black font-medium">
                         Spacefurnio
                     </span>
-                    <span class="font-bold phitagate-font text-7xl text-gray-700 -my-9">
+                    <span class="font-bold phitagate-font text-7xl text-gray-700 -mt-4 md:-mt-6 xl:-mt-7">
                         ×
                     </span>
-                    <span class="italic text-6xl xl:text-7xl font-light tracking-wide mt-9">
+                    <span class="italic text-6xl xl:text-7xl font-light tracking-wide mt-1 md:mt-1 xl:mt-2">
                         Collabs
                     </span>
                 </h1>
