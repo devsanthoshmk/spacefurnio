@@ -23,25 +23,44 @@ onMounted(() => {
     <div class="bg-background-light text-primary font-body antialiased transition-colors duration-500">
 
         <!-- Header -->
-        <header class="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden">
+        <header class="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden py-20">
             <div class="absolute inset-0 z-0">
                 <img alt="Abstract architectural shadows" class="w-full h-full object-cover opacity-90 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhgKO0hSTWG8ItXCNibW_OwnRd-hVLNDjVdtYABLzMFnJkmxfTo7lezGgAKHJ2oByOqbt0Bdw95Lrr3sTj3iHl_amf-PmUOcLb3AL6c1isxbGZQVied6Oj22vBxQCc2dMH2kfcZFz43VOGgJTNV_jmcUI7_I3OiG5d1AyLmsopkxfYQ0WQ6YNr_kdf9JmCknkr6oSYw0pJtsag5DTR7rgUjVR5VJALqahF4ingfIhsUOQVUp0IvC64M0l7IppyjdZ5bg5MUF28tf0"/>
-                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/20 to-background-light"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/30 to-background-light"></div>
             </div>
-            <div class="relative z-10 text-center flex flex-col items-center max-w-4xl px-4 animate-fadeIn">
-                <div class="mb-8 w-32 md:w-48 transition-all duration-700 hover:scale-105">
-                    <img alt="Spacefurnio Monogram" class="w-full h-auto drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUBgycchDWgxF5U0x4FPzT5zqI83-JpZyw2pcWAw_pSzbJO9VIacMG5YGtzLd6kEkbwDw5vfhYlHpxlStdk259zAiJBc-kieT-0pCUsoIJDlViJzsuClp5nhSNWyS2A1F7vguW1o-UqefAb-yXTqdBWz4ST2DqRpmY_qvZ4zZgeYzO8eb3MMv03WZx7j6soXoXi-OmmZ4YK2UHWgN-N2eNVvpxHr0O2DisaXjL9x1ADhT5bX8GY1c5coEYjWvUCBOvnMWjYzbWVFU"/>
+            <div class="relative z-10 text-center flex flex-col items-center max-w-5xl px-6 sm:px-8 animate-fadeIn">
+                <!-- Logo -->
+                <div class="mb-1 sm:mb-2 w-25 sm:w-28 md:w-26 lg:w-34 transition-all duration-700 hover:scale-105">
+                    <img alt="Spacefurnio Monogram" class="w-full h-auto drop-shadow-2xl" src="/images/Spacefurnio-Logo.png"/>
                 </div>
-                <h1 class="text-5xl md:text-8xl font-display italic font-light mb-6 tracking-tight leading-tight text-gray-900">
-                    SF Collabs
+
+                <!-- Main Title -->
+                <h1 class="font-display mb-0 sm:mb-1 tracking-tight text-gray-900 flex flex-col items-center gap-0">
+                    <span class="phitagate-font font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent text-8xl xl:text-9xl leading-tight">
+                        Spacefurnio
+                    </span>
+                    <span class="font-bold phitagate-font text-7xl text-gray-700 -my-9">
+                        ×
+                    </span>
+                    <span class="italic text-6xl xl:text-7xl font-light tracking-wide mt-9">
+                        Collabs
+                    </span>
                 </h1>
-                <div class="w-24 h-[1px] bg-gray-900 mb-8"></div>
-                <p class="text-lg md:text-xl font-light tracking-widest uppercase text-gray-700">
-                    Where Design Meets Legacy
+
+                <!-- Divider -->
+                <div class="w-16 sm:w-20 md:w-24 h-[2px] bg-gradient-to-r from-transparent via-gray-800 to-transparent my-4 sm:my-5"></div>
+
+                <!-- Tagline -->
+                <p class="text-sm sm:text-base md:text-lg lg:text-xl font-light tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gray-600">
+                    Creative Meets Living
                 </p>
             </div>
-            <div class="absolute bottom-10 animate-bounce">
-                <span class="material-icons text-3xl opacity-50">keyboard_arrow_down</span>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-6 sm:bottom-10 animate-bounce">
+                <span class="material-icons text-2xl sm:text-3xl text-gray-500 opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+                    keyboard_arrow_down
+                </span>
             </div>
         </header>
 
