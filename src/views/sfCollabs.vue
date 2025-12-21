@@ -36,7 +36,7 @@ onMounted(() => {
 
                 <!-- Main Title -->
                 <h1 class="font-display mb-0 sm:mb-1 tracking-tight text-gray-900 flex flex-col items-center gap-0">
-                    <span class="phitagate-font font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent text-8xl xl:text-9xl leading-tight">
+                    <span class="phitagate-font font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent text-8xl xl:text-9xl leading-tight ps-1">
                         Spacefurnio
                     </span>
                     <span class="font-bold phitagate-font text-7xl text-gray-700 -my-9">
