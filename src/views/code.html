@@ -2,261 +2,209 @@
 <html class="scroll-smooth" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SF Collabs - Spacefurnio</title>
+<title>SpaceFurnio - Minimalist Furniture Portfolio</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
 <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        primary: "#1a1a1a", // Deep charcoal for strong primary actions
-                        "background-light": "#FDFBF7", // Warm editorial paper
-                        "background-dark": "#050505", // Deep luxury black
-                        "accent-light": "#E5E5E5",
-                        "accent-dark": "#262626",
+                        primary: "#8C7B6C", // Muted Bronze/Earth tone
+                        "background-light": "#D8D6D1", // Matches the warm grey/beige of the screenshot
+                        "background-dark": "#1C1C1E", // Soft charcoal for dark mode
+                        "surface-light": "#EAE8E4",
+                        "surface-dark": "#2C2C2E",
+                        "text-light": "#333333",
+                        "text-dark": "#E5E5E5"
                     },
                     fontFamily: {
-                        display: ["'Playfair Display'", "serif"],
-                        body: ["'Lato'", "sans-serif"],
+                        display: ["Montserrat", "sans-serif"],
+                        serif: ["Playfair Display", "serif"],
                     },
-                    borderRadius: {
-                        DEFAULT: "2px", // Sharp, editorial corners
-                        'lg': "4px"
-                    },
-                    letterSpacing: {
-                        widest: '.25em',
+                    spacing: {
+                        '128': '32rem',
                     }
                 },
             },
         };
     </script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&amp;family=Lato:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<style>.text-vertical {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }.no-scrollbar {
+            -ms-overflow-style: none;scrollbar-width: none;}
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
         }
-        .reveal-on-scroll {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 1s ease-out;
-        }
-        .reveal-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888; 
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555; 
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-primary dark:text-gray-100 font-body antialiased transition-colors duration-500">
-<nav class="fixed w-full z-50 top-0 left-0 transition-all duration-300 mix-blend-difference text-white">
-<div class="container mx-auto px-6 py-6 flex justify-between items-center">
-<div class="flex items-center gap-4">
-<a class="text-2xl font-display font-bold tracking-widest uppercase flex items-center gap-2" href="#">
-                   Spacefurnio
-                </a>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display transition-colors duration-300">
+<nav class="fixed top-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center mix-blend-difference text-white">
+<div class="text-sm tracking-[0.2em] font-medium uppercase hover:text-primary transition-colors cursor-pointer">
+<a href="#">Home</a>
 </div>
-<div class="hidden md:flex space-x-12 text-sm font-light tracking-widest uppercase">
-<a class="hover:opacity-70 transition-opacity" href="#">Work</a>
-<a class="hover:opacity-70 transition-opacity border-b border-white" href="#">Collabs</a>
-<a class="hover:opacity-70 transition-opacity" href="#">Studio</a>
-<a class="hover:opacity-70 transition-opacity" href="#">Contact</a>
-</div>
-<button class="md:hidden">
-<span class="material-icons">menu</span>
+<div class="flex space-x-8 text-sm tracking-[0.2em] font-medium uppercase">
+<a class="hover:text-primary transition-colors" href="#portfolio">Portfolio</a>
+<a class="hover:text-primary transition-colors" href="#">Shop</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+<button class="hover:text-primary transition-colors focus:outline-none" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-outlined text-sm">brightness_6</span>
 </button>
 </div>
 </nav>
-<header class="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden">
-<div class="absolute inset-0 z-0">
-<img alt="Abstract architectural shadows" class="w-full h-full object-cover opacity-90 dark:opacity-60 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhgKO0hSTWG8ItXCNibW_OwnRd-hVLNDjVdtYABLzMFnJkmxfTo7lezGgAKHJ2oByOqbt0Bdw95Lrr3sTj3iHl_amf-PmUOcLb3AL6c1isxbGZQVied6Oj22vBxQCc2dMH2kfcZFz43VOGgJTNV_jmcUI7_I3OiG5d1AyLmsopkxfYQ0WQ6YNr_kdf9JmCknkr6oSYw0pJtsag5DTR7rgUjVR5VJALqahF4ingfIhsUOQVUp0IvC64M0l7IppyjdZ5bg5MUF28tf0"/>
-<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/20 to-background-light dark:via-background-dark/20 dark:to-background-dark"></div>
-</div>
-<div class="relative z-10 text-center flex flex-col items-center max-w-4xl px-4 animate-fade-in-up">
-<div class="mb-8 w-32 md:w-48 transition-all duration-700 hover:scale-105">
-<img alt="Spacefurnio Monogram" class="w-full h-auto dark:invert drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUBgycchDWgxF5U0x4FPzT5zqI83-JpZyw2pcWAw_pSzbJO9VIacMG5YGtzLd6kEkbwDw5vfhYlHpxlStdk259zAiJBc-kieT-0pCUsoIJDlViJzsuClp5nhSNWyS2A1F7vguW1o-UqefAb-yXTqdBWz4ST2DqRpmY_qvZ4zZgeYzO8eb3MMv03WZx7j6soXoXi-OmmZ4YK2UHWgN-N2eNVvpxHr0O2DisaXjL9x1ADhT5bX8GY1c5coEYjWvUCBOvnMWjYzbWVFU"/>
-</div>
-<h1 class="text-5xl md:text-8xl font-display italic font-light mb-6 tracking-tight leading-tight text-gray-900 dark:text-white">
-                SF Collabs
-            </h1>
-<div class="w-24 h-[1px] bg-gray-900 dark:bg-white mb-8"></div>
-<p class="text-lg md:text-xl font-light tracking-widest uppercase text-gray-700 dark:text-gray-300">
-                Where Design Meets Legacy
+<header class="relative w-full h-[85vh] md:h-[95vh] overflow-hidden">
+<img alt="Minimalist living room with beige furniture" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD85tXAosaQo4t2gV1PUNBcjmRpWAH8pbq1wxdy9DJ8V1vveEcaZxXLsAuefmbnvaV4h9hUOdQH5HLrUdRAfcbPU_BHSEpSxjVKm3JoFwsWqFjVsmcbaJ2-PyX-4UbLzBey139RwUOzVS-PtKoD22uMco2w0VrcLYPhhn7xXi6nCLHTaq__EoBePq8MBV_XvqzRGvi32uTA13EWqPUfoZURjYpFf1ipvD31Ilwc4y-vOkxsfpTFl2pmMDDTdhN7faQsYu7OxBOxaBeg"/>
+<div class="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
+<div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+<p class="text-xs md:text-sm tracking-[0.3em] uppercase mb-4 opacity-90 font-light fade-in-up" style="animation-delay: 0.2s;">
+                Handcrafted furniture designs by
             </p>
-</div>
-<div class="absolute bottom-10 animate-bounce">
-<span class="material-icons text-3xl opacity-50">keyboard_arrow_down</span>
+<h1 class="text-4xl md:text-6xl lg:text-7xl font-light tracking-[0.15em] uppercase fade-in-up" style="animation-delay: 0.4s;">
+                Space<span class="font-normal text-white">Furnio</span>
+</h1>
 </div>
 </header>
-<section class="py-24 md:py-32 px-6 bg-background-light dark:bg-background-dark relative z-10">
-<div class="max-w-3xl mx-auto text-center reveal-on-scroll">
-<p class="font-display text-2xl md:text-4xl leading-relaxed text-gray-800 dark:text-gray-200">
-                "We believe that true elegance is found in the dialogue between distinct voices. Our collaborations series invites the world's most visionary brands to reimagine the Spacefurnio aesthetic."
+<main class="w-full px-6 md:px-12 py-16 md:py-24" id="portfolio">
+<div class="text-center mb-16 md:mb-24">
+<h2 class="text-lg md:text-xl tracking-[0.25em] uppercase font-light text-text-light dark:text-text-dark">
+                The Collection
+            </h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-[1600px] mx-auto">
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Minimalist wooden chair" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFwc4XVWbJtl3mIjYoRTni6iwm3j6nVWC-wWRRaAr_GcSVoGXS5VySGQci5FJTesrCxyzQFVRuBNvTxfA4LGaHab-DlLlfjY8rCIk5zhM1mym16l5kxTuaKqGC9jtZKmo5I4Msx6dPfj_1haeQkVTRrnAmCxmCHawHjvlJShRV5zNhKGmHpYRejyXxQFCw2nrkVyP5ofy1-Ibf_HzYpZ5E4gB13dvZnpoilQj3yFDKVSBU2X0rUaiaJsuIUmOqSDAU8aEstKDiWtxl"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">The Norden Chair</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Oak &amp; Weave</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$350.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Modern grey sofa" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjJGZ_ua-pP28siJepHa_msu8SzxdS0BDQfw0xFQHCvVOThbg2r3clY4v8p0bFsDU5Ztqw1Ce9ZC6SVia2TTL1511ZxjJMBBBUNK27KPebEpKhfIseoeOzBSXOzKrztPQItC5GwUqzFPzdVdZyATMthDA3y4vZNbFnvaEh8aXrcIJELkJPbcT4sNi-AKQU8zhyddg1XVVIn8-WQErHNmketCV6wOjt7vQCQDD0SjMenbGR6BKqPwFRZCJjo9p22pgadlinx6dmqT16"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Cloud Sectional</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Living Room</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$2,400.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Architectural lamp design" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3iG7pQq4C12hX4UYWd0baGjdXS3JJO9VLSZZ45oDdWhEk_sbgQsSCiT-42N5rNKuVaAjHDKfB1eS1PQcYpneefRwlyoDc9YSJcVLsPNSjKEy19Qj4XiCfyF9cFnaKnICdsX6oTIkgtWdz4n3CC2EfO2L1LGGVTastH_I7W5jR-NLOA7ydpKyNl9Lu-_HM94VbhjtINPqS1xvv1GRqJPbTst7p_vHt5eBKMNbQbBGswrAtJy9U-6te3Ruf6JlVn7iDP4_yhvkyJZp2"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Arc Lumen</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Lighting</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$185.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Minimalist wooden table" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS9Aq2hlRGT1VSNcjlP65gD00pDzUBjPZLu2YTxt6AttLVZ9Z8o_z3E9v2n9pckReyKCWOSQ1bjHPLpHte2hoH13DbHyE82Cc1NiIOCNv0psZa9JeA6iQ7bxG5JqSJhEhXf-FQ6k9ty_j5Laptrmnue-Yj0T5E9Hn8UeSp33QczLknRlzxQyxppK9qtBr7x4D6TiDcY03GGyuA6eI0LaoPbmY_yw8JBBxM1nH94tc12MhxW84wXl7NFZ_zsl_kr58J0vn2uXuhTjf_"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Kyoto Low Table</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Tables</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$420.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Outdoor lounge chair" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMdlMNnsIIU4hHkZ8Zvq5QgqcpjIGR0vJpwV_Uzqo8mV53TvN8VvqgjRscLozO4HXfUCaf6ge_pfgm_d-6f3OQqJ1TI-qhPdxVQIvdDUB_YO3-Ndvxjcc7pQWt7wbJd46HsS-0vxZyiZqo5YXFztQ01oX6qVJoebQ-xsxC9bkzcNVAn-jC39fG0iEwEiqGKJzeb20PFduidgtqT1gPPwAnliie6RWqKcl1RD3CxEgr4PfZMv0w72z3e0SbqS9sA5NAAYkT8BNFHTLq"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Terrace Lounger</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Outdoor</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$550.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Green velvet sofa" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD89VjYQA6hTYP_6IQSdexnfmjjHoOrITK90UfpkHzXc_K9gyns1nc1znE83e9PULJKj5RqIahDa0RaqbRdo7t8H58wRES3Gs7FxrRmoPADJFP_qJ1hAj49GzV8Ojxsg7exV_n1inc7nzWZUSJLSqBS2tH_N9yq6rIJceTFWCcgS2nOUzN4yQcoCKfICg6rQ0HBWXMvbxG8XO9xg2UjqirRbgw-zVBQrCUq34eEwTIV5NepJJOA5nMenhZFQHGw9gKJ28av44v1oyy"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Emerald Settee</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Living Room</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$1,890.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Minimalist bed frame" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8zz4yxfDYH0iGYvEYfzRSH6LkOsHqAzWMhdcwTvjhXzohId7Lqv2s9ySJowbXjuci4cETCkTb7HmAAwJUGl0vScjbpetWbAA9KcrsTPg6zXNlm2WuLTbA4IBviAoaJvnb0FiUp4RUvY37_NKIjvxw7pvDCPurA59QT9rjECRhM-DNU8Qj68mo8Vte1VfxCTEwDlsayzv14_aIEnJrjhzu1ZBGjA74pfo45Y6T-YLMxxye5e1umYk_mxtC8Pl2t_hvSSpYOJc5GTW0"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Hiven Bed</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Bedroom</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$950.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Modern shelving unit" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-0xZW_3vH44fwdigch9FuovUSbAQ8Sgh1uUuZBkPTGIvlOY9uOvl6HwKKUIUDZVXETnTFVpbzAl3SD0IA0AMu59nFlSSiOL2RK3jMpN7nwI5MivOivM7Zr4uXRExsOhEfYCyPZwbEyCFCZiOZpqD4q6Qwhjx2DtIVX6-DM744SozcXrYnrMYNTlwXWtGRZNu-byrHcjGjvNPQNonF22ahwnc-TdjQ0SjDcnTv0Fu5bTnMyJzPNkltRndgkAVo_BLqbgMHhpxtnbTn"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Axis Shelf</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Storage</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$600.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+<div class="group relative aspect-square overflow-hidden cursor-pointer bg-surface-light dark:bg-surface-dark">
+<img alt="Abstract art decor" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC04TpAlNU54N_LQ449VtJ19XODTSHMFyvzT_8JloZIh7bvgmKPZsN7Otb9fPZNzeCBQGLkb9uwnfQ4d85-17XkT2Kr68tNPLSZfu-wpVGuBDRHksLLS55O04-TpVhP6gMUaCLxmDKXX_KuX4b0Lb08oB5V4MWOL8UpCnTpYVgE8WggHqlCW45iexnsXhqnsID1PN8vnN7Aszve_-khsWd5biCH5jqZlKc5njHRutV30XMi16uA0nAoeSicAQoNIwG-o-RFvAl5a_Dz"/>
+<div class="absolute inset-0 bg-white/90 dark:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6">
+<h3 class="text-xl font-serif italic text-text-light dark:text-text-dark mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Ceramic Series 01</h3>
+<p class="text-xs tracking-widest uppercase text-primary mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">Decor</p>
+<p class="text-sm mb-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">$120.00</p>
+<button class="border border-text-light dark:border-text-dark px-6 py-2 text-xs tracking-widest uppercase hover:bg-primary hover:border-primary hover:text-white transition-colors translate-y-4 group-hover:translate-y-0 duration-300 delay-150">
+                        View Details
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<section class="w-full px-6 md:px-12 py-12 mb-8 md:mb-16">
+<div class="max-w-[1600px] mx-auto border-t border-b border-gray-300 dark:border-gray-700 py-12 md:py-20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+<div class="max-w-2xl">
+<h2 class="text-2xl md:text-4xl font-serif italic text-text-light dark:text-text-dark mb-4">
+                Discover Our Latest Collection
+            </h2>
+<p class="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light leading-relaxed max-w-lg">
+                Explore a curated selection of minimalist designs that bring harmony and functionality to your living spaces.
             </p>
 </div>
-</section>
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden group">
-<div class="absolute inset-0 transition-transform duration-[2s] ease-out group-hover:scale-105">
-<img alt="Modern minimalist office space" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW349msWLex7TvrKX5RpfUIkDUKU3CafodR3HicQz0sUhISN9-PJ9nbDuv15tXnGjOibqREfgsADj63mkHxiLQ-sOVM2Z2ebXCE3CWYkQswjHCg3Cm5iUBif9Jni3Gk4wTEmd2dN_LTIy_HNKkXZyYr7_u52AHj-m7TxqadKJKRZMKXQ0To7_TLBjetXDST0No5D1L846kxL07AA3jrDYRwnNVu3l0WBSfkuxhfB6w16UgAdtobxdyihdP_5s876ENnihSFP3qV54"/>
-<div class="absolute inset-0 bg-white/70 dark:bg-black/60 transition-colors duration-500 backdrop-blur-[2px]"></div>
-</div>
-<div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-<div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl reveal-on-scroll">
-<img alt="Detailed texture of fabric" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP2WO1VE9rdNv98iQv0vRE6NJElFdSV3y9iAfHZid11kzTqrnJwWZrLP2nKhN66iloEuHsX1EkWuD2CSc1Ayy4-YN-zfjM8hywlnWqGeZ5ni10FsE_Ae4fyYLswLo-cG0N7TSdDr4jCr5bR-dNLCScN1cwV4QJToDAHkgsPT7fA9WhlGOIqdj9hrDX6Q5WqmujUlIL-nmtEtXBrT-nYB8lGsFsdknU7vDII14jgJVjLIm9RQmNr-F2KL42OCavlI0Gk9QaJ3_N6LU"/>
-<div class="absolute top-6 left-6 flex items-center gap-4 bg-white/90 dark:bg-black/80 p-4 backdrop-blur-md">
-<img alt="Spacefurnio Logo" class="h-8 w-auto dark:invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbMb-XsDP8UOEDLQrZ77m-mWhcwh9NYdEJThvNCqdDdFE3WGqsl2ZdUBlqEgs0exNp06vWEyHUCSYuZ-tV36OnNgXnaEqYRp8ZL81N4XgG8m_jg6WpkyZRTToJzDu8Ez-KOV1IWz5xWlC4TFzIwKLRWDBUMWaZ1I6RCSsZqARtn72iSlm9ttcuerMjBuY_bH0Za8KfuITlrqASFk0ogpPiOsXvaEasj7mqTd6tfP8wpf6-5r8qAvd4vZ2_Vfur51BUzN2z6o-RkeI"/>
-<span class="text-xl font-thin mx-2">×</span>
-<span class="font-display font-bold text-lg tracking-widest uppercase">LUMINA</span>
-</div>
-</div>
-<div class="text-left md:pl-10 reveal-on-scroll" style="transition-delay: 200ms;">
-<span class="text-xs font-bold tracking-[0.3em] uppercase text-gray-500 dark:text-gray-400 mb-4 block">
-                    Collection 01
-                </span>
-<h2 class="text-5xl md:text-7xl font-display mb-8 text-gray-900 dark:text-white leading-tight">
-                    Light &amp;<br/> <span class="italic text-gray-500 dark:text-gray-400">Structure</span>
-</h2>
-<p class="text-lg text-gray-600 dark:text-gray-300 mb-10 font-light leading-relaxed max-w-md">
-                    Spacefurnio and Lumina are collaborating to redefine how light interacts with solid oak surfaces. A study in contrast and clarity.
-                </p>
-<a class="inline-flex items-center gap-3 group/btn" href="#">
-<span class="font-bold tracking-widest text-sm uppercase border-b border-black dark:border-white pb-1 group-hover/btn:border-transparent transition-colors">
-                        Explore Chapter
-                    </span>
-<span class="material-icons text-sm transform group-hover/btn:translate-x-2 transition-transform">east</span>
-</a>
+<div class="flex-shrink-0">
+<a class="inline-block border border-text-light dark:border-text-dark px-10 py-4 text-xs tracking-[0.2em] uppercase font-medium hover:bg-primary hover:border-primary hover:text-white transition-all duration-300" href="#">
+                Shop Now
+            </a>
 </div>
 </div>
 </section>
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden group bg-stone-100 dark:bg-stone-900">
-<div class="absolute inset-0 opacity-10 dark:opacity-5 pattern-dots"></div> 
-<div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-<div class="text-left md:pr-10 md:order-1 order-2 reveal-on-scroll">
-<span class="text-xs font-bold tracking-[0.3em] uppercase text-gray-500 dark:text-gray-400 mb-4 block">
-                    Collection 02
-                </span>
-<h2 class="text-5xl md:text-7xl font-display mb-8 text-gray-900 dark:text-white leading-tight">
-                    Earth &amp;<br/> <span class="italic text-gray-500 dark:text-gray-400">Form</span>
-</h2>
-<p class="text-lg text-gray-600 dark:text-gray-300 mb-10 font-light leading-relaxed max-w-md">
-                    Spacefurnio and TERRA are collaborating on a limited series of ceramic-inlaid coffee tables. Hand-thrown pottery meets precision joinery.
-                </p>
-<a class="inline-flex items-center gap-3 group/btn" href="#">
-<span class="font-bold tracking-widest text-sm uppercase border-b border-black dark:border-white pb-1 group-hover/btn:border-transparent transition-colors">
-                        Explore Chapter
-                    </span>
-<span class="material-icons text-sm transform group-hover/btn:translate-x-2 transition-transform">east</span>
-</a>
-</div>
-<div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl md:order-2 order-1 reveal-on-scroll" style="transition-delay: 200ms;">
-<img alt="Ceramic vase in modern room" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjZZoGIa0_bzfwIA76hYLKBo6UlNiGngyYbvQDImSqtDO7oGMKsnqtagpy9BJBuPBX_4a2RYnXYxJYZjFFT56aLgP2913h-wwfHxNeU_4JCWcFladcwt337TssFv6Jsy7nUbBEev64IlBF5hndblN0mjDaNhcen-w6DbO7ElVa0H_qDkTDBZylJMQbiUFAdpatbQSwzJ2LYuH8VWpfE6m-wW32Xh9JvDZ98xC2JYsXa6iOu4t_kuXb22opp3-PYpLLv39Pq6mDfg"/>
-<div class="absolute bottom-6 right-6 flex items-center gap-4 bg-white/90 dark:bg-black/80 p-4 backdrop-blur-md">
-<span class="font-display font-bold text-lg tracking-widest uppercase">TERRA</span>
-<span class="text-xl font-thin mx-2">×</span>
-<img alt="Spacefurnio Logo" class="h-8 w-auto dark:invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnuPNjmglgeEFO_Inbx362-U1s6S9W0g-VYMksrLqKuMfvb9JIu63w5Hd0zfBwZonyEWVQRMXom_toEOn027cqcod9IORpelSGOWvWnL8Dxo2vbCoRs9Psk8HwyyP2ZYpAtauljr70aFWFuVST3dhBqg3dmU8T_gjzQTR7ziEYkuQA7lyKO90ZoKcPw0XobzUCBZPrV0XnOUWgdclmLsW8bcPiEh50Tc_VegAygbTAsiNxytT-N0USJKzPDc6y28WyFWc0mh0SFOY"/>
-</div>
-</div>
-</div>
-</section>
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden group">
-<div class="absolute inset-0 transition-transform duration-[2s] ease-out group-hover:scale-105">
-<img alt="Dark moody interior" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSMVSphk9w33tvcC8gNlodZ6qdNZ-thkNPRnRiuYBE72i3sX_D8KyOWYmxLjBY9Wk2C3XyOOz_U5WveistX12I9F1kjB-3T38uqCI6u2iibJvwLixWv79dzTw_IkjHLDgjWGoYeZJ1JRGQ9pxVxCqn0_WrJhXJZRfQVAj-3riEv3xUJd0HxJVYvdDTn7E2mMPV4Y2nLeEOgfhFr5gh38YaK_Q4eoZkRAQlWJ1Cc98Iq8aWLzaNOn3CFWPuAnyTCNN6f8nsdG3mdrM"/>
-<div class="absolute inset-0 bg-black/40 dark:bg-black/70 transition-colors duration-500 backdrop-blur-[1px]"></div>
-</div>
-<div class="relative z-10 w-full max-w-5xl mx-auto px-6 text-center text-white">
-<div class="mb-12 flex justify-center items-center gap-6 opacity-80 hover:opacity-100 transition-opacity">
-<img alt="Spacefurnio Logo" class="h-16 w-auto invert drop-shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABY8y5u9-WtLA-h9hc6BTtfpeU-SR4gb34olK9rroP990x2dzQqCqLoOLtFt0EJcJ25FvdYsuOUVWKVuLVrzaxJ_sJ6KGc49J2UeFokopde6MZcgMergK_l2Xqah9UM_r8Ov5Cb_9Y5oRsoeuRcQUn_hLIQxsY6NfJwFNBX5xC17JEFVBveEOPHrZq7okPhtQAAT1AWjcKCb5_KFRc6H5DnIxvMWBabCX4TaAaQqgnGPGSTLY8MwCLniMQL58tCPM-CcsL0f5pxi0"/>
-<span class="text-4xl font-thin">×</span>
-<span class="font-display font-bold text-3xl tracking-widest uppercase drop-shadow-lg">VELVET&amp;CO</span>
-</div>
-<h2 class="text-6xl md:text-8xl font-display mb-8 leading-none reveal-on-scroll">
-                Soft<br/><span class="italic text-gray-300">Resilience</span>
-</h2>
-<p class="text-xl md:text-2xl font-light text-gray-200 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="transition-delay: 100ms;">
-                Spacefurnio and Velvet &amp; Co are collaborating to bring tactile warmth to industrial steel frames.
-            </p>
-<button class="bg-white text-black dark:bg-primary dark:text-white px-10 py-4 uppercase tracking-widest text-sm font-bold hover:bg-transparent hover:text-white border border-transparent hover:border-white transition-all duration-300 reveal-on-scroll" style="transition-delay: 200ms;">
-                Know More
-            </button>
-</div>
-</section>
-<section class="py-32 px-6 bg-primary text-white dark:bg-black flex items-center justify-center">
-<div class="max-w-4xl text-center border-y border-white/20 py-16">
-<span class="material-icons text-4xl mb-6 text-white/50">format_quote</span>
-<p class="font-display text-3xl md:text-5xl italic leading-relaxed mb-8">
-                Design is not just what it looks like and feels like. Design is how it works together.
-            </p>
-<div class="flex items-center justify-center gap-3">
-<div class="h-[1px] w-12 bg-white/50"></div>
-<span class="uppercase tracking-widest text-sm text-white/70">The SF Studio</span>
-<div class="h-[1px] w-12 bg-white/50"></div>
-</div>
-</div>
-</section>
-<footer class="bg-background-light dark:bg-background-dark pt-24 pb-12 border-t border-gray-200 dark:border-gray-800">
-<div class="container mx-auto px-6">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-<div class="md:col-span-2">
-<img alt="Spacefurnio Logo" class="h-12 w-auto dark:invert mb-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwOfYhbuK4zUSZFW4H27IfN_yNBhvZEl9ouocAfOTRa0y-8YdtulLWkK82pIhyFYRYH2T2krXazarcjfbEE05JiTJNfq97UstBsIsRwSdaDjBE9OXn3FIp_scYL73wBILEB_lk4NTxpB5UNYjsbus97TiusPBvba2r-VbvtDezdMajSbUzlQcC6VLs3ky3Eq_-hdm5LirwtjVHQ8iBVJw7iHszZsHLGVQgCCsUfDv7GHF5OEqjl4AD_-6n7TWBCddK0Po8ziYt4-M"/>
-<p class="text-gray-600 dark:text-gray-400 max-w-sm font-light leading-relaxed">
-                        Elevating living spaces through curated partnerships and timeless design principles.
-                    </p>
-</div>
-<div>
-<h4 class="font-bold uppercase tracking-widest mb-6 text-sm">Sitemap</h4>
-<ul class="space-y-4 text-sm font-light text-gray-600 dark:text-gray-400">
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Home</a></li>
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Collaborations</a></li>
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Journal</a></li>
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">About Us</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold uppercase tracking-widest mb-6 text-sm">Connect</h4>
-<ul class="space-y-4 text-sm font-light text-gray-600 dark:text-gray-400">
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Instagram</a></li>
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Pinterest</a></li>
-<li><a class="hover:text-primary dark:hover:text-white transition-colors" href="#">LinkedIn</a></li>
-</ul>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200 dark:border-gray-800 text-xs text-gray-400 font-light uppercase tracking-wider">
-<p>© 2023 Spacefurnio. All rights reserved.</p>
-<div class="flex gap-6 mt-4 md:mt-0">
-<a href="#">Privacy Policy</a>
-<a href="#">Terms of Use</a>
-</div>
-</div>
+<footer class="w-full px-6 md:px-12 py-12 border-t border-gray-300 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs tracking-widest uppercase text-gray-500 dark:text-gray-400">
+<div class="mb-4 md:mb-0">
+            © 2023 SpaceFurnio.
+        </div>
+<div class="flex space-x-6">
+<a class="hover:text-primary transition-colors" href="#">Instagram</a>
+<a class="hover:text-primary transition-colors" href="#">Pinterest</a>
+<a class="hover:text-primary transition-colors" href="#">Twitter</a>
 </div>
 </footer>
-<script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal-visible');
-                    }
-                });
-            }, observerOptions);
-            const elements = document.querySelectorAll('.reveal-on-scroll');
-            elements.forEach(el => observer.observe(el));
-        });
-    </script>
-
 </body></html>

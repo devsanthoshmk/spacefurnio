@@ -111,9 +111,16 @@ const router = createRouter({
         title: 'SF Collabs - Spacefurnio',
       },
     },
+    {
+      path: '/portfolio',
+      name: 'Portfolio',
+      component: () => import('@/views/PortfolioView.vue'),
+      meta: {
+        title: 'Portfolio - Spacefurnio',
+      },
+    },
     { path: '/shop', name: 'shop', component: comingSoon },
     { path: '/shopping', name: 'shopping', component: comingSoon },
-    { path: '/portfolio', name: 'portfolio', component: comingSoon },
     { path: '/projects', name: 'projects', component: comingSoon },
   ],
 })
