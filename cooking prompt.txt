@@ -1,0 +1,8 @@
+@workspace create a detailed backend implementation plan for this furniture based ecommerce site which now only have broken frontend application in vuejs v3 
+my backend architechture is neon for database coudflare workers for backend and the static page which is vue app is deployed in cloudflare pages.
+my backend needs:
+ - cost effectiveness call directly neon with rls whenever posible use cloudflare workers only when needed
+  - include every features in the frontend like cart, wishlist authentication and more also i need to get and show reviews in product details pages have backend for that too
+   - for auth use oauth in cloudflare workers (i already have initialized see backend folder) for gmail login send magic link using node mailler use app passward in cloudflare that too in that same worker
+    - hande magic link logic in workers and use neon db with github actions triggers for deleting the data on magic links and so if cron job wanted
+     - 
