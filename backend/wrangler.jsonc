@@ -1,41 +1,59 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "backend",
+	"name": "spacefurnio-api",
 	"main": "src/index.js",
-	"compatibility_date": "2025-12-25",
+	"compatibility_date": "2025-01-01",
 	"observability": {
 		"enabled": true
+	},
+	// Smart Placement - routes to region closest to database
+	"placement": {
+		"mode": "smart"
+	},
+	// Environment Variables (non-sensitive)
+	"vars": {
+		"FRONTEND_URL": "http://localhost:5173",
+		"JWT_ISSUER": "spacefurnio-api",
+		"JWT_AUDIENCE": "spacefurnio-users",
+		"JWT_EXPIRY_HOURS": "168",
+		"MAGIC_LINK_EXPIRY_MINS": "15",
+		"RAZORPAY_KEY_ID": "rzp_test_xxx"
+	},
+	// KV Namespaces for caching and rate limiting
+	"kv_namespaces": [
+		{
+			"binding": "RATE_LIMIT",
+			"id": "RATE_LIMIT_KV_ID_HERE"
+		},
+		{
+			"binding": "CACHE",
+			"id": "CACHE_KV_ID_HERE"
+		}
+	],
+	// Production environment
+	"env": {
+		"staging": {
+			"vars": {
+				"FRONTEND_URL": "https://staging.spacefurnio.in"
+			}
+		},
+		"production": {
+			"vars": {
+				"FRONTEND_URL": "https://spacefurnio.in"
+			},
+			"routes": [
+				{
+					"pattern": "api.spacefurnio.in/*",
+					"zone_name": "spacefurnio.in"
+				}
+			]
+		}
 	}
-	/**
-	 * Smart Placement
-	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": {  "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": {  "directory": "./public/",  "binding": "ASSETS" }
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
+	// SECRETS (set via wrangler secret put):
+	// - DATABASE_URL: Neon PostgreSQL connection string
+	// - JWT_SECRET: Secret for signing JWTs (min 32 chars)
+	// - GOOGLE_CLIENT_ID: Google OAuth client ID
+	// - GOOGLE_CLIENT_SECRET: Google OAuth client secret
+	// - RAZORPAY_KEY_SECRET: Razorpay secret key
+	// - ADMIN_SECURITY_CODE: Admin access verification code
 }

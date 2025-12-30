@@ -1,12 +1,22 @@
 {
-	"name": "backend",
-	"version": "0.0.0",
+	"name": "spacefurnio-backend",
+	"version": "1.0.0",
 	"private": true,
+	"description": "Spacefurnio E-commerce Backend API - Cloudflare Workers",
 	"scripts": {
 		"deploy": "wrangler deploy",
+		"deploy:staging": "wrangler deploy --env staging",
+		"deploy:prod": "wrangler deploy --env production",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
-		"test": "vitest"
+		"test": "vitest",
+		"cf-typegen": "wrangler types",
+		"db:migrate": "node scripts/migrate.js"
+	},
+	"dependencies": {
+		"@neondatabase/serverless": "^0.10.4",
+		"itty-router": "^4.0.27",
+		"jose": "^5.9.6"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
