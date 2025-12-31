@@ -252,7 +252,7 @@
           <h2 class="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-6">Product Specifications</h2>
           <p class="text-gray-600 mb-8 leading-relaxed">
             This {{ product.name.toLowerCase() }} combines superior craftsmanship with modern design sensibilities.
-            Perfect for {{ product.room.toLowerCase() }} spaces, it features premium {{ product.material.toLowerCase() }}
+            Perfect for {{ product.room }} spaces, it features premium {{ product.material.toLowerCase() }}
             construction with attention to every detail.
           </p>
 

@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "spacefurnio-api",
+	"name": "api",
 	"main": "src/index.js",
 	"compatibility_date": "2025-01-01",
 	"observability": {
@@ -17,17 +17,21 @@
 		"JWT_AUDIENCE": "spacefurnio-users",
 		"JWT_EXPIRY_HOURS": "168",
 		"MAGIC_LINK_EXPIRY_MINS": "15",
-		"RAZORPAY_KEY_ID": "rzp_test_xxx"
+		"RAZORPAY_KEY_ID": "rzp_test_xxx",
+		"EMAIL_FROM": "Spacefurnio <noreply@spacefurnio.in>"
 	},
+	// Secrets (set via `wrangler secret put`):
+	// - RESEND_API_KEY: Your Resend API key
 	// KV Namespaces for caching and rate limiting
 	"kv_namespaces": [
 		{
-			"binding": "RATE_LIMIT",
-			"id": "RATE_LIMIT_KV_ID_HERE"
-		},
-		{
 			"binding": "CACHE",
 			"id": "CACHE_KV_ID_HERE"
+		},
+		{
+			"binding": "RATE_LIMIT",
+			"id": "9a96f916131b47fea1a58b5e11984f77",
+			"remote": true
 		}
 	],
 	// Production environment

@@ -2,8 +2,15 @@
  * ===========================================
  * EMAIL SERVICE
  * ===========================================
- * Uses MailChannels API (free with Cloudflare Workers)
+ * Uses Resend SDK (works with Cloudflare Workers)
+ * https://developers.cloudflare.com/workers/tutorials/send-emails-with-resend/
+ *
+ * Required env variables:
+ * - RESEND_API_KEY: Your Resend API key
+ * - EMAIL_FROM: Sender email (e.g., 'Spacefurnio <noreply@spacefurnio.in>')
  */
+
+import { Resend } from 'resend';
 
 /**
  * Send magic link email
@@ -267,47 +274,28 @@ export async function sendOrderConfirmationEmail(env, to, order) {
 }
 
 /**
- * Send email using MailChannels
+ * Send email using Resend SDK
  * @param {Object} env - Environment bindings
  * @param {Object} options - Email options
  */
 async function sendEmail(env, { to, subject, html, text }) {
-  const response = await fetch('https://api.mailchannels.net/tx/v1/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      personalizations: [
-        {
-          to: [{ email: to }]
-        }
-      ],
-      from: {
-        email: 'noreply@spacefurnio.in',
-        name: 'Spacefurnio'
-      },
-      subject,
-      content: [
-        {
-          type: 'text/plain',
-          value: text
-        },
-        {
-          type: 'text/html',
-          value: html
-        }
-      ]
-    })
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const { data, error } = await resend.emails.send({
+    from: env.EMAIL_FROM || 'Spacefurnio <noreply@spacefurnio.in>',
+    to: [to],
+    subject,
+    html,
+    text
   });
 
-  if (!response.ok) {
-    const error = await response.text();
+  if (error) {
     console.error('Email send failed:', error);
-    throw new Error(`Failed to send email: ${response.status}`);
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 
-  return true;
+  console.log('Email sent successfully:', data.id);
+  return data;
 }
 
 export default { sendMagicLinkEmail, sendOrderConfirmationEmail, sendEmail };

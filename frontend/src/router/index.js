@@ -16,25 +16,25 @@ const router = createRouter({
       component: () => import('@/views/AboutView.vue'),
     },
 
-    // // Shop redirects
-    // {
-    //   path: '/shop',
-    //   redirect: '/shop/category',
-    // },
+    // Shop redirects
+    {
+      path: '/shop',
+      redirect: '/shop/category',
+    },
 
-    // // Shop overview views
-    // {
-    //   path: '/shop/category',
-    //   name: 'ShopCategory',
-    //   component: () => import('@/views/ShopView.vue'),
-    //   meta: { title: 'Shop by Category - Space Furnio' },
-    // },
-    // {
-    //   path: '/shop/design',
-    //   name: 'ShopDesign',
-    //   component: () => import('@/views/ShopView.vue'),
-    //   meta: { title: 'Shop by Design - Space Furnio' },
-    // },
+    // Shop overview views
+    {
+      path: '/shop/category',
+      name: 'ShopCategory',
+      component: () => import('@/views/ShopView.vue'),
+      meta: { title: 'Shop by Category - Space Furnio' },
+    },
+    {
+      path: '/shop/design',
+      name: 'ShopDesign',
+      component: () => import('@/views/ShopView.vue'),
+      meta: { title: 'Shop by Design - Space Furnio' },
+    },
 
     // // Product detail views — placed first to avoid collision with listing routes
     {

@@ -16,7 +16,8 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.4",
 		"itty-router": "^4.0.27",
-		"jose": "^5.9.6"
+		"jose": "^5.9.6",
+		"resend": "^6.6.0"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
