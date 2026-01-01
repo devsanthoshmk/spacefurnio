@@ -27,6 +27,7 @@ const DEFAULT_OPTIONS = Object.freeze({
   bounceDuration: 250,
   touchThreshold: 30,
   transitionTiming: 'cubic-bezier(0.5, 0, 0.2, 1)',
+  emmitSectionChangeEvent: true,
   enableResizeListener: true
 })
 // Add pixel snap tolerance
@@ -128,8 +129,18 @@ const highlightDots = (navDotsEl, activeIndex) => {
  * @param {ReturnType<typeof createScrollState>} state
  */
 const updateActiveState = state => {
-  highlightSections(state.childElements, state.currentIndex)
-  highlightDots(state.navDotsEl, state.currentIndex)
+  highlightSections(state.childElements, state.currentIndex);
+  highlightDots(state.navDotsEl, state.currentIndex);
+  // Emit custom event for section change
+  if (state.options.emmitSectionChangeEvent) {
+    const event = new CustomEvent('sectionChange', {
+      detail: {
+        currentIndex: state.currentIndex,
+        currentSection: state.childElements[state.currentIndex]
+       }
+    });
+    state.wrapperEl.dispatchEvent(event);
+  }
 }
 
 /**

@@ -1,66 +1,8 @@
-<script setup>
-import { RouterView, useRoute } from 'vue-router'
-import { ref, onMounted, onUnmounted, watch } from 'vue'
-import NavComponent from './components/Nav-component.vue'
-import FooterComponent from './components/Footer-component.vue'
-
-const route = useRoute()
-const showNav = ref(false)
-const showfooter = ref(false)
-
-const handleScroll = () => {
-  const scrollY = window.scrollY
-  const screenHeight = window.innerHeight
-  showNav.value = scrollY >= screenHeight * 0.2
-}
-
-function setupScrollForHome() {
-  window.addEventListener('scroll', handleScroll)
-  handleScroll() // check once on load
-}
-
-function cleanupScroll() {
-  window.removeEventListener('scroll', handleScroll)
-}
-
-// ✅ run once on mount
-onMounted(() => {
-  if (route.path === '/') {
-    setupScrollForHome()
-  } else {
-    showNav.value = true
-  }
-})
-
-// ✅ clean up
-onUnmounted(() => {
-  cleanupScroll()
-})
-
-// ✅ react when route changes (SPA navigation)
-watch(
-  () => route.path,
-  (newPath) => {
-    cleanupScroll()
-    if (newPath === '/') {
-      setupScrollForHome()
-    } else {
-      showNav.value = true
-    }
-    if (newPath !== '/about') {
-      showfooter.value = true
-    } else {
-      showfooter.value = false
-    }
-  }
-)
-
-</script>
 
 
 <template>
   <header>
-    <NavComponent v-if="showNav" />
+    <NavComponent v-show="showNav"/>
   </header>
 
   <main>
@@ -68,8 +10,21 @@ watch(
   </main>
 
   <footer>
-    <FooterComponent v-if="showfooter" />
+    <FooterComponent/>
   </footer>
 
 </template>
 
+
+<script setup>
+  import { RouterView } from 'vue-router'
+  import { ref } from 'vue'
+  import NavComponent from './components/Nav-component.vue'
+  import FooterComponent from './components/Footer-component.vue'
+  import { provide } from 'vue'
+
+  const showNav = ref(true)
+
+  provide('navShowUtils', {showNav})
+
+</script>

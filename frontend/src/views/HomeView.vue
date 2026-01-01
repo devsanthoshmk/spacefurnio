@@ -6,6 +6,9 @@ import ProductSection from '@/components/home/Product-section.vue';
 import Button from 'primevue/button';
 import FooterComponent from '@/components/Footer-component.vue'
 import { scroller } from '@/views/utills/customScroll.js';
+import { inject } from 'vue';
+
+const { showNav } = inject('navShowUtils');
 
 const heroRef = ref(null);
 const newArrivalsRef = ref(null);
@@ -16,10 +19,6 @@ const wrapper = ref(null)
 const navDotsContainer = ref(null)
 
 
-onMounted(() => {
-  const cleanup = scroller(wrapper, 'scroll-section', navDotsContainer)
-  onBeforeUnmount(cleanup)
-})
 
 const newArrivalImages = [
   {
@@ -44,6 +43,27 @@ const handleGrabNow = () => {
   // Handle button click
   console.log('Grab now clicked!');
 };
+
+onMounted(() => {
+  const cleanup = scroller(wrapper, 'scroll-section', navDotsContainer)
+  wrapper.value.addEventListener('sectionChange', (e) => {
+    console.log('Scroll started', e.detail);
+    if (e.detail.currentIndex === 0) {
+      showNav.value = false;
+      console.log('Hiding nav');
+    } else {
+      setTimeout(() => {
+        (showNav.value = true);
+      }, 100);
+    }
+  });
+  showNav.value = false;
+  onBeforeUnmount(() => {
+    cleanup();
+    showNav.value = true;
+  });
+})
+
 </script>
 
 <template>
