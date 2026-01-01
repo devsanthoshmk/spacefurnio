@@ -467,7 +467,7 @@
 
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import Breadcrumbs from '../Breadcrumbs-component.vue'
+import Breadcrumbs from '@/components/Breadcrumbs-component.vue'
 
 const route = useRoute()
 const products = ref([])
@@ -490,9 +490,16 @@ const touchStartX = ref(0)
 const touchEndX = ref(0)
 
 // Derive shop type & category/design from the URL
-const currentShopType = computed(() =>
-  route.path.includes('/shop/design') ? 'design' : 'category'
-)
+const currentShopType = computed(() => {
+  const designStart = route.path.indexOf('/shop/design/');
+  if (route.path.includes('/shop/design')) {
+    const design = route.path.slice(designStart+1, route.path.length).split('/')[0]
+    console.log('Design detected:', design)
+    return  design
+  } else {
+    return 'category'
+  }
+})
 const currentCategory = computed(() =>
   route.params.category || route.query.category || 'all'
 )
@@ -655,40 +662,21 @@ const handleSwipe = (productId) => {
 
 // --- Helpers ---
 
+const formatName = (slug) => {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 const getCurrentCategoryName = () => {
-  const map = {
-    furniture: 'Furniture Collection',
-    'wall-art': 'Wall Art & Decor',
-    decor: 'Home Decor',
-    lights: 'Lighting Solutions'
-  }
-  return map[currentCategory.value] || 'All Products'
+  if (currentCategory.value === 'all') return 'All Products'
+  return formatName(currentCategory.value)
 }
 
 const getCurrentDesignName = () => {
-  const map = {
-    foyer: 'Foyer Design',
-    living: 'Living Room Design',
-    dining: 'Dining Room Design',
-    kitchen: 'Kitchen Design',
-    'home-office': 'Home Office Design',
-    bedroom: 'Bedroom Design',
-    bathroom: 'Bathroom Design',
-    balcony: 'Balcony Design',
-    lounge: 'Lounge Design',
-    poolside: 'Poolside Design',
-    brutalist: 'Brutalist Style',
-    minimalist: 'Minimalist Style',
-    sustainable: 'Sustainable Style',
-    parametric: 'Parametric Style',
-    'wabi-sabi': 'Wabi Sabi Style',
-    traditional: 'Traditional Style',
-    'vintage-retro': 'Vintage/Retro Style',
-    victorian: 'Victorian Style',
-    japandi: 'Japandi Style',
-    moroccan: 'Moroccan Style'
-  }
-  return map[currentCategory.value] || 'Design Collection'
+  if (currentCategory.value === 'all') return 'Design Collection'
+  return formatName(currentCategory.value)
 }
 
 const breadcrumbs = computed(() => [
@@ -738,25 +726,19 @@ const getColorHex = (colorName) => {
 async function loadProducts() {
   loading.value = true
   try {
-    const spaceSpecific = [
-      'foyer','living','dining','kitchen','home-office',
-      'bedroom','bathroom','balcony','lounge','poolside'
-    ]
+    let data = []
 
-    const fileBase =
-      currentShopType.value === 'category'
-        ? 'category-products'
-        : spaceSpecific.includes(currentCategory.value)
-        ? 'design-space-products'
-        : 'design-style-products'
-
-    const base = import.meta.env.BASE_URL || '/'
-    const url = `${base}data/products/${fileBase}.json`
-
-    const res = await fetch(url)
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`)
-
-    let data = await res.json()
+    // import products based on shop type
+    if (currentShopType.value === 'category') {
+      const { default: category } = await import('@/data/category.json')
+      data = category
+    } else if (currentShopType.value === 'space') {
+      const { default: space } = await import('@/data/design-space.json')
+      data = space
+    } else {
+      const { default: designStyles } = await import('@/data/design-style.json')
+      data = designStyles
+    }
 
     if (currentCategory.value !== 'all') {
       data = data.filter(p =>
@@ -785,7 +767,7 @@ async function loadProducts() {
     })
 
   } catch (err) {
-    console.error('Error fetching products JSON:', err)
+    console.error('Error loading products:', err)
     products.value = []
   } finally {
     loading.value = false
