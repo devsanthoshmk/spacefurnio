@@ -467,7 +467,7 @@
 
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import Breadcrumbs from '../common/Breadcrumbs-component.vue'
+import Breadcrumbs from '../Breadcrumbs-component.vue'
 
 const route = useRoute()
 const products = ref([])

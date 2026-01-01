@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white mt-33">
     <!-- Header -->
     <div class="text-center py-12">
       <h1 class="text-5xl font-bold text-charcoal mb-8" style="font-family: 'Phitagate', sans-serif;">

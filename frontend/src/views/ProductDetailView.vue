@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white">
+  <div class="mt-20 bg-white">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500"></div>
@@ -19,15 +19,9 @@
     <!-- Product Details -->
     <div v-else-if="product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Breadcrumb -->
-      <nav class="flex mb-8" aria-label="Breadcrumb" data-aos="fade-down" data-aos-duration="600">
-        <ol class="flex items-center space-x-2 text-sm">
-          <li><router-link to="/" class="text-gray-500 hover:text-orange-500">Home</router-link></li>
-          <li><span class="text-gray-400">/</span></li>
-          <li><router-link :to="getBreadcrumbLink()" class="text-gray-500 hover:text-orange-500">{{ getBreadcrumbText() }}</router-link></li>
-          <li><span class="text-gray-400">/</span></li>
-          <li><span class="text-gray-900">{{ product.name }}</span></li>
-        </ol>
-      </nav>
+      <div class="mb-8" data-aos="fade-down" data-aos-duration="600">
+        <Breadcrumbs :items="breadcrumbs" />
+      </div>
 
       <!-- Main Product Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 mb-16">
@@ -308,6 +302,7 @@ import { useRoute } from 'vue-router'
 import * as THREE from 'three'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import Breadcrumbs from '@/components/common/Breadcrumbs-component.vue'
 
 const route = useRoute()
 const product = ref(null)
@@ -375,6 +370,37 @@ const getDataFilePath = () => {
   return 'category-products'
 }
 
+const breadcrumbs = computed(() => {
+  const items = [
+    { name: 'Home', route: '/' },
+    { name: 'Shop', route: '/shop' }
+  ]
+
+  const path = route.path
+  const isDesign = path.includes('/shop/design')
+
+  // Level 3: Shop by ...
+  items.push({
+    name: isDesign ? 'Shop by Design' : 'Shop by Category',
+    route: isDesign ? '/shop/design' : '/shop/category'
+  })
+
+  // Level 4: Category Name
+  const parentLink = getBreadcrumbLink()
+  const parentText = getBreadcrumbText()
+
+  if (parentLink && parentText && parentText !== 'Shop') {
+      items.push({ name: parentText, route: parentLink })
+  }
+
+  // Level 5: Product Name
+  if (product.value) {
+    items.push({ name: product.value.name, route: null })
+  }
+
+  return items
+})
+
 const getBreadcrumbLink = () => {
   const name = route.name
   const cat = route.params.category
@@ -386,12 +412,45 @@ const getBreadcrumbLink = () => {
 }
 
 const getBreadcrumbText = () => {
-  const name = route.name
   const cat = route.params.category
-  if (name === 'CategoryProducts') return `${cat} Category`
-  if (name === 'DesignSpaceProducts') return `${cat} Space Design`
-  if (name === 'DesignStyleProducts') return `${cat} Style Design`
-  if (name === 'DesignProducts') return `${cat} Design`
+  const path = route.path
+  
+  if (path.includes('/shop/category')) {
+    const map = {
+      furniture: 'Furniture Collection',
+      'wall-art': 'Wall Art & Decor',
+      decor: 'Home Decor',
+      lights: 'Lighting Solutions'
+    }
+    return map[cat] || `${cat} Category`
+  }
+  
+  if (path.includes('/shop/design')) {
+    const map = {
+      foyer: 'Foyer Design',
+      living: 'Living Room Design',
+      dining: 'Dining Room Design',
+      kitchen: 'Kitchen Design',
+      'home-office': 'Home Office Design',
+      bedroom: 'Bedroom Design',
+      bathroom: 'Bathroom Design',
+      balcony: 'Balcony Design',
+      lounge: 'Lounge Design',
+      poolside: 'Poolside Design',
+      brutalist: 'Brutalist Style',
+      minimalist: 'Minimalist Style',
+      sustainable: 'Sustainable Style',
+      parametric: 'Parametric Style',
+      'wabi-sabi': 'Wabi Sabi Style',
+      traditional: 'Traditional Style',
+      'vintage-retro': 'Vintage/Retro Style',
+      victorian: 'Victorian Style',
+      japandi: 'Japandi Style',
+      moroccan: 'Moroccan Style'
+    }
+    return map[cat] || `${cat} Design`
+  }
+
   return 'Shop'
 }
 
