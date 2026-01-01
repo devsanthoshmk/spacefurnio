@@ -302,7 +302,7 @@ import { useRoute } from 'vue-router'
 import * as THREE from 'three'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import Breadcrumbs from '@/components/common/Breadcrumbs-component.vue'
+import Breadcrumbs from '@/components/Breadcrumbs-component.vue'
 
 const route = useRoute()
 const product = ref(null)
@@ -362,14 +362,6 @@ const specifications = computed(() => {
   ]
 })
 
-const getDataFilePath = () => {
-  const path = route.path
-  if (path.startsWith('/shop/design/space/')) return 'design-space-products'
-  if (path.startsWith('/shop/design/style/')) return 'design-style-products'
-  if (path.startsWith('/shop/design/')) return 'design-products'
-  return 'category-products'
-}
-
 const breadcrumbs = computed(() => {
   const items = [
     { name: 'Home', route: '/' },
@@ -414,7 +406,7 @@ const getBreadcrumbLink = () => {
 const getBreadcrumbText = () => {
   const cat = route.params.category
   const path = route.path
-  
+
   if (path.includes('/shop/category')) {
     const map = {
       furniture: 'Furniture Collection',
@@ -424,7 +416,7 @@ const getBreadcrumbText = () => {
     }
     return map[cat] || `${cat} Category`
   }
-  
+
   if (path.includes('/shop/design')) {
     const map = {
       foyer: 'Foyer Design',
@@ -713,21 +705,25 @@ async function fetchProductData() {
   error.value = null
 
   try {
-    const fileBase = getDataFilePath()
-    const base = import.meta.env.BASE_URL || '/'
-    const url = `${base}data/products/${fileBase}.json`
+    let allProducts = []
+    const path = route.path
 
-    const res = await fetch(url)
-    if (!res.ok) {
-      throw new Error(`Failed to load ${url}: ${res.status}`)
+    if (path.includes('/shop/design/space')) {
+      const { default: data } = await import('@/data/design-space.json')
+      allProducts = data
+    } else if (path.includes('/shop/design')) {
+      const { default: data } = await import('@/data/design-style.json')
+      allProducts = data
+    } else {
+      const { default: data } = await import('@/data/category.json')
+      allProducts = data
     }
 
-    const allProducts = await res.json()
     const productId = parseInt(route.params.id, 10)
     const found = allProducts.find(p => p.id === productId)
 
     if (!found) {
-      throw new Error(`Product with ID ${productId} not found in ${fileBase}.json`)
+      throw new Error(`Product with ID ${productId} not found`)
     }
 
     product.value = found
