@@ -5,7 +5,7 @@ import NavComponent from '@/components/Nav-component.vue';
 import ProductSection from '@/components/home/Product-section.vue';
 import Button from 'primevue/button';
 import FooterComponent from '@/components/Footer-component.vue'
-import { scroller } from '@/views/utills/customScroll.js';
+import { scroller } from '@/utills/customScroll.js';
 import { inject } from 'vue';
 
 const { showNav } = inject('navShowUtils');

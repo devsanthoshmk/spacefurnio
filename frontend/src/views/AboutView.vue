@@ -311,7 +311,7 @@
 
 <script setup>
 import { ref,onMounted,onBeforeUnmount } from 'vue';
-import { scroller } from './utills/customScroll';
+import { scroller } from '../utills/customScroll';
 import FooterComponent from '@/components/Footer-component.vue';
 import TeamMembers from '@/components/about/TeamMembers.vue';
 
