@@ -56,7 +56,7 @@
             </select>
           </div>
 
-          <div v-if="currentShopType === 'category'" class="space-y-4">
+          <div v-if="currentShop.type === 'category'" class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Material</label>
             <select v-model="selectedMaterial" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
               <option value="">All Materials</option>
@@ -64,7 +64,7 @@
             </select>
           </div>
 
-          <div v-if="currentShopType === 'design'" class="space-y-4">
+          <div v-else class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Room</label>
             <select v-model="selectedRoom" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
               <option value="">All Rooms</option>
@@ -94,7 +94,7 @@
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mt-2">
               <div>
                 <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl font-serif">
-                  {{ currentShopType === 'category' ? getCurrentCategoryName() : getCurrentDesignName() }}
+                  {{ currentShop.type === 'category' ? getCurrentCategoryName() : getCurrentDesignName() }}
                 </h1>
                 <p class="text-sm text-gray-500 mt-2 max-w-2xl">
                   <span class="font-medium text-indigo-600 ml-1">{{ filteredProducts.length }} items found</span>
@@ -173,7 +173,7 @@
               </div>
             </div>
 
-            <div v-if="currentShopType === 'category'" class="relative group">
+            <div v-if="currentShop.type === 'category'" class="relative group">
               <select v-model="selectedMaterial" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">Material</option>
                 <option v-for="material in availableMaterials" :key="material" :value="material">{{ material }}</option>
@@ -183,7 +183,7 @@
               </div>
             </div>
 
-            <div v-if="currentShopType === 'design'" class="relative group">
+            <div v-else class="relative group">
               <select v-model="selectedRoom" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">Room Type</option>
                 <option v-for="room in availableRooms" :key="room" :value="room">{{ room }}</option>
@@ -435,7 +435,7 @@
                    v-for="color in product.colors.slice(0, 3)"
                    :key="color"
                    class="inline-block h-5 w-5 rounded-full ring-2 ring-white shadow-sm"
-                   :style="{ backgroundColor: getColorHex(color) }"
+                   :style="{ backgroundColor: getColorHexHelper(color) }"
                    :title="color"
                  ></div>
                  <div v-if="product.colors.length > 3" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 ring-2 ring-white text-[9px] font-bold text-gray-500">
@@ -468,6 +468,7 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import Breadcrumbs from '@/components/Breadcrumbs-component.vue'
+import { getColorHexHelper,formatNameHelper, addToCart, toggleWishlist, useCurrentShop, getShopTypeProducts} from '@/composables/productsUtills.js'
 
 const route = useRoute()
 const products = ref([])
@@ -489,17 +490,8 @@ const imageStates = reactive({})
 const touchStartX = ref(0)
 const touchEndX = ref(0)
 
-// Derive shop type & category/design from the URL
-const currentShopType = computed(() => {
-  const designStart = route.path.indexOf('/shop/design/');
-  if (route.path.includes('/shop/design')) {
-    const design = route.path.slice(designStart+1, route.path.length).split('/')[0]
-    console.log('Design detected:', design)
-    return  design
-  } else {
-    return 'category'
-  }
-})
+// Derive shop type & category/design from the URL and returns everything needed for each category type
+const currentShop = computed(() => useCurrentShop(route))
 const currentCategory = computed(() =>
   route.params.category || route.query.category || 'all'
 )
@@ -599,17 +591,6 @@ const filteredProducts = computed(() => {
 
 // --- Actions ---
 
-const addToCart = (product) => {
-  // Placeholder for cart logic
-  console.log('Added to cart:', product.name)
-  // You would typically use a store here, e.g., cartStore.addItem(product)
-}
-
-const toggleWishlist = (product) => {
-  // Placeholder for wishlist logic
-  console.log('Toggled wishlist:', product.name)
-}
-
 const clearAllFilters = () => {
   selectedBrand.value = ''
   selectedColor.value = ''
@@ -662,32 +643,25 @@ const handleSwipe = (productId) => {
 
 // --- Helpers ---
 
-const formatName = (slug) => {
-  return slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
-
 const getCurrentCategoryName = () => {
   if (currentCategory.value === 'all') return 'All Products'
-  return formatName(currentCategory.value)
+  return formatNameHelper(currentCategory.value)
 }
 
 const getCurrentDesignName = () => {
   if (currentCategory.value === 'all') return 'Design Collection'
-  return formatName(currentCategory.value)
+  return formatNameHelper(currentCategory.value)
 }
 
 const breadcrumbs = computed(() => [
   { name: 'Home', route: '/' },
   { name: 'Shop', route: '/shop' },
   {
-    name: currentShopType.value === 'category' ? 'Shop by Category' : 'Shop by Design',
-    route: currentShopType.value === 'category' ? '/shop/category' : '/shop/design'
+    name: currentShop.value.breadcrumbName,
+    route: currentShop.value.route
   },
   {
-    name: currentShopType.value === 'category' ? getCurrentCategoryName() : getCurrentDesignName(),
+    name: currentShop.value.tyle === 'category' ? getCurrentCategoryName() : getCurrentDesignName(),
     route: null
   }
 ])
@@ -701,44 +675,15 @@ const isNewProduct = (dateString) => {
   return diffDays < 60 // Considered new if less than 60 days old
 }
 
-// Simple color name to hex mapper for swatches
-const getColorHex = (colorName) => {
-  const colors = {
-    'Natural': '#E5D3B3',
-    'Dark Brown': '#4A3728',
-    'Black': '#1A1A1A',
-    'White': '#F5F5F5',
-    'Grey': '#808080',
-    'Blue': '#3B82F6',
-    'Red': '#EF4444',
-    'Green': '#10B981',
-    'Yellow': '#F59E0B',
-    'Beige': '#F5F5DC',
-    'Walnut': '#5D4037',
-    'Oak': '#C19A6B',
-    'Teak': '#8B5A2B'
-  }
-  return colors[colorName] || '#CCCCCC'
-}
-
 // --- Data Loading ---
 
 async function loadProducts() {
   loading.value = true
   try {
-    let data = []
 
     // import products based on shop type
-    if (currentShopType.value === 'category') {
-      const { default: category } = await import('@/data/category.json')
-      data = category
-    } else if (currentShopType.value === 'space') {
-      const { default: space } = await import('@/data/design-space.json')
-      data = space
-    } else {
-      const { default: designStyles } = await import('@/data/design-style.json')
-      data = designStyles
-    }
+    let data = await getShopTypeProducts(route)
+
 
     if (currentCategory.value !== 'all') {
       data = data.filter(p =>
@@ -748,23 +693,13 @@ async function loadProducts() {
       )
     }
 
-    // Normalize and enhance data for UI
-    products.value = data.map(p => {
-      // Ensure images array exists. If only imageSrc, create array.
-      // For demo purposes, we duplicate the image to show carousel functionality
-      // In production, this would come from the API
-      const images = p.images || (p.imageSrc ? [p.imageSrc, p.imageSrc, p.imageSrc] : [])
+    data.forEach(p => {
 
-      return {
-        ...p,
-        images,
-        // Ensure other fields exist
-        rating: p.rating || 0,
-        reviews: p.reviews || 0,
-        colors: p.colors || [],
-        isNew: isNewProduct(p.createdAt)
-      }
+      p.isNew = isNewProduct(p.createdAt)
+
+      return p
     })
+    products.value = data
 
   } catch (err) {
     console.error('Error loading products:', err)
