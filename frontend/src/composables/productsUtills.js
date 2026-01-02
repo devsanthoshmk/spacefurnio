@@ -52,9 +52,9 @@ const files={
 export const useCurrentShop = (route) => {
   if (route.path.includes('/shop/design')) {
     if (route.path.includes('/shop/design/space'))
-      return {type:'space',breadcrumbName: "Shop By Space", importJson: files.space, route: "/shop/design/space" }
+      return {type:'space',breadcrumbName: "Shop By Space", importJson: files.space, route: "/shop/design" }
     else
-      return {type:'style',breadcrumbName: "Shop By Style", importJson: files.style, route: "/shop/design/style" }
+      return {type:'style',breadcrumbName: "Shop By Style", importJson: files.style, route: "/shop/design" }
   } else {
     return {type:'category',breadcrumbName: "Shop By Category", importJson: files.category, route: "/shop/category" }
   }
