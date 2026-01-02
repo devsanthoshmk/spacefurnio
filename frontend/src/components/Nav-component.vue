@@ -41,7 +41,7 @@
         <li>
           <router-link to="/projects" class="nav-link flex text-center
  relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
-            Ongoing Projects
+            Contact Us
           </router-link>
         </li>
       </ul>
@@ -127,7 +127,7 @@
               class="block py-3 px-4 rounded-xl transition-all duration-300 hover:bg-gray-50"
               @click="closeMobileMenu"
             >
-              Ongoing Projects
+              Contact Us
             </router-link>
           </li>
         </ul>
