@@ -187,7 +187,7 @@
                         'w-10 h-10 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200',
                         selectedColor === color ? 'border-orange-500 scale-110' : 'border-gray-300 hover:border-orange-300'
                       ]"
-                      :style="`background-color: ${getColorHex(color)}`"
+                      :style="`background-color: ${getColorHexHelper(color)}`"
                       :title="color">
                 <div v-if="selectedColor === color" class="w-full h-full rounded-full flex items-center justify-center">
                   <svg class="w-4 h-4 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 20 20">
@@ -209,7 +209,7 @@
             </div>
 
             <button
-              @click="addToCart"
+              @click="addToCart({product: product.value, quantity: selectedQuantity, color: selectedColor})"
               :disabled="isAddingToCart"
               class="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
             >
@@ -223,7 +223,7 @@
             </button>
 
             <button
-              @click="toggleWishlist"
+              @click="toggleWishlist(product.value)"
               :class="[
                 'w-full py-3 px-6 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]',
                 isInWishlist
@@ -303,6 +303,7 @@ import * as THREE from 'three'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import Breadcrumbs from '@/components/Breadcrumbs-component.vue'
+import { useCurrentShop, formatNameHelper, getColorHexHelper, toggleWishlist, addToCart, getShopTypeProducts} from '@/composables/productsUtills.js'
 
 const route = useRoute()
 const product = ref(null)
@@ -362,126 +363,16 @@ const specifications = computed(() => {
   ]
 })
 
-const breadcrumbs = computed(() => {
-  const items = [
+const shopType = computed(() => useCurrentShop(route))
+const breadcrumbs = computed(() =>  [
     { name: 'Home', route: '/' },
-    { name: 'Shop', route: '/shop' }
-  ]
+    { name: 'Shop', route: '/shop' },
+    { name: shopType.value.breadcrumbName, route: shopType.value.route },
+    { name: formatNameHelper(route.params.category || ''), route: shopType.value.route + '/' + (route.params.category || '') },
+    { name: product.value.name, route: null }
+])
 
-  const path = route.path
-  const isDesign = path.includes('/shop/design')
 
-  // Level 3: Shop by ...
-  items.push({
-    name: isDesign ? 'Shop by Design' : 'Shop by Category',
-    route: isDesign ? '/shop/design' : '/shop/category'
-  })
-
-  // Level 4: Category Name
-  const parentLink = getBreadcrumbLink()
-  const parentText = getBreadcrumbText()
-
-  if (parentLink && parentText && parentText !== 'Shop') {
-      items.push({ name: parentText, route: parentLink })
-  }
-
-  // Level 5: Product Name
-  if (product.value) {
-    items.push({ name: product.value.name, route: null })
-  }
-
-  return items
-})
-
-const getBreadcrumbLink = () => {
-  const name = route.name
-  const cat = route.params.category
-  if (name === 'CategoryProducts') return `/shop/category/${cat}`
-  if (name === 'DesignSpaceProducts') return `/shop/design/space/${cat}`
-  if (name === 'DesignStyleProducts') return `/shop/design/style/${cat}`
-  if (name === 'DesignProducts') return `/shop/design/${cat}`
-  return '/shop/category'
-}
-
-const getBreadcrumbText = () => {
-  const cat = route.params.category
-  const path = route.path
-
-  if (path.includes('/shop/category')) {
-    const map = {
-      furniture: 'Furniture Collection',
-      'wall-art': 'Wall Art & Decor',
-      decor: 'Home Decor',
-      lights: 'Lighting Solutions'
-    }
-    return map[cat] || `${cat} Category`
-  }
-
-  if (path.includes('/shop/design')) {
-    const map = {
-      foyer: 'Foyer Design',
-      living: 'Living Room Design',
-      dining: 'Dining Room Design',
-      kitchen: 'Kitchen Design',
-      'home-office': 'Home Office Design',
-      bedroom: 'Bedroom Design',
-      bathroom: 'Bathroom Design',
-      balcony: 'Balcony Design',
-      lounge: 'Lounge Design',
-      poolside: 'Poolside Design',
-      brutalist: 'Brutalist Style',
-      minimalist: 'Minimalist Style',
-      sustainable: 'Sustainable Style',
-      parametric: 'Parametric Style',
-      'wabi-sabi': 'Wabi Sabi Style',
-      traditional: 'Traditional Style',
-      'vintage-retro': 'Vintage/Retro Style',
-      victorian: 'Victorian Style',
-      japandi: 'Japandi Style',
-      moroccan: 'Moroccan Style'
-    }
-    return map[cat] || `${cat} Design`
-  }
-
-  return 'Shop'
-}
-
-const getColorHex = (colorName) => {
-  const colorMap = {
-    'Gray': '#6B7280',
-    'Charcoal': '#374151',
-    'White': '#FFFFFF',
-    'Black': '#000000',
-    'Brown': '#92400E',
-    'Beige': '#D2B48C',
-    'Oak': '#D2691E',
-    'Walnut': '#8B4513',
-    'Cherry': '#8B0000',
-    'Maple': '#D2B48C'
-  }
-  return colorMap[colorName] || '#6B7280'
-}
-
-const addToCart = async () => {
-  isAddingToCart.value = true
-
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
-  // Here you would typically dispatch to a store or call an API
-  console.log('Added to cart:', {
-    product: product.value,
-    quantity: selectedQuantity.value,
-    color: selectedColor.value
-  })
-
-  isAddingToCart.value = false
-}
-
-const toggleWishlist = () => {
-  isInWishlist.value = !isInWishlist.value
-  // Here you would typically update the wishlist in your store or API
-}
 
 const init3DScene = () => {
   if (!threejsContainer.value) return
@@ -551,7 +442,7 @@ const createFurniture = () => {
   // Chair seat
   const seatGeometry = new THREE.BoxGeometry(3, 0.2, 3)
   const seatMaterial = new THREE.MeshPhongMaterial({
-    color: selectedColor.value ? getColorHex(selectedColor.value) : 0xD2691E
+    color: selectedColor.value ? getColorHexHelper(selectedColor.value) : 0xD2691E
   })
   const seat = new THREE.Mesh(seatGeometry, seatMaterial)
   seat.position.y = 1
@@ -561,7 +452,7 @@ const createFurniture = () => {
   // Chair back
   const backGeometry = new THREE.BoxGeometry(3, 2, 0.2)
   const backMaterial = new THREE.MeshPhongMaterial({
-    color: selectedColor.value ? getColorHex(selectedColor.value) : 0xD2691E
+    color: selectedColor.value ? getColorHexHelper(selectedColor.value) : 0xD2691E
   })
   const back = new THREE.Mesh(backGeometry, backMaterial)
   back.position.y = 2
@@ -705,19 +596,7 @@ async function fetchProductData() {
   error.value = null
 
   try {
-    let allProducts = []
-    const path = route.path
-
-    if (path.includes('/shop/design/space')) {
-      const { default: data } = await import('@/data/design-space.json')
-      allProducts = data
-    } else if (path.includes('/shop/design')) {
-      const { default: data } = await import('@/data/design-style.json')
-      allProducts = data
-    } else {
-      const { default: data } = await import('@/data/category.json')
-      allProducts = data
-    }
+    const allProducts = await getShopTypeProducts(route) // Ensure products are loaded
 
     const productId = parseInt(route.params.id, 10)
     const found = allProducts.find(p => p.id === productId)
@@ -758,8 +637,8 @@ watch(selectedColor, (newColor) => {
       child.geometry?.type === 'BoxGeometry' && child.position.z < 0
     )
 
-    if (seatMesh) seatMesh.material.color.setHex(parseInt(getColorHex(newColor).replace('#', '0x')))
-    if (backMesh) backMesh.material.color.setHex(parseInt(getColorHex(newColor).replace('#', '0x')))
+    if (seatMesh) seatMesh.material.color.setHex(parseInt(getColorHexHelper(newColor).replace('#', '0x')))
+    if (backMesh) backMesh.material.color.setHex(parseInt(getColorHexHelper(newColor).replace('#', '0x')))
   }
 })
 
@@ -786,7 +665,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import 'aos/dist/aos.css';
+/* @import 'aos/dist/aos.css'; */
 
 .aspect-square {
   aspect-ratio: 1 / 1;
