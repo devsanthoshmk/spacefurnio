@@ -77,7 +77,7 @@
           <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
             <i class="fas fa-user"></i>
           </button>
-          <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
+          <button @click="openWishlist" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
             <i class="fas fa-heart"></i>
           </button>
           <button @click="openCart" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
@@ -143,7 +143,7 @@
           <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
             <i class="fas fa-user text-sm"></i>
           </button>
-          <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
+          <button @click="openWishlist(); closeMobileMenu()" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
             <i class="fas fa-heart text-sm"></i>
           </button>
           <button @click="openCart" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
@@ -166,6 +166,12 @@ import { ref, inject, onMounted, onBeforeUnmount } from 'vue'
 // ===========================================
 // Get openCart function and cartItemCount from parent via inject
 const { openCart, cartItemCount } = inject('cartUtils')
+
+// ===========================================
+// WISHLIST UTILITIES (from App.vue)
+// ===========================================
+// Get openWishlist function and wishlistItemCount from parent via inject
+const { openWishlist, wishlistItemCount } = inject('wishlistUtils')
 
 const mobileMenuOpen = ref(false)
 

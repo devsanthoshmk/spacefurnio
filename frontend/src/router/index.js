@@ -50,6 +50,26 @@ const router = createRouter({
     },
 
     // ===========================================
+    // WISHLIST MODAL ROUTE (Wildcard - matches any path)
+    // ===========================================
+    // Same pattern as cart - /wishlist can be appended to ANY existing route
+    // WishlistOffCanvas uses route.meta.isWishlistOpen to control visibility
+    {
+      path: '/:pathMatch(.*)/wishlist',
+      name: 'wishlist',
+      meta: { isWishlistOpen: true },
+      component: null,
+    },
+    // Also handle root /wishlist route
+    {
+      path: '/wishlist',
+      name: 'wishlistRoot',
+      meta: { isWishlistOpen: true },
+      component: null,
+    },
+
+
+    // ===========================================
     // STATIC PAGES
     // ===========================================
     // Static pages

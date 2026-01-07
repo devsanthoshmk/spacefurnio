@@ -14,7 +14,29 @@ export const useWishlistStore = defineStore('wishlist', () => {
   // STATE
   // ===========================================
 
-  const items = ref([]);
+  // Sample data for UI demonstration
+  const items = ref([
+    {
+      id: 'sample-1',
+      productId: 'prod-001',
+      product: {
+        name: 'Modern Velvet Sofa',
+        price: 1299,
+        primaryImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'
+      },
+      variant: '3-Seater, Navy Blue'
+    },
+    {
+      id: 'sample-2',
+      productId: 'prod-002',
+      product: {
+        name: 'Minimalist Coffee Table',
+        price: 449,
+        primaryImage: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=400'
+      },
+      variant: 'Walnut Wood'
+    }
+  ]);
   const isPublic = ref(false);
   const isLoading = ref(false);
   const error = ref(null);
