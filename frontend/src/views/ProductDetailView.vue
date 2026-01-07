@@ -277,22 +277,210 @@
 
       <!-- Reviews Section -->
       <div class="mt-16 pt-16 border-t border-gray-200" data-aos="fade-up" data-aos-duration="800">
-        <h2 class="text-2xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
-        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-8 shadow-lg">
-          <div class="text-center">
-            <div class="text-5xl font-bold text-gray-900 mb-4">{{ product.rating }}</div>
-            <div class="flex justify-center mb-4">
-              <svg v-for="i in 5" :key="i"
-                   :class="i <= Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'"
-                   class="w-6 h-6 fill-current" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-              </svg>
+        <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <!-- Rating Summary -->
+          <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8 shadow-lg" data-aos="fade-right" data-aos-delay="100">
+            <div class="text-center">
+              <div class="text-6xl font-bold text-gray-900 mb-2">{{ product.rating }}</div>
+              <div class="flex justify-center mb-3">
+                <svg v-for="i in 5" :key="i"
+                     :class="i <= Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'"
+                     class="w-7 h-7 fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+              </div>
+              <p class="text-gray-700 font-medium">Based on {{ product.reviews }} reviews</p>
             </div>
-            <p class="text-gray-700 font-medium">Based on {{ product.reviews }} reviews</p>
+            
+            <!-- Rating Breakdown -->
+            <div class="mt-6 space-y-2">
+              <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="flex items-center gap-2">
+                <span class="text-sm text-gray-600 w-8">{{ star }}★</span>
+                <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                  <div 
+                    class="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-500"
+                    :style="{ width: getRatingPercentage(star) + '%' }"
+                  ></div>
+                </div>
+                <span class="text-sm text-gray-500 w-10 text-right">{{ getRatingPercentage(star) }}%</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Verified Reviews List -->
+          <div class="lg:col-span-2 space-y-6">
+            <div 
+              v-for="(review, index) in customerReviews" 
+              :key="index"
+              class="bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300"
+              data-aos="fade-up"
+              :data-aos-delay="150 * (index + 1)"
+            >
+              <!-- Review Header -->
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    {{ review.name.charAt(0) }}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="font-semibold text-gray-900">{{ review.name }}</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Verified Buyer
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <div class="flex">
+                        <svg v-for="i in 5" :key="i"
+                             :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-300'"
+                             class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      </div>
+                      <span class="text-sm text-gray-500">{{ review.date }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Review Title -->
+              <h5 class="font-semibold text-gray-900 mb-2">{{ review.title }}</h5>
+              
+              <!-- Review Content -->
+              <p class="text-gray-600 leading-relaxed mb-4">{{ review.content }}</p>
+              
+              <!-- Review Footer -->
+              <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div class="flex items-center gap-4">
+                  <button 
+                    @click="markHelpful(index)"
+                    class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors duration-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                    </svg>
+                    Helpful ({{ review.helpful }})
+                  </button>
+                </div>
+                <span v-if="review.purchaseVerified" class="text-xs text-gray-400 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                  Verified Purchase
+                </span>
+              </div>
+            </div>
+            
+            <!-- View All Reviews Button -->
+            <button 
+              @click="showReviewsModal = true"
+              class="w-full py-4 px-6 border-2 border-orange-200 text-orange-600 rounded-xl font-semibold hover:bg-orange-50 hover:border-orange-300 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              View All {{ product.reviews }} Reviews
+            </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Reviews Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div 
+          v-if="showReviewsModal" 
+          class="z-[100000] fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          @click.self="showReviewsModal = false"
+        >
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showReviewsModal = false"></div>
+          
+          <!-- Modal Content -->
+          <div class="relative bg-white w-full sm:max-w-3xl max-h-[90vh] sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden transform transition-all">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Customer Reviews</h3>
+                <p class="text-sm text-gray-500">{{ product.reviews }} verified reviews</p>
+              </div>
+              <button 
+                @click="showReviewsModal = false"
+                class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="overflow-y-auto max-h-[calc(90vh-80px)] p-6 space-y-6">
+              <!-- All Reviews -->
+              <div 
+                v-for="(review, index) in allReviews" 
+                :key="index"
+                class="bg-gray-50 rounded-2xl p-5 hover:bg-gray-100 transition-colors duration-200"
+              >
+                <!-- Review Header -->
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="w-11 h-11 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
+                    {{ review.name.charAt(0) }}
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="font-semibold text-gray-900">{{ review.name }}</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Verified Buyer
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <div class="flex">
+                        <svg v-for="i in 5" :key="i"
+                             :class="i <= review.rating ? 'text-yellow-400' : 'text-gray-300'"
+                             class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      </div>
+                      <span class="text-sm text-gray-500">{{ review.date }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Review Content -->
+                <h5 class="font-semibold text-gray-900 mb-2">{{ review.title }}</h5>
+                <p class="text-gray-600 leading-relaxed mb-3">{{ review.content }}</p>
+                
+                <!-- Review Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                  <button 
+                    @click="markHelpful(index)"
+                    class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors duration-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                    </svg>
+                    Helpful ({{ review.helpful }})
+                  </button>
+                  <span v-if="review.purchaseVerified" class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Verified Purchase
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -317,10 +505,102 @@ const threejsContainer = ref(null)
 const loading3D = ref(false)
 const isAddingToCart = ref(false)
 const isInWishlist = ref(false)
+const showReviewsModal = ref(false)
 
 // 3D Scene variables
 let scene, camera, renderer, furniture, controls
 let animationId = null
+
+// Customer Reviews Data
+const customerReviews = ref([
+  {
+    name: 'Sarah Mitchell',
+    rating: 5,
+    date: 'December 28, 2025',
+    title: 'Absolutely stunning quality!',
+    content: 'This piece exceeded all my expectations. The craftsmanship is impeccable, and it fits perfectly in my living room. The color is exactly as shown in the photos. Delivery was fast and the packaging was excellent. Highly recommend!',
+    helpful: 24,
+    purchaseVerified: true
+  },
+  {
+    name: 'James Anderson',
+    rating: 5,
+    date: 'December 15, 2025',
+    title: 'Worth every penny',
+    content: 'I was hesitant about ordering furniture online, but Space Furnio made it so easy. The quality is outstanding and the design is modern yet timeless. Assembly was straightforward with clear instructions. Will definitely shop here again!',
+    helpful: 18,
+    purchaseVerified: true
+  },
+  {
+    name: 'Emma Roberts',
+    rating: 4,
+    date: 'December 3, 2025',
+    title: 'Great design, minor issue with delivery',
+    content: 'The product itself is beautiful and well-made. The only reason I\'m giving 4 stars is because delivery took a bit longer than expected. But the quality makes up for it. Really happy with my purchase overall.',
+    helpful: 12,
+    purchaseVerified: true
+  }
+])
+
+// Rating distribution (simulated for demo)
+const ratingDistribution = {
+  5: 65,
+  4: 22,
+  3: 8,
+  2: 3,
+  1: 2
+}
+
+const getRatingPercentage = (star) => {
+  return ratingDistribution[star] || 0
+}
+
+// Extended reviews for the modal
+const allReviews = computed(() => [
+  ...customerReviews.value,
+  {
+    name: 'Michael Chen',
+    rating: 5,
+    date: 'November 28, 2025',
+    title: 'Perfect addition to my home office',
+    content: 'I spent weeks researching before making this purchase, and I\'m so glad I chose Space Furnio. The build quality is exceptional, and the modern design complements my home office perfectly. Customer service was also top-notch!',
+    helpful: 15,
+    purchaseVerified: true
+  },
+  {
+    name: 'Lisa Thompson',
+    rating: 4,
+    date: 'November 15, 2025',
+    title: 'Beautiful piece with minor color variance',
+    content: 'The furniture is gorgeous and well-crafted. The only reason for 4 stars is that the color appeared slightly different from the website photos under my lighting. Still very happy with the purchase!',
+    helpful: 9,
+    purchaseVerified: true
+  },
+  {
+    name: 'David Wilson',
+    rating: 5,
+    date: 'November 3, 2025',
+    title: 'Exceeded expectations!',
+    content: 'My wife and I were looking for something unique and this was exactly it. The attention to detail is remarkable. We\'ve received so many compliments from guests. Worth every cent!',
+    helpful: 21,
+    purchaseVerified: true
+  },
+  {
+    name: 'Amanda Garcia',
+    rating: 5,
+    date: 'October 20, 2025',
+    title: 'Fast shipping and amazing quality',
+    content: 'I was worried about ordering furniture online but Space Furnio made it seamless. The product arrived well-packaged and was easy to set up. Quality is outstanding for the price. Highly recommend!',
+    helpful: 17,
+    purchaseVerified: true
+  }
+])
+
+const markHelpful = (index) => {
+  if (index < customerReviews.value.length) {
+    customerReviews.value[index].helpful++
+  }
+}
 
 const productImages = computed(() => {
   if (!product.value) return []
@@ -713,5 +993,33 @@ button:focus-visible {
 
 .animate-pulse-orange {
   animation: pulse-orange 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-active > div:last-child,
+.modal-leave-active > div:last-child {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from > div:last-child,
+.modal-leave-to > div:last-child {
+  transform: translateY(100%) scale(0.95);
+}
+
+@media (min-width: 640px) {
+  .modal-enter-from > div:last-child,
+  .modal-leave-to > div:last-child {
+    transform: translateY(20px) scale(0.95);
+  }
 }
 </style>

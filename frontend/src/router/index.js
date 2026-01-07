@@ -1,9 +1,57 @@
 import { createRouter, createWebHistory } from 'vue-router'
 const comingSoon = () => import('@/components/Coming-Soon.vue')
 
+/**
+ * ===========================================
+ * CART ROUTE CONFIGURATION
+ * ===========================================
+ * The cart is implemented as a route-driven modal overlay.
+ * 
+ * How it works:
+ * 1. Opening cart appends /cart to current URL
+ *    Example: /shop/category/sofas → /shop/category/sofas/cart
+ * 
+ * 2. Cart route uses a wildcard to match any path + /cart
+ *    Pattern: /:pathMatch(.*)/cart
+ * 
+ * 3. The CartOffCanvas component checks route.meta.isCartOpen
+ *    to determine visibility
+ * 
+ * 4. Closing cart uses router.back() to restore previous URL
+ *    Browser back/forward works correctly
+ * 
+ * 5. Direct navigation to /any/path/cart auto-opens cart
+ * ===========================================
+ */
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // ===========================================
+    // CART MODAL ROUTE (Wildcard - matches any path)
+    // ===========================================
+    // This route pattern allows /cart to be appended to ANY existing route
+    // It does NOT render a component - CartOffCanvas is always mounted in App.vue
+    // and uses route.meta.isCartOpen to control visibility
+    {
+      path: '/:pathMatch(.*)/cart',
+      name: 'cart',
+      meta: { isCartOpen: true },
+      // No component - parent route's view remains visible
+      // Cart overlay is handled by CartOffCanvas in App.vue
+      component: null,
+    },
+    // Also handle root /cart route
+    {
+      path: '/cart',
+      name: 'cartRoot',
+      meta: { isCartOpen: true },
+      component: null,
+    },
+
+    // ===========================================
+    // STATIC PAGES
+    // ===========================================
     // Static pages
     {
       path: '/',

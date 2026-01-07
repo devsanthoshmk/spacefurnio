@@ -31,7 +31,7 @@
         <div class="mt-4 border-t border-gray-200 px-4 py-4 space-y-6">
           <div class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Brand</label>
-            <select v-model="selectedBrand" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+            <select v-model="selectedBrand" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand focus:outline-none focus:ring-brand sm:text-sm">
               <option value="">All Brands</option>
               <option v-for="brand in availableBrands" :key="brand" :value="brand">{{ brand }}</option>
             </select>
@@ -39,7 +39,7 @@
 
           <div class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Color</label>
-            <select v-model="selectedColor" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+            <select v-model="selectedColor" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand focus:outline-none focus:ring-brand sm:text-sm">
               <option value="">All Colors</option>
               <option v-for="color in availableColors" :key="color" :value="color">{{ color }}</option>
             </select>
@@ -47,7 +47,7 @@
 
           <div class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Price Range</label>
-            <select v-model="selectedPriceRange" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+            <select v-model="selectedPriceRange" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand focus:outline-none focus:ring-brand sm:text-sm">
               <option value="">Any Price</option>
               <option value="0-100">$0 - $100</option>
               <option value="100-500">$100 - $500</option>
@@ -58,7 +58,7 @@
 
           <div v-if="currentShop.type === 'category'" class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Material</label>
-            <select v-model="selectedMaterial" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+            <select v-model="selectedMaterial" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand focus:outline-none focus:ring-brand sm:text-sm">
               <option value="">All Materials</option>
               <option v-for="material in availableMaterials" :key="material" :value="material">{{ material }}</option>
             </select>
@@ -66,7 +66,7 @@
 
           <div v-else class="space-y-4">
             <label class="block text-sm font-medium text-gray-900">Room</label>
-            <select v-model="selectedRoom" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+            <select v-model="selectedRoom" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand focus:outline-none focus:ring-brand sm:text-sm">
               <option value="">All Rooms</option>
               <option v-for="room in availableRooms" :key="room" :value="room">{{ room }}</option>
             </select>
@@ -97,7 +97,7 @@
                   {{ currentShop.type === 'category' ? getCurrentCategoryName() : getCurrentDesignName() }}
                 </h1>
                 <p class="text-sm text-gray-500 mt-2 max-w-2xl">
-                  <span class="font-medium text-indigo-600 ml-1">{{ filteredProducts.length }} items found</span>
+                  <span class="font-medium text-brand ml-1">{{ filteredProducts.length }} items found</span>
                 </p>
               </div>
 
@@ -106,7 +106,7 @@
               <div class="relative inline-block text-left">
                 <select
                   v-model="sortBy"
-                  class="cursor-pointer appearance-none rounded-lg border-0 bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 hover:bg-gray-100 transition-colors"
+                  class="cursor-pointer appearance-none rounded-lg border-0 bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand sm:text-sm sm:leading-6 hover:bg-gray-100 transition-colors"
                 >
                   <option value="popular">Most Popular</option>
                   <option value="rating">Best Rating</option>
@@ -130,7 +130,7 @@
                 <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
                 </svg>
-                <span v-if="activeFilterCount > 0" class="ml-1.5 inline-flex items-center justify-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">
+                <span v-if="activeFilterCount > 0" class="ml-1.5 inline-flex items-center justify-center rounded-full bg-brand/20 px-2 py-0.5 text-xs font-medium text-brand">
                   {{ activeFilterCount }}
                 </span>
               </button>
@@ -141,7 +141,7 @@
           <!-- Desktop Filters Bar -->
           <div class="hidden lg:flex flex-wrap items-center gap-3">
             <div class="relative group">
-              <select v-model="selectedBrand" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
+              <select v-model="selectedBrand" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-brand hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">All Brands</option>
                 <option v-for="brand in availableBrands" :key="brand" :value="brand">{{ brand }}</option>
               </select>
@@ -151,7 +151,7 @@
             </div>
 
             <div class="relative group">
-              <select v-model="selectedColor" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
+              <select v-model="selectedColor" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-brand hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">All Colors</option>
                 <option v-for="color in availableColors" :key="color" :value="color">{{ color }}</option>
               </select>
@@ -161,7 +161,7 @@
             </div>
 
             <div class="relative group">
-              <select v-model="selectedPriceRange" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
+              <select v-model="selectedPriceRange" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-brand hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">Price Range</option>
                 <option value="0-100">$0 - $100</option>
                 <option value="100-500">$100 - $500</option>
@@ -174,7 +174,7 @@
             </div>
 
             <div v-if="currentShop.type === 'category'" class="relative group">
-              <select v-model="selectedMaterial" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
+              <select v-model="selectedMaterial" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-brand hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">Material</option>
                 <option v-for="material in availableMaterials" :key="material" :value="material">{{ material }}</option>
               </select>
@@ -184,7 +184,7 @@
             </div>
 
             <div v-else class="relative group">
-              <select v-model="selectedRoom" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
+              <select v-model="selectedRoom" class="appearance-none block w-full rounded-full border-0 bg-white py-2 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-brand hover:bg-gray-50 hover:ring-gray-300 transition-all cursor-pointer">
                 <option value="">Room Type</option>
                 <option v-for="room in availableRooms" :key="room" :value="room">{{ room }}</option>
               </select>
@@ -207,20 +207,20 @@
           <!-- Active Filter Tags -->
           <div v-if="hasActiveFilters" class="flex flex-wrap gap-2">
             <span class="text-xs font-medium text-gray-500 uppercase tracking-wider self-center mr-1">Active:</span>
-            <button v-if="selectedBrand" @click="selectedBrand = ''" class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 transition-colors">
-              {{ selectedBrand }} <span class="ml-1 text-indigo-400 hover:text-indigo-600">&times;</span>
+            <button v-if="selectedBrand" @click="selectedBrand = ''" class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20 hover:bg-brand/20 transition-colors">
+              {{ selectedBrand }} <span class="ml-1 text-brand/60 hover:text-brand">&times;</span>
             </button>
-            <button v-if="selectedColor" @click="selectedColor = ''" class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 transition-colors">
-              {{ selectedColor }} <span class="ml-1 text-indigo-400 hover:text-indigo-600">&times;</span>
+            <button v-if="selectedColor" @click="selectedColor = ''" class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20 hover:bg-brand/20 transition-colors">
+              {{ selectedColor }} <span class="ml-1 text-brand/60 hover:text-brand">&times;</span>
             </button>
-            <button v-if="selectedPriceRange" @click="selectedPriceRange = ''" class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 transition-colors">
-              ${{ selectedPriceRange }} <span class="ml-1 text-indigo-400 hover:text-indigo-600">&times;</span>
+            <button v-if="selectedPriceRange" @click="selectedPriceRange = ''" class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20 hover:bg-brand/20 transition-colors">
+              ${{ selectedPriceRange }} <span class="ml-1 text-brand/60 hover:text-brand">&times;</span>
             </button>
-            <button v-if="selectedMaterial" @click="selectedMaterial = ''" class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 transition-colors">
-              {{ selectedMaterial }} <span class="ml-1 text-indigo-400 hover:text-indigo-600">&times;</span>
+            <button v-if="selectedMaterial" @click="selectedMaterial = ''" class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20 hover:bg-brand/20 transition-colors">
+              {{ selectedMaterial }} <span class="ml-1 text-brand/60 hover:text-brand">&times;</span>
             </button>
-            <button v-if="selectedRoom" @click="selectedRoom = ''" class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20 hover:bg-indigo-100 transition-colors">
-              {{ selectedRoom }} <span class="ml-1 text-indigo-400 hover:text-indigo-600">&times;</span>
+            <button v-if="selectedRoom" @click="selectedRoom = ''" class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20 hover:bg-brand/20 transition-colors">
+              {{ selectedRoom }} <span class="ml-1 text-brand/60 hover:text-brand">&times;</span>
             </button>
           </div>
         </div>
@@ -235,7 +235,7 @@
         <div class="relative inline-block text-left">
           <select
             v-model="sortBy"
-            class="cursor-pointer appearance-none rounded-lg border-0 bg-gray-50 py-2 pl-3 pr-8 text-xs font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 hover:bg-gray-100 transition-colors"
+            class="cursor-pointer appearance-none rounded-lg border-0 bg-gray-50 py-2 pl-3 pr-8 text-xs font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand hover:bg-gray-100 transition-colors"
           >
             <option value="popular">Popular</option>
             <option value="rating">Rating</option>
@@ -259,7 +259,7 @@
           <svg class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
           </svg>
-          <span v-if="activeFilterCount > 0" class="ml-1 inline-flex items-center justify-center rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium text-indigo-800">
+          <span v-if="activeFilterCount > 0" class="ml-1 inline-flex items-center justify-center rounded-full bg-brand/20 px-1.5 py-0.5 text-[10px] font-medium text-brand">
             {{ activeFilterCount }}
           </span>
         </button>
@@ -293,7 +293,7 @@
         <p class="mt-2 text-gray-500 max-w-sm mx-auto">We couldn't find any products matching your current filters. Try adjusting your search criteria.</p>
         <button
           @click="clearAllFilters"
-          class="mt-8 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
+          class="mt-8 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-brand hover:bg-brand/90 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
         >
           Clear all filters
         </button>
@@ -359,7 +359,7 @@
               </button>
               <button
                 @click.prevent="addToCart(product)"
-                class="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm hover:bg-white hover:text-indigo-600 transition-colors"
+                class="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm hover:bg-white hover:text-brand transition-colors"
                 title="Quick Add"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
@@ -399,7 +399,7 @@
 
             <!-- Badges -->
             <div class="absolute top-3 left-3 flex flex-col gap-1 pointer-events-none">
-              <span v-if="isNewProduct(product.createdAt)" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-indigo-600 shadow-lg rounded-full">New</span>
+              <span v-if="isNewProduct(product.createdAt)" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-brand shadow-lg rounded-full">New</span>
               <span v-if="product.discount" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-rose-500 shadow-lg rounded-full">-{{ product.discount }}%</span>
             </div>
           </div>
@@ -416,7 +416,7 @@
               </div>
             </div>
 
-            <h3 class="text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+            <h3 class="text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-brand transition-colors">
               <a :href="`./${route.params.category}/${product.id}`">
                 <span aria-hidden="true" class="absolute inset-0"></span>
                 {{ product.name }}

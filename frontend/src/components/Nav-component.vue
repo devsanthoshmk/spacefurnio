@@ -80,8 +80,11 @@
           <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
             <i class="fas fa-heart"></i>
           </button>
-          <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Cart">
+          <button @click="openCart" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
             <i class="fas fa-shopping-cart"></i>
+            <span v-if="cartItemCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+              {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+            </span>
           </button>
         </div>
 
@@ -143,8 +146,11 @@
           <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
             <i class="fas fa-heart text-sm"></i>
           </button>
-          <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Cart">
+          <button @click="openCart" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
             <i class="fas fa-shopping-cart text-sm"></i>
+            <span v-if="cartItemCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full text-[10px]">
+              {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+            </span>
           </button>
         </div>
       </div>
@@ -153,7 +159,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, inject, onMounted, onBeforeUnmount } from 'vue'
+
+// ===========================================
+// CART UTILITIES (from App.vue)
+// ===========================================
+// Get openCart function and cartItemCount from parent via inject
+const { openCart, cartItemCount } = inject('cartUtils')
 
 const mobileMenuOpen = ref(false)
 
