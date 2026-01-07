@@ -189,7 +189,12 @@ const router = createRouter({
     },
     { path: '/shop', name: 'shop', component: comingSoon },
     { path: '/shopping', name: 'shopping', component: comingSoon },
-    { path: '/projects', name: 'projects', component: comingSoon },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('@/views/ContactView.vue'),
+      meta: { title: 'Contact Us - Spacefurnio' }
+    },
   ],
 })
 
