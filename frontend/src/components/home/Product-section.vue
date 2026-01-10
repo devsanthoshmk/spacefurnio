@@ -47,14 +47,14 @@
                 class="pointer-events-none grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
               />
             </div>
-            
+
             <!-- Coming Soon Overlay -->
             <div class="coming-soon-overlay">
               <div class="coming-soon-content">
                 <!-- Animated pulse ring -->
                 <div class="pulse-ring"></div>
                 <div class="pulse-ring delay-1"></div>
-                
+
                 <!-- Glass card -->
                 <div class="glass-card">
                   <i class="pi pi-clock text-xl text-orange-400 mb-2 animate-pulse"></i>
@@ -63,7 +63,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Coming Soon badge -->
             <div class="disabled-badge">
               <i class="pi pi-hourglass text-xs"></i>
@@ -87,7 +87,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import Button from 'primevue/button'
 import ProductCard from '@/components/shop/ProductCard.vue'
-import homePageText from '@/data/homePage.json'
+import homePageText from '@/assets/contents/homePage.json'
 
 
 // Reactive references
@@ -169,9 +169,10 @@ const formattedProducts = computed(() => products.value)
 // Computed properties
 const isAtStart = computed(() => scrollPosition.value <= 0)
 const isAtEnd = computed(() => scrollPosition.value >= maxScrollLeft.value)
-const scrollProgress = computed(() =>
-  maxScrollLeft.value > 0 ? (scrollPosition.value / maxScrollLeft.value) * 100 : 0
-)
+// not using now will use later
+// const scrollProgress = computed(() =>
+//   maxScrollLeft.value > 0 ? (scrollPosition.value / maxScrollLeft.value) * 100 : 0
+// )
 
 // Methods
 const scrollLeft = () => {
@@ -202,10 +203,11 @@ const handleScroll = () => {
   }
 }
 
-const selectProduct = (product) => {
-  // Products are disabled - coming soon
-  console.log(`Product coming soon: ${product.name}`)
-}
+// not using now will use later
+// const selectProduct = (product) => {
+//   // Products are disabled - coming soon
+//   console.log(`Product coming soon: ${product.name}`)
+// }
 
 // Lifecycle hooks
 onMounted(() => {
@@ -389,7 +391,7 @@ onUnmounted(() => {
   transform: scale(0.8) translateY(20px);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   position: relative;
@@ -419,9 +421,9 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(249, 115, 22, 0.9) 50%, 
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(249, 115, 22, 0.9) 50%,
     transparent 100%
   );
   transform: translateX(-100%);
