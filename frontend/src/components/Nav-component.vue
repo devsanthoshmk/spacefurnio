@@ -171,7 +171,7 @@ const { openCart, cartItemCount } = inject('cartUtils')
 // WISHLIST UTILITIES (from App.vue)
 // ===========================================
 // Get openWishlist function and wishlistItemCount from parent via inject
-const { openWishlist, wishlistItemCount } = inject('wishlistUtils')
+const { openWishlist } = inject('wishlistUtils') // wishlistItemCount add if needed
 
 const mobileMenuOpen = ref(false)
 
