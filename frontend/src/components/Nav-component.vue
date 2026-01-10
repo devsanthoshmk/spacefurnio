@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
   transform: translateX(-50%);
   width: 10px;                /* your icon’s width */
   height: 10px;               /* your icon’s height */
-  background: url('@/assets/images/nav-img.png') no-repeat center/contain;
+  background: url('/images/nav-img.png') no-repeat center/contain;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;       /* so it never steals your hover */
