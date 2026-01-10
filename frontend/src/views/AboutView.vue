@@ -363,12 +363,6 @@ const ourteam = [
     image: "https://placehold.co/400x400",
   },
   {
-    id: 2,
-    name: "Mr. Gowtham",
-    role: "Interior Designer",
-    image: "https://placehold.co/400x400",
-  },
-  {
     id: 3,
     name: "Ms. Kaviya Arulthilagam",
     role: "Product Designer",
