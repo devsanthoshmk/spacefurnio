@@ -1,3 +1,7 @@
+<script setup>
+import homePageText from '@/data/homePage.json'
+</script>
+
 <template>
   <section>
     <!-- Panel 1 -->
@@ -6,8 +10,9 @@
         class="panel h-screen w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative">
         <div
           id="text-1"
-          class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700">
-          Where lines meet light
+          class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700"
+          data-key="scroll_text_1">
+          {{ homePageText.scroll_text_1 }}
         </div>
       </div>
     </div>
@@ -18,8 +23,9 @@
         class="panel h-screen w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative">
         <div
           id="text-2"
-          class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1">
-          And functions meet soul
+          class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1"
+          data-key="scroll_text_2">
+          {{ homePageText.scroll_text_2 }}
         </div>
       </div>
     </div>

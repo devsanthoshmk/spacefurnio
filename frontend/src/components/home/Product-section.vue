@@ -1,7 +1,7 @@
 <template>
-<section class="scroll-section h-screen">
+<section class="pt-32 scroll-section h-screen">
       <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center
-            text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]">You'll find us</h2>
+            text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]" data-key="product_section_heading">{{ homePageText.product_section_heading }}</h2>
     <div class="product-gallery-container">
       <!-- Navigation Controls -->
       <div class="scroll-controls">
@@ -31,49 +31,42 @@
           @scroll="handleScroll"
         >
           <div
-            v-for="(product, index) in products"
+            v-for="(product, index) in formattedProducts"
             :key="product.id"
-            class="product-card"
-            @click="selectProduct(product)"
+            class="product-card-wrapper group"
             v-animateonscroll="{
               enterClass: 'animate__fadeInUp',
               delay: index * 100
             }"
           >
-            <div class="product-image-container">
-              <img
-                :src="product.image"
-                :alt="product.title"
-                class="product-image"
+            <!-- ProductCard with grayscale effect -->
+            <!-- :is-new="index < 2" add is new in product card latter -->
+            <div class="product-card-inner">
+              <ProductCard
+                :product="product"
+                class="pointer-events-none grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
               />
-              <div class="product-overlay">
-                <Button
-                  icon="pi pi-heart"
-                  class="favorite-btn"
-                  severity="secondary"
-                  outlined
-                  rounded
-                />
-                <Button
-                  icon="pi pi-shopping-cart"
-                  class="cart-btn !text-black hover:!text-white"
-                  severity="success"
-                  rounded
-                />
+            </div>
+            
+            <!-- Coming Soon Overlay -->
+            <div class="coming-soon-overlay">
+              <div class="coming-soon-content">
+                <!-- Animated pulse ring -->
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring delay-1"></div>
+                
+                <!-- Glass card -->
+                <div class="glass-card">
+                  <i class="pi pi-clock text-xl text-orange-400 mb-2 animate-pulse"></i>
+                  <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon }}</span>
+                  <div class="sparkle-line"></div>
+                </div>
               </div>
             </div>
-
-            <div class="product-info">
-              <h3 class="product-title">{{ product.title }}</h3>
-              <div class="product-rating">
-                <Rating
-                  v-model="product.rating"
-                  readonly
-                  :stars="5"
-                  class="custom-rating"
-                />
-              </div>
-              <div class="product-price">${{ product.price }}</div>
+            
+            <!-- Coming Soon badge -->
+            <div class="disabled-badge">
+              <i class="pi pi-hourglass text-xs"></i>
             </div>
           </div>
         </div>
@@ -93,7 +86,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import Button from 'primevue/button'
-import Rating from 'primevue/rating'
+import ProductCard from '@/components/shop/ProductCard.vue'
+import homePageText from '@/data/homePage.json'
 
 
 // Reactive references
@@ -101,65 +95,76 @@ const productsGrid = ref(null)
 const scrollPosition = ref(0)
 const maxScrollLeft = ref(0)
 
-// Products data
+// Products data (raw format)
 const products = ref([
   {
     id: 1,
-    title: 'Luxurious Modern Sofa',
+    name: 'Luxurious Modern Sofa',
+    brand: 'Spacefurnio',
     price: 899,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 2,
-    title: 'Minimalist Dining Chair',
+    name: 'Minimalist Dining Chair',
+    brand: 'Spacefurnio',
     price: 249,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 3,
-    title: 'Scandinavian Coffee Table',
+    name: 'Scandinavian Coffee Table',
+    brand: 'Spacefurnio',
     price: 449,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 4,
-    title: 'Designer Floor Lamp',
+    name: 'Designer Floor Lamp',
+    brand: 'Spacefurnio',
     price: 199,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 5,
-    title: 'Modern Bookshelf',
+    name: 'Modern Bookshelf',
+    brand: 'Spacefurnio',
     price: 329,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 6,
-    title: 'Elegant Side Table',
+    name: 'Elegant Side Table',
+    brand: 'Spacefurnio',
     price: 179,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 7,
-    title: 'Luxury Accent Chair',
+    name: 'Luxury Accent Chair',
+    brand: 'Spacefurnio',
     price: 599,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop']
   },
   {
     id: 8,
-    title: 'Contemporary Ottoman',
+    name: 'Contemporary Ottoman',
+    brand: 'Spacefurnio',
     price: 149,
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop'
+    images: ['https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop']
   }
 ])
+
+// Format products for ProductCard component
+const formattedProducts = computed(() => products.value)
 
 // Computed properties
 const isAtStart = computed(() => scrollPosition.value <= 0)
@@ -198,9 +203,8 @@ const handleScroll = () => {
 }
 
 const selectProduct = (product) => {
-  console.log(`Selected product: ${product.title}`)
-  window.location.href = `/shop`
-  // Add your product selection logic here
+  // Products are disabled - coming soon
+  console.log(`Product coming soon: ${product.name}`)
 }
 
 // Lifecycle hooks
@@ -293,6 +297,178 @@ onUnmounted(() => {
   display: none;
 }
 
+/* Product Card Wrapper - Contains the overlay */
+.product-card-wrapper {
+  scroll-snap-align: center;
+  flex: 0 0 280px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  z-index: 1;
+}
+
+.product-card-wrapper:hover {
+  transform: translateY(-8px);
+}
+
+.product-card-inner {
+  width: 100%;
+  height: 100%;
+}
+
+/* Coming Soon Overlay */
+.coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(0px);
+  pointer-events: none;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+.product-card-wrapper:hover .coming-soon-overlay {
+  opacity: 1;
+  backdrop-filter: blur(6px);
+}
+
+.coming-soon-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animated pulse rings */
+.pulse-ring {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 2px solid rgba(249, 115, 22, 0.5);
+  border-radius: 50%;
+  animation: pulseRing 2s ease-out infinite;
+  opacity: 0;
+}
+
+.pulse-ring.delay-1 {
+  animation-delay: 0.5s;
+}
+
+.product-card-wrapper:hover .pulse-ring {
+  opacity: 1;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 20px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: scale(0.8) translateY(20px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card-wrapper:hover .glass-card {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Coming Soon Text */
+.coming-soon-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Sparkle line animation */
+.sparkle-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(249, 115, 22, 0.9) 50%, 
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: none;
+}
+
+.product-card-wrapper:hover .sparkle-line {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Disabled badge */
+.disabled-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  z-index: 15;
+}
+
+.product-card-wrapper:hover .disabled-badge {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 1) 100%);
+  transform: rotate(15deg) scale(1.15);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+}
+
+/* Legacy product-card styles (kept for reference) */
 .product-card {
   scroll-snap-align: center;
   flex: 0 0 280px;

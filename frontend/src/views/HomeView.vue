@@ -39,10 +39,10 @@ const newArrivalImages = [
   }
 ];
 
-const handleGrabNow = () => {
-  // Handle button click
-  console.log('Grab now clicked!');
-};
+// const handleGrabNow = () => {
+//   // Handle button click
+//   console.log('Grab now clicked!');
+// };
 
 onMounted(() => {
   const cleanup = scroller(wrapper, 'scroll-section', navDotsContainer)
@@ -69,27 +69,26 @@ onMounted(() => {
 <template>
   <div id="scroll-container" class="overflow-hidden">
     <div id="scroll-wrapper" ref="wrapper">
-      <section class="scroll-section h-screen p-2">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-2 min-h-[97vh]">
-          <!-- Hero Section -->
-          <div ref="heroRef" class="lg:col-span-4 relative rounded-xl overflow-hidden h-[98vh]" :style="{
+      <section class="scroll-section hero-section">
+        <div class="hero-grid">
+          <!-- Hero Section - Full viewport on mobile, left side on desktop -->
+          <div ref="heroRef" class="hero-image-container" :style="{
             backgroundImage: `url('/images/taglinebg.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }" v-animateonscroll="{ enterClass: 'animate-fadein', leaveClass: 'animate-fadeout' }">
             <!-- Dark overlay -->
-            <div class="absolute inset-0 bg-black/20 z-10"></div> <!-- lighter overlay -->
-
+            <div class="absolute inset-0 bg-black/20 z-10"></div>
 
             <NavComponent class="!absolute z-20" />
 
             <div class="relative z-20 w-full h-full flex items-center justify-center p-4">
-              <div ref="taglineRef" class="text-center lg:mb-55"
+              <div ref="taglineRef" class="text-center lg:mb-32"
                 v-animateonscroll="{ enterClass: 'animate-zoomin', leaveClass: 'animate-zoomout', delay: 600 }">
-                <h1 class="phitagate-font text-[clamp(2.5rem,14vw,7rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl">
+                <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl">
                   Spacefurnio
                 </h1>
-                <p class="phitagate-font text-[clamp(1.25rem,3vw,2rem)] text-white italic drop-shadow-xl">
+                <p class="phitagate-font text-[clamp(1.25rem,3vw,1.75rem)] text-white italic drop-shadow-xl">
                   "Creative Meets Living"
                 </p>
                 <div class="w-20 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
@@ -97,78 +96,74 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- New Arrivals Section -->
-          <div ref="newArrivalsRef" class="lg:col-span-1 bg-gray-50 rounded-xl p-4"
+          <!-- New Arrivals Section - Hidden on mobile, right side on desktop -->
+          <div ref="newArrivalsRef" class="new-arrivals-container hidden lg:flex flex-col"
             v-animateonscroll="{ enterClass: 'animate-fadeinleft', leaveClass: 'animate-fadeoutright' }">
-            <h2 class="text-gray-800 font-bold text-xl lg:text-2xl text-center mb-6 font-['Montserrat']">
-              New Arrivals
-            </h2>
 
-            <!-- Flex container for better layout control -->
-            <div class="flex flex-col h-[60%]">
-              <!-- Images Gallery -->
-              <div class="flex-1 mb-6">
-                <!-- Mobile: Horizontal layout -->
-                <div class="flex lg:hidden gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  <div v-for="(image, index) in newArrivalImages" :key="index" class="flex-shrink-0 group relative">
-                    <div class="w-40 h-28 rounded-lg overflow-hidden shadow-md bg-gray-200">
-                      <img :src="image.src" :alt="image.alt"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        @error="handleImageError" loading="lazy" />
-                      <div
-                        class="absolute inset-0 bg-black/20 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                        <i
-                          class="pi pi-eye text-white text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+            <!-- Header -->
+            <div class="new-arrivals-header">
+              <h2 class="text-gray-800 font-bold text-base xl:text-lg text-center font-['Montserrat']">
+                New Arrivals
+              </h2>
+            </div>
+
+            <!-- Images Gallery - Vertical layout with fixed aspect ratio -->
+            <div class="new-arrivals-gallery">
+              <div
+                v-for="(image, index) in newArrivalImages"
+                :key="index"
+                class="new-arrival-item group timer-cursor"
+              >
+                <div class="new-arrival-image-wrapper">
+                  <img
+                    :src="image.src"
+                    :alt="image.alt"
+                    class="new-arrival-image grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
+                    loading="lazy"
+                  />
+                  <!-- Coming Soon Overlay -->
+                  <div class="coming-soon-overlay">
+                    <div class="coming-soon-content">
+                      <!-- Animated pulse ring -->
+                      <div class="pulse-ring"></div>
+                      <div class="pulse-ring delay-1"></div>
+
+                      <!-- Glass card -->
+                      <div class="glass-card">
+                        <i class="pi pi-clock text-lg text-orange-400 mb-1 animate-pulse"></i>
+                        <span class="coming-soon-text">Coming Soon</span>
+                        <div class="sparkle-line"></div>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <!-- Desktop: Vertical layout -->
-                <div class="hidden lg:flex lg:flex-col gap-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
-                  <div v-for="(image, index) in newArrivalImages" :key="index" class="group relative">
-                    <div class="w-full h-32 rounded-lg overflow-hidden shadow-md bg-gray-200">
-                      <img :src="image.src" :alt="image.alt"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        @error="handleImageError" loading="lazy" />
-                      <div
-                        class="absolute inset-0 bg-black/20 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                        <i
-                          class="pi pi-eye text-white text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
-                      </div>
-                    </div>
+                  <!-- Coming Soon badge -->
+                  <div class="disabled-badge">
+                    <i class="pi pi-hourglass text-[10px]"></i>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- CTA Section - Always at bottom -->
-              <div ref="ctaRef" class="text-center mt-auto"
-                v-animateonscroll="{ enterClass: 'animate-fadeup', leaveClass: 'animate-fadedown', delay: 1000 }">
-                <p class="text-lg lg:text-xl font-semibold text-gray-800 mb-4 font-['Montserrat'] leading-tight">
-                  Design this good<br />
-                  <span class="text-orange-500">doesn't wait</span>
-                </p>
+            <!-- CTA Section -->
+            <div ref="ctaRef" class="cta-section"
+              v-animateonscroll="{ enterClass: 'animate-fadeup', leaveClass: 'animate-fadedown', delay: 1000 }">
+              <p class="text-xs xl:text-sm font-semibold text-gray-800 mb-2 font-['Montserrat'] leading-tight text-center">
+                Design this good<br />
+                <span class="text-orange-500">doesn't wait</span>
+              </p>
 
-                <!-- Elegant Button -->
-                <div class="relative inline-block">
+              <!-- Elegant Button -->
+              <div class="flex justify-center">
+                <router-link to="/shopping">
                   <Button
-                    class="grab-now-button bg-gradient-to-r from-orange-500 to-orange-600 border-none text-white px-6 py-3 rounded-full font-medium text-sm lg:text-base shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
-                    @click="handleGrabNow">
+                    class="grab-now-button bg-gradient-to-r from-orange-500 to-orange-600 border-none text-white px-4 py-1.5 xl:px-5 xl:py-2 rounded-full font-medium text-xs shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <span class="relative z-10 flex items-center gap-2">
-                      <i class="pi pi-bolt text-sm"></i>
+                      <i class="pi pi-bolt text-xs"></i>
                       Grab it now!
-                      <i class="pi pi-arrow-right text-sm transition-transform duration-300 group-hover:translate-x-1"></i>
+                      <i class="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
                     </span>
-                    <div
-                      class="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-700 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    </div>
                   </Button>
-
-                  <!-- Animated ring effect -->
-                  <div
-                    class="absolute inset-0 rounded-full border-2 border-orange-400 opacity-0 animate-ping hover:opacity-100">
-                  </div>
-                </div>
+                </router-link>
               </div>
             </div>
           </div>
@@ -208,6 +203,264 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   overflow: hidden;
+}
+
+/* Hero Section Styles */
+.hero-section {
+  height: 100vh;
+  max-height: 100vh;
+  padding: 0.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  height: calc(100vh - 1rem);
+  max-height: calc(100vh - 1rem);
+}
+
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-grid {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+.hero-image-container {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  height: calc(100vh - 1rem);
+  max-height: calc(100vh - 1rem);
+}
+
+@media (min-width: 1024px) {
+  .hero-image-container {
+    height: 100%;
+    max-height: 100%;
+  }
+}
+
+/* New Arrivals Container */
+.new-arrivals-container {
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  height: 100%;
+  max-height: calc(100vh - 1rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* New Arrivals Header */
+.new-arrivals-header {
+  flex-shrink: 0;
+  padding-bottom: 0.375rem;
+}
+
+/* New Arrivals Gallery */
+.new-arrivals-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Timer emoji cursor not using rn doesnt looking good */
+/* .timer-cursor {
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text y='24' font-size='24'>⏱️</text></svg>") 16 16, wait;
+} */
+
+.new-arrival-item {
+  flex: 1;
+  min-height: 0;
+  display: block;
+  max-height: calc((100vh - 10rem) / 4);
+}
+
+.new-arrival-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  background-color: #e5e7eb;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.new-arrival-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.new-arrival-item:hover .new-arrival-image {
+  transform: scale(1.05);
+}
+
+/* Coming Soon Overlay */
+.coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(0px);
+}
+
+.new-arrival-item:hover .coming-soon-overlay {
+  opacity: 1;
+  backdrop-filter: blur(4px);
+}
+
+.coming-soon-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animated pulse rings */
+.pulse-ring {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(249, 115, 22, 0.4);
+  border-radius: 50%;
+  animation: pulseRing 2s ease-out infinite;
+  opacity: 0;
+}
+
+.pulse-ring.delay-1 {
+  animation-delay: 0.5s;
+}
+
+.new-arrival-item:hover .pulse-ring {
+  opacity: 1;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: scale(0.8) translateY(10px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.new-arrival-item:hover .glass-card {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Coming Soon Text */
+.coming-soon-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Sparkle line animation */
+.sparkle-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(249, 115, 22, 0.8) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: none;
+}
+
+.new-arrival-item:hover .sparkle-line {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Disabled badge */
+.disabled-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.new-arrival-item:hover .disabled-badge {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.8) 0%, rgba(234, 88, 12, 0.9) 100%);
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* CTA Section */
+.cta-section {
+  flex-shrink: 0;
+  padding-top: 0.5rem;
+  background-color: #f9fafb;
 }
 
 .nav-dots {
