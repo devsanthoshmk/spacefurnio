@@ -15,26 +15,28 @@ export const useCartStore = defineStore('cart', () => {
   // ===========================================
 
   // Sample items for demo/testing (remove in production)
-  const items = ref([
-    {
-      id: 'demo-1',
-      productId: 'prod-001',
-      name: 'Modern Velvet Sofa',
-      variant: 'Navy Blue',
-      image: '/images/products/sofa-navy.jpg',
-      unitPrice: 1299,
-      quantity: 1,
-    },
-    {
-      id: 'demo-2',
-      productId: 'prod-002',
-      name: 'Scandinavian Oak Coffee Table',
-      variant: 'Natural Oak',
-      image: '/images/products/coffee-table.jpg',
-      unitPrice: 449,
-      quantity: 2,
-    },
-  ]);
+  const items = ref()
+  // seed data
+  //   [
+  //   {
+  //     id: 'demo-1',
+  //     productId: 'prod-001',
+  //     name: 'Modern Velvet Sofa',
+  //     variant: 'Navy Blue',
+  //     image: '/images/products/sofa-navy.jpg',
+  //     unitPrice: 1299,
+  //     quantity: 1,
+  //   },
+  //   {
+  //     id: 'demo-2',
+  //     productId: 'prod-002',
+  //     name: 'Scandinavian Oak Coffee Table',
+  //     variant: 'Natural Oak',
+  //     image: '/images/products/coffee-table.jpg',
+  //     unitPrice: 449,
+  //     quantity: 2,
+  //   },
+  // ]);
   const subtotal = ref(2197); // 1299 + (449 * 2)
   const discountCode = ref(null);
   const discountAmount = ref(0);
@@ -46,7 +48,8 @@ export const useCartStore = defineStore('cart', () => {
   // ===========================================
 
   const itemCount = computed(() => {
-    return items.value.reduce((sum, item) => sum + item.quantity, 0);
+    // console.info('itemCount', items.value);
+    return items.value?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   });
 
   const total = computed(() => {
