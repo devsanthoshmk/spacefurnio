@@ -7,6 +7,7 @@ import Button from 'primevue/button';
 import FooterComponent from '@/components/Footer-component.vue'
 import { scroller } from '@/utills/customScroll.js';
 import { inject } from 'vue';
+import homePageText from '@/assets/contents/homePage.json';
 
 const { showNav } = inject('navShowUtils');
 
@@ -23,19 +24,23 @@ const navDotsContainer = ref(null)
 const newArrivalImages = [
   {
     src: "https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: "Modern Chair Collection"
+    alt: homePageText.new_arrival_alt_1,
+    altKey: "new_arrival_alt_1"
   },
   {
     src: "https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: "Elegant Sofa Design"
+    alt: homePageText.new_arrival_alt_2,
+    altKey: "new_arrival_alt_2"
   },
   {
     src: "https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: "Contemporary Table"
+    alt: homePageText.new_arrival_alt_3,
+    altKey: "new_arrival_alt_3"
   },
   {
     src: "https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: "Minimalist Furniture"
+    alt: homePageText.new_arrival_alt_4,
+    altKey: "new_arrival_alt_4"
   }
 ];
 
@@ -85,11 +90,11 @@ onMounted(() => {
             <div class="relative z-20 w-full h-full flex items-center justify-center p-4">
               <div ref="taglineRef" class="text-center lg:mb-32"
                 v-animateonscroll="{ enterClass: 'animate-zoomin', leaveClass: 'animate-zoomout', delay: 600 }">
-                <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl">
-                  Spacefurnio
+                <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl" data-key="hero_brand_name">
+                  {{ homePageText.hero_brand_name }}
                 </h1>
-                <p class="phitagate-font text-[clamp(1.25rem,3vw,1.75rem)] text-white italic drop-shadow-xl">
-                  "Creative Meets Living"
+                <p class="phitagate-font text-[clamp(1.25rem,3vw,1.75rem)] text-white italic drop-shadow-xl" data-key="hero_tagline">
+                  {{ homePageText.hero_tagline }}
                 </p>
                 <div class="w-20 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
               </div>
@@ -102,8 +107,8 @@ onMounted(() => {
 
             <!-- Header -->
             <div class="new-arrivals-header">
-              <h2 class="text-gray-800 font-bold text-base xl:text-lg text-center font-['Montserrat']">
-                New Arrivals
+              <h2 class="text-gray-800 font-bold text-base xl:text-lg text-center font-['Montserrat']" data-key="new_arrivals_heading">
+                {{ homePageText.new_arrivals_heading }}
               </h2>
             </div>
 
@@ -118,6 +123,7 @@ onMounted(() => {
                   <img
                     :src="image.src"
                     :alt="image.alt"
+                    :data-key="image.altKey"
                     class="new-arrival-image grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
                     loading="lazy"
                   />
@@ -131,7 +137,7 @@ onMounted(() => {
                       <!-- Glass card -->
                       <div class="glass-card">
                         <i class="pi pi-clock text-lg text-orange-400 mb-1 animate-pulse"></i>
-                        <span class="coming-soon-text">Coming Soon</span>
+                        <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon }}</span>
                         <div class="sparkle-line"></div>
                       </div>
                     </div>
@@ -148,8 +154,8 @@ onMounted(() => {
             <div ref="ctaRef" class="cta-section"
               v-animateonscroll="{ enterClass: 'animate-fadeup', leaveClass: 'animate-fadedown', delay: 1000 }">
               <p class="text-xs xl:text-sm font-semibold text-gray-800 mb-2 font-['Montserrat'] leading-tight text-center">
-                Design this good<br />
-                <span class="text-orange-500">doesn't wait</span>
+                <span data-key="cta_line_1">{{ homePageText.cta_line_1 }}</span><br />
+                <span class="text-orange-500" data-key="cta_line_2">{{ homePageText.cta_line_2 }}</span>
               </p>
 
               <!-- Elegant Button -->
@@ -159,7 +165,7 @@ onMounted(() => {
                     class="grab-now-button bg-gradient-to-r from-orange-500 to-orange-600 border-none text-white px-4 py-1.5 xl:px-5 xl:py-2 rounded-full font-medium text-xs shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <span class="relative z-10 flex items-center gap-2">
                       <i class="pi pi-bolt text-xs"></i>
-                      Grab it now!
+                      <span data-key="grab_now_button">{{ homePageText.grab_now_button }}</span>
                       <i class="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
                     </span>
                   </Button>

@@ -1,5 +1,5 @@
 <script setup>
-import homePageText from '@/data/homePage.json'
+import homePageText from '@/assets/contents/homePage.json'
 </script>
 
 <template>
