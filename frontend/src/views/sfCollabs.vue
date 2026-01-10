@@ -36,7 +36,7 @@ onMounted(() => {
 
                 <!-- Main Title -->
                 <h1 class="font-display mb-0 sm:mb-1 tracking-tight text-gray-900 flex flex-col items-center gap-0">
-                    <span class="phitagate-font bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-8xl xl:text-9xl leading-tight ps-1 text-black font-medium">
+                    <span class="phitagate-font bg-clip-text text-8xl xl:text-9xl leading-tight ps-1 text-black font-medium">
                         Spacefurnio
                     </span>
                     <span class="font-bold phitagate-font text-7xl text-gray-700 -mt-4 md:-mt-6 xl:-mt-7">
@@ -49,11 +49,6 @@ onMounted(() => {
 
                 <!-- Divider -->
                 <div class="w-16 sm:w-20 md:w-24 h-[2px] bg-gradient-to-r from-transparent via-gray-800 to-transparent my-4 sm:my-5"></div>
-
-                <!-- Tagline -->
-                <p class="text-sm sm:text-base md:text-lg lg:text-xl font-light tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gray-600">
-                    Creative Meets Living
-                </p>
             </div>
 
             <!-- Scroll Indicator -->
