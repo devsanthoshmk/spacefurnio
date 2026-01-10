@@ -87,16 +87,16 @@ onMounted(() => {
 
             <NavComponent class="!absolute z-20" />
 
-            <div class="relative z-20 w-full h-full flex items-center justify-center p-4">
-              <div ref="taglineRef" class="text-center lg:mb-32"
+            <div class="relative z-20 w-full h-full flex items-start justify-center pt-[35%] sm:pt-[30%] lg:pt-0 lg:items-center p-4">
+              <div ref="taglineRef" class="text-center lg:mb-40"
                 v-animateonscroll="{ enterClass: 'animate-zoomin', leaveClass: 'animate-zoomout', delay: 600 }">
-                <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] font-bold text-white mb-4 lg:mb-1 drop-shadow-2xl" data-key="hero_brand_name">
+                <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] text-white drop-shadow-2xl tracking-wide font-extrabold" data-key="hero_brand_name">
                   {{ homePageText.hero_brand_name }}
                 </h1>
-                <p class="phitagate-font text-[clamp(1.25rem,3vw,1.75rem)] text-white italic drop-shadow-xl" data-key="hero_tagline">
+                <p class="phitagate-font text-[clamp(2.8rem,2.3vw,4.05rem)] mt-[0.3vh] text-white italic drop-shadow-xl tracking-widest leading-10 font-medium" data-key="hero_tagline">
                   {{ homePageText.hero_tagline }}
                 </p>
-                <div class="w-20 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
+                <div class="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
               </div>
             </div>
           </div>
