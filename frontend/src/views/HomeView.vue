@@ -93,7 +93,7 @@ onMounted(() => {
                 <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] text-white drop-shadow-2xl tracking-wide font-extrabold" data-key="hero_brand_name">
                   {{ homePageText.hero_brand_name }}
                 </h1>
-                <p class="phitagate-font text-[clamp(2.8rem,2.3vw,4.05rem)] mt-[0.3vh] text-white italic drop-shadow-xl tracking-widest leading-10 font-medium" data-key="hero_tagline">
+                <p class="phitagate-font text-[clamp(1.5rem,2.3vw,4.05rem)] mt-[0.3dvh] text-white italic drop-shadow-xl tracking-widest leading-10 font-medium" data-key="hero_tagline">
                   {{ homePageText.hero_tagline }}
                 </p>
                 <div class="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
@@ -197,7 +197,7 @@ onMounted(() => {
 <style scoped>
   #scroll-wrapper {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   position: relative;
 }
   body{
@@ -206,15 +206,15 @@ onMounted(() => {
 
 .section {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   overflow: hidden;
 }
 
 /* Hero Section Styles */
 .hero-section {
-  height: 100vh;
-  max-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   padding: 0.5rem;
   overflow: hidden;
   box-sizing: border-box;
@@ -224,8 +224,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.5rem;
-  height: calc(100vh - 1rem);
-  max-height: calc(100vh - 1rem);
+  height: calc(100dvh - 1rem);
+  max-height: calc(100dvh - 1rem);
 }
 
 @media (min-width: 1024px) {
@@ -244,8 +244,8 @@ onMounted(() => {
   position: relative;
   border-radius: 0.75rem;
   overflow: hidden;
-  height: calc(100vh - 1rem);
-  max-height: calc(100vh - 1rem);
+  height: calc(100dvh - 1rem);
+  max-height: calc(100dvh - 1rem);
 }
 
 @media (min-width: 1024px) {
@@ -261,7 +261,7 @@ onMounted(() => {
   border-radius: 0.75rem;
   padding: 0.5rem;
   height: 100%;
-  max-height: calc(100vh - 1rem);
+  max-height: calc(100dvh - 1rem);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -292,7 +292,7 @@ onMounted(() => {
   flex: 1;
   min-height: 0;
   display: block;
-  max-height: calc((100vh - 10rem) / 4);
+  max-height: calc((100dvh - 10rem) / 4);
 }
 
 .new-arrival-image-wrapper {

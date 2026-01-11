@@ -5,9 +5,9 @@ import homePageText from '@/assets/contents/homePage.json'
 <template>
   <section>
     <!-- Panel 1 -->
-    <div class="scroll-section h-screen">
+    <div class="scroll-section h-[100dvh]">
       <div
-        class="panel h-screen w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative">
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative">
         <div
           id="text-1"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700"
@@ -18,9 +18,9 @@ import homePageText from '@/assets/contents/homePage.json'
     </div>
 
     <!-- Panel 2 -->
-    <div class="scroll-section h-screen">
+    <div class="scroll-section h-[100dvh]">
       <div
-        class="panel h-screen w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative">
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative">
         <div
           id="text-2"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1"

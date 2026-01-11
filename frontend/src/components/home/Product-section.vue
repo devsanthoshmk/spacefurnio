@@ -1,5 +1,5 @@
 <template>
-<section class="pt-32 scroll-section h-screen">
+<section class="pt-32 scroll-section h-[100dvh]">
       <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center
             text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]" data-key="product_section_heading">{{ homePageText.product_section_heading }}</h2>
     <div class="product-gallery-container">
