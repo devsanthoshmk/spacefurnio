@@ -3,7 +3,7 @@
  * PreviewModal.vue - Preview modal with direct component rendering
  * Renders the component directly and highlights element based on data-key attribute
  */
-import { ref, watch, onMounted, onUnmounted, computed, nextTick, defineAsyncComponent, shallowRef } from 'vue';
+import { ref, watch, onMounted, onUnmounted, computed, nextTick, shallowRef } from 'vue';
 import Button from 'primevue/button';
 
 const props = defineProps({
@@ -35,11 +35,6 @@ const componentsToRender = computed(() => {
   }
   return [props.componentName];
 });
-
-// // test done
-// watch(componentsToRender, (newVal) => {
-//   console.info('Components to render changed:', newVal);
-// });
 
 // Current component import function based on active tab
 const currentComponentLoader = computed(() => {
@@ -75,47 +70,34 @@ async function loadComponent() {
   isLoading.value = true;
 
   try {
-    // Call the arrow function directly to import the component
     const module = await loader();
     loadedComponent.value = module.default;
-
-    // Wait for next tick to ensure component is rendered
-    await nextTick();
-
-    // Small delay to ensure DOM is fully rendered
-    setTimeout(() => {
-      highlightElement();
-      isLoading.value = false;
-    }, 300);
   } catch (error) {
     console.error('Failed to load component:', error);
     loadedComponent.value = null;
+  } finally {
     isLoading.value = false;
+    
+    // Highlight element after render
+    if (loadedComponent.value) {
+      await nextTick();
+      // Small delay to ensure styles are applied and layout is stable
+      setTimeout(highlightElement, 200);
+    }
   }
 }
 
 
-// Highlight the element with matching data-key
+// Highlight the element with matching data-key using vanilla JS
 function highlightElement() {
-  if (!previewContainer.value || !props.highlightKey) return;
+  if (!props.highlightKey || !previewContainer.value) return;
 
-  // Remove any existing highlights
-  const existingHighlights = previewContainer.value.querySelectorAll('.preview-highlight');
-  existingHighlights.forEach(el => {
-    el.style.outline = '';
-    el.style.outlineOffset = '';
-    el.classList.remove('preview-highlight');
-  });
+  const element = previewContainer.value.querySelector(
+    `[data-key="${props.highlightKey}"]`
+  );
 
-  // Find and highlight the element
-  const element = previewContainer.value.querySelector(`[data-key="${props.highlightKey}"]`);
   if (element) {
-    element.classList.add('preview-highlight');
-    element.style.outline = '3px solid #f97316';
-    element.style.outlineOffset = '4px';
-    element.style.animation = 'pulse-highlight 1.5s ease-in-out infinite';
-
-    // Scroll into view
+    element.classList.add('preview-data-key-highlight');
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
@@ -210,6 +192,7 @@ watch(activeTab, () => {
               class="preview-container"
               :class="{ 'scrollable': !isLoading }"
             >
+
               <component
                 v-if="loadedComponent && !isLoading"
                 :is="loadedComponent"
@@ -271,6 +254,7 @@ watch(activeTab, () => {
   padding: 1rem 1.5rem;
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
 .header-info {
@@ -327,6 +311,7 @@ watch(activeTab, () => {
   background: linear-gradient(135deg, #faf5ff 0%, #f8fafc 100%);
   border-bottom: 1px solid #e2e8f0;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .component-tab {
@@ -392,6 +377,9 @@ watch(activeTab, () => {
   flex: 1;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .loading-overlay {
@@ -428,8 +416,9 @@ watch(activeTab, () => {
 
 .preview-container {
   width: 100%;
-  height: 100%;
+  flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 .preview-container.scrollable {
@@ -438,6 +427,7 @@ watch(activeTab, () => {
 
 .preview-component {
   min-height: 100%;
+  width: 100%;
 }
 
 .no-component {
@@ -466,6 +456,7 @@ watch(activeTab, () => {
   padding: 0.75rem 1.5rem;
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
 .footer-note {
@@ -480,12 +471,6 @@ watch(activeTab, () => {
 
 .footer-note i {
   color: #f97316;
-}
-
-/* Highlight Animation */
-@keyframes pulse-highlight {
-  0%, 100% { outline-color: #f97316; }
-  50% { outline-color: #ea580c; }
 }
 
 /* Transitions */
@@ -530,5 +515,54 @@ watch(activeTab, () => {
     margin-top: 0.5rem;
     justify-content: center;
   }
+}
+
+/* Global styles for highlighting data-key elements inside dynamically loaded components */
+:global(.preview-data-key-highlight) {
+  outline: 3px solid #f97316 !important;
+  outline-offset: 4px !important;
+  animation: preview-pulse-highlight 1.5s ease-in-out infinite !important;
+  position: relative;
+  z-index: 10;
+  border-radius: 4px;
+  background-color: rgba(249, 115, 22, 0.1) !important;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Target any element with data-highlight-active attribute as extra fallback */
+:global([data-highlight-active="true"]) {
+  outline: 3px solid #f97316 !important;
+  outline-offset: 4px !important;
+  animation: preview-pulse-highlight 1.5s ease-in-out infinite !important;
+}
+
+@keyframes preview-pulse-highlight {
+  0%, 100% {
+    outline-color: #f97316;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+  }
+  50% {
+    outline-color: #ea580c;
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.7);
+  }
+}
+
+/* Visual label indicator for the highlighted element */
+:global(.preview-data-key-highlight::before) {
+  content: '← This element';
+  position: absolute;
+  top: -30px;
+  left: 0;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  font-size: 0.7rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+  pointer-events: none;
 }
 </style>
