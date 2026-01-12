@@ -1,7 +1,17 @@
 <template>
-<section class="pt-32 scroll-section h-[100dvh]">
-      <h2 class="phitagate-font bold italicfont-phitagate text-[5rem] font-normal not-italic text-center
-            text-black [text-fill-color:white] [-webkit-text-stroke:2px_black]" data-key="product_section_heading">{{ homePageText.product_section_heading }}</h2>
+<section class="product-section pt-28">
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="header-decoration header-decoration--left"></div>
+      <h2 class="section-title phitagate-font" data-key="product_section_heading">
+        {{ homePageText.product_section_heading }}
+      </h2>
+      <div class="header-decoration header-decoration--right"></div>
+    </div>
+
+    <!-- Subtitle ADD IF REQUIRED-->
+    <!-- <p class="section-subtitle">Discover our handcrafted collection of premium furniture</p> -->
+
     <div class="product-gallery-container">
       <!-- Navigation Controls -->
       <div class="scroll-controls">
@@ -28,7 +38,6 @@
         <div
           ref="productsGrid"
           class="products-grid"
-          @scroll="handleScroll"
         >
           <div
             v-for="(product, index) in formattedProducts"
@@ -36,11 +45,10 @@
             class="product-card-wrapper group"
             v-animateonscroll="{
               enterClass: 'animate__fadeInUp',
-              delay: index * 100
+              delay: index * 50
             }"
           >
             <!-- ProductCard with grayscale effect -->
-            <!-- :is-new="index < 2" add is new in product card latter -->
             <div class="product-card-inner">
               <ProductCard
                 :product="product"
@@ -57,7 +65,7 @@
 
                 <!-- Glass card -->
                 <div class="glass-card">
-                  <i class="pi pi-clock text-xl text-orange-400 mb-2 animate-pulse"></i>
+                  <i class="pi pi-clock coming-soon-icon"></i>
                   <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon }}</span>
                   <div class="sparkle-line"></div>
                 </div>
@@ -66,19 +74,24 @@
 
             <!-- Coming Soon badge -->
             <div class="disabled-badge">
-              <i class="pi pi-hourglass text-xs"></i>
+              <i class="pi pi-hourglass"></i>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Scroll Indicator -->
-      <!-- <div class="scroll-indicator">
-        <div
-          class="scroll-progress"
-          :style="{ width: scrollProgress + '%' }"
-        ></div>
-      </div> -->
+      <!-- Page Indicator -->
+      <div class="page-indicator-container">
+        <div class="page-dots">
+          <span
+            v-for="(_, idx) in totalPages"
+            :key="idx"
+            class="page-dot"
+            :class="{ 'active': idx === currentPage }"
+            @click="goToPage(idx)"
+          ></span>
+        </div>
+      </div>
     </div>
 </section>
 </template>
@@ -89,11 +102,10 @@ import Button from 'primevue/button'
 import ProductCard from '@/components/shop/ProductCard.vue'
 import homePageText from '@/assets/contents/homePage.json'
 
-
 // Reactive references
 const productsGrid = ref(null)
-const scrollPosition = ref(0)
-const maxScrollLeft = ref(0)
+const currentPage = ref(0)
+const itemsPerPage = ref(4) // Default for desktop
 
 // Products data (raw format)
 const products = ref([
@@ -163,68 +175,65 @@ const products = ref([
   }
 ])
 
-// Format products for ProductCard component
-const formattedProducts = computed(() => products.value)
-
 // Computed properties
-const isAtStart = computed(() => scrollPosition.value <= 0)
-const isAtEnd = computed(() => scrollPosition.value >= maxScrollLeft.value)
-// not using now will use later
+const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage.value))
+
+const formattedProducts = computed(() => {
+  const start = currentPage.value * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return products.value.slice(start, end)
+})
+
+const isAtStart = computed(() => currentPage.value === 0)
+const isAtEnd = computed(() => currentPage.value >= totalPages.value - 1)
+
+// Scroll progress for indicator (now page-based) NOT NEEDED NOW
 // const scrollProgress = computed(() =>
-//   maxScrollLeft.value > 0 ? (scrollPosition.value / maxScrollLeft.value) * 100 : 0
+//   totalPages.value > 1 ? ((currentPage.value + 1) / totalPages.value) * 100 : 100
 // )
 
 // Methods
 const scrollLeft = () => {
-  const container = productsGrid.value
-  if (container) {
-    container.scrollBy({
-      left: -300,
-      behavior: 'smooth'
-    })
+  if (currentPage.value > 0) {
+    currentPage.value--
   }
 }
 
 const scrollRight = () => {
-  const container = productsGrid.value
-  if (container) {
-    container.scrollBy({
-      left: 300,
-      behavior: 'smooth'
-    })
+  if (currentPage.value < totalPages.value - 1) {
+    currentPage.value++
   }
 }
 
-const handleScroll = () => {
-  const container = productsGrid.value
-  if (container) {
-    scrollPosition.value = container.scrollLeft
-    maxScrollLeft.value = container.scrollWidth - container.clientWidth
-  }
+const goToPage = (pageIndex) => {
+  currentPage.value = pageIndex
 }
 
-// not using now will use later
-// const selectProduct = (product) => {
-//   // Products are disabled - coming soon
-//   console.log(`Product coming soon: ${product.name}`)
-// }
+// Calculate items per page based on screen width
+const updateItemsPerPage = () => {
+  // Always show 4 products per page on all screens
+  itemsPerPage.value = 4
+  // Reset to first page if current page is out of bounds
+  if (currentPage.value >= totalPages.value) {
+    currentPage.value = Math.max(0, totalPages.value - 1)
+  }
+}
 
 // Lifecycle hooks
 onMounted(() => {
-  if (productsGrid.value) {
-    maxScrollLeft.value = productsGrid.value.scrollWidth - productsGrid.value.clientWidth
-  }
-
-  // Add resize listener to update scroll calculations
-  window.addEventListener('resize', handleScroll)
+  updateItemsPerPage()
+  window.addEventListener('resize', updateItemsPerPage)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleScroll)
+  window.removeEventListener('resize', updateItemsPerPage)
 })
 </script>
 
 <style scoped>
+/* ========================================
+   FONTS
+======================================== */
 @font-face {
   font-family: 'Phitagate';
   src: url('/fonts/Phitagate.otf') format('opentype');
@@ -233,13 +242,106 @@ onUnmounted(() => {
 .phitagate-font {
   font-family: 'Phitagate', serif !important;
 }
+
+/* ========================================
+   MAIN SECTION - Strict 100dvh Container
+======================================== */
+.product-section {
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1rem, 3vh, 2rem) 0;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(249, 250, 251, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   SECTION HEADER
+======================================== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 1.5vw, 1.5rem);
+  margin-bottom: 0.25rem;
+  padding: 0 1rem;
+}
+
+.header-decoration {
+  flex: 1;
+  max-width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(230, 126, 34, 0.5),
+    rgba(230, 126, 34, 0.8)
+  );
+  border-radius: 1px;
+}
+
+.header-decoration--left {
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(230, 126, 34, 0.5),
+    rgba(230, 126, 34, 0.8)
+  );
+}
+
+.header-decoration--right {
+  background: linear-gradient(270deg,
+    transparent,
+    rgba(230, 126, 34, 0.5),
+    rgba(230, 126, 34, 0.8)
+  );
+}
+
+.section-title {
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  font-weight: 400;
+  text-align: center;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #1a1a1a;
+  text-stroke: 1.5px #1a1a1a;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  color: #6b7280;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+}
+
+/* ========================================
+   GALLERY CONTAINER
+======================================== */
 .product-gallery-container {
   position: relative;
   width: 100%;
-  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow: hidden;
 }
 
+/* ========================================
+   NAVIGATION CONTROLS
+======================================== */
 .scroll-controls {
   position: absolute;
   top: 50%;
@@ -249,81 +351,110 @@ onUnmounted(() => {
   justify-content: space-between;
   pointer-events: none;
   z-index: 10;
-  padding: 0 1rem;
+  padding: 0 0.25rem;
 }
 
 .scroll-btn {
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.9);
+  width: clamp(36px, 5vw, 48px) !important;
+  height: clamp(36px, 5vw, 48px) !important;
+  min-width: 36px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 50% !important;
 }
 
-.scroll-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: scale(1.05);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+.scroll-btn:hover:not(:disabled) {
+  background: #fff !important;
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .scroll-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
+  transform: scale(0.95);
 }
 
+/* ========================================
+   PRODUCTS SECTION
+======================================== */
 .products-section {
-  position: sticky;
-  top: 0;
-  height: fit-content;
-  padding: 2rem 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  padding: clamp(0.5rem, 2vh, 1rem) 0;
 }
 
 .products-grid {
   display: flex;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  gap: 2rem;
-  padding: 0 2rem;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding: 0 clamp(2.5rem, 5vw, 4rem) 10px;
   margin: 0 auto;
-  max-width: 100%;
-  transition: filter 0.8s ease;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overflow-y: visible;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.products-grid::-webkit-scrollbar {
-  display: none;
-}
-
-/* Product Card Wrapper - Contains the overlay */
 .product-card-wrapper {
-  scroll-snap-align: center;
-  flex: 0 0 280px;
+  /* Dynamic sizing - fills available space equally */
+  flex: 1 1 0;
+  max-width: clamp(200px, 22vw, 280px);
+  height: clamp(300px, 55vh, 420px);
   position: relative;
-  border-radius: 16px;
+  border-radius: clamp(12px, 1.5vw, 16px);
   overflow: hidden;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .product-card-wrapper:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  z-index: 5;
 }
 
 .product-card-inner {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Coming Soon Overlay */
+.product-card-inner :deep(.relative) {
+  height: 100%;
+}
+
+.product-card-inner :deep(.aspect-\[4\/5\]) {
+  aspect-ratio: auto;
+  height: 65%;
+}
+
+.product-card-inner :deep(.mt-4) {
+  margin-top: auto;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(0.5rem, 1.5vh, 1rem) !important;
+}
+
+/* ========================================
+   COMING SOON OVERLAY
+======================================== */
 .coming-soon-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -331,13 +462,13 @@ onUnmounted(() => {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(0px);
   pointer-events: none;
-  border-radius: 16px;
+  border-radius: inherit;
   z-index: 10;
 }
 
 .product-card-wrapper:hover .coming-soon-overlay {
   opacity: 1;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
 }
 
 .coming-soon-content {
@@ -347,11 +478,11 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-/* Animated pulse rings */
+/* Pulse Rings */
 .pulse-ring {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: clamp(60px, 8vw, 100px);
+  height: clamp(60px, 8vw, 100px);
   border: 2px solid rgba(249, 115, 22, 0.5);
   border-radius: 50%;
   animation: pulseRing 2s ease-out infinite;
@@ -377,17 +508,17 @@ onUnmounted(() => {
   }
 }
 
-/* Glass card */
+/* Glass Card */
 .glass-card {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-  padding: 20px 32px;
+  border-radius: clamp(10px, 1.5vw, 16px);
+  padding: clamp(12px, 2vw, 20px) clamp(20px, 3vw, 32px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: clamp(4px, 0.5vh, 8px);
   transform: scale(0.8) translateY(20px);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -403,18 +534,29 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* Coming Soon Text */
+.coming-soon-icon {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #f97316;
+  margin-bottom: clamp(4px, 0.5vh, 8px);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .coming-soon-text {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: clamp(10px, 1.2vw, 13px);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: clamp(1.5px, 0.3vw, 3px);
   color: white;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Sparkle line animation */
+/* Sparkle Line */
 .sparkle-line {
   position: absolute;
   bottom: 0;
@@ -435,21 +577,17 @@ onUnmounted(() => {
 }
 
 @keyframes sparkle {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-/* Disabled badge */
+/* Disabled Badge */
 .disabled-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  top: clamp(8px, 1.5vw, 12px);
+  right: clamp(8px, 1.5vw, 12px);
+  width: clamp(22px, 3vw, 28px);
+  height: clamp(22px, 3vw, 28px);
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   border-radius: 50%;
@@ -461,6 +599,7 @@ onUnmounted(() => {
   opacity: 0.8;
   transition: all 0.3s ease;
   z-index: 15;
+  font-size: clamp(10px, 1.2vw, 12px);
 }
 
 .product-card-wrapper:hover .disabled-badge {
@@ -470,117 +609,47 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
 }
 
-/* Legacy product-card styles (kept for reference) */
-.product-card {
-  scroll-snap-align: center;
-  flex: 0 0 280px;
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-}
-
-.product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-.product-image-container {
-  position: relative;
-  overflow: hidden;
-}
-
-.product-image {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.product-card:hover .product-image {
-  transform: scale(1.1);
-}
-
-.product-overlay {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+/* ========================================
+   PAGE INDICATOR
+======================================== */
+.page-indicator-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  align-items: center;
+  gap: clamp(4px, 1vh, 8px);
+  padding: clamp(0.75rem, 2vh, 1.5rem) 1rem 0;
 }
 
-.product-card:hover .product-overlay {
-  opacity: 1;
+.page-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.favorite-btn,
-.cart-btn {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+.page-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.product-info {
-  padding: 1.5rem;
+.page-dot:hover {
+  background: rgba(230, 126, 34, 0.5);
+  transform: scale(1.2);
 }
 
-.product-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-}
-
-.product-rating {
-  margin-bottom: 0.75rem;
-}
-
-.custom-rating {
-  gap: 2px;
-}
-
-.custom-rating .p-rating-icon {
-  color: #ffd700;
-  font-size: 0.9rem;
-}
-
-.product-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #e67e22;
-  background: linear-gradient(45deg, #e67e22, #f39c12);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.scroll-indicator {
-  position: relative;
-  height: 4px;
-  background: #e0e0e0;
-  border-radius: 2px;
-  margin: 1rem 2rem 0;
-  overflow: hidden;
-}
-
-.scroll-progress {
-  height: 100%;
+.page-dot.active {
+  width: 28px;
+  border-radius: 5px;
   background: linear-gradient(90deg, #e67e22, #f39c12);
-  border-radius: 2px;
-  transition: width 0.3s ease;
+  box-shadow: 0 2px 8px rgba(230, 126, 34, 0.4);
 }
 
-/* Animate.css integration */
+/* ========================================
+   ANIMATIONS
+======================================== */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -596,41 +665,474 @@ onUnmounted(() => {
   animation: fadeInUp 0.6s ease-out;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .products-grid {
-    gap: 1rem;
-    padding: 0 1rem;
+/* ========================================
+   RESPONSIVE - Mobile Small (< 360px)
+======================================== */
+@media (max-width: 359px) {
+  .product-section {
+    padding-top: 6.5rem;
   }
 
-  .product-card {
-    flex: 0 0 240px;
+  .section-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    -webkit-text-stroke: 1.2px #1a1a1a;
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.7rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .products-section {
+    padding: 0.25rem 0;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 0.25rem 2rem;
+    height: 100%;
+    width: 100%;
+  }
+
+  .product-card-wrapper {
+    flex: none;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .product-card-inner :deep(.aspect-\[4\/5\]) {
+    height: 68%;
+  }
+
+  .product-card-inner :deep(.mt-4) {
+    height: 32%;
+    margin-top: 0 !important;
+    padding: 0.35rem 0.4rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+  }
+
+  /* Brand and rating row */
+  .product-card-inner :deep(.flex.justify-between.items-start) {
+    margin-bottom: 0.15rem;
+  }
+
+  /* Product name */
+  .product-card-inner :deep(.text-base) {
+    font-size: 0.72rem;
+    line-height: 1.25;
+    margin-bottom: 0.1rem;
+  }
+
+  /* Brand text */
+  .product-card-inner :deep(.text-xs) {
+    font-size: 0.55rem;
+  }
+
+  /* Price section */
+  .product-card-inner :deep(.mt-auto) {
+    margin-top: 0.15rem !important;
+    padding-top: 0.15rem !important;
+  }
+
+  .product-card-inner :deep(.text-lg) {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .scroll-controls {
+    padding: 0 0.15rem;
+  }
+
+  .scroll-btn {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+  }
+
+  .header-decoration {
+    display: none;
+  }
+
+  .page-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .page-dot.active {
+    width: 16px;
+  }
+
+  .page-indicator-container {
+    padding: 0.35rem 0.5rem 0;
+  }
+
+  .page-dots {
+    gap: 6px;
+  }
+
+  /* Hide some overlay elements on very small screens */
+  .coming-soon-overlay .pulse-ring {
+    display: none;
+  }
+
+  .glass-card {
+    padding: 8px 12px;
+  }
+
+  .coming-soon-icon {
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+  }
+
+  .coming-soon-text {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .disabled-badge {
+    width: 18px;
+    height: 18px;
+    top: 5px;
+    right: 5px;
+    font-size: 8px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - Mobile (360px - 767px)
+======================================== */
+@media (min-width: 360px) and (max-width: 767px) {
+  .product-section {
+    padding-top: 7rem;
+  }
+
+  .section-header {
+    margin-bottom: 0.6rem;
+  }
+
+  .section-title {
+    font-size: 2.4rem;
+    -webkit-text-stroke: 1.3px #1a1a1a;
+  }
+
+  .section-subtitle {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .products-section {
+    padding: 0.35rem 0;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.6rem;
+    padding: 0.25rem 1.75rem;
+    height: 100%;
+    width: 100%;
+  }
+
+  .product-card-wrapper {
+    flex: none;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.07);
+  }
+
+  .product-card-inner :deep(.aspect-\[4\/5\]) {
+    height: 68%;
+  }
+
+  .product-card-inner :deep(.mt-4) {
+    height: 32%;
+    margin-top: 0 !important;
+    padding: 0.4rem 0.5rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+  }
+
+  /* Brand and rating row */
+  .product-card-inner :deep(.flex.justify-between.items-start) {
+    margin-bottom: 0.2rem;
+  }
+
+  /* Product name */
+  .product-card-inner :deep(.text-base) {
+    font-size: 0.82rem;
+    line-height: 1.25;
+    margin-bottom: 0.1rem;
+  }
+
+  /* Brand text */
+  .product-card-inner :deep(.text-xs) {
+    font-size: 0.6rem;
+  }
+
+  /* Price section */
+  .product-card-inner :deep(.mt-auto) {
+    margin-top: 0.2rem !important;
+    padding-top: 0.2rem !important;
+  }
+
+  .product-card-inner :deep(.text-lg) {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .scroll-controls {
+    padding: 0 0.25rem;
+  }
+
+  .scroll-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+  }
+
+  .header-decoration {
+    max-width: 40px;
+  }
+
+  .page-indicator-container {
+    padding: 0.4rem 0.5rem 0;
+  }
+
+  .page-dots {
+    gap: 8px;
+  }
+
+  .page-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .page-dot.active {
+    width: 20px;
+  }
+
+  /* Adjust overlay for mobile */
+  .coming-soon-overlay .pulse-ring {
+    width: 55px;
+    height: 55px;
+  }
+
+  .glass-card {
+    padding: 12px 18px;
+  }
+
+  .coming-soon-icon {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+
+  .coming-soon-text {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+  }
+
+  .disabled-badge {
+    width: 20px;
+    height: 20px;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - Tablet (768px - 1023px)
+======================================== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .product-section {
+    padding-top: 6.5rem;
+  }
+
+  .products-grid {
+    gap: 0.75rem;
+    padding: 0 2.5rem;
+  }
+
+  .product-card-wrapper {
+    flex: 1 1 0;
+    max-width: 180px;
+    height: clamp(280px, 48vh, 350px);
+  }
+
+  .scroll-controls {
+    padding: 0 0.25rem;
+  }
+
+  .scroll-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .header-decoration {
+    max-width: 80px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - Desktop (1024px - 1399px)
+======================================== */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .product-section {
+    padding-top: 7rem;
+  }
+
+  .products-grid {
+    gap: 1rem;
+    padding: 0 3rem;
+  }
+
+  .product-card-wrapper {
+    flex: 1 1 0;
+    max-width: 240px;
+    height: clamp(300px, 50vh, 380px);
+  }
+
+  .scroll-controls {
+    padding: 0 0.35rem;
+  }
+
+  .scroll-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - Large Desktop (1400px+)
+======================================== */
+@media (min-width: 1400px) {
+  .product-section {
+    padding-top: 7rem;
+  }
+
+  .section-title {
+    -webkit-text-stroke: 2px #1a1a1a;
+  }
+
+  .products-grid {
+    gap: 1.25rem;
+    padding: 0 3.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .product-card-wrapper {
+    flex: 1 1 0;
+    max-width: 280px;
+    height: min(400px, 52vh);
   }
 
   .scroll-controls {
     padding: 0 0.5rem;
   }
 
-  .scroll-indicator {
-    margin: 1rem 1rem 0;
+  .scroll-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .header-decoration {
+    max-width: 120px;
   }
 }
 
-@media (max-width: 480px) {
-  .product-card {
-    flex: 0 0 200px;
+/* ========================================
+   RESPONSIVE - Ultra Wide (1800px+)
+======================================== */
+@media (min-width: 1800px) {
+  .products-grid {
+    max-width: 1600px;
+    gap: 1.5rem;
+    padding: 0 4rem;
   }
 
-  .product-info {
-    padding: 1rem;
+  .product-card-wrapper {
+    max-width: 320px;
+    height: min(420px, 52vh);
   }
 
-  .product-title {
-    font-size: 1.1rem;
+  .scroll-controls {
+    padding: 0 1rem;
+  }
+}
+
+/* ========================================
+   LANDSCAPE MODE ADJUSTMENTS
+======================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .product-section {
+    padding-top: 4rem;
   }
 
-  .product-price {
-    font-size: 1.25rem;
+  .section-header {
+    margin-bottom: 0.25rem;
+  }
+
+  .section-subtitle {
+    display: none;
+  }
+
+  .product-card-wrapper {
+    height: 65vh;
+    min-height: 180px;
+  }
+
+  .products-section {
+    padding: 0.25rem 0;
+  }
+
+  .page-indicator-container {
+    padding-top: 0.25rem;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .product-card-wrapper {
+    transition: none;
+  }
+
+  .pulse-ring {
+    animation: none;
+  }
+
+  .sparkle-line {
+    animation: none;
+  }
+
+  .coming-soon-icon {
+    animation: none;
+  }
+
+  .animate__fadeInUp {
+    animation: none;
   }
 }
 </style>

@@ -180,7 +180,7 @@ onMounted(() => {
         <scrollAnimation />
       </section>
 
-      <section>
+      <section class="scroll-section">
         <ProductSection />
       </section>
 
@@ -195,14 +195,15 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
   #scroll-wrapper {
   width: 100%;
   height: 100dvh;
   position: relative;
 }
-  body{
-    overflow: hidden;
-  }
+:global(html, body) {
+  overflow: hidden !important;
+}
 
 .section {
   width: 100%;
