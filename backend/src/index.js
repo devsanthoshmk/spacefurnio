@@ -22,6 +22,7 @@ import orderRoutes from './routes/orders.js';
 import addressRoutes from './routes/addresses.js';
 import adminRoutes from './routes/admin/index.js';
 import webhookRoutes from './routes/webhooks.js';
+import contentAdminRoutes from './routes/contentAdmin.js';
 
 // Create router
 const router = Router();
@@ -102,6 +103,11 @@ router.all('/api/v1/admin/*', withParams, withDb, withAuth, adminRoutes.handle);
 // WEBHOOK ROUTES (Signature Verification)
 // ===========================================
 router.all('/api/v1/webhooks/*', withParams, withDb, webhookRoutes.handle);
+
+// ===========================================
+// CONTENT ADMIN ROUTES (Passcode Protected via KV)
+// ===========================================
+router.all('/api/v1/admin/content/*', withParams, contentAdminRoutes.handle);
 
 // ===========================================
 // 404 HANDLER

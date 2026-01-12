@@ -32,6 +32,10 @@
 			"binding": "RATE_LIMIT",
 			"id": "9a96f916131b47fea1a58b5e11984f77",
 			"remote": true
+		},
+		{
+			"binding": "ADMIN_SECRETS",
+			"id": "e55f50a5c1714b37b80a1fdc70c46b4c"
 		}
 	],
 	// Production environment

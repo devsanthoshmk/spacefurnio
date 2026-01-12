@@ -84,6 +84,12 @@ frontend/
         └── wishlist.js       # Wishlist state (Pinia)
 ```
 
+## Additional Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Admin Content Panel](./docs/ADMIN_CONTENT_PANEL.md) | Walkthrough for setting up and using the admin content management panel |
+
 ## Environment Variables
 
 ### Cloudflare Worker Secrets (wrangler secret put)

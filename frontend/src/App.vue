@@ -1,7 +1,8 @@
 
 
 <template>
-  <header>
+  <!-- Hide header on admin routes -->
+  <header v-if="!isAdminRoute">
     <NavComponent v-show="showNav"/>
   </header>
 
@@ -9,22 +10,27 @@
     <RouterView />
   </main>
 
-  <footer>
+  <!-- Hide footer on admin routes -->
+  <footer v-if="!isAdminRoute">
     <FooterComponent/>
   </footer>
 
-  <!-- Route-driven Cart Off-Canvas Overlay -->
-  <CartOffCanvas />
+  <!-- Route-driven Cart Off-Canvas Overlay (hidden on admin) -->
+  <CartOffCanvas v-if="!isAdminRoute" />
 
-  <!-- Route-driven Wishlist Off-Canvas Overlay -->
-  <WishlistOffCanvas />
+  <!-- Route-driven Wishlist Off-Canvas Overlay (hidden on admin) -->
+  <WishlistOffCanvas v-if="!isAdminRoute" />
 
+  <!-- Highlight overlay for admin preview -->
+  <div v-if="highlightKey" class="highlight-indicator">
+    <span>Previewing: {{ highlightKey }}</span>
+  </div>
 </template>
 
 
 <script setup>
   import { RouterView, useRouter, useRoute } from 'vue-router'
-  import { ref, computed, provide } from 'vue'
+  import { ref, computed, provide, watch, onMounted, nextTick } from 'vue'
   import NavComponent from './components/Nav-component.vue'
   import FooterComponent from './components/Footer-component.vue'
   import CartOffCanvas from './components/CartOffCanvas.vue'
@@ -41,6 +47,12 @@
   const route = useRoute()
   const cart = useCartStore()
   const wishlist = useWishlistStore()
+
+  // Check if current route is admin
+  const isAdminRoute = computed(() => route.path.startsWith('/admin-spacefurnio'))
+
+  // Highlight key from URL query param
+  const highlightKey = computed(() => route.query.highlight || '')
 
   // Cart item count for nav badge
   const cartItemCount = computed(() => cart.itemCount)
@@ -74,5 +86,86 @@
   // Provide wishlist utilities to child components (Nav, etc.)
   provide('wishlistUtils', { openWishlist, wishlistItemCount })
 
+  /**
+   * Highlight element with matching data-key attribute
+   * Used for admin preview functionality
+   */
+  function highlightElement(key) {
+    // Remove any existing highlights
+    document.querySelectorAll('[data-admin-highlighted]').forEach(el => {
+      el.removeAttribute('data-admin-highlighted')
+      el.style.removeProperty('outline')
+      el.style.removeProperty('outline-offset')
+      el.style.removeProperty('animation')
+    })
+
+    if (!key) return
+
+    // Find and highlight the element
+    const element = document.querySelector(`[data-key="${key}"]`)
+    if (element) {
+      element.setAttribute('data-admin-highlighted', 'true')
+      element.style.outline = '3px solid #f97316'
+      element.style.outlineOffset = '4px'
+      element.style.animation = 'admin-highlight-pulse 1.5s ease-in-out infinite'
+      
+      // Scroll into view
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+
+  // Watch for highlight query param changes
+  watch(highlightKey, async (newKey) => {
+    await nextTick()
+    // Small delay to ensure DOM is ready
+    setTimeout(() => highlightElement(newKey), 500)
+  }, { immediate: true })
+
+  // Also highlight on mount if query param exists
+  onMounted(() => {
+    if (highlightKey.value) {
+      setTimeout(() => highlightElement(highlightKey.value), 1000)
+    }
+
+    // Add highlight animation style
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes admin-highlight-pulse {
+        0%, 100% { outline-color: #f97316; }
+        50% { outline-color: #ea580c; }
+      }
+    `
+    document.head.appendChild(style)
+  })
 </script>
+
+<style>
+.highlight-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);
+  z-index: 9999;
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+</style>
 

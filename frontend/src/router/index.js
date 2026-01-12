@@ -195,6 +195,62 @@ const router = createRouter({
       component: () => import('@/views/ContactView.vue'),
       meta: { title: 'Contact Us - Spacefurnio' }
     },
+
+    // ===========================================
+    // ADMIN PANEL
+    // ===========================================
+    {
+      path: '/admin-spacefurnio',
+      name: 'Admin',
+      component: () => import('@/views/AdminView.vue'),
+      meta: {
+        title: 'Admin Panel - Spacefurnio',
+        hideNav: true,
+        hideFooter: true
+      },
+      children: [
+        {
+          path: '',
+          redirect: '/admin-spacefurnio/contents'
+        },
+        {
+          path: 'dashboard',
+          name: 'AdminDashboard',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Dashboard' }
+        },
+        {
+          path: 'contents',
+          name: 'AdminContents',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Content Management' }
+        },
+        {
+          path: 'products',
+          name: 'AdminProducts',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Products' }
+        },
+        {
+          path: 'orders',
+          name: 'AdminOrders',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Orders' }
+        },
+        {
+          path: 'reviews',
+          name: 'AdminReviews',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Reviews' }
+        },
+        {
+          path: 'settings',
+          name: 'AdminSettings',
+          component: () => import('@/views/admin/AdminContentsPage.vue'),
+          meta: { title: 'Settings' }
+        }
+      ]
+    },
   ],
 })
 

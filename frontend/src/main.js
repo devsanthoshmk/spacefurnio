@@ -9,6 +9,7 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura' // ✅ Aura preset (light/dark built-in)
 import AnimateOnScroll from 'primevue/animateonscroll'
+import ToastService from 'primevue/toastservice'
 
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -18,6 +19,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(ToastService)
 app.directive('animateonscroll', AnimateOnScroll)
 app.use(PrimeVue, {
   theme: {
@@ -33,3 +35,4 @@ app.use(PrimeVue, {
 app.mount('#app')
 
 AOS.init()
+
