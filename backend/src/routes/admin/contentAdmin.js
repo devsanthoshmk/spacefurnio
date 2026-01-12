@@ -116,7 +116,7 @@ function generateJsContentFile(content) {
 // VERIFY PASSCODE AND GET PAT TOKEN
 // ===========================================
 router.post('/verify', async (request) => {
-    console.log('Content admin verify request received');
+    // console.log('Content admin verify request received');
     const { env } = request;
 
     let body;

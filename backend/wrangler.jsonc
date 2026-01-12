@@ -6,11 +6,10 @@
 	"observability": {
 		"enabled": true
 	},
-	// Smart Placement - routes to region closest to database
 	"placement": {
 		"mode": "smart"
 	},
-	// Environment Variables (non-sensitive)
+	// Dev (local) vars
 	"vars": {
 		"FRONTEND_URL": "http://localhost:5173",
 		"JWT_ISSUER": "spacefurnio-api",
@@ -20,9 +19,6 @@
 		"RAZORPAY_KEY_ID": "rzp_test_xxx",
 		"EMAIL_FROM": "Spacefurnio <noreply@spacefurnio.in>"
 	},
-	// Secrets (set via `wrangler secret put`):
-	// - RESEND_API_KEY: Your Resend API key
-	// KV Namespaces for caching and rate limiting
 	"kv_namespaces": [
 		{
 			"binding": "CACHE",
@@ -38,30 +34,69 @@
 			"id": "e55f50a5c1714b37b80a1fdc70c46b4c"
 		}
 	],
-	// Production environment
 	"env": {
 		"staging": {
 			"vars": {
-				"FRONTEND_URL": "https://staging.spacefurnio.in"
-			}
+				"FRONTEND_URL": "https://staging.spacefurnio.in",
+				"JWT_ISSUER": "spacefurnio-api",
+				"JWT_AUDIENCE": "spacefurnio-users",
+				"JWT_EXPIRY_HOURS": "168",
+				"MAGIC_LINK_EXPIRY_MINS": "15",
+				"RAZORPAY_KEY_ID": "rzp_live_xxx",
+				"EMAIL_FROM": "Spacefurnio <noreply@spacefurnio.in>"
+			},
+			"kv_namespaces": [
+				{
+					"binding": "CACHE",
+					"id": "CACHE_STAGING_ID_HERE",
+					"remote": true
+				},
+				{
+					"binding": "RATE_LIMIT",
+					"id": "RATE_LIMIT_STAGING_ID_HERE",
+					"remote": true
+				},
+				{
+					"binding": "ADMIN_SECRETS",
+					"id": "STAGING_ADMIN_SECRETS_ID_HERE",
+					"remote": true
+				}
+			]
 		},
 		"production": {
 			"vars": {
-				"FRONTEND_URL": "https://spacefurnio.in"
+				"FRONTEND_URL": "https://spacefurnio.in",
+				"JWT_ISSUER": "spacefurnio-api",
+				"JWT_AUDIENCE": "spacefurnio-users",
+				"JWT_EXPIRY_HOURS": "168",
+				"MAGIC_LINK_EXPIRY_MINS": "15",
+				"RAZORPAY_KEY_ID": "rzp_live_xxx",
+				"EMAIL_FROM": "Spacefurnio <noreply@spacefurnio.in>"
 			},
 			"routes": [
 				{
-					"pattern": "api.spacefurnio.in/*",
+					"pattern": "spacefurnio.in/backend/*",
 					"zone_name": "spacefurnio.in"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "RATE_LIMIT",
+					"id": "9a96f916131b47fea1a58b5e11984f77",
+					"remote": true
+				},
+				{
+					"binding": "ADMIN_SECRETS",
+					"id": "f45b292aa15f4af6a197974c46d06e16",
+					"remote": true
+				},
+				{
+					"binding": "CACHE",
+					"id": "d12c5e348a6e4067ad3456af4b0961d6",
+					"remote": true
 				}
 			]
 		}
-	}
-	// SECRETS (set via wrangler secret put):
-	// - DATABASE_URL: Neon PostgreSQL connection string
-	// - JWT_SECRET: Secret for signing JWTs (min 32 chars)
-	// - GOOGLE_CLIENT_ID: Google OAuth client ID
-	// - GOOGLE_CLIENT_SECRET: Google OAuth client secret
-	// - RAZORPAY_KEY_SECRET: Razorpay secret key
-	// - ADMIN_SECURITY_CODE: Admin access verification code
+	},
+	"preview_urls": true
 }
