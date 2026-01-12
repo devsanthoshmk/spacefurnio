@@ -36,6 +36,11 @@ const componentsToRender = computed(() => {
   return [props.componentName];
 });
 
+// // test done
+// watch(componentsToRender, (newVal) => {
+//   console.info('Components to render changed:', newVal);
+// });
+
 // Current component import function based on active tab
 const currentComponentLoader = computed(() => {
   return componentsToRender.value[activeTab.value] || null;
@@ -60,7 +65,7 @@ const loadedComponent = shallowRef(null);
 // Load and render component by calling the import function directly
 async function loadComponent() {
   const loader = currentComponentLoader.value;
-  
+
   if (!loader || typeof loader !== 'function') {
     loadedComponent.value = null;
     isLoading.value = false;
@@ -73,10 +78,10 @@ async function loadComponent() {
     // Call the arrow function directly to import the component
     const module = await loader();
     loadedComponent.value = module.default;
-    
+
     // Wait for next tick to ensure component is rendered
     await nextTick();
-    
+
     // Small delay to ensure DOM is fully rendered
     setTimeout(() => {
       highlightElement();
@@ -109,7 +114,7 @@ function highlightElement() {
     element.style.outline = '3px solid #f97316';
     element.style.outlineOffset = '4px';
     element.style.animation = 'pulse-highlight 1.5s ease-in-out infinite';
-    
+
     // Scroll into view
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -200,17 +205,17 @@ watch(activeTab, () => {
             </div>
 
             <!-- Preview Container -->
-            <div 
-              ref="previewContainer" 
+            <div
+              ref="previewContainer"
               class="preview-container"
               :class="{ 'scrollable': !isLoading }"
             >
-              <component 
-                v-if="loadedComponent && !isLoading" 
-                :is="loadedComponent" 
+              <component
+                v-if="loadedComponent && !isLoading"
+                :is="loadedComponent"
                 class="preview-component"
               />
-              
+
               <!-- Fallback if no component -->
               <div v-if="!loadedComponent && !isLoading" class="no-component">
                 <i class="pi pi-exclamation-circle"></i>

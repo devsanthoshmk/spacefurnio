@@ -3,9 +3,9 @@
  * AdminLayout.vue - Sidebar layout with navigation
  * Inspired by the reference design - clean, modern admin panel
  */
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Button from 'primevue/button';
+// import Button from 'primevue/button';
 
 const props = defineProps({
   patToken: {
@@ -25,55 +25,55 @@ const isMobileMenuOpen = ref(false);
 
 // Navigation items
 const navItems = [
-  { 
-    id: 'dashboard', 
-    label: 'Dashboard', 
-    icon: 'pi-th-large', 
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: 'pi-th-large',
     route: '/admin-spacefurnio/dashboard',
     disabled: true
   },
-  { 
-    id: 'products', 
-    label: 'Products', 
-    icon: 'pi-box', 
+  {
+    id: 'products',
+    label: 'Products',
+    icon: 'pi-box',
     route: '/admin-spacefurnio/products',
     disabled: true
   },
-  { 
-    id: 'contents', 
-    label: 'Contents', 
-    icon: 'pi-file-edit', 
+  {
+    id: 'contents',
+    label: 'Contents',
+    icon: 'pi-file-edit',
     route: '/admin-spacefurnio/contents',
     disabled: false
   },
-  { 
-    id: 'orders', 
-    label: 'Orders', 
-    icon: 'pi-shopping-cart', 
+  {
+    id: 'orders',
+    label: 'Orders',
+    icon: 'pi-shopping-cart',
     route: '/admin-spacefurnio/orders',
     disabled: true
   },
-  { 
-    id: 'reviews', 
-    label: 'Reviews', 
-    icon: 'pi-star', 
+  {
+    id: 'reviews',
+    label: 'Reviews',
+    icon: 'pi-star',
     route: '/admin-spacefurnio/reviews',
     disabled: true
   },
-  { 
-    id: 'analytics', 
-    label: 'Analytics', 
-    icon: 'pi-chart-line', 
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    icon: 'pi-chart-line',
     route: '/admin-spacefurnio/analytics',
     disabled: true
   }
 ];
 
 const bottomNavItems = [
-  { 
-    id: 'settings', 
-    label: 'Settings', 
-    icon: 'pi-cog', 
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: 'pi-cog',
     route: '/admin-spacefurnio/settings',
     disabled: true
   }
@@ -143,12 +143,12 @@ function handleLogout() {
       <!-- Main Navigation -->
       <nav class="sidebar-nav">
         <ul class="nav-list">
-          <li 
-            v-for="item in navItems" 
+          <li
+            v-for="item in navItems"
             :key="item.id"
             class="nav-item"
-            :class="{ 
-              active: isActive(item), 
+            :class="{
+              active: isActive(item),
               disabled: item.disabled,
               collapsed: isSidebarCollapsed
             }"
@@ -165,12 +165,12 @@ function handleLogout() {
 
         <!-- Bottom Navigation -->
         <ul class="nav-list nav-bottom">
-          <li 
-            v-for="item in bottomNavItems" 
+          <li
+            v-for="item in bottomNavItems"
             :key="item.id"
             class="nav-item"
-            :class="{ 
-              active: isActive(item), 
+            :class="{
+              active: isActive(item),
               disabled: item.disabled,
               collapsed: isSidebarCollapsed
             }"
@@ -196,8 +196,8 @@ function handleLogout() {
     </aside>
 
     <!-- Mobile Overlay -->
-    <div 
-      v-if="isMobileMenuOpen" 
+    <div
+      v-if="isMobileMenuOpen"
       class="mobile-overlay"
       @click="toggleMobileMenu"
     ></div>
@@ -221,7 +221,7 @@ function handleLogout() {
 
       <!-- Content Area -->
       <div class="content-area">
-        <router-view :pat-token="patToken" />
+        <router-view :pat-token="props.patToken" />
       </div>
     </main>
   </div>
