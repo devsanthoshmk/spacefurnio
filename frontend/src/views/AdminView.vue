@@ -22,7 +22,7 @@ const patToken = ref('');
 const errorMessage = ref('');
 
 // API base URL
-const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend/';
+const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend';
 
 // Check for existing session on mount
 onMounted(() => {
