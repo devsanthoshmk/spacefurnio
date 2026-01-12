@@ -1,5 +1,5 @@
 <script setup>
-import homePageText from '@/assets/contents/homePage.json'
+import homePageText from '@/assets/contents/homePage.js'
 </script>
 
 <template>
@@ -12,7 +12,7 @@ import homePageText from '@/assets/contents/homePage.json'
           id="text-1"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700"
           data-key="scroll_text_1">
-          {{ homePageText.scroll_text_1 }}
+          {{ homePageText.scroll_text_1.text }}
         </div>
       </div>
     </div>
@@ -25,7 +25,7 @@ import homePageText from '@/assets/contents/homePage.json'
           id="text-2"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1"
           data-key="scroll_text_2">
-          {{ homePageText.scroll_text_2 }}
+          {{ homePageText.scroll_text_2.text }}
         </div>
       </div>
     </div>

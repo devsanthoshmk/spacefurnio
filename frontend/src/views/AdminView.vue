@@ -22,7 +22,7 @@ const patToken = ref('');
 const errorMessage = ref('');
 
 // API base URL
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://spacefurnio.in/api';
+const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend';
 
 // Check for existing session on mount
 onMounted(() => {
@@ -44,7 +44,7 @@ async function verifyPasscode() {
   errorMessage.value = '';
 
   try {
-    const response = await fetch(`${API_BASE}/v1/admin/content/verify`, {
+    const response = await fetch(`${API_BASE}/api/v1/admin/content/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -101,10 +101,10 @@ function handleKeypress(e) {
 
 <template>
   <Toast />
-  
+
   <!-- Authenticated: Show Admin Layout -->
-  <AdminLayout 
-    v-if="isAuthenticated" 
+  <AdminLayout
+    v-if="isAuthenticated"
     :pat-token="patToken"
     @logout="logout"
   />
@@ -192,7 +192,7 @@ function handleKeypress(e) {
   max-width: 420px;
   position: relative;
   z-index: 10;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.05);
 }

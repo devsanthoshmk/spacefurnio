@@ -4,7 +4,7 @@
     <div class="section-header">
       <div class="header-decoration header-decoration--left"></div>
       <h2 class="section-title phitagate-font" data-key="product_section_heading">
-        {{ homePageText.product_section_heading }}
+        {{ homePageText.product_section_heading.text }}
       </h2>
       <div class="header-decoration header-decoration--right"></div>
     </div>
@@ -66,7 +66,7 @@
                 <!-- Glass card -->
                 <div class="glass-card">
                   <i class="pi pi-clock coming-soon-icon"></i>
-                  <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon }}</span>
+                  <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon.text }}</span>
                   <div class="sparkle-line"></div>
                 </div>
               </div>
@@ -100,7 +100,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import Button from 'primevue/button'
 import ProductCard from '@/components/shop/ProductCard.vue'
-import homePageText from '@/assets/contents/homePage.json'
+import homePageText from '@/assets/contents/homePage.js'
 
 // Reactive references
 const productsGrid = ref(null)

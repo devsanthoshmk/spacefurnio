@@ -7,7 +7,7 @@ import Button from 'primevue/button';
 import FooterComponent from '@/components/Footer-component.vue'
 import { scroller } from '@/utills/customScroll.js';
 import { inject } from 'vue';
-import homePageText from '@/assets/contents/homePage.json';
+import homePageText from '@/assets/contents/homePage.js';
 
 const { showNav } = inject('navShowUtils');
 
@@ -24,22 +24,22 @@ const navDotsContainer = ref(null)
 const newArrivalImages = [
   {
     src: "https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: homePageText.new_arrival_alt_1,
+    alt: homePageText.new_arrival_alt_1.text,
     altKey: "new_arrival_alt_1"
   },
   {
     src: "https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: homePageText.new_arrival_alt_2,
+    alt: homePageText.new_arrival_alt_2.text,
     altKey: "new_arrival_alt_2"
   },
   {
     src: "https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: homePageText.new_arrival_alt_3,
+    alt: homePageText.new_arrival_alt_3.text,
     altKey: "new_arrival_alt_3"
   },
   {
     src: "https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    alt: homePageText.new_arrival_alt_4,
+    alt: homePageText.new_arrival_alt_4.text,
     altKey: "new_arrival_alt_4"
   }
 ];
@@ -91,10 +91,10 @@ onMounted(() => {
               <div ref="taglineRef" class="text-center lg:mb-40"
                 v-animateonscroll="{ enterClass: 'animate-zoomin', leaveClass: 'animate-zoomout', delay: 600 }">
                 <h1 class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] text-white drop-shadow-2xl tracking-wide font-extrabold" data-key="hero_brand_name">
-                  {{ homePageText.hero_brand_name }}
+                  {{ homePageText.hero_brand_name.text }}
                 </h1>
                 <p class="phitagate-font text-[clamp(1.5rem,2.3vw,4.05rem)] mt-[0.3dvh] text-white italic drop-shadow-xl tracking-widest leading-10 font-medium" data-key="hero_tagline">
-                  {{ homePageText.hero_tagline }}
+                  {{ homePageText.hero_tagline.text }}
                 </p>
                 <div class="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"></div>
               </div>
@@ -108,7 +108,7 @@ onMounted(() => {
             <!-- Header -->
             <div class="new-arrivals-header">
               <h2 class="text-gray-800 font-bold text-base xl:text-lg text-center font-['Montserrat']" data-key="new_arrivals_heading">
-                {{ homePageText.new_arrivals_heading }}
+                {{ homePageText.new_arrivals_heading.text }}
               </h2>
             </div>
 
@@ -137,7 +137,7 @@ onMounted(() => {
                       <!-- Glass card -->
                       <div class="glass-card">
                         <i class="pi pi-clock text-lg text-orange-400 mb-1 animate-pulse"></i>
-                        <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon }}</span>
+                        <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon.text }}</span>
                         <div class="sparkle-line"></div>
                       </div>
                     </div>
@@ -154,8 +154,8 @@ onMounted(() => {
             <div ref="ctaRef" class="cta-section"
               v-animateonscroll="{ enterClass: 'animate-fadeup', leaveClass: 'animate-fadedown', delay: 1000 }">
               <p class="text-xs xl:text-sm font-semibold text-gray-800 mb-2 font-['Montserrat'] leading-tight text-center">
-                <span data-key="cta_line_1">{{ homePageText.cta_line_1 }}</span><br />
-                <span class="text-orange-500" data-key="cta_line_2">{{ homePageText.cta_line_2 }}</span>
+                <span data-key="cta_line_1">{{ homePageText.cta_line_1.text }}</span><br />
+                <span class="text-orange-500" data-key="cta_line_2">{{ homePageText.cta_line_2.text }}</span>
               </p>
 
               <!-- Elegant Button -->
@@ -165,7 +165,7 @@ onMounted(() => {
                     class="grab-now-button bg-gradient-to-r from-orange-500 to-orange-600 border-none text-white px-4 py-1.5 xl:px-5 xl:py-2 rounded-full font-medium text-xs shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <span class="relative z-10 flex items-center gap-2">
                       <i class="pi pi-bolt text-xs"></i>
-                      <span data-key="grab_now_button">{{ homePageText.grab_now_button }}</span>
+                      <span data-key="grab_now_button">{{ homePageText.grab_now_button.text }}</span>
                       <i class="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
                     </span>
                   </Button>

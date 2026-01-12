@@ -12,7 +12,7 @@
 
 import { Router, json, error } from 'itty-router';
 
-const router = Router({ base: '/api/v1/admin' });
+const router = Router({ base: '/backend/api/v1/admin' });
 
 // ===========================================
 // VERIFY ADMIN ACCESS MIDDLEWARE

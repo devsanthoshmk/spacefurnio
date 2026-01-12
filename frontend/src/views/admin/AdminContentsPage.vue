@@ -11,6 +11,9 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ProgressSpinner from 'primevue/progressspinner';
 
+// Import content source files directly to get actual arrow functions for components
+import homePageContent from '@/assets/contents/homePage.js';
+
 const props = defineProps({
   patToken: {
     type: String,
@@ -21,7 +24,7 @@ const props = defineProps({
 const toast = useToast();
 
 // API base URL
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://spacefurnio.in/api';
+const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend';
 
 // State
 const isLoading = ref(true);
@@ -37,16 +40,42 @@ const hasUnsavedChanges = computed(() => Object.keys(pendingChanges.value).lengt
 const isPreviewOpen = ref(false);
 const previewKey = ref('');
 const previewUrl = ref('');
+const previewComponent = ref(null);
 
 // Page mapping for preview URLs
 const pageMapping = {
-  'homePage.json': '/'
+  'homePage.js': '/'
 };
+
+// Map of content files to their imported modules
+// Uses the local import to get actual arrow functions for component loading
+const contentSourceMap = {
+  'homePage.js': homePageContent
+};
+
+// Get component loader(s) from the original content source
+// Returns the actual arrow function(s) for dynamic imports
+// The component property can be a single function or an array showing all impacted components
+function getComponentLoader(key) {
+  const fileName = activeFile.value?.name;
+  if (!fileName || !key) return null;
+  
+  const contentSource = contentSourceMap[fileName];
+  if (!contentSource || !contentSource[key]) return null;
+  
+  const component = contentSource[key].component;
+  if (!component) return null;
+  
+  // Return the component loader(s) directly
+  // If it's an array, it means the content appears in multiple components
+  // (e.g., child component and parent component - shows full impact of changes)
+  return component;
+}
 
 // Load content files on mount
 onMounted(async () => {
   await loadContentFiles();
-  
+
   // Check for pending changes in localStorage
   const stored = localStorage.getItem('admin_pending_changes');
   if (stored) {
@@ -70,25 +99,25 @@ watch(pendingChanges, (newVal) => {
 // Load list of content files
 async function loadContentFiles() {
   isLoading.value = true;
-  
+
   try {
     const response = await fetch(
-      `${API_BASE}/v1/admin/content/files?pat=${encodeURIComponent(props.patToken)}`
+      `${API_BASE}/api/v1/admin/content/files?pat=${encodeURIComponent(props.patToken)}`
     );
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Failed to load files');
     }
-    
+
     contentFiles.value = data.files;
-    
+
     // Auto-select first file
     if (data.files.length > 0) {
       await selectFile(data.files[0]);
     }
-    
+
   } catch (err) {
     console.error('Load content files error:', err);
     toast.add({
@@ -104,30 +133,30 @@ async function loadContentFiles() {
 
 // Select and load a file
 async function selectFile(file) {
+  console.log('Selecting file:', file.name);
   if (activeFile.value?.name === file.name) return;
-  
+
   activeFile.value = file;
   isLoading.value = true;
-  
+
   try {
     const response = await fetch(
-      `${API_BASE}/v1/admin/content/files/${file.name}?pat=${encodeURIComponent(props.patToken)}`
+      `${API_BASE}/api/v1/admin/content/files/${file.name}?pat=${encodeURIComponent(props.patToken)}`
     );
-    
+
     const data = await response.json();
-    
     if (!response.ok) {
       throw new Error(data.message || 'Failed to load file');
     }
-    
+
     fileContent.value = data.content;
     fileSha.value = data.sha;
-    
+
     // Merge with any pending changes for this file
     if (pendingChanges.value[file.name]) {
       fileContent.value = { ...fileContent.value, ...pendingChanges.value[file.name] };
     }
-    
+
   } catch (err) {
     console.error('Load file error:', err);
     toast.add({
@@ -145,7 +174,7 @@ async function selectFile(file) {
 function handleValueChange(key, value) {
   // Update local content
   fileContent.value[key] = value;
-  
+
   // Track pending changes
   if (!pendingChanges.value[activeFile.value.name]) {
     pendingChanges.value[activeFile.value.name] = {};
@@ -156,11 +185,15 @@ function handleValueChange(key, value) {
 // Open preview modal
 function openPreview(key) {
   previewKey.value = key;
-  
+
   // Get the page URL for this file
   const pageUrl = pageMapping[activeFile.value?.name] || '/';
   previewUrl.value = `${window.location.origin}${pageUrl}?highlight=${key}`;
-  
+
+  // Get the component loader(s) directly from the original content source
+  // This uses the actual arrow functions defined in homePage.js
+  previewComponent.value = getComponentLoader(key);
+
   isPreviewOpen.value = true;
 }
 
@@ -169,19 +202,20 @@ function closePreview() {
   isPreviewOpen.value = false;
   previewKey.value = '';
   previewUrl.value = '';
+  previewComponent.value = null;
 }
 
 // Save changes to GitHub
 async function saveChanges() {
   if (!hasUnsavedChanges.value || !activeFile.value) return;
-  
+
   isSaving.value = true;
-  
+
   try {
     // Get the full content with merged changes
     const updatedContent = { ...fileContent.value };
-    
-    const response = await fetch(`${API_BASE}/v1/admin/content/update`, {
+
+    const response = await fetch(`${API_BASE}/api/v1/admin/content/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -194,27 +228,27 @@ async function saveChanges() {
         commitMessage: `Update content: ${Object.keys(pendingChanges.value[activeFile.value.name] || {}).join(', ')}`
       })
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Failed to save changes');
     }
-    
+
     // Update SHA for future updates
     fileSha.value = data.newSha;
-    
+
     // Clear pending changes for this file
     delete pendingChanges.value[activeFile.value.name];
     pendingChanges.value = { ...pendingChanges.value }; // Trigger reactivity
-    
+
     toast.add({
       severity: 'success',
       summary: 'Saved!',
       detail: data.message || 'Changes saved to GitHub',
       life: 5000
     });
-    
+
   } catch (err) {
     console.error('Save error:', err);
     toast.add({
@@ -231,13 +265,13 @@ async function saveChanges() {
 // Discard pending changes
 function discardChanges() {
   if (!activeFile.value) return;
-  
+
   delete pendingChanges.value[activeFile.value.name];
   pendingChanges.value = { ...pendingChanges.value };
-  
+
   // Reload file content
   selectFile(activeFile.value);
-  
+
   toast.add({
     severity: 'info',
     summary: 'Changes Discarded',
@@ -258,7 +292,7 @@ function formatFilename(filename) {
 
 <template>
   <Toast />
-  
+
   <div class="contents-page">
     <!-- Page Header -->
     <div class="page-top">
@@ -266,7 +300,7 @@ function formatFilename(filename) {
         <h2 class="section-title">Content Management</h2>
         <p class="section-subtitle">Edit website content and save to repository</p>
       </div>
-      
+
       <div class="page-actions">
         <Button
           v-if="hasUnsavedChanges"
@@ -313,8 +347,8 @@ function formatFilename(filename) {
         >
           <i class="pi pi-file"></i>
           <span>{{ formatFilename(file.name) }}</span>
-          <span 
-            v-if="pendingChanges[file.name]" 
+          <span
+            v-if="pendingChanges[file.name]"
             class="changes-indicator"
             :title="`${Object.keys(pendingChanges[file.name]).length} unsaved changes`"
           >
@@ -332,11 +366,11 @@ function formatFilename(filename) {
           @value-change="handleValueChange"
           @preview="openPreview"
         />
-        
+
         <div v-else-if="isLoading" class="loading-editor">
           <ProgressSpinner strokeWidth="4" />
         </div>
-        
+
         <div v-else class="empty-state">
           <i class="pi pi-folder-open"></i>
           <p>Select a file to edit</p>
@@ -347,7 +381,7 @@ function formatFilename(filename) {
     <!-- Preview Modal -->
     <PreviewModal
       :visible="isPreviewOpen"
-      :url="previewUrl"
+      :component-name="previewComponent"
       :highlight-key="previewKey"
       @close="closePreview"
     />

@@ -22,7 +22,7 @@ import orderRoutes from './routes/orders.js';
 import addressRoutes from './routes/addresses.js';
 import adminRoutes from './routes/admin/index.js';
 import webhookRoutes from './routes/webhooks.js';
-import contentAdminRoutes from './routes/contentAdmin.js';
+import contentAdminRoutes from './routes/admin/contentAdmin.js';
 
 // Create router
 const router = Router();
@@ -35,7 +35,7 @@ router.options('*', handleCors);
 // ===========================================
 // HEALTH CHECK
 // ===========================================
-router.get('/health', () => json({
+router.get('/backend/health', () => json({
   status: 'ok',
   timestamp: new Date().toISOString(),
   service: 'spacefurnio-api'
@@ -44,70 +44,71 @@ router.get('/health', () => json({
 // ===========================================
 // API VERSION
 // ===========================================
-router.get('/api/v1', () => json({
+router.get('/backend/api/v1', () => json({
   version: '1.0.0',
-  documentation: 'https://api.spacefurnio.in/docs',
+  documentation: 'https://spacefurnio.in/docs',
   endpoints: {
-    auth: '/api/v1/auth',
-    products: '/api/v1/products',
-    cart: '/api/v1/cart',
-    wishlist: '/api/v1/wishlist',
-    reviews: '/api/v1/reviews',
-    orders: '/api/v1/orders',
-    addresses: '/api/v1/addresses',
-    admin: '/api/v1/admin'
+    auth: '/backend/api/v1/auth',
+    products: '/backend/api/v1/products',
+    cart: '/backend/api/v1/cart',
+    wishlist: '/backend/api/v1/wishlist',
+    reviews: '/backend/api/v1/reviews',
+    orders: '/backend/api/v1/orders',
+    addresses: '/backend/api/v1/addresses',
+    admin: '/backend/api/v1/admin'
   }
 }));
 
 // ===========================================
 // AUTH ROUTES (Public)
 // ===========================================
-router.all('/api/v1/auth/*', withParams, withDb, authRoutes.handle);
+router.all('/backend/api/v1/auth/*', withParams, withDb, authRoutes.handle);
 
 // ===========================================
 // PRODUCT ROUTES (Public)
 // ===========================================
-router.all('/api/v1/products/*', withParams, withDb, withOptionalAuth, productRoutes.handle);
+router.all('/backend/api/v1/products/*', withParams, withDb, withOptionalAuth, productRoutes.handle);
 
 // ===========================================
 // CART ROUTES (Auth Optional - supports guest carts)
 // ===========================================
-router.all('/api/v1/cart/*', withParams, withDb, withOptionalAuth, cartRoutes.handle);
+router.all('/backend/api/v1/cart/*', withParams, withDb, withOptionalAuth, cartRoutes.handle);
 
 // ===========================================
 // WISHLIST ROUTES (Auth Required)
 // ===========================================
-router.all('/api/v1/wishlist/*', withParams, withDb, withAuth, wishlistRoutes.handle);
+router.all('/backend/api/v1/wishlist/*', withParams, withDb, withAuth, wishlistRoutes.handle);
 
 // ===========================================
 // REVIEW ROUTES (Mixed auth)
 // ===========================================
-router.all('/api/v1/reviews/*', withParams, withDb, withOptionalAuth, reviewRoutes.handle);
+router.all('/backend/api/v1/reviews/*', withParams, withDb, withOptionalAuth, reviewRoutes.handle);
 
 // ===========================================
 // ORDER ROUTES (Auth Required)
 // ===========================================
-router.all('/api/v1/orders/*', withParams, withDb, withAuth, orderRoutes.handle);
+router.all('/backend/api/v1/orders/*', withParams, withDb, withAuth, orderRoutes.handle);
 
 // ===========================================
 // ADDRESS ROUTES (Auth Required)
 // ===========================================
-router.all('/api/v1/addresses/*', withParams, withDb, withAuth, addressRoutes.handle);
-
-// ===========================================
-// ADMIN ROUTES (Admin Required + Security Code)
-// ===========================================
-router.all('/api/v1/admin/*', withParams, withDb, withAuth, adminRoutes.handle);
-
-// ===========================================
-// WEBHOOK ROUTES (Signature Verification)
-// ===========================================
-router.all('/api/v1/webhooks/*', withParams, withDb, webhookRoutes.handle);
+router.all('/backend/api/v1/addresses/*', withParams, withDb, withAuth, addressRoutes.handle);
 
 // ===========================================
 // CONTENT ADMIN ROUTES (Passcode Protected via KV)
 // ===========================================
-router.all('/api/v1/admin/content/*', withParams, contentAdminRoutes.handle);
+router.all('/backend/api/v1/admin/content/*', withParams, contentAdminRoutes.handle);
+
+// ===========================================
+// ADMIN ROUTES (Admin Required + Security Code)
+// ===========================================
+router.all('/backend/api/v1/admin/*', withParams, withDb, withAuth, adminRoutes.handle);
+
+// ===========================================
+// WEBHOOK ROUTES (Signature Verification)
+// ===========================================
+router.all('/backend/api/v1/webhooks/*', withParams, withDb, webhookRoutes.handle);
+
 
 // ===========================================
 // 404 HANDLER
