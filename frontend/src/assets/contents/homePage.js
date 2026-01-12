@@ -7,7 +7,7 @@
 
 export default {
     hero_brand_name: {
-        text: "Spacefurnio edited",
+        text: "Spacefurnio",
         component: () => import('@/components/home/HeroSection.vue')
     },
     hero_tagline: {
