@@ -1,7 +1,9 @@
 # Admin Panel Implementation Walkthrough
 
 ## Summary
+
 Successfully implemented a content management admin panel at `/admin-spacefurnio` with:
+
 - Passcode authentication via Cloudflare KV
 - GitHub API integration for updating content files
 - Premium, responsive UI with sidebar navigation
@@ -13,25 +15,25 @@ Successfully implemented a content management admin panel at `/admin-spacefurnio
 
 ### Backend (Cloudflare Workers)
 
-| Action | File | Description |
-|--------|------|-------------|
-| ➕ NEW | [contentAdmin.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/src/routes/contentAdmin.js) | Passcode verification, file listing, GitHub update |
-| ✏️ MODIFY | [index.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/src/index.js) | Added content admin routes import |
-| ✏️ MODIFY | [wrangler.jsonc](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/wrangler.jsonc) | Added ADMIN_SECRETS KV namespace |
+| Action    | File                                                                                                                      | Description                                        |
+| --------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| ➕ NEW    | [contentAdmin.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/src/routes/contentAdmin.js) | Passcode verification, file listing, GitHub update |
+| ✏️ MODIFY | [index.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/src/index.js)                      | Added content admin routes import                  |
+| ✏️ MODIFY | [wrangler.jsonc](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/backend/wrangler.jsonc)              | Added ADMIN_SECRETS KV namespace                   |
 
 ---
 
 ### Frontend (Vue.js)
 
-| Action | File | Description |
-|--------|------|-------------|
-| ➕ NEW | [AdminView.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/views/AdminView.vue) | Main wrapper with passcode login |
-| ➕ NEW | [AdminLayout.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/AdminLayout.vue) | Sidebar layout with navigation |
-| ➕ NEW | [AdminContentsPage.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/views/admin/AdminContentsPage.vue) | Content file management |
-| ➕ NEW | [ContentEditor.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/ContentEditor.vue) | Key-value content editor |
-| ➕ NEW | [PreviewModal.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/PreviewModal.vue) | Preview with element highlighting |
-| ✏️ MODIFY | [index.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/router/index.js) | Added admin routes |
-| ✏️ MODIFY | [App.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/App.vue) | Hide nav/footer for admin, highlight elements |
+| Action    | File                                                                                                                                        | Description                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| ➕ NEW    | [AdminView.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/views/AdminView.vue)                       | Main wrapper with passcode login              |
+| ➕ NEW    | [AdminLayout.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/AdminLayout.vue)        | Sidebar layout with navigation                |
+| ➕ NEW    | [AdminContentsPage.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/views/admin/AdminContentsPage.vue) | Content file management                       |
+| ➕ NEW    | [ContentEditor.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/ContentEditor.vue)    | Key-value content editor                      |
+| ➕ NEW    | [PreviewModal.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/components/admin/PreviewModal.vue)      | Preview with element highlighting             |
+| ✏️ MODIFY | [index.js](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/router/index.js)                                | Added admin routes                            |
+| ✏️ MODIFY | [App.vue](file:///home/santhoshmk/EDUCATION%20CONTENT/Freelancing/spacefurnio/frontend/src/App.vue)                                         | Hide nav/footer for admin, highlight elements |
 
 ---
 
@@ -47,6 +49,7 @@ npx wrangler kv:namespace create ADMIN_SECRETS
 ```
 
 This will output something like:
+
 ```
 ⛅ wrangler 3.x.x
 🌀 Creating namespace ADMIN_SECRETS...
@@ -60,8 +63,8 @@ Replace `ADMIN_SECRETS_KV_ID_HERE` in your `wrangler.jsonc` with the actual ID f
 
 ```jsonc
 {
-  "binding": "ADMIN_SECRETS",
-  "id": "paste-your-actual-id-here"
+	"binding": "ADMIN_SECRETS",
+	"id": "paste-your-actual-id-here"
 }
 ```
 
@@ -80,7 +83,7 @@ Run this command to store your passcode and PAT token:
 
 ```bash
 cd backend
-npx wrangler kv:key put --binding ADMIN_SECRETS "admin-spacefunio.in" '{"pat":"<github-token>","repo":"devsanthoshmk/spacefurnio","branch":"main"}'
+npx wrangler kv:key put --binding ADMIN_SECRETS "admin-spacefunio.in" '{"pat":"<git_pat>","repo":"devsanthoshmk/spacefurnio","branch":"main"}'
 ```
 
 > [!IMPORTANT]
@@ -157,6 +160,7 @@ flowchart LR
 ## Screenshots
 
 The admin panel features:
+
 - Clean, modern sidebar with icons
 - Premium passcode login screen
 - Grid-based content editor
@@ -168,6 +172,7 @@ The admin panel features:
 ## Security Notes
 
 > [!CAUTION]
+>
 > - The PAT token has repository write access
 > - Store the passcode securely
 > - Rotate the PAT token periodically
