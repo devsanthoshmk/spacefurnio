@@ -1,7 +1,10 @@
 /**
- * Home page content configuration
- * Contains text content and component import functions for each content key
+ * Home Page Content Configuration
+ * Each content key contains:
+ *   - text: The content value
+ *   - component: Arrow function(s) to dynamically import the component(s) that use this content
  */
+
 export default {
     hero_brand_name: {
         text: "Spacefurnio",
