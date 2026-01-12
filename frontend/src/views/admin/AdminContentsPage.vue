@@ -74,9 +74,7 @@ function getComponentLoader(key) {
 
 // Load content files on mount
 onMounted(async () => {
-  await loadContentFiles();
-
-  // Check for pending changes in localStorage
+  // Check for pending changes in localStorage FIRST
   const stored = localStorage.getItem('admin_pending_changes');
   if (stored) {
     try {
@@ -85,6 +83,8 @@ onMounted(async () => {
       console.error('Failed to parse stored changes:', e);
     }
   }
+
+  await loadContentFiles();
 });
 
 // Watch pending changes and save to localStorage
@@ -94,6 +94,8 @@ watch(pendingChanges, (newVal) => {
   } else {
     localStorage.removeItem('admin_pending_changes');
   }
+  // Trigger update for reactive content files
+  window.dispatchEvent(new Event('content:update'));
 }, { deep: true });
 
 // Load list of content files
@@ -173,9 +175,15 @@ async function selectFile(file) {
 // Handle value change from editor
 function handleValueChange(key, value) {
   // Update local content
-  fileContent.value[key] = value;
+  // We recreate the object to ensure Vue detects the change and propagates it to ContentEditor props
+  fileContent.value = {
+    ...fileContent.value,
+    [key]: value
+  };
 
   // Track pending changes
+  if (!activeFile.value) return;
+  
   if (!pendingChanges.value[activeFile.value.name]) {
     pendingChanges.value[activeFile.value.name] = {};
   }
