@@ -5,7 +5,7 @@ import homePageText from '@/assets/contents/homePage.js'
 <template>
   <section>
     <!-- Panel 1 -->
-    <div class="scroll-section h-[100dvh]">
+    <div class="h-[100dvh]">
       <div
         class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative">
         <div
