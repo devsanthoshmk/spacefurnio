@@ -36,86 +36,91 @@
       </div>
     </section>
 
-    <section class="scroll-section relative w-full h-screen overflow-hidden">
-      <!-- Background -->
-      <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.png')]"></div>
+      <section class="scroll-section relative w-full h-screen overflow-hidden">
+        <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.png')]"></div>
 
-      <!-- Overlay text (permanently placed inside curve) -->
-      <div class="absolute text-center px-3 py-2 rounded-lg" :style="{
-        left: '54.42%',
-        top: '37.98%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: 'rgb(255, 244, 236)',
-      }">
-        <h2
-          class="font-serif text-[clamp(0.8rem,1.6vw,1.3rem)] md:text-[clamp(1rem,2vw,1.6rem)] leading-snug text-gray-800">
-          Where lines meet light,<br />
-          and function meets soul,<br />
-          you’ll find us –<br />
-          blending vision with reality &<br />
-          creativity with living.
-        </h2>
+        <!-- Overlay text (permanently placed inside curve) -->
+        <div class="absolute text-center px-5 py-4 rounded-xl" :style="{
+  left: '54.42%',
+  top: '37.98%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'rgb(255, 244, 236)',
+  width: 'max-content',
+  maxWidth: '85%'
+}">
+  <h2
+    class="font-serif leading-tight text-gray-900
+    text-[clamp(1.1rem,3.5vw,1.5rem)]
+    md:text-[clamp(1.4rem,2.5vw,2.2rem)]">
+    Where lines meet light,<br />
+    and function meets soul,<br />
+    you’ll find us –<br />
+    blending vision with reality &<br />
+    creativity with living.
+  </h2>
 
-        <p class="mt-2 text-[clamp(1rem,2vw,1.35rem)] text-gray-700 leading-snug">
-          Every corner crafted.<br />
-          Every piece with purpose.<br />
-          Because your space deserves<br />
-          more than structure,<br />
-          <span class="font-script italic text-[clamp(0.8rem,1.6vw,1.3rem)] md:text-[clamp(1rem,2vw,1.6rem)] font-bold">it
-            deserves a story.</span>
-        </p>
-      </div>
-
-
-      <!-- Left side rotated label -->
-      <div class="relative h-[calc(100vh+109.5px)] w-full">
-        <div
-          class="phitagate-font text-black font-semibold text-[19vh] absolute left-0 top-1/2 whitespace-nowrap origin-top-left"
-          :style="{ transform: `rotate(-90deg) translateY(${brandManifestoTranslateY}) translateX(-44%)` }">
-          Brand Manifesto
+  <p class="mt-3 font-medium text-gray-800 leading-snug
+    text-[clamp(0.95rem,2vw,1.3rem)]">
+    Every corner crafted.<br />
+    Every piece with purpose.<br />
+    Because your space deserves<br />
+    more than structure,<br />
+    <span class="block mt-1 font-script italic font-extrabold text-gray-900
+      text-[1.3em] leading-normal">
+      it deserves a story.
+    </span>
+  </p>
+</div>
+        <div class="absolute top-[35%] left-1/2 "
+              style="transform: translateX(calc(-35.41vw)); /* REPLACE -35.41 WITH YOUR MATH */"
+            >
+              <div class="phitagate-font text-black font-semibold text-[19vh] whitespace-nowrap origin-center brand-manifesto">
+            Brand&#x20;Manifesto
+          </div>
         </div>
-      </div>
-
-
     </section>
+
     <section class="scroll-section relative w-full h-screen overflow-hidden">
       <!-- Background -->
       <div class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/3.png')]"></div>
 
-      <!-- Overlay text (permanently placed inside curve) -->
-      <div class="absolute text-center px-3 py-2 rounded-lg" :style="{
-        left: '45%',
-        top: '67%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: 'rgb(255, 244, 236)',
-      }">
-        <h2
-          class="font-serif text-[clamp(1rem,2vw,1.5rem)] md:text-[clamp(1.2rem,2.5vw,2rem)] leading-snug text-gray-800">
-          At <span class="font-bold">Spacefurnio</span>,<br />
-          we believe that great design is where<br />
-          <span class="font-script italic">creativity meets living.</span>
-        </h2>
+      <div class="absolute text-center px-6 py-4 rounded-xl" :style="{
+  left: '45%',
+  top: '67%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'rgb(255, 244, 236)',
+  width: 'max-content',
+  maxWidth: '90%'
+}">
+  <h2
+    class="font-serif leading-tight text-gray-900
+    text-[clamp(1.1rem,4vw,1.6rem)]
+    md:text-[clamp(1.5rem,2.5vw,2.5rem)]">
+    At <span class="font-extrabold tracking-wide">Spacefurnio</span>,<br />
+    we believe that great design is where<br />
+    <span class="font-script italic font-bold text-[1.2em]">creativity meets living.</span>
+  </h2>
 
-        <p class="mt-3 text-[clamp(0.9rem,1.8vw,1.25rem)] text-gray-700 leading-snug">
-          We exist to transform everyday spaces into<br />
-          thoughtful experiences by fusing imaginative<br />
-          design, precision craftsmanship, and<br />
-          sustainable practices. From architecture<br />
-          and interiors to product design and<br />
-          furniture manufacturing, we bring<br />
-          creative ideas to life so people can<br />
-          live beautifully, functionally,<br />
-          and meaningfully.
-        </p>
-      </div>
+  <p class="mt-4 font-medium text-gray-800 leading-snug
+    text-[clamp(0.95rem,2vw,1.4rem)]">
+    We exist to transform everyday spaces into<br />
+    thoughtful experiences by fusing imaginative<br />
+    design, precision craftsmanship, and<br />
+    sustainable practices. From architecture<br />
+    and interiors to product design and<br />
+    furniture manufacturing, we bring<br />
+    creative ideas to life so people can<br />
+    live beautifully, functionally,<br />
+    and meaningfully.
+  </p>
+</div>
 
 
       <!-- Right side rotated label -->
-      <div class="relative h-[calc(100vh)] w-full">
-        <div class="phitagate-font text-black font-semibold absolute right-0 top-1/2 whitespace-nowrap origin-top-right"
-          :style="{ transform: `rotate(90deg) translateY(${missionStatementTranslateY}) translateX(50%)`, fontSize: '17.5vh' }">
-          Mission Statement
-        </div>
+      <div class="absolute top-[35%] right-1/2 " style="transform: translateX(calc(35.41vw)); /* REPLACE -35.41 WITH YOUR MATH */">
+        <div class="phitagate-font text-black font-semibold text-[17vh] whitespace-nowrap origin-center mission-statement">
+            Mission&#x20;Statement
+          </div>
       </div>
     </section>
     <div class="scroll-section h-screen w-full relative">
@@ -303,14 +308,272 @@
 </style>
 
 <style scoped>
-  #scroll-wrapper {
+  #scroll-container {
+    /* YOUR EXACT DATA */
+    --img-width: 3061;
+    --img-height: 2168;
+    --line-offset: -4; /* Taken from your "-4vw" code */
+
+    /* AUTOMATIC CALCULATION */
+    --img-ar: calc(var(--img-width) / var(--img-height));
+  }
+
+  /* DEFAULT: Screen is WIDER than image (Use VW) */
+  .brand-manifesto {
+    /* Matches your working code: translateX(calc(-50% - 4vw)) */
+    transform: translateX(calc(-50% + (var(--line-offset) * 1vw))) rotate(-90deg);
+  }
+
+  /* MOBILE/NARROW: Screen is NARROWER than image (Switch to VH) */
+  @media (max-aspect-ratio: 3061/2168) {
+    .brand-manifesto {
+      /* Calculates the width based on height to keep text pinned to the line */
+      transform: translateX(calc(-50% + (var(--line-offset) * var(--img-ar) * 1vh))) rotate(-90deg);
+    }
+  }
+  /* same calculations for mission-statement */
+  .mission-statement {
+    /* Matches your working code: translateX(calc(-50% - 4vw)) */
+    transform: translateX(calc(0.5% - (-50% + (var(--line-offset) * 1vw)))) rotate(90deg);
+  }
+
+  /* MOBILE/NARROW: Screen is NARROWER than image (Switch to VH) */
+  @media (max-aspect-ratio: 3061/2168) {
+    .mission-statement {
+      /* Calculates the width based on height to keep text pinned to the line */
+      transform: translateX(calc(0.5% - (-50% + (var(--line-offset) * var(--img-ar) * 1vh)))) rotate(90deg);
+    }
+  }
+  /* same calculations for mission-statement */
+
+/* ELEGANT DESIGN with curved trails for narrow/tall screens */
+  @media (max-aspect-ratio: 1816/1280) {
+    /* Hide the original rotated text labels */
+    .brand-manifesto {
+      display: none;
+    }
+    .mission-statement {
+      display: none;
+    }
+    
+    /* ========== BRAND MANIFESTO SECTION ========== */
+    .scroll-section:has(.brand-manifesto) {
+      background: #f8f4f0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Hide original background image */
+    .scroll-section:has(.brand-manifesto) > div:first-child {
+      display: none;
+    }
+    
+    /* Curved trail - Top right flowing wave */
+    .scroll-section:has(.brand-manifesto)::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      right: -20%;
+      width: 80%;
+      height: 60%;
+      background: #b8aba3;
+      border-radius: 0 0 0 100%;
+      transform: rotate(-15deg);
+      z-index: 1;
+    }
+    
+    /* Curved trail - Bottom left flowing wave */
+    .scroll-section:has(.brand-manifesto)::after {
+      content: '';
+      position: absolute;
+      bottom: -15%;
+      left: -25%;
+      width: 90%;
+      height: 50%;
+      background: #c4b8b0;
+      border-radius: 0 100% 0 0;
+      transform: rotate(10deg);
+      z-index: 1;
+    }
+    
+    /* Content card positioning with rotated heading outside */
+    .scroll-section:has(.brand-manifesto) > div:nth-child(2) {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      background: #f8f4f0 !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border-radius: 20px !important;
+      padding: 2.5rem 2rem !important;
+      max-width: 80% !important;
+      width: auto !important;
+      z-index: 5;
+      margin-top: 5vh;
+      margin-left: 5.5rem; /* Increased margin to fit larger label */
+      min-height: 50vh; /* Ensure height for label */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    /* Improved text readability */
+    .scroll-section:has(.brand-manifesto) > div:nth-child(2) h2 {
+      font-size: clamp(1.2rem, 4vw, 1.8rem) !important;
+      line-height: 1.4 !important;
+    }
+    
+    .scroll-section:has(.brand-manifesto) > div:nth-child(2) p {
+      font-size: clamp(0.95rem, 3.5vw, 1.3rem) !important;
+      line-height: 1.6 !important;
+      margin-top: 1rem !important;
+    }
+    
+    /* Rotated heading on left side - positioned outside container */
+    .scroll-section:has(.brand-manifesto) > div:nth-child(2)::before {
+      content: 'Brand Manifesto';
+      position: absolute;
+      left: -3.25rem; /* Adjusted for mobile fit */
+      top: 50%;
+      transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+      transform-origin: center center;
+      font-family: 'Phitagate', serif;
+      font-size: clamp(2.5rem, 10vw, 4rem); /* Significantly Increased size */
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      z-index: 10;
+      text-decoration: underline;
+      text-decoration-color: #8b7355;
+      text-decoration-thickness: 4px;
+      text-underline-offset: 12px;
+      background: transparent; 
+       text-shadow: none;
+    }
+    
+    /* Hide the original heading container div */
+    .scroll-section:has(.brand-manifesto) > div:nth-child(3) {
+      display: none !important;
+    }
+    
+    /* ========== MISSION STATEMENT SECTION ========== */
+    .scroll-section:has(.mission-statement) {
+      background: #f8f4f0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Hide original background image */
+    .scroll-section:has(.mission-statement) > div:first-child {
+      display: none;
+    }
+    
+    /* Curved trail - Top left flowing wave */
+    .scroll-section:has(.mission-statement)::before {
+      content: '';
+      position: absolute;
+      top: -15%;
+      left: -20%;
+      width: 85%;
+      height: 55%;
+      background: #c4b8b0;
+      border-radius: 0 0 100% 0;
+      transform: rotate(12deg);
+      z-index: 1;
+    }
+    
+    /* Curved trail - Bottom right flowing wave */
+    .scroll-section:has(.mission-statement)::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -25%;
+      width: 95%;
+      height: 55%;
+      background: #b8aba3;
+      border-radius: 100% 0 0 0;
+      transform: rotate(-8deg);
+      z-index: 1;
+    }
+    
+    /* Content card positioning with rotated heading outside */
+    .scroll-section:has(.mission-statement) > div:nth-child(2) {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      background: #f8f4f0 !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border-radius: 20px !important;
+      padding: 2.5rem 2rem !important;
+      max-width: 80% !important;
+      width: auto !important;
+      z-index: 5;
+      margin-top: 5vh;
+      margin-left: 5.5rem; /* Increased margin */
+      min-height: 50vh; /* Ensure height */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    /* Improved text readability */
+    .scroll-section:has(.mission-statement) > div:nth-child(2) h2 {
+      font-size: clamp(1.2rem, 4vw, 1.8rem) !important;
+      line-height: 1.4 !important;
+    }
+    
+    .scroll-section:has(.mission-statement) > div:nth-child(2) p {
+      font-size: clamp(0.95rem, 3.5vw, 1.3rem) !important;
+      line-height: 1.6 !important;
+      margin-top: 1rem !important;
+    }
+    
+    /* Rotated heading on left side - positioned outside container */
+    .scroll-section:has(.mission-statement) > div:nth-child(2)::before {
+      content: 'Mission Statement';
+      position: absolute;
+      left: -3.25rem; /* Adjusted for mobile fit */
+      top: 50%;
+      transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+      transform-origin: center center;
+      font-family: 'Phitagate', serif;
+      font-size: clamp(2.5rem, 10vw, 4rem); /* Significantly Increased size */
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      z-index: 10;
+      text-decoration: underline;
+      text-decoration-color: #8b7355;
+      text-decoration-thickness: 4px;
+      text-underline-offset: 12px;
+      /* Remove box styling for cleaner large text */
+       background: transparent;
+       text-shadow: none;
+    }
+    
+    /* Hide the original heading container div */
+    .scroll-section:has(.mission-statement) > div:nth-child(3) {
+      display: none !important;
+    }
+  }
+</style>
+
+<style scoped>
+  /* #scroll-wrapper {
   width: 100%;
   height: 100vh;
   position: relative;
 }
-  body{
-    overflow: hidden;
-  }
+body{
+  overflow: hidden;
+} */
 </style>
 
 <script setup>
@@ -321,35 +584,11 @@ import TeamMembers from '@/components/about/TeamMembers.vue';
 
 const wrapper = ref(null);
 
-const brandManifestoTranslateY = ref('34.5%');
-const missionStatementTranslateY = ref('26.6%');
 
-const updateBrandManifestoPosition = () => {
-  const width = window.innerWidth;
-  // Brand Manifesto
-  // Base: 1920px -> 34.5% (converted from 3.69vw)
-  // Change: 40px -> 3.75% (converted from 0.4vw)
-  const brandValue = 24 + (width - 1920) * (1.5 / 40);
-  brandManifestoTranslateY.value = `${brandValue}%`;
-
-  // Mission Statement
-  // Base: 1920px -> 26.6%
-  // Change: 40px -> 0.1%
-  const missionValue = 26.6 + (width - 1920) * (1.2 / 40);
-  missionStatementTranslateY.value = `${missionValue}%`;
-};
-
-onMounted(() => {
-  const cleanup = scroller(wrapper, 'scroll-section')
-  onBeforeUnmount(cleanup)
-
-  updateBrandManifestoPosition();
-  window.addEventListener('resize', updateBrandManifestoPosition);
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateBrandManifestoPosition);
-})
+// onMounted(() => {
+//   const cleanup = scroller(wrapper, 'scroll-section')
+//   onBeforeUnmount(cleanup)
+// })
 
 const getInitials = (name) => {
   let cleanName = name.replace(/^(Ar\.|Mr\.|Ms\.|Mrs\.|Dr\.|Er\.)\s+/i, '');
