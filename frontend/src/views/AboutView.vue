@@ -5,13 +5,16 @@
 <!-- hero section -->
     <section class="scroll-section">
       <!-- container -->
-      <div class="h-[125vh]  w-full relative">
+      <div class="h-[100dvh] md:h-[125dvh] w-full relative">
 
         <!-- top solid block -->
-        <div class="top-0 left-0 w-full h-[calc(20%)] bg-[#fff4ec]"></div>
+        <div class="top-0 left-0 w-full h-[20%] bg-[#fff4ec]"></div>
 
         <!-- background image block -->
-        <div class="bg-[url('/images/aboutus/hero_main.webp')] bg-cover bg-bottom h-[80%]"></div>
+        <div class="h-[80%] w-full relative">
+          <img src="/images/aboutus/hero/window.png" alt="" style="bottom:0; width:100%; height:100%; object-fit:cover; object-position:bottom;"/>
+          <img src="/images/aboutus/hero/people.png" alt="" style="position: absolute; bottom: 0; inset-inline:0; margin:auto;"/>
+        </div>
 
         <!-- foreground text -->
         <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center w-[90%] md:w-[70%] lg:w-[50%] z-10"
@@ -29,7 +32,8 @@
             <br class="hidden md:block">
             <span class="font-bold">we handle everything!</span>
           </p>
-        </div>      </div>
+        </div>
+      </div>
     </section>
 
     <section class="scroll-section relative w-full h-screen overflow-hidden">
