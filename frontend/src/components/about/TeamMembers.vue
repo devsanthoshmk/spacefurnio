@@ -4,7 +4,7 @@
     <div
       v-for="(person, index) in team"
       :key="person.id"
-      class="team-member-section !min-h-[100dvh]"
+      class="scroll-section team-member-section !min-h-[100dvh]"
       :class="index % 2 !== 0 ? 'bg-[#fff4ec]' : 'bg-[#f4f2ed]'"
     >
     <div class="h-[9vh] block"></div>
@@ -235,6 +235,7 @@ function splitRole(roleString) {
 
 /* Name Block at bottom right */
 .name-block {
+  padding-top:1vw;
   text-align: right;
   margin-top: auto;
 }
