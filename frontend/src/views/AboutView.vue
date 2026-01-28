@@ -126,12 +126,12 @@
 
 
     <!-- What We Do Section - Clean Single Background -->
-    <section class="scroll-section what-we-do-section h-[100dvh] w-full">
+    <section class="scroll-section what-we-do-section min-h-[100dvh] md:h-[100dvh] w-full" style="position: relative; z-index: 1;">
 
       <!-- Plain Background Container -->
-      <div class="w-full h-full bg-[#fff4ec] flex items-center justify-center px-4 md:px-8 lg:px-12 py-8 md:py-12 relative overflow-hidden">
+      <div class="pt-21 w-full h-full bg-[#fff4ec] flex items-center justify-center px-4 md:px-8 lg:px-12 py-8 md:py-12 relative overflow-hidden">
 
-      <div class="absolute top-0 left-0 w-full h-3/10 bg-[#e2e2e2]"></div>
+      <div class="absolute top-0 left-0 w-full h-[19.9vh] bg-[#e2e2e2]"></div>
 
       <!-- Main Content Container -->
       <div class="relative z-10 w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto flex flex-col items-center">
@@ -221,7 +221,9 @@
       </div>
 
     </section>
-    <div class="team-section">
+
+    <!-- founder's section -->
+    <div class="team-section" style="position: relative; z-index: 2;">
 
       <TeamMembers />
 
@@ -256,7 +258,7 @@
       </ul>
     </section>
 
-    <section class="scroll-section max-w-6xl mx-auto px-6 py-16">
+    <section class="scroll-section mx-auto py-16 bg-[#f4f2ed] w-full">
       <!-- Section Heading -->
       <div class="text-center mb-16">
         <h2 class="text-4xl md:text-5xl font-bold text-[#5A4A42] relative inline-block">
@@ -266,7 +268,7 @@
       </div>
 
       <!-- Clients Grid -->
-      <div class="grid md:grid-cols-2 gap-16">
+      <div class="grid md:grid-cols-2 gap-16 max-w-6xl self-center mx-auto px-4">
         <!-- Client 1 -->
         <div class="flex flex-col items-center text-center">
           <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
@@ -620,10 +622,10 @@ import TeamMembers from '@/components/about/TeamMembers.vue';
 const wrapper = ref(null);
 
 
-// onMounted(() => {
-//   const cleanup = scroller(wrapper, 'scroll-section')
-//   onBeforeUnmount(cleanup)
-// })
+onMounted(() => {
+  const cleanup = scroller(wrapper, 'scroll-section')
+  onBeforeUnmount(cleanup)
+})
 
 const getInitials = (name) => {
   let cleanName = name.replace(/^(Ar\.|Mr\.|Ms\.|Mrs\.|Dr\.|Er\.)\s+/i, '');
