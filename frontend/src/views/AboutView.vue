@@ -123,69 +123,104 @@
           </div>
       </div>
     </section>
-    <div class="scroll-section h-screen w-full relative">
 
-      <!-- top solid block -->
-      <div class="top-0 left-0 w-full h-3/10 bg-[#e2e2e2]"></div>
 
-      <!-- background image block -->
-      <div class="!bg-[#fff4ec] h-7/10"></div>
+    <!-- What We Do Section - Clean Single Background -->
+    <section class="scroll-section what-we-do-section h-[100dvh] w-full">
 
-      <!-- foreground text -->
-      <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center text-center px-4"
-        style="     top: calc(0.25 * 100%);">
-        <h2 class="phitagate-font text-7xl font-bold mb-4 text-black">
-          What we do?
-        </h2>
-        <div class="w-[75vw] mx-auto mt-7">
-          <div class="flex flex-col md:flex-row justify-between items-start w-full gap-10">
+      <!-- Plain Background Container -->
+      <div class="w-full h-full bg-[#fff4ec] flex items-center justify-center px-4 md:px-8 lg:px-12 py-8 md:py-12 relative overflow-hidden">
 
-            <!-- Left Side Image -->
-            <div class="w-full md:w-1/2">
-              <img src="https://placehold.co/500x350" alt="Dummy Image"
-                class="w-full h-auto rounded-2xl shadow-lg object-cover" />
+      <div class="absolute top-0 left-0 w-full h-3/10 bg-[#e2e2e2]"></div>
+
+      <!-- Main Content Container -->
+      <div class="relative z-10 w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto flex flex-col items-center">
+
+
+        <!-- Section Heading with Decorative Line -->
+        <div class="text-center mb-10 md:mb-16">
+          <h2 class="phitagate-font text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#2a2a2a] mb-4">
+            What we do?
+                  <!-- diff underline -->
+            <div class="flex items-center justify-center gap-3">
+              <span class="h-[2px] w-12 md:w-20 bg-gradient-to-r from-transparent to-[#5A4A42]"></span>
+              <span class="w-2 h-2 bg-[#5A4A42] rounded-full"></span>
+              <span class="h-[2px] w-12 md:w-20 bg-gradient-to-l from-transparent to-[#5A4A42]"></span>
             </div>
+          </h2>
 
-            <!-- Right Side Bullet Points -->
-            <div class="w-full md:w-1/2 flex flex-col items-center text-center self-stretch">
-              <h3 class="text-2xl font-semibold text-gray-800 mb-4">
-                Key Highlights
-              </h3>
+        </div>
 
-              <ul class="mt-6 space-y-3 text-left text-[clamp(0.9rem,1.8vw,1.25rem)] text-gray-800">
-                <li class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-gray-800 rounded-full"></span>
-                  Architecture &amp; Planning
-                </li>
-                <li class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-gray-800 rounded-full"></span>
-                  Construction &amp; Project Execution
-                </li>
-                <li class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-gray-800 rounded-full"></span>
-                  Interior Design &amp; Styling
-                </li>
-                <li class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-gray-800 rounded-full"></span>
-                  Custom Furniture Design &amp; Manufacturing
-                </li>
-                <li class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-gray-800 rounded-full"></span>
-                  Turnkey Décor Solutions
-                </li>
-              </ul>
+          <!-- Content Container with Image and Key Highlights -->
+          <div class="w-full">
+
+            <!-- Flexbox container for responsive layout -->
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-16 xl:gap-24 max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
+
+              <!-- Left Side: Image with Frame Effect -->
+              <div class="w-full md:w-5/12 lg:w-2/5 flex items-center justify-center md:justify-end">
+                <div class="relative w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl group">
+                  <!-- Decorative frame behind image -->
+                  <div class="absolute inset-0 bg-[#5A4A42]/10 rounded-2xl transform translate-x-4 translate-y-4 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-300"></div>
+                  <img
+                    src="https://placehold.co/600x400/e8ddd4/5A4A42?text=Our+Services"
+                    alt="What we do - Services"
+                    class="relative w-full h-auto aspect-[3/2] rounded-2xl shadow-2xl object-cover group-hover:shadow-3xl transition-shadow duration-300"
+                  />
+                </div>
+              </div>
+
+              <!-- Right Side: Key Highlights with Enhanced Styling -->
+              <div class="w-full md:w-5/12 lg:w-2/5 flex flex-col items-center md:items-start">
+
+                <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5A4A42] mb-6 md:mb-8 text-center md:text-left tracking-tight">
+                  Key Highlights
+                </h3>
+
+                <ul class="space-y-4 md:space-y-5 w-full max-w-md">
+                  <li class="what-we-do-item flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-all duration-300 cursor-default">
+                    <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#5A4A42] to-[#7a6a62] rounded-lg shadow-md flex-shrink-0">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </span>
+                    <span class="text-lg sm:text-xl font-medium text-gray-800">Architecture &amp; Planning</span>
+                  </li>
+                  <li class="what-we-do-item flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-all duration-300 cursor-default">
+                    <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#5A4A42] to-[#7a6a62] rounded-lg shadow-md flex-shrink-0">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </span>
+                    <span class="text-lg sm:text-xl font-medium text-gray-800">Construction &amp; Project Execution</span>
+                  </li>
+                  <li class="what-we-do-item flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-all duration-300 cursor-default">
+                    <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#5A4A42] to-[#7a6a62] rounded-lg shadow-md flex-shrink-0">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                    </span>
+                    <span class="text-lg sm:text-xl font-medium text-gray-800">Interior Design &amp; Styling</span>
+                  </li>
+                  <li class="what-we-do-item flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-all duration-300 cursor-default">
+                    <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#5A4A42] to-[#7a6a62] rounded-lg shadow-md flex-shrink-0">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </span>
+                    <span class="text-lg sm:text-xl font-medium text-gray-800">Custom Furniture Design &amp; Manufacturing</span>
+                  </li>
+                  <li class="what-we-do-item flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-all duration-300 cursor-default">
+                    <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#5A4A42] to-[#7a6a62] rounded-lg shadow-md flex-shrink-0">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </span>
+                    <span class="text-lg sm:text-xl font-medium text-gray-800">Turnkey Décor Solutions</span>
+                  </li>
+                </ul>
+
+              </div>
+
             </div>
 
           </div>
+
         </div>
-
-
-
-
 
       </div>
 
-    </div>
+    </section>
     <div class="team-section">
 
       <TeamMembers />
@@ -355,7 +390,7 @@
     .mission-statement {
       display: none;
     }
-    
+
     /* ========== BRAND MANIFESTO SECTION ========== */
     .scroll-section:has(.brand-manifesto) {
       background: #f8f4f0;
@@ -364,12 +399,12 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     /* Hide original background image */
     .scroll-section:has(.brand-manifesto) > div:first-child {
       display: none;
     }
-    
+
     /* Curved trail - Top right flowing wave */
     .scroll-section:has(.brand-manifesto)::before {
       content: '';
@@ -383,7 +418,7 @@
       transform: rotate(-15deg);
       z-index: 1;
     }
-    
+
     /* Curved trail - Bottom left flowing wave */
     .scroll-section:has(.brand-manifesto)::after {
       content: '';
@@ -397,7 +432,7 @@
       transform: rotate(10deg);
       z-index: 1;
     }
-    
+
     /* Content card positioning with rotated heading outside */
     .scroll-section:has(.brand-manifesto) > div:nth-child(2) {
       position: relative !important;
@@ -418,19 +453,19 @@
       flex-direction: column;
       justify-content: center;
     }
-    
+
     /* Improved text readability */
     .scroll-section:has(.brand-manifesto) > div:nth-child(2) h2 {
       font-size: clamp(1.2rem, 4vw, 1.8rem) !important;
       line-height: 1.4 !important;
     }
-    
+
     .scroll-section:has(.brand-manifesto) > div:nth-child(2) p {
       font-size: clamp(0.95rem, 3.5vw, 1.3rem) !important;
       line-height: 1.6 !important;
       margin-top: 1rem !important;
     }
-    
+
     /* Rotated heading on left side - positioned outside container */
     .scroll-section:has(.brand-manifesto) > div:nth-child(2)::before {
       content: 'Brand Manifesto';
@@ -450,15 +485,15 @@
       text-decoration-color: #8b7355;
       text-decoration-thickness: 4px;
       text-underline-offset: 12px;
-      background: transparent; 
+      background: transparent;
        text-shadow: none;
     }
-    
+
     /* Hide the original heading container div */
     .scroll-section:has(.brand-manifesto) > div:nth-child(3) {
       display: none !important;
     }
-    
+
     /* ========== MISSION STATEMENT SECTION ========== */
     .scroll-section:has(.mission-statement) {
       background: #f8f4f0;
@@ -467,12 +502,12 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     /* Hide original background image */
     .scroll-section:has(.mission-statement) > div:first-child {
       display: none;
     }
-    
+
     /* Curved trail - Top left flowing wave */
     .scroll-section:has(.mission-statement)::before {
       content: '';
@@ -486,7 +521,7 @@
       transform: rotate(12deg);
       z-index: 1;
     }
-    
+
     /* Curved trail - Bottom right flowing wave */
     .scroll-section:has(.mission-statement)::after {
       content: '';
@@ -500,7 +535,7 @@
       transform: rotate(-8deg);
       z-index: 1;
     }
-    
+
     /* Content card positioning with rotated heading outside */
     .scroll-section:has(.mission-statement) > div:nth-child(2) {
       position: relative !important;
@@ -521,19 +556,19 @@
       flex-direction: column;
       justify-content: center;
     }
-    
+
     /* Improved text readability */
     .scroll-section:has(.mission-statement) > div:nth-child(2) h2 {
       font-size: clamp(1.2rem, 4vw, 1.8rem) !important;
       line-height: 1.4 !important;
     }
-    
+
     .scroll-section:has(.mission-statement) > div:nth-child(2) p {
       font-size: clamp(0.95rem, 3.5vw, 1.3rem) !important;
       line-height: 1.6 !important;
       margin-top: 1rem !important;
     }
-    
+
     /* Rotated heading on left side - positioned outside container */
     .scroll-section:has(.mission-statement) > div:nth-child(2)::before {
       content: 'Mission Statement';
@@ -557,7 +592,7 @@
        background: transparent;
        text-shadow: none;
     }
-    
+
     /* Hide the original heading container div */
     .scroll-section:has(.mission-statement) > div:nth-child(3) {
       display: none !important;
