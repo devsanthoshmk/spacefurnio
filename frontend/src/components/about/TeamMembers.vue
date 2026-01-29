@@ -18,7 +18,7 @@
           <div class="photo-frame-wrapper">
             <div class="photo-frame">
               <!-- Hello Text positioned above the clipped container -->
-              <h2 class="hello-text cinzel-font" aria-hidden="true">
+              <h2 class="hello-text cinzel-font"  aria-hidden="true">
                 HELLO,
               </h2>
 
@@ -207,7 +207,7 @@ function splitRole(roleString) {
 .hello-text {
   transform: translateY(55%);
   color: #000;
-  font-size: clamp(1.25rem, calc(1rem + 1.5vw), 2.25rem);
+  font-size: clamp(1.75rem, calc(1.4rem + 1.5vw), 2.25rem);
   line-height: 1;
   margin: 0;
   z-index: 10;
@@ -241,7 +241,7 @@ function splitRole(roleString) {
 }
 
 .name-title {
-  font-size: clamp(1.1rem, calc(0.8rem + 1.2vw), 2rem);
+  font-size: clamp(1.6rem, calc(1.2rem + 1.2vw), 2rem);
   line-height: 1.1;
   margin-bottom: clamp(0.35rem, 0.8vw, 0.5rem);
   white-space: nowrap;
@@ -327,6 +327,9 @@ function splitRole(roleString) {
 
 /* ===== TABLET & DESKTOP (768px and above) ===== */
 @media (min-width: 768px) {
+  .name-block{
+    padding-top: 0vw;
+  }
   .team-member-section {
     min-height: calc(100dvh - 4rem);
     padding: clamp(2rem, 4vw, 4rem);
@@ -574,11 +577,11 @@ function splitRole(roleString) {
   }
 
   .hello-text {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
   }
 
   .name-title {
-    font-size: 1rem;
+    font-size: 1.4rem;
   }
 
   .role-text {
