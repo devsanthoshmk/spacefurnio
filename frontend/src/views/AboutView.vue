@@ -343,6 +343,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap");
 
+:global(html, body) {
+  overflow: hidden !important;
+}
+
 .our-team {
   font-family: "Nunito Sans", sans-serif;
 }
