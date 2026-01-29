@@ -34,5 +34,13 @@ app.use(PrimeVue, {
 
 app.mount('#app')
 
-AOS.init()
+// Initialize AOS after Vue has mounted
+setTimeout(() => {
+  AOS.init({
+    duration: 1000,
+    easing: 'ease-out',
+    once: true,
+    offset: 100
+  })
+}, 100)
 

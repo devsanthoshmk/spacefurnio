@@ -1,22 +1,4 @@
 <script setup>
-import { onMounted } from 'vue';
-
-onMounted(() => {
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('reveal-visible');
-            }
-        });
-    }, observerOptions);
-    const elements = document.querySelectorAll('.reveal-on-scroll');
-    elements.forEach(el => observer.observe(el));
-});
 </script>
 
 <template>
@@ -61,7 +43,7 @@ onMounted(() => {
 
         <!-- Quote Section -->
         <section class="py-24 md:py-32 px-6 bg-background-light relative z-10">
-            <div class="max-w-3xl mx-auto text-center reveal-on-scroll">
+            <div class="max-w-3xl mx-auto text-center" data-aos="fade-up">
                 <p class="font-display text-2xl md:text-4xl leading-relaxed text-gray-800">
                     "We believe that true elegance is found in the dialogue between distinct voices. Our collaborations series invites the world's most visionary brands to reimagine the Spacefurnio aesthetic."
                 </p>
@@ -75,7 +57,7 @@ onMounted(() => {
                 <div class="absolute inset-0 bg-white/70 transition-colors duration-500 backdrop-blur-[2px]"></div>
             </div>
             <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-                <div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl reveal-on-scroll">
+                <div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl" data-aos="fade-up">
                     <img alt="Detailed texture of fabric" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP2WO1VE9rdNv98iQv0vRE6NJElFdSV3y9iAfHZid11kzTqrnJwWZrLP2nKhN66iloEuHsX1EkWuD2CSc1Ayy4-YN-zfjM8hywlnWqGeZ5ni10FsE_Ae4fyYLswLo-cG0N7TSdDr4jCr5bR-dNLCScN1cwV4QJToDAHkgsPT7fA9WhlGOIqdj9hrDX6Q5WqmujUlIL-nmtEtXBrT-nYB8lGsFsdknU7vDII14jgJVjLIm9RQmNr-F2KL42OCavlI0Gk9QaJ3_N6LU"/>
                     <div class="absolute top-6 left-6 flex items-center gap-4 bg-white/90 p-4 backdrop-blur-md">
                         <img alt="Spacefurnio Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbMb-XsDP8UOEDLQrZ77m-mWhcwh9NYdEJThvNCqdDdFE3WGqsl2ZdUBlqEgs0exNp06vWEyHUCSYuZ-tV36OnNgXnaEqYRp8ZL81N4XgG8m_jg6WpkyZRTToJzDu8Ez-KOV1IWz5xWlC4TFzIwKLRWDBUMWaZ1I6RCSsZqARtn72iSlm9ttcuerMjBuY_bH0Za8KfuITlrqASFk0ogpPiOsXvaEasj7mqTd6tfP8wpf6-5r8qAvd4vZ2_Vfur51BUzN2z6o-RkeI"/>
@@ -83,7 +65,7 @@ onMounted(() => {
                         <span class="font-display font-bold text-lg tracking-widest uppercase">LUMINA</span>
                     </div>
                 </div>
-                <div class="text-left md:pl-10 reveal-on-scroll" style="transition-delay: 200ms;">
+                <div class="text-left md:pl-10" data-aos="fade-up" data-aos-delay="200">
                     <span class="text-xs font-bold tracking-[0.3em] uppercase text-gray-500 mb-4 block">
                         Collection 01
                     </span>
@@ -107,7 +89,7 @@ onMounted(() => {
         <section class="relative min-h-screen flex items-center justify-center overflow-hidden group bg-stone-100">
             <div class="absolute inset-0 opacity-10 pattern-dots"></div>
             <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-left md:pr-10 md:order-1 order-2 reveal-on-scroll">
+                <div class="text-left md:pr-10 md:order-1 order-2" data-aos="fade-up">
                     <span class="text-xs font-bold tracking-[0.3em] uppercase text-gray-500 mb-4 block">
                         Collection 02
                     </span>
@@ -124,7 +106,7 @@ onMounted(() => {
                         <span class="material-icons text-sm transform group-hover/btn:translate-x-2 transition-transform">east</span>
                     </a>
                 </div>
-                <div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl md:order-2 order-1 reveal-on-scroll" style="transition-delay: 200ms;">
+                <div class="relative h-[50vh] md:h-[70vh] w-full overflow-hidden shadow-2xl md:order-2 order-1" data-aos="fade-up" data-aos-delay="200">
                     <img alt="Ceramic vase in modern room" class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjZZoGIa0_bzfwIA76hYLKBo6UlNiGngyYbvQDImSqtDO7oGMKsnqtagpy9BJBuPBX_4a2RYnXYxJYZjFFT56aLgP2913h-wwfHxNeU_4JCWcFladcwt337TssFv6Jsy7nUbBEev64IlBF5hndblN0mjDaNhcen-w6DbO7ElVa0H_qDkTDBZylJMQbiUFAdpatbQSwzJ2LYuH8VWpfE6m-wW32Xh9JvDZ98xC2JYsXa6iOu4t_kuXb22opp3-PYpLLv39Pq6mDfg"/>
                     <div class="absolute bottom-6 right-6 flex items-center gap-4 bg-white/90 p-4 backdrop-blur-md">
                         <span class="font-display font-bold text-lg tracking-widest uppercase">TERRA</span>
@@ -147,13 +129,13 @@ onMounted(() => {
                     <span class="text-4xl font-thin">×</span>
                     <span class="font-display font-bold text-3xl tracking-widest uppercase drop-shadow-lg">VELVET&amp;CO</span>
                 </div>
-                <h2 class="text-6xl md:text-8xl font-display mb-8 leading-none reveal-on-scroll">
+                <h2 class="text-6xl md:text-8xl font-display mb-8 leading-none" data-aos="fade-up">
                     Soft<br/><span class="italic text-gray-300">Resilience</span>
                 </h2>
-                <p class="text-xl md:text-2xl font-light text-gray-200 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="transition-delay: 100ms;">
+                <p class="text-xl md:text-2xl font-light text-gray-200 mb-12 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
                     Spacefurnio and Velvet &amp; Co are collaborating to bring tactile warmth to industrial steel frames.
                 </p>
-                <button class="bg-white text-black px-10 py-4 uppercase tracking-widest text-sm font-bold hover:bg-transparent hover:text-white border border-transparent hover:border-white transition-all duration-300 reveal-on-scroll" style="transition-delay: 200ms;">
+                <button class="bg-white text-black px-10 py-4 uppercase tracking-widest text-sm font-bold hover:bg-transparent hover:text-white border border-transparent hover:border-white transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
                     Know More
                 </button>
             </div>
@@ -182,15 +164,6 @@ onMounted(() => {
 .text-vertical {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-}
-.reveal-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 1s ease-out;
-}
-.reveal-visible {
-    opacity: 1;
-    transform: translateY(0);
 }
 ::-webkit-scrollbar {
     width: 8px;
