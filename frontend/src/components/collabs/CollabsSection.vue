@@ -93,7 +93,7 @@ const navigate = (direction) => {
       <div class="section-inner px-4 py-6 md:px-8 md:py-10 lg:py-12 flex flex-col items-center h-full">
 
         <!-- Header with Logo and X -->
-        <header class="header-section flex flex-col items-center text-center w-full max-w-3xl mx-auto" data-aos="fade-down" data-aos-duration="1000">
+        <header class="header-section flex flex-col items-center text-center w-full max-w-3xl mx-auto" v-animateonscroll="{ enterClass: 'animate__fadeInDown' }">
           <!-- Bigger Logo - Using img tag for reliability -->
           <div class="mb-3 md:mb-5 lg:mb-6 logo-container">
             <img 
