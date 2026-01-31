@@ -343,9 +343,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap");
 
-:global(html, body) {
+/* :global(html, body) {
   overflow: hidden !important;
-}
+} */
 
 .our-team {
   font-family: "Nunito Sans", sans-serif;
@@ -646,14 +646,47 @@
 </style>
 
 <style scoped>
-  /* #scroll-wrapper {
+#scroll-wrapper {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   position: relative;
 }
-body{
-  overflow: hidden;
+
+/* :global(html, body) {
+  overflow: hidden !important;
 } */
+
+.section {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  overflow: hidden;
+}
+
+.nav-dots {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 100;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border: 1px solid #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dot.active {
+  background: #fff;
+}
 </style>
 
 <script setup>

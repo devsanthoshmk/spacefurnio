@@ -7,7 +7,7 @@ import FooterComponent from '@/components/Footer-component.vue'
 import { scroller } from '@/utills/customScroll.js';
 import { inject } from 'vue';
 
-const { showNav } = inject('navShowUtils');
+const { showNavFoo } = inject('navShowUtils');
 
 const wrapper = ref(null)
 const navDotsContainer = ref(null)
@@ -17,18 +17,18 @@ onMounted(() => {
   wrapper.value.addEventListener('sectionChange', (e) => {
     console.log('Scroll started', e.detail);
     if (e.detail.currentIndex === 0) {
-      showNav.value = false;
+      showNavFoo.value = false;
       console.log('Hiding nav');
     } else {
       setTimeout(() => {
-        (showNav.value = true);
+        (showNavFoo.value = true);
       }, 100);
     }
   });
-  showNav.value = false;
+  showNavFoo.value = false;
   onBeforeUnmount(() => {
     cleanup();
-    showNav.value = true;
+    showNavFoo.value = true;
   });
 })
 
@@ -66,9 +66,9 @@ onMounted(() => {
   position: relative;
 }
 
-:global(html, body) {
+/* :global(html, body) {
   overflow: hidden !important;
-}
+} */
 
 .section {
   width: 100%;
