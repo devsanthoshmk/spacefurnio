@@ -690,10 +690,13 @@
 </style>
 
 <script setup>
-import { ref,onMounted,onBeforeUnmount } from 'vue';
+import { ref,onMounted,onBeforeUnmount, inject } from 'vue';
 import { scroller } from '../utills/customScroll';
 import FooterComponent from '@/components/Footer-component.vue';
 import TeamMembers from '@/components/about/TeamMembers.vue';
+
+const { showFoo } = inject('navShowUtils');
+
 
 const wrapper = ref(null);
 
@@ -701,6 +704,10 @@ const wrapper = ref(null);
 onMounted(() => {
   const cleanup = scroller(wrapper, 'scroll-section')
   onBeforeUnmount(cleanup)
+  showFoo.value = false;
+  onBeforeUnmount(() => {
+    showFoo.value = true;
+  });
 })
 
 const getInitials = (name) => {

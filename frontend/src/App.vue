@@ -3,7 +3,7 @@
 <template>
   <!-- Hide header on admin routes -->
   <header v-show="!isAdminRoute">
-    <NavComponent v-show="showNavFoo"/>
+    <NavComponent v-show="showNav"/>
   </header>
 
   <main>
@@ -12,7 +12,7 @@
 
   <!-- Hide footer on admin routes -->
   <footer v-show="!isAdminRoute">
-    <FooterComponent v-show="showNavFoo"/>
+    <FooterComponent v-show="showFoo"/>
   </footer>
 
   <!-- Route-driven Cart Off-Canvas Overlay (hidden on admin) -->
@@ -39,8 +39,11 @@
   import { useWishlistStore } from '@/stores/wishlist'
 
   // Nav visibility
-  const showNavFoo = ref(true)
-  provide('navShowUtils', { showNavFoo })
+  const showNav = ref(true)
+  provide('navShowUtils', { showNav })
+  // footer visibility
+  const showFoo = ref(true)
+  provide('navShowUtils', { showFoo, showNav })
 
   // Cart store and router for cart opening
   const router = useRouter()
