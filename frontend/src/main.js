@@ -13,6 +13,7 @@ import ToastService from 'primevue/toastservice'
 
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import 'animate.css' // be skptical
 import 'primeicons/primeicons.css'
 
 const app = createApp(App)

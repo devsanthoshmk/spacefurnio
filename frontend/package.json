@@ -14,6 +14,7 @@
     "@primeuix/themes": "^1.2.1",
     "@primevue/themes": "^4.3.6",
     "@tailwindcss/vite": "^4.1.11",
+    "animate.css": "^4.1.1",
     "aos": "^3.0.0-beta.6",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
