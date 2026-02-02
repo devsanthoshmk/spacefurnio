@@ -1,19 +1,8 @@
 <template>
   <div class="bg-space-bg-light dark:bg-space-bg-dark text-space-text-light dark:text-space-text-dark font-space-display transition-colors duration-300 min-h-screen">
 
-
-    <header class="relative w-full h-[85vh] md:h-[95vh] overflow-hidden">
-      <img alt="Minimalist living room with beige furniture" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD85tXAosaQo4t2gV1PUNBcjmRpWAH8pbq1wxdy9DJ8V1vveEcaZxXLsAuefmbnvaV4h9hUOdQH5HLrUdRAfcbPU_BHSEpSxjVKm3JoFwsWqFjVsmcbaJ2-PyX-4UbLzBey139RwUOzVS-PtKoD22uMco2w0VrcLYPhhn7xXi6nCLHTaq__EoBePq8MBV_XvqzRGvi32uTA13EWqPUfoZURjYpFf1ipvD31Ilwc4y-vOkxsfpTFl2pmMDDTdhN7faQsYu7OxBOxaBeg"/>
-      <div class="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
-      <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-        <p class="text-xs md:text-sm tracking-[0.3em] uppercase mb-4 opacity-90 font-light fade-in-up" style="animation-delay: 0.2s;">
-          Handcrafted furniture designs by
-        </p>
-        <h1 class="phitagate-font text-6xl md:text-8xl lg:text-9xl font-light tracking-[0.15em] fade-in-up" style="animation-delay: 0.4s;">
-          Space<span class="font-normal text-white">furnio</span>
-        </h1>
-      </div>
-    </header>
+    <!-- Hero Section -->
+    <HeroSection />
 
     <main class="w-full px-6 md:px-12 py-16 md:py-24" id="portfolio">
       <div class="text-center mb-16 md:mb-24">
@@ -165,6 +154,8 @@
 </template>
 
 <script setup>
+import HeroSection from '@/components/portfolio/HeroSection.vue'
+
 // const toggleDarkMode = () => {
 //   document.documentElement.classList.toggle('dark');
 // };
