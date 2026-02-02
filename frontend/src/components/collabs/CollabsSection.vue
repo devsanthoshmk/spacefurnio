@@ -58,7 +58,7 @@ const visibleCollabs = computed(() => {
   const total = featuredCollabs.value.length;
   const prevIndex = (currentIndex.value - 1 + total) % total;
   const nextIndex = (currentIndex.value + 1) % total;
-  
+
   return {
     left: featuredCollabs.value[prevIndex],
     center: featuredCollabs.value[currentIndex.value],
@@ -70,14 +70,14 @@ const navigate = (direction) => {
   if (isAnimating.value) return;
   isAnimating.value = true;
   slideDirection.value = direction;
-  
+
   const total = featuredCollabs.value.length;
   if (direction === 'next') {
     currentIndex.value = (currentIndex.value + 1) % total;
   } else {
     currentIndex.value = (currentIndex.value - 1 + total) % total;
   }
-  
+
   setTimeout(() => {
     isAnimating.value = false;
   }, 500);
@@ -90,33 +90,33 @@ const navigate = (direction) => {
     <main
       class="collabs-main w-full max-w-7xl rounded-[2rem] overflow-hidden relative border border-white/20 shadow-soft-xl bg-radial-gradient"
     >
-      <div class="section-inner px-4 py-6 md:px-8 md:py-10 lg:py-12 flex flex-col items-center h-full">
+      <div class="section-inner px-4 py-6 md:px-8 md:py-8 lg:py-8 flex flex-col items-center h-full">
 
         <!-- Header with Logo and X -->
         <header class="header-section flex flex-col items-center text-center w-full max-w-3xl mx-auto" v-animateonscroll="{ enterClass: 'animate__fadeInDown' }">
           <!-- Bigger Logo - Using img tag for reliability -->
           <div class="mb-3 md:mb-5 lg:mb-6 logo-container">
-            <img 
-              src="/images/Spacefurnio-Logo.png" 
-              alt="Spacefurnio Logo" 
-              class="logo-image w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 object-contain select-none animate-logo-pulse"
+            <img
+              src="/images/Spacefurnio-Logo.png"
+              alt="Spacefurnio Logo"
+              class="logo-image w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain select-none animate-logo-pulse"
             />
           </div>
 
           <!-- Animated X with phitagate-font - Much bigger -->
-          <h1 class="phitagate-font text-gray-800 tracking-tight text-6xl md:text-7xl lg:text-8xl animated-x font-light">
+          <h1 class="phitagate-font text-gray-800 tracking-tight text-6xl md:text-7xl lg:text-7xl animated-x font-light">
             ×
           </h1>
         </header>
 
         <!-- Spacer between header and carousel -->
-        <div class="header-carousel-gap flex-shrink-0 h-10 md:h-14 lg:h-20"></div>
+        <div class="header-carousel-gap flex-shrink-0 h-10 md:h-12 lg:h-14"></div>
 
         <!-- Carousel Container -->
-        <div class="carousel-wrapper w-full relative flex-1 flex flex-col justify-center">
-          
+        <div class="carousel-wrapper w-full relative flex-1 flex flex-col justify-center" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
+
           <!-- Navigation Buttons -->
-          <button 
+          <button
             @click="navigate('prev')"
             class="nav-button nav-button-left"
             :disabled="isAnimating"
@@ -126,8 +126,8 @@ const navigate = (direction) => {
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
-          <button 
+
+          <button
             @click="navigate('next')"
             class="nav-button nav-button-right"
             :disabled="isAnimating"
@@ -141,7 +141,7 @@ const navigate = (direction) => {
           <!-- Cards Container with Transitions -->
           <div class="carousel-container">
             <div class="cards-track">
-              
+
               <!-- Left Card (Previous) -->
               <div class="card-slot">
                 <Transition :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'">
@@ -215,8 +215,8 @@ const navigate = (direction) => {
               @click="() => { if (!isAnimating) { currentIndex = index; } }"
               :class="[
                 'w-2 h-2 rounded-full transition-all duration-300',
-                index === currentIndex 
-                  ? 'bg-gray-800 w-6' 
+                index === currentIndex
+                  ? 'bg-gray-800 w-6'
                   : 'bg-gray-400 hover:bg-gray-600'
               ]"
               :aria-label="`Go to ${collab.name}`"
@@ -248,7 +248,7 @@ const navigate = (direction) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5rem 1rem 2rem 1rem; /* More top padding for navbar */
+  padding: 6rem 1rem 2rem 1rem; /* Adjusted for better fit */
   box-sizing: border-box;
   background: linear-gradient(
     165deg,
@@ -300,7 +300,7 @@ const navigate = (direction) => {
 
 /* Custom Shadow Utility */
 .shadow-soft-xl {
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.08),
     0 12px 24px -8px rgba(0, 0, 0, 0.05),
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
@@ -442,7 +442,7 @@ const navigate = (direction) => {
     width: 8rem;
   }
   .center-img {
-    width: 14rem;
+    width: 13rem;
   }
 }
 
@@ -478,7 +478,7 @@ const navigate = (direction) => {
     font-size: 1.25rem;
   }
   .center-title {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 }
 
@@ -547,7 +547,7 @@ const navigate = (direction) => {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(0, 0, 0, 0.05);
   border: none;
@@ -664,7 +664,7 @@ const navigate = (direction) => {
 @media (min-width: 1024px) {
   .side-card {
     width: 180px;
-    height: 210px;
+    height: 200px;
   }
 }
 
@@ -679,7 +679,7 @@ const navigate = (direction) => {
   justify-content: center;
   padding: 1.25rem;
   z-index: 30;
-  box-shadow: 
+  box-shadow:
     0 25px 60px rgba(0, 0, 0, 0.15),
     0 10px 30px rgba(0, 0, 0, 0.08);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -699,7 +699,7 @@ const navigate = (direction) => {
 
 .center-card:hover {
   transform: translateY(-6px);
-  box-shadow: 
+  box-shadow:
     0 35px 70px rgba(0, 0, 0, 0.18),
     0 15px 40px rgba(0, 0, 0, 0.12);
 }
@@ -722,9 +722,9 @@ const navigate = (direction) => {
 
 @media (min-width: 1024px) {
   .center-card {
-    width: 320px;
-    height: 360px;
-    padding: 2rem;
+    width: 300px;
+    height: 340px;
+    padding: 1.75rem;
   }
 }
 
@@ -743,7 +743,7 @@ const navigate = (direction) => {
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 4px 15px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
@@ -774,22 +774,22 @@ const navigate = (direction) => {
   .collabs-section {
     padding: 1.5rem 1rem;
   }
-  
+
   .logo-image {
     width: 60px !important;
     height: 60px !important;
   }
-  
+
   .header-carousel-gap {
     height: 1rem !important;
   }
-  
+
   .center-card {
     width: 180px !important;
     height: 220px !important;
     padding: 1rem !important;
   }
-  
+
   .side-card {
     width: 110px !important;
     height: 130px !important;
@@ -802,20 +802,20 @@ const navigate = (direction) => {
     width: 50px !important;
     height: 50px !important;
   }
-  
+
   .animated-x {
     font-size: 1.75rem !important;
   }
-  
+
   .header-carousel-gap {
     height: 0.5rem !important;
   }
-  
+
   .center-card {
     width: 160px !important;
     height: 190px !important;
   }
-  
+
   .side-card {
     width: 100px !important;
     height: 120px !important;
@@ -827,21 +827,21 @@ const navigate = (direction) => {
   .collabs-section {
     padding: 1rem 0.5rem;
   }
-  
+
   .section-inner {
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
   }
-  
+
   .logo-image {
     width: 40px !important;
     height: 40px !important;
   }
-  
+
   .animated-x {
     font-size: 1.5rem !important;
   }
-  
+
   .header-carousel-gap {
     height: 0.25rem !important;
   }
@@ -853,20 +853,20 @@ const navigate = (direction) => {
     width: 140px !important;
     height: 140px !important;
   }
-  
+
   .animated-x {
     font-size: 4.5rem !important;
   }
-  
+
   .header-carousel-gap {
     height: 3rem !important;
   }
-  
+
   .center-card {
     width: 360px !important;
     height: 400px !important;
   }
-  
+
   .side-card {
     width: 200px !important;
     height: 240px !important;
