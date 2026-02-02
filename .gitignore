@@ -199,3 +199,5 @@ dist
 .env*
 !.env.example
 .wrangler/
+
+pnpm-lock.yaml
