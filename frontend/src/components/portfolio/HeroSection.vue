@@ -1,5 +1,5 @@
 <template>
-  <section 
+  <section
     class="hero-section relative w-full h-[100dvh] overflow-hidden"
     aria-label="Portfolio Hero Section"
   >
@@ -27,7 +27,7 @@
       <div class="container mx-auto px-6 md:px-12 lg:px-16">
         <div class="w-full mx-auto md:mx-0 text-center md:text-left">
           <!-- Main Heading with Typing Animation -->
-          <h1 
+          <h1
             class="hero-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif mb-6 text-white"
             :class="{ 'opacity-0': !headingVisible && !prefersReducedMotion }"
           >
@@ -60,7 +60,7 @@
           <!-- Subheading with Fade In -->
           <p
             class="hero-subheading text-xl sm:text-2xl md:text-3xl font-sans text-gray-200 tracking-wide"
-            :class="{ 
+            :class="{
               'opacity-0': !subheadingVisible && !prefersReducedMotion,
               'subheading-fade-in': subheadingVisible && !prefersReducedMotion
             }"
@@ -69,8 +69,8 @@
           </p>
 
           <!-- Optional Scroll Indicator (only shown when motion is reduced) -->
-          <div 
-            v-if="prefersReducedMotion" 
+          <div
+            v-if="prefersReducedMotion"
             class="mt-12 flex justify-center md:justify-start"
           >
             <div class="scroll-indicator text-white/60 text-sm uppercase tracking-widest">
@@ -95,7 +95,7 @@ const subheading = 'Designing space through form and comfort'
 const autoScroll = true
 const autoScrollDelay = 1500 // ms after typing completes
 const typeSpeed = 40 // ms per character
-const useGsap = false // Optional GSAP integration (not implemented)
+// const useGsap = false // Optional GSAP integration (not implemented)
 
 // ========================================
 // Reactive State
@@ -111,10 +111,10 @@ const headingWords = computed(() => {
     { text: headingLine1, noBreak: false },
     { text: headingLine2, noBreak: false }
   ]
-  
+
   let charIndex = 0
-  
-  return lineGroups.map((group, groupIndex) => {
+
+  return lineGroups.map((group) => {
     const words = group.text.split(' ')
     const lineWords = words.map(word => {
       const wordData = {
@@ -124,7 +124,7 @@ const headingWords = computed(() => {
       charIndex += word.length + 1 // +1 for the space
       return wordData
     })
-    
+
     return {
       noBreak: group.noBreak,
       words: lineWords
@@ -143,7 +143,7 @@ const checkReducedMotion = () => {
   // Check if user prefers reduced motion
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
   prefersReducedMotion.value = mediaQuery.matches
-  
+
   // If reduced motion is preferred, show everything immediately
   if (prefersReducedMotion.value) {
     headingVisible.value = true
@@ -211,7 +211,7 @@ onMounted(() => {
       subheadingVisible.value = true
     }
   }
-  
+
   mediaQuery.addEventListener('change', handleMotionChange)
 
   // Cleanup listener on unmount
@@ -312,12 +312,12 @@ onMounted(() => {
   .hero-background-animate img {
     animation: none !important;
   }
-  
+
   .char-animate {
     animation: none !important;
     opacity: 1 !important;
   }
-  
+
   .subheading-fade-in {
     animation: none !important;
     opacity: 1 !important;
