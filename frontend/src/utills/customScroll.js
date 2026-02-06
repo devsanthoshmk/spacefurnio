@@ -139,7 +139,7 @@ const updateActiveState = state => {
         currentSection: state.childElements[state.currentIndex]
        }
     });
-    state.wrapperEl.dispatchEvent(event);
+    window.dispatchEvent(event);
   }
 }
 
@@ -325,7 +325,8 @@ const moveToAdjacentSection = (state, direction) => {
   const nextIndex = state.currentIndex + direction
   if (nextIndex < 0 || nextIndex >= state.itemCount) return false
 
-  const sectionHeight = state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex].offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
+  const sectionOffsetHeight = state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex].offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
+  const sectionHeight = sectionOffsetHeight + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginTop) + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginBottom) // the property el.offsetHeight does not include margins, so we need to add them manually to get the total height of the section
   const delta = sectionHeight > state.viewportHeight ? state.viewportHeight : sectionHeight
   const nextOffset = state.offset - delta * direction
 
