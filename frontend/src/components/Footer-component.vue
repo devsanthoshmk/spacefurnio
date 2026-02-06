@@ -4,7 +4,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
         <!-- Navigation Column -->
-        <div v-animateonscroll="{ enterClass: 'animate-fade-in-up', leaveClass: 'animate-fade-out-down', once: false }">
+        <div >
           <nav aria-label="Footer Navigation">
             <h3 class="text-white text-lg font-semibold mb-4">Navigation</h3>
             <ul class="space-y-2">
@@ -44,7 +44,7 @@
   </div>
 
         <!-- Contact Column -->
-        <div v-animateonscroll="{ enterClass: 'animate-fade-in-up', leaveClass: 'animate-fade-out-down', once: false }">
+        <div >
           <h3 class="text-white text-lg font-semibold mb-4">Contact</h3>
           <div class="space-y-3">
             <address class="not-italic">
@@ -68,7 +68,7 @@
         </div>
 
         <!-- Social Column -->
-        <div v-animateonscroll="{ enterClass: 'animate-fade-in-up', leaveClass: 'animate-fade-out-down', once: false }">
+        <div >
           <h3 class="text-white text-lg font-semibold mb-4">Follow Us</h3>
           <div class="flex space-x-3">
             <Button
@@ -100,7 +100,7 @@
 
 
         <!-- Legal Column -->
-        <div v-animateonscroll="{ enterClass: 'animate-fade-in-up', leaveClass: 'animate-fade-out-down', once: false }">
+        <div >
           <h3 class="text-white text-lg font-semibold mb-4">Legal</h3>
           <div class="text-gray-300">
             <p>© {{ currentYear }} <span class="phitagate-font bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent text-[2.5vw] p-2">spacefurnio</span> – All rights reserved.</p>
