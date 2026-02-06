@@ -84,12 +84,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
+
+const props=defineProps({
+  simulateKey: Object,
+})
 
 // ========================================
 // Configuration Constants (No Props)
 // ========================================
-const headingLine1 = 'Welcome to SpaceFurnio'
+const headingLine1 = 'Welcome to Our'
 const headingLine2 = 'Portfolio'
 const subheading = 'Designing space through form and comfort'
 const autoScroll = true
@@ -186,10 +190,13 @@ const performAutoScroll = () => {
   }
 
   // Smooth scroll exactly one viewport height down
-  window.scrollTo({
-    top: window.innerHeight,
-    behavior: 'smooth'
-  })
+  // window.scrollTo({
+  //   top: window.innerHeight,
+  //   behavior: 'smooth'
+  // })
+
+  // for custom scroll
+  props.simulateKey('ArrowDown');
 }
 
 // ========================================

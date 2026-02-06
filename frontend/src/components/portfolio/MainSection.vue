@@ -1,22 +1,14 @@
 <template>
-  <!-- 
-    ACCEPTANCE CHECKLIST:
-    [x] Desktop: Text Left, Image Right (Dominant)
-    [x] Top Spacing: 5rem reserved for navbar (pt-20)
-    [x] Mobile: Image stacked FIRST, then Text
-    [x] Shadow: Soft "sticker" outer shadow on image wrapper
-    [x] Animations: All existing transitions preserved exactly
-    [x] Image: Aspect ratio preserved, no unintended cropping
-  -->
-  <div 
+
+  <div
     ref="containerRef"
     class="relative w-full h-[100dvh] pt-20 bg-stone-100 overflow-hidden outline-none flex flex-col"
     tabindex="0"
-    @keydown="handleKeydown"
-    @wheel.prevent="handleWheel"
-    @touchstart="handleTouchStart"
-    @touchmove.prevent="handleTouchMove"
-    @touchend="handleTouchEnd"
+    @keydown.stop="handleKeydown"
+    @wheel.prevent.stop="handleWheel"
+    @touchstart.stop="handleTouchStart"
+    @touchmove.prevent.stop="handleTouchMove"
+    @touchend.stop="handleTouchEnd"
   >
     <!-- Background -->
     <div class="absolute inset-0 pointer-events-none">
@@ -26,7 +18,7 @@
     <!-- Main Content Flex Wrapper: Centered content with constant gap -->
     <!-- Replaced Grid with Flex to ensure Text and Image move together during size changes -->
     <div class="relative z-10 w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24 flex-grow h-full">
-      
+
       <!-- Text Block (Fixed width to prevent reflow, moves smoothly) -->
       <div class="order-2 md:order-1 w-full md:w-[480px] flex-shrink-0 flex flex-col items-start text-left">
         <Transition name="text-fade" mode="out-in">
@@ -66,17 +58,17 @@
       <!-- Image Block (Moves smoothly towards center) -->
       <div class="order-1 md:order-2 flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform">
         <!-- Wrapper morphs aspect ratio via CSS transition -->
-        <div 
+        <div
           class="image-wrapper sticker-card"
           :class="getAspectRatioClass(currentSection.orientation)"
         >
           <!-- TRUE CROSSFADE: Both images exist, positioned absolutely -->
           <TransitionGroup name="image-crossfade" tag="div" class="image-stack">
-            <img 
+            <img
               v-for="(section, index) in sections"
               v-show="index === currentIndex"
               :key="`img-${index}`"
-              :src="section.imageUrl" 
+              :src="section.imageUrl"
               :alt="section.title"
               class="image-actual"
             />
@@ -108,13 +100,18 @@
 <script setup>
 /**
  * MainSection.vue - Smooth Simultaneous Transitions
- * 
+ *
  * - Text: Immediate crossfade via Vue Transition
  * - Image: True crossfade with TransitionGroup (both images overlap during transition)
  * - Wrapper: CSS transition morphs aspect ratio simultaneously
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
+
+const props=defineProps({
+  simulateKey: Function,
+  innerCustomScollEl: HTMLElement
+})
 
 // ============================================
 // SECTION DATA
@@ -188,12 +185,18 @@ function handleKeydown(event) {
 function navigateNext() {
   if (currentIndex.value < sections.value.length - 1) {
     triggerTransition(currentIndex.value + 1)
+  } else {
+    scroll100(1);
+    containerRef.value.style.pointerEvents = 'none';
   }
 }
 
 function navigatePrev() {
   if (currentIndex.value > 0) {
     triggerTransition(currentIndex.value - 1)
+  } else {
+    scroll100(-1);
+    containerRef.value.style.pointerEvents = 'none';
   }
 }
 
@@ -206,7 +209,7 @@ function triggerTransition(newIndex) {
   isTransitioning.value = true
   showHint.value = false
   currentIndex.value = newIndex
-  
+
   // Reset after transition completes
   setTimeout(() => {
     isTransitioning.value = false
@@ -224,17 +227,26 @@ function getAspectRatioClass(orientation) {
   }
 }
 
+function scroll100(up) {
+  /** up is -1 or +1 whih desides to go up or down */
+  if (up > 0) {
+    props.simulateKey('ArrowDown');
+  } else {
+    props.simulateKey('ArrowUp');
+  }
+}
+
 // ============================================
 // SCROLL HANDLING (Container-level only)
 // ============================================
-const isInsideContainer = ref(false)
+// const isInsideContainer = ref(false)
 
 function handleWheel(event) {
   // Prevent default scroll and use for navigation
   event.preventDefault()
-  
+
   if (isTransitioning.value) return
-  
+
   if (event.deltaY > 0) {
     navigateNext()
   } else if (event.deltaY < 0) {
@@ -253,11 +265,11 @@ function handleTouchMove(event) {
 
 function handleTouchEnd(event) {
   if (isTransitioning.value) return
-  
+
   const touchEndY = event.changedTouches[0].clientY
   const touchStartY = containerRef.value._touchStartY || touchEndY
   const diff = touchStartY - touchEndY
-  
+
   // Swipe threshold of 50px
   if (Math.abs(diff) > 50) {
     if (diff > 0) {
@@ -268,15 +280,29 @@ function handleTouchEnd(event) {
   }
 }
 
+// enabling auto focus for custom scroll to work properly
+// using custom scroll event to handle scroll
+function handlecustomScroll(e) {
+  console.warn("called",e.detail.currentSection , props.innerCustomScollEl,e.detail.currentSection === props.innerCustomScollEl)
+  if (e.detail.currentSection === props.innerCustomScollEl) {
+    containerRef.value.style.pointerEvents = 'auto';
+    containerRef.value?.focus({ preventScroll: true });
+    containerRef.value?.children[0].click() //aditinal ensurance for click verification
+  }
+}
+
+
 // ============================================
 // LIFECYCLE
 // ============================================
 onMounted(() => {
-  containerRef.value?.focus()
+  window.addEventListener('sectionChange', handlecustomScroll);
 })
 
 onUnmounted(() => {
   // Cleanup if needed
+  window.removeEventListener('sectionChange', handlecustomScroll);
+
 })
 </script>
 
@@ -285,7 +311,7 @@ onUnmounted(() => {
    BACKGROUND PATTERN
    ============================================ */
 .pattern-grid {
-  background-image: 
+  background-image:
     linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -391,7 +417,7 @@ onUnmounted(() => {
   overflow: hidden;
   border-radius: 2px;
   /* Smooth simultaneous morph preserved */
-  transition: 
+  transition:
     width 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     height 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     aspect-ratio 0.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -399,7 +425,7 @@ onUnmounted(() => {
 
 /* Sticker / Pasted visual treatment - soft, diffuse outer shadow */
 .sticker-card {
-  box-shadow: 
+  box-shadow:
     0 30px 60px -12px rgba(0, 0, 0, 0.12),
     0 18px 36px -18px rgba(0, 0, 0, 0.08); /* Softened interaction */
 }
@@ -415,7 +441,7 @@ onUnmounted(() => {
 
 .aspect-portrait {
   /* Height target ~75vh.  Width = 75vh * (3/4) = 56.25vh */
-  width: 56.25vh;       
+  width: 56.25vh;
   max-width: 650px;
   aspect-ratio: 3 / 4;
 }
@@ -467,8 +493,8 @@ onUnmounted(() => {
    INDICATOR DOTS
    ============================================ */
 .indicator-dots {
-  position: fixed;
-  bottom: 2rem;
+  position: absolute;
+  bottom: 0.8rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -500,7 +526,7 @@ onUnmounted(() => {
    NAVIGATION HINT
    ============================================ */
 .nav-hint {
-  position: fixed;
+  position: absolute;
   bottom: 4.5rem;
   left: 50%;
   transform: translateX(-50%);
@@ -537,15 +563,15 @@ onUnmounted(() => {
   .aspect-square-custom {
     width: 85vw;
     max-width: 450px;
-    height: auto; 
+    height: auto;
     /* Max-height caps can be removed or kept loose */
-    max-height: 60vh; 
+    max-height: 60vh;
   }
-  
+
   .section-title {
     font-size: clamp(1.75rem, 6vw, 2.5rem);
   }
-  
+
   .section-subtitle {
     font-size: clamp(1.75rem, 6vw, 2.5rem);
     margin-bottom: 1rem;
