@@ -14,7 +14,7 @@ const navDotsContainer = ref(null)
 
 onMounted(() => {
   showFoo.value = false;
-  const cleanup = scroller(wrapper, 'scroll-section', navDotsContainer)
+  const cleanup = scroller(wrapper, 'scroll-section', null)
   wrapper.value.addEventListener('sectionChange', (e) => {
     console.log('Scroll started', e.detail);
     if (e.detail.currentIndex === 0) {
@@ -61,7 +61,7 @@ onMounted(() => {
   <div class="nav-dots" id="nav-dots" ref="navDotsContainer"></div>
 </template>
 
-<style scoped>
+<style>
 #scroll-wrapper {
   width: 100%;
   height: 100dvh;
