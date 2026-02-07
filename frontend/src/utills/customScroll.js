@@ -152,6 +152,7 @@ const updateActiveState = state => {
 const applyOffset = (state, nextOffset) => {
   // Snap to integer to avoid sub-pixel accumulation (-772.4 -> -773)
   state.offset = Math.round(clamp(nextOffset, state.minOffset, state.maxOffset))
+  console.info("Applying offset:", state.offset);
   state.wrapperEl.style.transform = `translateY(${state.offset}px)`
 }
 
@@ -255,7 +256,7 @@ const isAtBoundary = (state, direction) => {
   if (direction === SCROLL_DIRECTION.UP) {
     return state.currentIndex === 0 && state.offset >= state.maxOffset
   }
-  console.log("currentIndex:", state.currentIndex, "itemCount:", state.itemCount, "offset:", state.offset, "minOffset:", state.minOffset,"return:", state.currentIndex === state.itemCount - 1 && state.offset <= state.minOffset);
+  // console.log("currentIndex:", state.currentIndex, "itemCount:", state.itemCount, "offset:", state.offset, "minOffset:", state.minOffset,"return:", state.currentIndex === state.itemCount - 1 && state.offset <= state.minOffset);
   return state.currentIndex === state.itemCount - 1 && state.offset <= state.minOffset
 }
 
@@ -268,6 +269,7 @@ const isAtBoundary = (state, direction) => {
 const bounce = (state, direction) => {
   const temporaryOffset = state.offset + state.options.bounceDistance * -direction
   state.wrapperEl.style.transform = `translateY(${temporaryOffset}px)`
+  console.info("Bouncing with temporary offset:", temporaryOffset);
 
   window.setTimeout(() => {
     state.wrapperEl.style.transform = `translateY(${state.offset}px)`
@@ -290,10 +292,13 @@ const scrollWithinSection = (state, direction) => {
   if (direction === SCROLL_DIRECTION.UP && rect.top < 0) {
     if (rect.top > -ALIGN_EPSILON) {
       // Snap precisely, then let performDirectionalScroll proceed to moveToAdjacentSection
+      console.info("Top boundary within epsilon, snapping to section with offset:", getOffsetForIndex(state, state.currentIndex));
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
+      state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, Math.abs(rect.top))
+    console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount);
     applyOffset(state, state.offset + scrollAmount)
     return true
   }
@@ -302,10 +307,13 @@ const scrollWithinSection = (state, direction) => {
   if (direction === SCROLL_DIRECTION.DOWN && rect.bottom > state.viewportHeight) {
     const overflow = rect.bottom - state.viewportHeight
     if (overflow < ALIGN_EPSILON) {
+      console.info("Bottom boundary within epsilon, snapping to section with getoffsetforindex:", getOffsetForIndex(state, state.currentIndex),);
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
+      state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, overflow)
+    console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount, state.offset, scrollAmount);
     applyOffset(state, state.offset - scrollAmount)
     return true
   }
@@ -328,10 +336,22 @@ const moveToAdjacentSection = (state, direction) => {
   const sectionOffsetHeight = state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex].offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
   const sectionHeight = sectionOffsetHeight + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginTop) + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginBottom) // the property el.offsetHeight does not include margins, so we need to add them manually to get the total height of the section
   const delta = sectionHeight > state.viewportHeight ? state.viewportHeight : sectionHeight
-  const nextOffset = state.offset - delta * direction
+  // the scroll after scroll within set the offset one step back like for index 0 to 1 where index 0 is scrollwithin-ed to its bottom the offset is set to 0 so the next scroll should add the exces height that the prev section has to offset
+  const balanceOffset = (state.childElements[state.currentIndex].offsetHeight-state.viewportHeight)
+  const nextOffset = (state.offset - delta * direction) - (state.balanceOffset ? balanceOffset : 0)
+  state.balanceOffset = false; // reset after use
 
+  console.info("Moving to adjacent section:", {
+    nextIndex,
+    sectionHeight,
+    viewportHeight: state.viewportHeight,
+    delta,
+    nextOffset,
+    currentOffset: state.offset,
+    direction
+  });
   applyOffset(state, nextOffset)
-  console.log("sectionHeight:", sectionHeight, "viewportHeight:", state.viewportHeight, "delta:", delta, "nextOffset:", nextOffset, "OFFSET:", state.offset, "direction:", direction);
+  // console.log("sectionHeight:", sectionHeight, "viewportHeight:", state.viewportHeight, "delta:", delta, "nextOffset:", nextOffset, "OFFSET:", state.offset, "direction:", direction);
   state.currentIndex = nextIndex
   updateActiveState(state)
   return true
