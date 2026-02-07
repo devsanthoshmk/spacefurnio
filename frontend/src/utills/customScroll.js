@@ -152,7 +152,7 @@ const updateActiveState = state => {
 const applyOffset = (state, nextOffset) => {
   // Snap to integer to avoid sub-pixel accumulation (-772.4 -> -773)
   state.offset = Math.round(clamp(nextOffset, state.minOffset, state.maxOffset))
-  console.info("Applying offset:", state.offset);
+  // console.info("Applying offset:", state.offset);
   state.wrapperEl.style.transform = `translateY(${state.offset}px)`
 }
 
@@ -269,7 +269,7 @@ const isAtBoundary = (state, direction) => {
 const bounce = (state, direction) => {
   const temporaryOffset = state.offset + state.options.bounceDistance * -direction
   state.wrapperEl.style.transform = `translateY(${temporaryOffset}px)`
-  console.info("Bouncing with temporary offset:", temporaryOffset);
+  // console.info("Bouncing with temporary offset:", temporaryOffset);
 
   window.setTimeout(() => {
     state.wrapperEl.style.transform = `translateY(${state.offset}px)`
@@ -292,13 +292,13 @@ const scrollWithinSection = (state, direction) => {
   if (direction === SCROLL_DIRECTION.UP && rect.top < 0) {
     if (rect.top > -ALIGN_EPSILON) {
       // Snap precisely, then let performDirectionalScroll proceed to moveToAdjacentSection
-      console.info("Top boundary within epsilon, snapping to section with offset:", getOffsetForIndex(state, state.currentIndex));
+      // console.info("Top boundary within epsilon, snapping to section with offset:", getOffsetForIndex(state, state.currentIndex));
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
       state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, Math.abs(rect.top))
-    console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount);
+    // console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount);
     applyOffset(state, state.offset + scrollAmount)
     return true
   }
@@ -307,13 +307,13 @@ const scrollWithinSection = (state, direction) => {
   if (direction === SCROLL_DIRECTION.DOWN && rect.bottom > state.viewportHeight) {
     const overflow = rect.bottom - state.viewportHeight
     if (overflow < ALIGN_EPSILON) {
-      console.info("Bottom boundary within epsilon, snapping to section with getoffsetforindex:", getOffsetForIndex(state, state.currentIndex),);
+      // console.info("Bottom boundary within epsilon, snapping to section with getoffsetforindex:", getOffsetForIndex(state, state.currentIndex),);
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
       state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, overflow)
-    console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount, state.offset, scrollAmount);
+    // console.info("Scrolling within section initiating applyoffset with amount:", state.offset + scrollAmount, state.offset, scrollAmount);
     applyOffset(state, state.offset - scrollAmount)
     return true
   }
@@ -341,15 +341,15 @@ const moveToAdjacentSection = (state, direction) => {
   const nextOffset = (state.offset - delta * direction) - (state.balanceOffset ? balanceOffset : 0)
   state.balanceOffset = false; // reset after use
 
-  console.info("Moving to adjacent section:", {
-    nextIndex,
-    sectionHeight,
-    viewportHeight: state.viewportHeight,
-    delta,
-    nextOffset,
-    currentOffset: state.offset,
-    direction
-  });
+  // console.info("Moving to adjacent section:", {
+  //   nextIndex,
+  //   sectionHeight,
+  //   viewportHeight: state.viewportHeight,
+  //   delta,
+  //   nextOffset,
+  //   currentOffset: state.offset,
+  //   direction
+  // });
   applyOffset(state, nextOffset)
   // console.log("sectionHeight:", sectionHeight, "viewportHeight:", state.viewportHeight, "delta:", delta, "nextOffset:", nextOffset, "OFFSET:", state.offset, "direction:", direction);
   state.currentIndex = nextIndex
