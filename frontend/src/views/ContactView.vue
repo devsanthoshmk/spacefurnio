@@ -1,464 +1,142 @@
 <script setup>
-import { ref, reactive } from 'vue';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
-import Button from 'primevue/button';
-import FooterComponent from '@/components/Footer-component.vue';
+import { ref } from 'vue';
+import CTA from '@/components/contactUs/CTA.vue';
 
-// Form state
-const form = reactive({
-  title: '',
+const form = ref({
+  firstName: '',
+  lastName: '',
   email: '',
-  subject: '',
-  description: ''
+  message: '',
+  agree: false
 });
 
-const isSubmitting = ref(false);
-const isSubmitted = ref(false);
-const errors = reactive({
-  title: '',
-  email: '',
-  subject: '',
-  description: ''
-});
+const contactMethods = [
+  { label: 'Email', value: 'bray@ubix.com', desc: 'Contact us by email, and we will respond shortly.', link: 'mailto:bray@ubix.com' },
+  { label: 'Phone', value: '+1 (222) 333-4444', desc: 'Call us on weekdays from 9 AM to 5 PM.', link: 'tel:+12223334444' },
+  { label: 'Mobile', value: '+2 (222) 333-4444', desc: 'Call us on weekdays from 9 AM to 5 PM.', link: 'tel:+22223334444' },
+  { label: 'Office', value: '87266 Green Station, Fada, Oregon 26730, Canada', desc: 'Visit us at our headquarters.', link: null }
+];
 
-// Validation
-const validateEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-};
+const teamImages = Array.from({ length: 7 }, (_, i) => ({
+  id: i,
+  src: `https://placehold.co/300x400/png?text=User+${i + 1}`,
+  rot: (i - 3) * 12 // Distributed angles centered at 0
+}));
 
-const validateForm = () => {
-  let isValid = true;
-  
-  // Reset errors
-  Object.keys(errors).forEach(key => errors[key] = '');
-  
-  if (!form.title.trim()) {
-    errors.title = 'Please enter your name';
-    isValid = false;
-  }
-  
-  if (!form.email.trim()) {
-    errors.email = 'Please enter your email';
-    isValid = false;
-  } else if (!validateEmail(form.email)) {
-    errors.email = 'Please enter a valid email address';
-    isValid = false;
-  }
-  
-  if (!form.subject.trim()) {
-    errors.subject = 'Please enter a subject';
-    isValid = false;
-  }
-  
-  if (!form.description.trim()) {
-    errors.description = 'Please enter your message';
-    isValid = false;
-  } else if (form.description.trim().length < 10) {
-    errors.description = 'Message must be at least 10 characters';
-    isValid = false;
-  }
-  
-  return isValid;
-};
-
-const handleSubmit = async () => {
-  if (!validateForm()) return;
-  
-  isSubmitting.value = true;
-  
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  console.log('Form submitted:', form);
-  isSubmitting.value = false;
-  isSubmitted.value = true;
-  
-  // Reset form after successful submission
-  Object.keys(form).forEach(key => form[key] = '');
-};
-
-const resetForm = () => {
-  isSubmitted.value = false;
-  Object.keys(form).forEach(key => form[key] = '');
-  Object.keys(errors).forEach(key => errors[key] = '');
+const submitForm = () => {
+  console.log('Submitting', form.value);
 };
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#fff4ec] via-[#fef7f1] to-[#f5f1ed]">
-    <!-- Hero Section -->
-    <section class="relative pt-32 pb-16 overflow-hidden">
-      <!-- Decorative Elements -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-orange-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-      <div class="absolute bottom-0 left-0 w-80 h-80 bg-orange-200/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-      
-      <div class="max-w-7xl mx-auto px-6 relative z-10">
-        <div class="text-center" data-aos="fade-up" data-aos-duration="800">
-          <h1 class="phitagate-font text-5xl md:text-7xl font-bold text-[#5A4A42] mb-4">
-            Get in Touch
-          </h1>
-          <div class="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto rounded-full mb-6"></div>
-          <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light">
-            We'd love to hear from you. Whether you have a question about our services, 
-            need design consultation, or want to start a project with us.
-          </p>
-        </div>
-      </div>
-    </section>
+  <div class="min-h-screen bg-[#F3F0EA] font-sans text-gray-900 overflow-x-hidden pt-[110px]">
+    <!-- Top Section: Contact & Form -->
+    <div class="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-8 md:py-12 min-h-[calc(100dvh-110px)] flex items-center justify-center">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 xl:gap-28 items-center w-full">
 
-    <!-- Main Content -->
-    <section class="pb-20 px-6">
-      <div class="max-w-7xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20">
-          
-          <!-- Contact Info Side -->
-          <div class="order-2 lg:order-1" data-aos="fade-right" data-aos-duration="800" data-aos-delay="200">
-            <div class="bg-black rounded-3xl p-8 md:p-12 text-white h-full relative overflow-hidden">
-              <!-- Decorative Pattern -->
-              <div class="absolute top-0 right-0 w-64 h-64 opacity-5">
-                <svg viewBox="0 0 200 200" fill="currentColor">
-                  <circle cx="100" cy="100" r="80" stroke="white" stroke-width="0.5" fill="none" />
-                  <circle cx="100" cy="100" r="60" stroke="white" stroke-width="0.5" fill="none" />
-                  <circle cx="100" cy="100" r="40" stroke="white" stroke-width="0.5" fill="none" />
-                </svg>
-              </div>
-              
-              <h2 class="font-serif text-3xl md:text-4xl font-bold mb-8">
-                Contact Information
-              </h2>
-              
-              <div class="space-y-8">
-                <!-- Address -->
-                <div class="flex items-start gap-4 group">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <i class="pi pi-map-marker text-xl"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Our Office</h3>
-                    <p class="text-gray-300 leading-relaxed">
-                      90/1, North Beach Road<br />
-                      Tuticorin, Chennai – 628001
-                    </p>
-                  </div>
-                </div>
-                
-                <!-- Phone -->
-                <div class="flex items-start gap-4 group">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <i class="pi pi-phone text-xl"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Call Us</h3>
-                    <a href="tel:+919751112025" class="text-gray-300 hover:text-orange-400 transition-colors duration-300">
-                      +91 97511 12025
-                    </a>
-                  </div>
-                </div>
-                
-                <!-- Email -->
-                <div class="flex items-start gap-4 group">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <i class="pi pi-envelope text-xl"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Email Us</h3>
-                    <a href="mailto:info.spacefurnio@gmail.com" class="text-gray-300 hover:text-orange-400 transition-colors duration-300 break-all">
-                      info.spacefurnio@gmail.com
-                    </a>
-                  </div>
-                </div>
-                
-                <!-- Working Hours -->
-                <div class="flex items-start gap-4 group">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <i class="pi pi-clock text-xl"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Working Hours</h3>
-                    <p class="text-gray-300">
-                      Mon - Sat: 9:00 AM - 6:00 PM<br />
-                      Sunday: Closed
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Social Links -->
-              <div class="mt-12 pt-8 border-t border-gray-700">
-                <h3 class="font-semibold text-lg mb-4">Follow Us</h3>
-                <div class="flex gap-3">
-                  <a href="#" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-orange-600 hover:border-transparent transition-all duration-300">
-                    <i class="pi pi-facebook"></i>
-                  </a>
-                  <a href="#" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-orange-600 hover:border-transparent transition-all duration-300">
-                    <i class="pi pi-instagram"></i>
-                  </a>
-                  <a href="#" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-orange-600 hover:border-transparent transition-all duration-300">
-                    <i class="pi pi-linkedin"></i>
-                  </a>
-                  <a href="#" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-orange-600 hover:border-transparent transition-all duration-300">
-                    <i class="pi pi-twitter"></i>
-                  </a>
-                </div>
-              </div>
+        <!-- Left: Info -->
+        <div class="space-y-10 md:space-y-14 lg:space-y-16">
+          <div>
+            <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[72px] font-bold mb-4 md:mb-6 tracking-tight leading-tight">Contact us</h1>
+            <p class="text-gray-500 max-w-md lg:max-w-lg text-base md:text-lg lg:text-xl leading-relaxed">
+              We'd love to hear from you. Please fill out this form, and we'll reply soon.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-y-10 md:gap-y-12 lg:gap-y-14 gap-x-8 md:gap-x-12 lg:gap-x-16">
+            <div v-for="(method, idx) in contactMethods" :key="idx">
+              <h3 class="font-semibold text-lg md:text-xl lg:text-2xl mb-2 md:mb-3">{{ method.label }}</h3>
+              <p class="text-gray-500 text-sm md:text-base lg:text-lg mb-3 md:mb-4 leading-relaxed max-w-[220px] lg:max-w-[260px]">{{ method.desc }}</p>
+              <template v-if="method.link">
+                <a :href="method.link" class="font-semibold text-base md:text-lg lg:text-xl border-b-2 border-black pb-0.5 hover:text-gray-600 transition-colors">
+                  {{ method.value }}
+                </a>
+              </template>
+              <template v-else>
+                <p class="font-semibold text-base md:text-lg lg:text-xl max-w-[220px] lg:max-w-[280px] leading-snug">{{ method.value }}</p>
+              </template>
             </div>
           </div>
-          
-          <!-- Form Side -->
-          <div class="order-1 lg:order-2" data-aos="fade-left" data-aos-duration="800" data-aos-delay="400">
-            <div class="bg-white rounded-3xl shadow-2xl shadow-orange-100/50 p-8 md:p-12">
-              
-              <!-- Success State -->
-              <div v-if="isSubmitted" class="text-center py-12">
-                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center animate-bounce-once">
-                  <i class="pi pi-check text-4xl text-white"></i>
-                </div>
-                <h3 class="font-serif text-2xl md:text-3xl font-bold text-[#5A4A42] mb-4">
-                  Message Sent!
-                </h3>
-                <p class="text-gray-600 mb-8">
-                  Thank you for reaching out. We'll get back to you within 24 hours.
-                </p>
-                <Button 
-                  label="Send Another Message" 
-                  icon="pi pi-arrow-left"
-                  class="bg-gradient-to-r from-orange-400 to-orange-600 border-none text-white px-8 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                  @click="resetForm"
+        </div>
+
+        <!-- Right: Form -->
+        <div class="bg-[#FDFBF7] p-8 sm:p-10 md:p-12 lg:p-14 rounded-3xl md:rounded-[2rem] shadow-md">
+          <h2 class="font-display text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8 lg:mb-10">Write us a message</h2>
+          <form @submit.prevent="submitForm" class="space-y-5 md:space-y-6 lg:space-y-7">
+
+            <div class="grid grid-cols-2 gap-4 md:gap-5 lg:gap-6">
+              <div class="space-y-2 md:space-y-2.5">
+                <label class="text-sm md:text-base lg:text-lg font-medium text-gray-700">First name *</label>
+                <input
+                  v-model="form.firstName"
+                  type="text"
+                  placeholder="Jane"
+                  class="w-full bg-[#EAE8E4] rounded-xl px-4 md:px-5 py-3 md:py-4 text-base md:text-lg outline-none focus:ring-2 focus:ring-gray-400 transition-all placeholder-gray-500"
                 />
               </div>
-              
-              <!-- Form -->
-              <form v-else @submit.prevent="handleSubmit" class="space-y-6">
-                <div class="mb-8">
-                  <h2 class="font-serif text-3xl md:text-4xl font-bold text-[#5A4A42] mb-2">
-                    Send us a Message
-                  </h2>
-                  <p class="text-gray-500">
-                    Fill out the form below and we'll respond shortly.
-                  </p>
-                </div>
-                
-                <!-- Name/Title Field -->
-                <div class="form-group">
-                  <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Your Name <span class="text-orange-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <i class="pi pi-user"></i>
-                    </span>
-                    <InputText 
-                      id="title"
-                      v-model="form.title"
-                      placeholder="Enter your full name"
-                      class="w-full pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 transition-colors duration-300"
-                      :class="{ 'border-red-400': errors.title }"
-                      :style="{ paddingLeft: '3rem' }"
-                    />
-                  </div>
-                  <small v-if="errors.title" class="text-red-500 mt-1 block">{{ errors.title }}</small>
-                </div>
-                
-                <!-- Email Field -->
-                <div class="form-group">
-                  <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Email Address <span class="text-orange-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <i class="pi pi-envelope"></i>
-                    </span>
-                    <InputText 
-                      id="email"
-                      v-model="form.email"
-                      type="email"
-                      placeholder="Enter your email address"
-                      class="w-full pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 transition-colors duration-300"
-                      :class="{ 'border-red-400': errors.email }"
-                      :style="{ paddingLeft: '3rem' }"
-                    />
-                  </div>
-                  <small v-if="errors.email" class="text-red-500 mt-1 block">{{ errors.email }}</small>
-                </div>
-                
-                <!-- Subject Field -->
-                <div class="form-group">
-                  <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Subject <span class="text-orange-500">*</span>
-                  </label>
-                  <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <i class="pi pi-tag"></i>
-                    </span>
-                    <InputText 
-                      id="subject"
-                      v-model="form.subject"
-                      placeholder="What is this regarding?"
-                      class="w-full pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 transition-colors duration-300"
-                      :class="{ 'border-red-400': errors.subject }"
-                      :style="{ paddingLeft: '3rem' }"
-                    />
-                  </div>
-                  <small v-if="errors.subject" class="text-red-500 mt-1 block">{{ errors.subject }}</small>
-                </div>
-                
-                <!-- Description/Message Field -->
-                <div class="form-group">
-                  <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Your Message <span class="text-orange-500">*</span>
-                  </label>
-                  <Textarea 
-                    id="description"
-                    v-model="form.description"
-                    rows="5"
-                    placeholder="Tell us about your project or inquiry..."
-                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 transition-colors duration-300 resize-none"
-                    :class="{ 'border-red-400': errors.description }"
-                  />
-                  <small v-if="errors.description" class="text-red-500 mt-1 block">{{ errors.description }}</small>
-                </div>
-                
-                <!-- Submit Button -->
-                <div class="pt-4">
-                  <Button 
-                    type="submit"
-                    :label="isSubmitting ? 'Sending...' : 'Send Message'"
-                    :icon="isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-send'"
-                    :disabled="isSubmitting"
-                    class="w-full bg-gradient-to-r from-orange-400 to-orange-600 border-none text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-                  />
-                </div>
-              </form>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-    </section>
-    
-    <!-- Map Section (Optional Enhancement) -->
-    <section class="pb-20 px-6" data-aos="fade-up" data-aos-duration="800">
-      <div class="max-w-7xl mx-auto">
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-          <div class="aspect-[21/9] bg-gray-100 relative">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3943.686447361!2d78.1275!3d8.7642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwNDUnNTEuMSJOIDc4wrAwNyczMy4wIkU!5e0!3m2!1sen!2sin!4v1234567890"
-              class="w-full h-full border-0"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-            ></iframe>
-            <!-- Map Overlay -->
-            <div class="absolute bottom-6 left-6 bg-white rounded-2xl shadow-lg px-6 py-4 max-w-sm">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                  <i class="pi pi-map-marker text-white"></i>
-                </div>
-                <div>
-                  <p class="font-semibold text-gray-800">Spacefurnio Office</p>
-                  <p class="text-sm text-gray-500">Tuticorin, Tamil Nadu</p>
-                </div>
+              <div class="space-y-2 md:space-y-2.5">
+                <label class="text-sm md:text-base lg:text-lg font-medium text-gray-700">Last name *</label>
+                <input
+                  v-model="form.lastName"
+                  type="text"
+                  placeholder="Smith"
+                  class="w-full bg-[#EAE8E4] rounded-xl px-4 md:px-5 py-3 md:py-4 text-base md:text-lg outline-none focus:ring-2 focus:ring-gray-400 transition-all placeholder-gray-500"
+                />
               </div>
             </div>
-          </div>
+
+            <div class="space-y-2 md:space-y-2.5">
+              <label class="text-sm md:text-base lg:text-lg font-medium text-gray-700">Email *</label>
+              <input
+                v-model="form.email"
+                type="email"
+                placeholder="jane@email.com"
+                class="w-full bg-[#EAE8E4] rounded-xl px-4 md:px-5 py-3 md:py-4 text-base md:text-lg outline-none focus:ring-2 focus:ring-gray-400 transition-all placeholder-gray-500"
+              />
+            </div>
+
+            <div class="space-y-2 md:space-y-2.5">
+              <label class="text-sm md:text-base lg:text-lg font-medium text-gray-700">Message *</label>
+              <textarea
+                v-model="form.message"
+                rows="5"
+                placeholder="Leave us a message..."
+                class="w-full bg-[#EAE8E4] rounded-xl px-4 md:px-5 py-3 md:py-4 text-base md:text-lg outline-none focus:ring-2 focus:ring-gray-400 transition-all placeholder-gray-500 resize-none"
+              ></textarea>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+              <input
+                v-model="form.agree"
+                type="checkbox"
+                id="agree"
+                class="w-5 h-5 rounded border-gray-400 text-black focus:ring-black accent-black"
+              />
+              <label for="agree" class="text-sm md:text-base lg:text-lg text-gray-600 select-none">I agree the Privacy Policy</label>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-black text-white font-medium text-base md:text-lg lg:text-xl py-4 md:py-5 rounded-full mt-4 hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"
+            >
+              Send
+            </button>
+
+          </form>
         </div>
       </div>
-    </section>
-    
-    <!-- Footer -->
-    <FooterComponent />
+    </div>
+
+    <!-- Bottom Section: Team Arc -->
+    <div class="pt-[50px]">
+      <CTA/>
+    </div>
   </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
-
-@font-face {
-  font-family: 'Phitagate';
-  src: url('/fonts/Phitagate.otf') format('opentype');
-}
-
-.phitagate-font {
-  font-family: 'Phitagate', serif;
-}
-
-.font-serif {
+/* Optional: specific tweaks */
+.font-display {
   font-family: 'Playfair Display', serif;
-}
-
-/* Input focus styles */
-:deep(.p-inputtext:enabled:focus),
-:deep(.p-textarea:enabled:focus) {
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2);
-  border-color: #fb923c !important;
-}
-
-:deep(.p-inputtext),
-:deep(.p-textarea) {
-  font-family: inherit;
-}
-
-/* Button hover animation */
-:deep(.p-button) {
-  position: relative;
-  overflow: hidden;
-}
-
-:deep(.p-button)::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-:deep(.p-button:hover)::before {
-  left: 100%;
-}
-
-/* Custom bounce animation for success icon */
-@keyframes bounceOnce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.animate-bounce-once {
-  animation: bounceOnce 0.5s ease-out;
-}
-
-/* Smooth gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Form group focus-within styling */
-.form-group:focus-within label {
-  color: #ea580c;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .grid {
-    gap: 2rem;
-  }
-}
-
-@media (max-width: 640px) {
-  :deep(.p-inputtext),
-  :deep(.p-textarea) {
-    font-size: 16px; /* Prevents zoom on iOS */
-  }
 }
 </style>
