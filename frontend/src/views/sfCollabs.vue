@@ -19,7 +19,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="scroll-container" class="overflow-hidden">
+  <div id="scroll-container" class="overflow-clip">
     <div id="scroll-wrapper" ref="wrapper">
         <div class="scroll-section bg-background-light text-primary font-body antialiased transition-colors duration-500">
           <!-- Header -->
@@ -96,65 +96,3 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.text-vertical {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-}
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #888;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-</style>
-
-<style scoped>
-#scroll-wrapper {
-  width: 100%;
-  height: 100dvh;
-  position: relative;
-}
-
-/* :global(html, body) {
-  overflow: hidden !important;
-} */
-
-.section {
-  width: 100%;
-  height: 100dvh;
-  display: flex;
-  overflow: hidden;
-}
-
-.nav-dots {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 100;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border: 1px solid #fff;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.dot.active {
-  background: #fff;
-}
-</style>
