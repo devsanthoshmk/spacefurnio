@@ -1,0 +1,32 @@
+meta {
+  name: User Details Update
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/backend/api/v1/auth/me
+  body: json
+  auth: bearer
+}
+
+headers {
+  Cookie: sf_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyOTI1MGU2ZS00NDhhLTQwZWUtYWM1NC0xMjM3N2ZmZmExMGQiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzcwNTc2Nzc5LCJpc3MiOiJzcGFjZWZ1cm5pby1hcGkiLCJhdWQiOiJzcGFjZWZ1cm5pby11c2VycyIsImV4cCI6MTc3MTE4MTU3OX0.yv4232vUziHLpNfwgHCv4GhiQ839zjJtbGQGODPcEgg
+}
+
+auth:bearer {
+  token: 
+}
+
+body:json {
+  {
+    "name": "Kumar",
+    "phone": "123456789",
+    "email": "sudo.santhoshmk@gmail.com"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
