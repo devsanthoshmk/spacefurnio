@@ -43,27 +43,30 @@ export const toggleWishlist = (product) => {
   console.log('Toggled wishlist:', product)
 }
 
-const files={
-  category: () => import('@/data/category.json').then(d=>d.default || d),
-  style: () => import('@/data/design-style.json').then(d=>d.default || d),
-  space: () => import('@/data/design-space.json').then(d=>d.default || d),
+const files = {
+  category: () => import('@/data/category.json').then(d => d.default || d),
+  style: () => import('@/data/design-style.json').then(d => d.default || d),
+  space: () => import('@/data/design-space.json').then(d => d.default || d),
 }
 // Derive shop type & category/design from the URL and returns everything needed for each category type
 export const useCurrentShop = (route) => {
   if (route.path.includes('/shop/design')) {
     if (route.path.includes('/shop/design/space'))
-      return {type:'space',breadcrumbName: "Shop By Space", importJson: files.space, route: "/shop/design" }
+      return { type: 'space', breadcrumbName: "Shop By Space", importJson: files.space, route: "/shop/design/space" }
+    else if (route.path.includes('/shop/design/style'))
+      return { type: 'style', breadcrumbName: "Shop By Style", importJson: files.style, route: "/shop/design/style" }
     else
-      return {type:'style',breadcrumbName: "Shop By Style", importJson: files.style, route: "/shop/design" }
+      // Default fallback for /shop/design/:category routes - use style JSON
+      return { type: 'style', breadcrumbName: "Shop By Style", importJson: files.style, route: "/shop/design" }
   } else {
-    return {type:'category',breadcrumbName: "Shop By Category", importJson: files.category, route: "/shop/category" }
+    return { type: 'category', breadcrumbName: "Shop By Category", importJson: files.category, route: "/shop/category" }
   }
 }
 
 // --- Data Loading ---
 const cache = {}
 
-export const getShopTypeProducts= async (route) => {
+export const getShopTypeProducts = async (route) => {
   try {
     const shop = useCurrentShop(route)
     if (!cache[shop.type]) {

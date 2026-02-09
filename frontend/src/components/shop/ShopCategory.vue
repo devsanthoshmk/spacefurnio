@@ -1,59 +1,67 @@
 <template>
-  <div>
+  <div class="shop-category">
     <!-- Loading State -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <div
-        v-for="n in 4"
-        :key="n"
-        class="bg-gray-100 rounded-2xl aspect-square animate-pulse"
-      ></div>
+    <div v-if="loading" class="categories-grid">
+      <div v-for="n in 4" :key="n" class="category-card skeleton">
+        <div class="category-icon-wrapper shop-skeleton"></div>
+        <div class="shop-skeleton skeleton-label"></div>
+      </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="text-center py-16">
-      <div class="text-warm-orange text-6xl mb-4">⚠️</div>
-      <h3 class="text-2xl font-bold text-charcoal mb-2">Oops! Something went wrong</h3>
-      <p class="text-gray-600">{{ error }}</p>
+    <div v-else-if="error" class="error-state">
+      <div class="error-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8v4M12 16h.01"/>
+        </svg>
+      </div>
+      <h3 class="error-title">Something went wrong</h3>
+      <p class="error-text">{{ error }}</p>
+      <button class="shop-btn shop-btn-secondary" @click="$emit('retry')">
+        Try Again
+      </button>
     </div>
 
-    <!-- Categories Grid - FIXED -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <!-- Categories Grid -->
+    <div v-else class="categories-grid shop-stagger">
       <div
-        v-for="(item, index) in items"
+        v-for="item in items"
         :key="item.id"
-        class="group cursor-pointer"
-        :style="{ animationDelay: `${index * 100}ms` }"
+        class="category-card"
         @click="navigateToCategory(item.slug)"
       >
-        <div class="relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-2">
-          <!-- Icon Container -->
-          <div class="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-warm-orange group-hover:to-orange-400 transition-all duration-300">
-            <!-- Shop Now Overlay - FIXED POSITIONING -->
-            <div class="absolute inset-0 bg-warm-orange bg-opacity-0 group-hover:bg-opacity-95 transition-all duration-300 flex items-center justify-center z-20">
-              <div class="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
-                <span class="text-white font-bold text-lg px-6 py-3 border-2 border-white rounded-full">
-                  Shop Now
-                </span>
-              </div>
-            </div>
-
-            <!-- Image with proper containment -->
-            <img
-              :src="item.image"
-              :alt="item.name"
-              class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 group-hover:opacity-0 z-10"
-            />
+        <div class="category-icon-wrapper">
+          <!-- Icon or Image -->
+          <div v-if="item.icon" class="category-icon" v-html="item.icon"></div>
+          <img 
+            v-else-if="item.image" 
+            :src="item.image" 
+            :alt="item.name"
+            class="category-image"
+            loading="lazy"
+          />
+          <div v-else class="category-placeholder">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
           </div>
-
-          <!-- Category Name -->
-          <div class="p-6 text-center relative z-30">
-            <h3 class="text-xl font-bold text-charcoal group-hover:text-warm-orange transition-colors duration-300">
-              {{ item.name }}
-            </h3>
-
-            <!-- Custom Badge Slot -->
-            <slot name="badge" :item="item"></slot>
-          </div>
+        </div>
+        
+        <div class="category-info">
+          <span class="category-name">{{ item.name }}</span>
+          <span v-if="item.productCount" class="category-count">
+            {{ item.productCount }} items
+          </span>
+        </div>
+        
+        <!-- Hover Arrow -->
+        <div class="category-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </div>
       </div>
     </div>
@@ -63,7 +71,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
 
-// Props (unchanged)
 defineProps({
   items: {
     type: Array,
@@ -79,6 +86,8 @@ defineProps({
   }
 })
 
+defineEmits(['retry'])
+
 const router = useRouter()
 
 const navigateToCategory = (slug) => {
@@ -86,27 +95,170 @@ const navigateToCategory = (slug) => {
 }
 </script>
 
-<!-- Styles unchanged -->
 <style scoped>
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@import '@/assets/shop.css';
+
+.shop-category {
+  width: 100%;
+}
+
+/* Categories Grid */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
   }
 }
 
-.grid > div {
-  animation: slideUp 0.6s ease-out forwards;
+/* Category Card */
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  background: white;
+  border: 1px solid var(--shop-beige, #E8E3DC);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.category-card:hover {
+  border-color: var(--shop-tan, #C4B8A9);
+  box-shadow: 0 8px 24px rgba(61, 58, 54, 0.1);
+  transform: translateY(-4px);
+}
+
+.category-card.skeleton {
+  pointer-events: none;
+}
+
+/* Icon Wrapper */
+.category-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--shop-cream-dark, #F5F2ED);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon-wrapper {
+  background: var(--shop-beige, #E8E3DC);
+  transform: scale(1.05);
+}
+
+.category-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--shop-charcoal, #3D3A36);
+}
+
+.category-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.category-placeholder {
+  color: var(--shop-tan, #C4B8A9);
+}
+
+/* Category Info */
+.category-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.category-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--shop-charcoal, #3D3A36);
+  transition: color 0.2s ease;
+}
+
+.category-card:hover .category-name {
+  color: var(--shop-accent, #B8956C);
+}
+
+.category-count {
+  font-size: 0.75rem;
+  color: var(--shop-brown, #A89B8C);
+}
+
+/* Hover Arrow */
+.category-arrow {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
   opacity: 0;
+  transform: translateX(-8px);
+  color: var(--shop-accent, #B8956C);
+  transition: all 0.3s ease;
 }
 
-/* Stagger animation for grid items */
-.grid > div:nth-child(1) { animation-delay: 0ms; }
-.grid > div:nth-child(2) { animation-delay: 100ms; }
-.grid > div:nth-child(3) { animation-delay: 200ms; }
-.grid > div:nth-child(4) { animation-delay: 300ms; }
+.category-card:hover .category-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Skeleton */
+.skeleton .category-icon-wrapper {
+  background: var(--shop-beige, #E8E3DC);
+}
+
+.skeleton-label {
+  width: 60%;
+  height: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.error-icon {
+  color: var(--shop-accent, #B8956C);
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--shop-charcoal, #3D3A36);
+  margin: 0 0 0.5rem 0;
+}
+
+.error-text {
+  font-size: 0.875rem;
+  color: var(--shop-brown, #A89B8C);
+  margin: 0 0 1.5rem 0;
+}
 </style>
