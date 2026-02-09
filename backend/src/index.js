@@ -14,12 +14,8 @@ import { withDb } from './middleware/database.js';
 
 // Import route handlers
 import authRoutes from './routes/auth.js';
-import productRoutes from './routes/products.js';
-import cartRoutes from './routes/cart.js';
-import wishlistRoutes from './routes/wishlist.js';
 import reviewRoutes from './routes/reviews.js';
 import orderRoutes from './routes/orders.js';
-import addressRoutes from './routes/addresses.js';
 import adminRoutes from './routes/admin/index.js';
 import webhookRoutes from './routes/webhooks.js';
 import contentAdminRoutes from './routes/admin/contentAdmin.js';
@@ -65,21 +61,6 @@ router.get('/backend/api/v1', () => json({
 router.all('/backend/api/v1/auth/*', withParams, withDb, authRoutes.handle);
 
 // ===========================================
-// PRODUCT ROUTES (Public)
-// ===========================================
-router.all('/backend/api/v1/products/*', withParams, withDb, withOptionalAuth, productRoutes.handle);
-
-// ===========================================
-// CART ROUTES (Auth Optional - supports guest carts)
-// ===========================================
-router.all('/backend/api/v1/cart/*', withParams, withDb, withOptionalAuth, cartRoutes.handle);
-
-// ===========================================
-// WISHLIST ROUTES (Auth Required)
-// ===========================================
-router.all('/backend/api/v1/wishlist/*', withParams, withDb, withAuth, wishlistRoutes.handle);
-
-// ===========================================
 // REVIEW ROUTES (Mixed auth)
 // ===========================================
 router.all('/backend/api/v1/reviews/*', withParams, withDb, withOptionalAuth, reviewRoutes.handle);
@@ -88,11 +69,6 @@ router.all('/backend/api/v1/reviews/*', withParams, withDb, withOptionalAuth, re
 // ORDER ROUTES (Auth Required)
 // ===========================================
 router.all('/backend/api/v1/orders/*', withParams, withDb, withAuth, orderRoutes.handle);
-
-// ===========================================
-// ADDRESS ROUTES (Auth Required)
-// ===========================================
-router.all('/backend/api/v1/addresses/*', withParams, withDb, withAuth, addressRoutes.handle);
 
 // ===========================================
 // CONTENT ADMIN ROUTES (Passcode Protected via KV)

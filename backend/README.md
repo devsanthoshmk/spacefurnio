@@ -16,7 +16,9 @@ The Spacefurnio backend is built on **Cloudflare Workers** with **Neon PostgreSQ
          │                      ▼
          │              ┌─────────────────┐
          │              │  Cloudflare KV  │
-         │              │  (Rate Limits)  │
+         │              │  - Rate Limits  │
+         │              │  - Session      │
+         │              │    Revocation   │
          │              └─────────────────┘
          │
          ▼
@@ -39,6 +41,7 @@ The Spacefurnio backend is built on **Cloudflare Workers** with **Neon PostgreSQ
 | Magic Links     | MailChannels                 |
 | Payments        | Razorpay                     |
 | Rate Limiting   | Cloudflare KV                |
+| Session Revoke  | Cloudflare KV (EXPIRED_SESSIONS) |
 | Frontend        | Vue.js 3 + Pinia             |
 
 ## Project Structure
@@ -89,6 +92,53 @@ frontend/
 | Document | Description |
 |----------|-------------|
 | [Admin Content Panel](./docs/ADMIN_CONTENT_PANEL.md) | Walkthrough for setting up and using the admin content management panel |
+
+## Migration Guide: Cookie-Based Authentication
+
+### For Existing Frontends
+
+The API now supports **dual authentication** (header + cookie), ensuring **backwards compatibility**:
+
+✅ **Existing implementations continue to work** - Authorization header is still supported  
+✅ **Gradual migration** - Frontends can adopt cookies at their own pace  
+✅ **Enhanced security** - New implementations benefit from httpOnly cookies
+
+#### Recommended Migration Steps
+
+1. **Update fetch calls to include credentials**:
+   ```javascript
+   // Before
+   fetch('/api/v1/cart', {
+     headers: { 'Authorization': `Bearer ${token}` }
+   });
+   
+   // After (recommended)
+   fetch('/api/v1/cart', {
+     credentials: 'include',  // Sends cookies + allows header
+     headers: { 'Authorization': `Bearer ${token}` }  // Optional
+   });
+   ```
+
+2. **Remove localStorage token management** (optional, for enhanced security):
+   - The `sf_token` cookie is set automatically on login
+   - Remove manual token storage if using cookie-only approach
+   - Keep Authorization header for custom scenarios (mobile apps, etc.)
+
+3. **Handle authentication responses**:
+   ```javascript
+   // The token is still returned in response body
+   // But it's ALSO set as httpOnly cookie automatically
+   const { user, token } = await loginUser();
+   // No need to manually store token if using cookies
+   ```
+
+#### Cookie Configuration
+
+Cookies are configured with:
+- **HttpOnly**: JavaScript cannot access (XSS protection)
+- **SameSite=Lax**: CSRF protection
+- **Secure** (production): HTTPS-only
+- **Max-Age**: Matches JWT expiry (7 days default)
 
 ## Environment Variables
 
@@ -141,12 +191,64 @@ wrangler secret put ADMIN_SECURITY_CODE
 | POST   | `/google/callback`   | ❌   | Handle Google OAuth callback |
 | POST   | `/magic-link`        | ❌   | Request magic link email     |
 | POST   | `/magic-link/verify` | ❌   | Verify magic link token      |
+| POST   | `/signup`            | ❌   | Register with email/password |
+| POST   | `/login`             | ❌   | Login with email/password    |
 | GET    | `/me`                | ✅   | Get current user             |
 | PATCH  | `/me`                | ✅   | Update user profile          |
 | POST   | `/logout`            | ✅   | Logout current session       |
-| POST   | `/logout-all`        | ✅   | Logout all sessions          |
-| GET    | `/sessions`          | ✅   | List all sessions            |
-| DELETE | `/sessions/:id`      | ✅   | Revoke specific session      |
+| POST   | `/logout-all`        | ✅   | Logout current session (same as /logout with stateless JWT) |
+
+#### Authentication Methods
+
+The API supports **dual authentication**:
+1. **Bearer Token (Header)**: `Authorization: Bearer <token>`
+2. **HttpOnly Cookie**: `sf_token` cookie (auto-set on login)
+
+**Priority**: Authorization header is checked first, then falls back to cookie if header is missing/invalid.
+
+#### User Profile Fields
+
+User objects include:
+- `id` - User UUID
+- `email` - Email address
+- `name` - Display name
+- `avatar_url` - Profile picture URL
+- `phone` - Phone number (E.164 format)
+- `is_admin` - Admin status (boolean)
+- `email_verified` - Email verification status (boolean)
+- `provider` - Auth provider (`google`, `email`)
+
+#### Authentication Response Format
+
+All successful authentication endpoints (`/google/callback`, `/magic-link/verify`) return:
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "uuid-here",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "avatarUrl": "https://...",
+    "isAdmin": false,
+    "email_verified": true
+  },
+  "token": "eyJhbGc...",
+  "isNewUser": false  // Only for new registrations
+}
+```
+
+**Headers**: Response includes `Set-Cookie` header with httpOnly `sf_token` cookie.
+
+#### Update User Profile (PATCH /me)
+
+Supports updating:
+- `name` - Display name
+- `phone` - Phone number (validated)
+- `avatar_url` - Profile picture URL
+- `email` - Email address (triggers re-verification)
+
+**Note**: Updating email sets `email_verified=false` and `provider='email'`.
 
 ### Products (`/api/v1/products`)
 
@@ -269,8 +371,8 @@ Legend: ❌ No auth | ✅ Auth required | 🔐 Admin required
 5. Google redirects to frontend callback URL with code
 6. Frontend calls POST /api/v1/auth/google/callback with code
 7. Backend exchanges code for tokens, creates/updates user
-8. Backend returns JWT token
-9. Frontend stores token, redirects to app
+8. Backend returns JWT token + sets httpOnly sf_token cookie
+9. Frontend stores token (optional), redirects to app
 ```
 
 ### Magic Link
@@ -283,9 +385,36 @@ Legend: ❌ No auth | ✅ Auth required | 🔐 Admin required
 5. Frontend extracts token from URL
 6. Frontend calls POST /api/v1/auth/magic-link/verify
 7. Backend verifies token, creates session
-8. Backend returns JWT token
-9. Frontend stores token, redirects to app
+8. Backend returns JWT token + sets httpOnly sf_token cookie
+9. Frontend stores token (optional), redirects to app
 ```
+
+### Logout
+
+Both `/logout` and `/logout-all` endpoints:
+1. **Verify JWT using JWT_SECRET**
+2. **Mark token as revoked in `EXPIRED_SESSIONS` KV** with TTL matching JWT expiration
+3. Clear the `sf_token` cookie (Max-Age=0)
+4. Return success response
+
+> **Note:** With stateless JWT authentication, `/logout-all` only revokes the current token. True "logout all sessions" would require server-side session tracking.
+
+**Session Revocation Flow:**
+```
+1. User calls POST /api/v1/auth/logout
+2. Backend verifies JWT using JWT_SECRET
+3. Backend calculates TTL = JWT expiration - current time
+4. Backend stores token hash in EXPIRED_SESSIONS KV with TTL
+5. Backend clears sf_token cookie
+6. Any subsequent requests with the revoked token will be rejected
+```
+
+**Why Stateless JWT + KV Revocation?**
+- **No database session table**: Sessions are not stored in database, reducing writes
+- **Fast validation**: JWT verified locally, KV checked for revocation only
+- **Automatic cleanup**: KV entries auto-expire when JWT would have expired
+- **Distributed**: Works across all edge locations instantly
+- **Scalable**: No session table queries for auth checks
 
 ## Database Schema
 
@@ -293,7 +422,6 @@ Legend: ❌ No auth | ✅ Auth required | 🔐 Admin required
 
 - `users` - User accounts
 - `magic_links` - Magic link tokens
-- `sessions` - Active sessions
 - `admin_access` - Admin permissions
 
 ### Product Tables
@@ -391,8 +519,9 @@ Rate limits are enforced using Cloudflare KV:
 cd backend
 pnpm install
 
-# 2. Create KV namespace
+# 2. Create KV namespaces
 wrangler kv:namespace create RATE_LIMIT
+wrangler kv:namespace create EXPIRED_SESSIONS
 
 # 3. Set secrets
 wrangler secret put DATABASE_URL
@@ -428,15 +557,16 @@ VITE_RAZORPAY_KEY_ID=rzp_live_xxxxx
 ```javascript
 import api from '@/api';
 
-// Auth
+// Auth - Tokens automatically managed via httpOnly cookies
 const { url } = await api.auth.getGoogleAuthUrl();
 const { token, user } = await api.auth.verifyMagicLink(token);
+// Token stored in cookie automatically, localStorage optional
 
 // Products
 const { products } = await api.products.getAll({ category: 'sofas' });
 const { product } = await api.products.getBySlug('modern-sofa');
 
-// Cart
+// Cart - Works with cookie authentication
 await api.cart.addItem(productId, 2);
 const { items, subtotal } = await api.cart.get();
 
@@ -447,6 +577,27 @@ const { order, razorpay } = await api.orders.create({
 });
 ```
 
+### Authentication Requests
+
+The API client should handle authentication in one of two ways:
+
+```javascript
+// Option 1: Authorization Header (if token in localStorage)
+fetch('/api/v1/cart', {
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  },
+  credentials: 'include' // Important: sends cookies
+});
+
+// Option 2: Cookie Only (recommended - more secure)
+fetch('/api/v1/cart', {
+  credentials: 'include' // Sends sf_token cookie automatically
+});
+```
+
+**Note**: Always include `credentials: 'include'` to ensure cookies are sent with requests.
+
 ### Pinia Store Usage
 
 ```javascript
@@ -455,7 +606,7 @@ import { useAuthStore, useCartStore } from '@/stores';
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 
-// Auth
+// Auth - token handled automatically via cookie
 await authStore.initialize();
 if (authStore.isAuthenticated) {
 	console.log(authStore.userName);
@@ -468,14 +619,52 @@ console.log(cartStore.itemCount, cartStore.total);
 
 ## Security Considerations
 
-1. **JWT Tokens** - 7-day expiry, stored in localStorage
-2. **CORS** - Strict origin validation
-3. **Rate Limiting** - Prevents abuse
-4. **RLS** - Database-level access control
-5. **Admin Access** - Requires security code
-6. **Webhook Signatures** - HMAC verification
-7. **Input Validation** - All inputs sanitized
-8. **SQL Injection** - Parameterized queries via postgres.js
+1. **Dual Authentication**
+   - Supports both Authorization header and httpOnly cookies
+   - Authorization header takes priority if present and valid
+   - Falls back to `sf_token` cookie if header is missing/invalid
+   - Validates tokens - ignores "undefined", "null", or empty values
+
+2. **Cookie Security**
+   - `HttpOnly` - Prevents JavaScript access to tokens
+   - `SameSite=Lax` - CSRF protection
+   - `Secure` flag in production (HTTPS only)
+   - Automatic expiry matching JWT token lifespan (7 days default)
+   - Path limited to `/` for scope control
+
+3. **JWT Tokens**
+   - Verified using `JWT_SECRET` environment variable (HS256 algorithm)
+   - 7-day expiry (configurable via `JWT_EXPIRY_HOURS`)
+   - Contains minimal claims: user ID (`sub`) and admin status
+   - Email removed from JWT payload (fetch from DB when needed)
+   - Stored in both cookie (httpOnly) and optionally localStorage
+   - **Integrity verified on every request** using jose library
+
+4. **Stateless Session Management & Revocation**
+   - **No database session storage** - Sessions are purely JWT-based
+   - **Revoked tokens stored in `EXPIRED_SESSIONS` Cloudflare KV**
+   - Token validation checks:
+     1. JWT signature and claims verified with `JWT_SECRET`
+     2. Token hash checked against `EXPIRED_SESSIONS` KV (if present = revoked)
+     3. User existence/active status verified in PostgreSQL users table
+   - KV entries auto-expire when JWT would naturally expire (TTL-based)
+   - Logout revokes current token only (stateless = no multi-session tracking)
+   - `/logout-all` is equivalent to `/logout` in stateless architecture
+
+5. **User Profile Updates**
+   - Email changes require re-verification (`email_verified` reset to false)
+   - Provider switches to 'email' when email is updated
+   - Phone number validation (E.164 format)
+   - Avatar URL validation
+
+6. **Additional Security Layers**
+   - **CORS** - Strict origin validation
+   - **Rate Limiting** - Prevents abuse
+   - **RLS** - Database-level access control
+   - **Admin Access** - Requires security code
+   - **Webhook Signatures** - HMAC verification
+   - **Input Validation** - All inputs sanitized
+   - **SQL Injection** - Parameterized queries via postgres.js
 
 ## Error Handling
 

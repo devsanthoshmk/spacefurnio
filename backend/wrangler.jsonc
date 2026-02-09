@@ -32,6 +32,10 @@
 		{
 			"binding": "ADMIN_SECRETS",
 			"id": "e55f50a5c1714b37b80a1fdc70c46b4c"
+		},
+		{
+			"binding": "EXPIRED_SESSIONS",
+			"id": "3c34960d9dcc464e985cb24bb330c2b5"
 		}
 	],
 	"env": {
@@ -49,17 +53,22 @@
 				{
 					"binding": "CACHE",
 					"id": "CACHE_STAGING_ID_HERE",
-					"remote": true
+					"remote": false
 				},
 				{
 					"binding": "RATE_LIMIT",
 					"id": "RATE_LIMIT_STAGING_ID_HERE",
-					"remote": true
+					"remote": false
 				},
 				{
 					"binding": "ADMIN_SECRETS",
 					"id": "STAGING_ADMIN_SECRETS_ID_HERE",
-					"remote": true
+					"remote": false
+				},
+				{
+					"binding": "EXPIRED_SESSIONS",
+					"id": "EXPIRED_SESSIONS_STAGING_ID_HERE",
+					"remote": false
 				}
 			]
 		},
@@ -93,6 +102,11 @@
 				{
 					"binding": "CACHE",
 					"id": "d12c5e348a6e4067ad3456af4b0961d6",
+					"remote": true
+				},
+				{
+					"binding": "EXPIRED_SESSIONS",
+					"id": "3c34960d9dcc464e985cb24bb330c2b5",
 					"remote": true
 				}
 			]

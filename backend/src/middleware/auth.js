@@ -10,12 +10,18 @@ import * as jose from 'jose';
 
 /**
  * Verify JWT token and extract payload
+ * Uses JWT_SECRET from environment to verify token integrity
  * @param {string} token - JWT token
  * @param {Object} env - Environment bindings
- * @returns {Object|null} Token payload or null
+ * @returns {Object|null} Token payload (including exp claim) or null
  */
 async function verifyToken(token, env) {
   try {
+    if (!env.JWT_SECRET) {
+      console.error('JWT_SECRET is not configured in environment');
+      return null;
+    }
+
     const secret = new TextEncoder().encode(env.JWT_SECRET);
 
     const { payload } = await jose.jwtVerify(token, secret, {
@@ -28,6 +34,69 @@ async function verifyToken(token, env) {
     console.error('Token verification failed:', err.message);
     return null;
   }
+}
+
+/**
+ * Check if a token has been marked as expired/revoked in EXPIRED_SESSIONS KV
+ * @param {string} tokenHash - Hashed token
+ * @param {Object} env - Environment bindings
+ * @returns {Promise<boolean>} True if token is expired/revoked
+ */
+export async function isTokenExpired(tokenHash, env) {
+  try {
+    if (!env.EXPIRED_SESSIONS) {
+      console.warn('EXPIRED_SESSIONS KV not configured, skipping expired check');
+      return false;
+    }
+
+    const expiredEntry = await env.EXPIRED_SESSIONS.get(`session:${tokenHash}`);
+    return expiredEntry !== null;
+  } catch (err) {
+    console.error('Error checking expired session:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Mark a token as expired/revoked in EXPIRED_SESSIONS KV
+ * The TTL is set to the remaining time until JWT expiration
+ * @param {string} tokenHash - Hashed token
+ * @param {number} jwtExpTimestamp - JWT expiration timestamp (Unix seconds)
+ * @param {Object} env - Environment bindings
+ * @returns {Promise<boolean>} True if successfully marked
+ */
+export async function markTokenAsExpired(tokenHash, jwtExpTimestamp, env) {
+  try {
+    if (!env.EXPIRED_SESSIONS) {
+      console.warn('EXPIRED_SESSIONS KV not configured, cannot mark token as expired');
+      return false;
+    }
+
+    // Calculate TTL in seconds (remaining time until JWT natural expiration)
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const ttlSeconds = Math.max(1, jwtExpTimestamp - nowSeconds);
+
+    // Store in KV with expiration matching JWT expiry
+    await env.EXPIRED_SESSIONS.put(
+      `session:${tokenHash}`,
+      JSON.stringify({ revokedAt: new Date().toISOString() }),
+      { expirationTtl: ttlSeconds }
+    );
+
+    return true;
+  } catch (err) {
+    console.error('Error marking token as expired:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Get JWT expiration timestamp from a verified payload
+ * @param {Object} payload - JWT payload
+ * @returns {number|null} Expiration timestamp in seconds, or null
+ */
+export function getJwtExpiration(payload) {
+  return payload?.exp || null;
 }
 
 /**
@@ -52,9 +121,9 @@ export async function createToken(payload, env) {
 }
 
 /**
- * Hash a token for storage
+ * Hash a token for storage (using SHA-256 - for tokens only, NOT passwords)
  * @param {string} token - Token to hash
- * @returns {string} Hashed token
+ * @returns {Promise<string>} Hashed token
  */
 export async function hashToken(token) {
   const encoder = new TextEncoder();
@@ -63,6 +132,87 @@ export async function hashToken(token) {
   return Array.from(new Uint8Array(hash))
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
+}
+
+/**
+ * Hash a password using PBKDF2 (proper password hashing with salt)
+ * @param {string} password - Password to hash
+ * @returns {Promise<string>} Hashed password with salt (format: salt:hash)
+ */
+export async function hashPassword(password) {
+  // Generate random salt
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+
+  const encoder = new TextEncoder();
+  const passwordData = encoder.encode(password);
+
+  // Import password as key
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passwordData,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+
+  // Derive hash using PBKDF2
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000, // 100k iterations
+      hash: 'SHA-256'
+    },
+    key,
+    256 // 256 bits = 32 bytes
+  );
+
+  // Convert to hex and combine with salt
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+  return `${saltHex}:${hashHex}`;
+}
+
+/**
+ * Verify a password against a hash
+ * @param {string} password - Password to verify
+ * @param {string} storedHash - Stored hash (format: salt:hash)
+ * @returns {Promise<boolean>} True if password matches
+ */
+export async function verifyPassword(password, storedHash) {
+  const [saltHex, hashHex] = storedHash.split(':');
+
+  // Convert salt from hex
+  const salt = new Uint8Array(saltHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+  const encoder = new TextEncoder();
+  const passwordData = encoder.encode(password);
+
+  // Import password as key
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passwordData,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+
+  // Derive hash with same salt
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    key,
+    256
+  );
+
+  const newHashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+  return newHashHex === hashHex;
 }
 
 /**
@@ -89,6 +239,7 @@ function extractToken(request) {
 
 /**
  * Authentication middleware - requires valid token
+ * Validates JWT using JWT_SECRET and checks EXPIRED_SESSIONS KV for revoked tokens
  * @param {Request} request - Incoming request
  */
 export async function withAuth(request) {
@@ -102,6 +253,7 @@ export async function withAuth(request) {
     });
   }
 
+  // Verify JWT signature and claims using JWT_SECRET
   const payload = await verifyToken(token, env);
 
   if (!payload) {
@@ -111,50 +263,53 @@ export async function withAuth(request) {
     });
   }
 
-  // Verify session exists in database
+  // Check if token has been explicitly revoked (stored in EXPIRED_SESSIONS KV)
   const tokenHash = await hashToken(token);
-  const sessions = await db`
-    SELECT s.*, u.email, u.name, u.avatar_url, u.is_admin, u.is_active
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.token_hash = ${tokenHash}
-      AND s.expires_at > NOW()
-      AND u.is_active = TRUE
-  `;
+  const isExpired = await isTokenExpired(tokenHash, env);
 
-  if (sessions.length === 0) {
+  if (isExpired) {
     return error(401, {
       error: 'Unauthorized',
-      message: 'Session expired or invalid'
+      message: 'Session has been revoked'
     });
   }
 
-  const session = sessions[0];
-
-  // Update last_used_at
-  await db`
-    UPDATE sessions
-    SET last_used_at = NOW()
-    WHERE id = ${session.id}
+  // Get user from users table using sub claim from JWT
+  const userId = payload.sub;
+  const users = await db`
+    SELECT id, email, name, avatar_url, is_admin, is_active
+    FROM users
+    WHERE id = ${userId}
+      AND is_active = TRUE
   `;
+
+  if (users.length === 0) {
+    return error(401, {
+      error: 'Unauthorized',
+      message: 'User not found or inactive'
+    });
+  }
+
+  const user = users[0];
 
   // Attach user to request
   request.user = {
-    id: session.user_id,
-    email: session.email,
-    name: session.name,
-    avatarUrl: session.avatar_url,
-    isAdmin: session.is_admin
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatar_url,
+    isAdmin: user.is_admin
   };
 
-  request.sessionId = session.id;
+  request.jwtPayload = payload; // Store payload for potential use (e.g., getting exp for logout)
 
   // Create database client with user context
-  request.dbWithContext = request.createDbWithContext(session.user_id, null);
+  request.dbWithContext = request.createDbWithContext(user.id, null);
 }
 
 /**
  * Optional authentication middleware - populates user if token valid
+ * Validates JWT using JWT_SECRET and checks EXPIRED_SESSIONS KV for revoked tokens
  * @param {Request} request - Incoming request
  */
 export async function withOptionalAuth(request) {
@@ -173,6 +328,7 @@ export async function withOptionalAuth(request) {
     return; // Continue without auth
   }
 
+  // Verify JWT signature and claims using JWT_SECRET
   const payload = await verifyToken(token, env);
 
   if (!payload) {
@@ -184,37 +340,41 @@ export async function withOptionalAuth(request) {
     return;
   }
 
-  // Verify session
+  // Check if token has been explicitly revoked (stored in EXPIRED_SESSIONS KV)
   const tokenHash = await hashToken(token);
-  const sessions = await db`
-    SELECT s.*, u.email, u.name, u.avatar_url, u.is_admin, u.is_active
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.token_hash = ${tokenHash}
-      AND s.expires_at > NOW()
-      AND u.is_active = TRUE
+  const isExpired = await isTokenExpired(tokenHash, env);
+
+  if (isExpired) {
+    // Token was revoked - continue as guest
+    if (guestSessionId) {
+      request.guestSessionId = guestSessionId;
+      request.dbWithContext = request.createDbWithContext(null, guestSessionId);
+    }
+    return;
+  }
+
+  // Get user from users table using sub claim from JWT
+  const userId = payload.sub;
+  const users = await db`
+    SELECT id, email, name, avatar_url, is_admin, is_active
+    FROM users
+    WHERE id = ${userId}
+      AND is_active = TRUE
   `;
 
-  if (sessions.length > 0) {
-    const session = sessions[0];
+  if (users.length > 0) {
+    const user = users[0];
 
     request.user = {
-      id: session.user_id,
-      email: session.email,
-      name: session.name,
-      avatarUrl: session.avatar_url,
-      isAdmin: session.is_admin
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+      isAdmin: user.is_admin
     };
 
-    request.sessionId = session.id;
-    request.dbWithContext = request.createDbWithContext(session.user_id, null);
-
-    // Update last_used_at
-    await db`
-      UPDATE sessions
-      SET last_used_at = NOW()
-      WHERE id = ${session.id}
-    `;
+    request.jwtPayload = payload; // Store payload for potential use
+    request.dbWithContext = request.createDbWithContext(user.id, null);
   } else if (guestSessionId) {
     request.guestSessionId = guestSessionId;
     request.dbWithContext = request.createDbWithContext(null, guestSessionId);
@@ -286,5 +446,10 @@ export default {
   withOptionalAuth,
   withAdminAuth,
   createToken,
-  hashToken
+  hashToken,
+  hashPassword,
+  verifyPassword,
+  isTokenExpired,
+  markTokenAsExpired,
+  getJwtExpiration
 };
