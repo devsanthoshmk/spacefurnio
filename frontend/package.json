@@ -11,6 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@primeuix/themes": "^1.2.1",
     "@primevue/themes": "^4.3.6",
     "@tailwindcss/vite": "^4.1.11",
