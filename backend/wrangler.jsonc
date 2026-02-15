@@ -9,6 +9,11 @@
 	"placement": {
 		"mode": "smart"
 	},
+	// for static assets (e.g., .well-known/jwks.json)
+	// No binding = assets served directly at edge without invoking Worker
+	"assets": {
+		"directory": "./public"
+	},
 	// Dev (local) vars
 	"vars": {
 		"FRONTEND_URL": "http://localhost:5173",

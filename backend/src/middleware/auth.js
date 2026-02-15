@@ -8,23 +8,76 @@
 import { error } from 'itty-router';
 import * as jose from 'jose';
 
+// ---- RSA Key Caching ----
+let _cachedSigningKey = null;
+let _cachedVerificationKey = null;
+let _cachedJWKS = null;
+
 /**
- * Verify JWT token and extract payload
- * Uses JWT_SECRET from environment to verify token integrity
+ * Parse the RSA private JWK from the environment variable.
+ * @param {Object} env - Environment bindings
+ * @returns {Object} Parsed JWK object
+ */
+function parsePrivateJWK(env) {
+  if (!env.JWT_PRIVATE_JWK) {
+    throw new Error('JWT_PRIVATE_JWK is not configured in environment');
+  }
+  return typeof env.JWT_PRIVATE_JWK === 'string'
+    ? JSON.parse(env.JWT_PRIVATE_JWK)
+    : env.JWT_PRIVATE_JWK;
+}
+
+/**
+ * Get the RSA private key (CryptoKey) for signing JWTs.
+ * Caches the key after first import for performance.
+ * @param {Object} env - Environment bindings
+ * @returns {Promise<CryptoKey>} Private key for signing
+ */
+export async function getSigningKey(env) {
+  if (_cachedSigningKey) return _cachedSigningKey;
+  const jwk = parsePrivateJWK(env);
+  _cachedSigningKey = await jose.importJWK(jwk, 'RS256');
+  return _cachedSigningKey;
+}
+
+/**
+ * Get the RSA public key (CryptoKey) for verifying JWTs.
+ * Extracts only the public components (kty, n, e) from the private JWK.
+ * Caches the key after first import for performance.
+ * @param {Object} env - Environment bindings
+ * @returns {Promise<CryptoKey>} Public key for verification
+ */
+export async function getVerificationKey(env) {
+  if (_cachedVerificationKey) return _cachedVerificationKey;
+
+  // If JWKS_URL is configured, use it via jose.createRemoteJWKSet
+  if (env.JWKS_URL && env.JWKS_URL !== '') {
+    if (!_cachedJWKS) {
+      _cachedJWKS = jose.createRemoteJWKSet(new URL(env.JWKS_URL));
+    }
+    return _cachedJWKS;
+  }
+
+  // Otherwise, derive the public key from the private JWK
+  const jwk = parsePrivateJWK(env);
+  const publicJWK = { kty: jwk.kty, n: jwk.n, e: jwk.e, kid: jwk.kid };
+  _cachedVerificationKey = await jose.importJWK(publicJWK, 'RS256');
+  return _cachedVerificationKey;
+}
+
+/**
+ * Verify JWT token and extract payload.
+ * Uses RSA public key derived from JWT_PRIVATE_JWK (or JWKS_URL) for verification.
  * @param {string} token - JWT token
  * @param {Object} env - Environment bindings
  * @returns {Object|null} Token payload (including exp claim) or null
  */
 async function verifyToken(token, env) {
   try {
-    if (!env.JWT_SECRET) {
-      console.error('JWT_SECRET is not configured in environment');
-      return null;
-    }
+    const key = await getVerificationKey(env);
 
-    const secret = new TextEncoder().encode(env.JWT_SECRET);
-
-    const { payload } = await jose.jwtVerify(token, secret, {
+    const { payload } = await jose.jwtVerify(token, key, {
+      algorithms: ['RS256'],
       issuer: env.JWT_ISSUER || 'spacefurnio-api',
       audience: env.JWT_AUDIENCE || 'spacefurnio-users'
     });
@@ -100,22 +153,23 @@ export function getJwtExpiration(payload) {
 }
 
 /**
- * Create a new JWT token
+ * Create a new JWT token using RSA (RS256) asymmetric signing.
  * @param {Object} payload - Token payload
  * @param {Object} env - Environment bindings
  * @returns {string} JWT token
  */
 export async function createToken(payload, env) {
-  const secret = new TextEncoder().encode(env.JWT_SECRET);
+  const privateKey = await getSigningKey(env);
+  const jwk = parsePrivateJWK(env); // Get JWK to access 'kid'
   const expiryHours = parseInt(env.JWT_EXPIRY_HOURS || '168'); // 7 days default
 
   const token = await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
+    .setProtectedHeader({ alg: 'RS256', kid: jwk.kid })
     .setIssuedAt()
     .setIssuer(env.JWT_ISSUER || 'spacefurnio-api')
     .setAudience(env.JWT_AUDIENCE || 'spacefurnio-users')
     .setExpirationTime(`${expiryHours}h`)
-    .sign(secret);
+    .sign(privateKey);
 
   return token;
 }
@@ -239,7 +293,7 @@ function extractToken(request) {
 
 /**
  * Authentication middleware - requires valid token
- * Validates JWT using JWT_SECRET and checks EXPIRED_SESSIONS KV for revoked tokens
+ * Validates JWT using RSA public key and checks EXPIRED_SESSIONS KV for revoked tokens
  * @param {Request} request - Incoming request
  */
 export async function withAuth(request) {
@@ -253,7 +307,7 @@ export async function withAuth(request) {
     });
   }
 
-  // Verify JWT signature and claims using JWT_SECRET
+  // Verify JWT signature and claims using RSA public key
   const payload = await verifyToken(token, env);
 
   if (!payload) {
@@ -309,7 +363,7 @@ export async function withAuth(request) {
 
 /**
  * Optional authentication middleware - populates user if token valid
- * Validates JWT using JWT_SECRET and checks EXPIRED_SESSIONS KV for revoked tokens
+ * Validates JWT using RSA public key and checks EXPIRED_SESSIONS KV for revoked tokens
  * @param {Request} request - Incoming request
  */
 export async function withOptionalAuth(request) {
@@ -328,7 +382,7 @@ export async function withOptionalAuth(request) {
     return; // Continue without auth
   }
 
-  // Verify JWT signature and claims using JWT_SECRET
+  // Verify JWT signature and claims using RSA public key
   const payload = await verifyToken(token, env);
 
   if (!payload) {
@@ -441,11 +495,16 @@ export async function withAdminAuth(request) {
   request.isAdminVerified = true;
 }
 
+export { verifyToken };
+
 export default {
   withAuth,
   withOptionalAuth,
   withAdminAuth,
   createToken,
+  verifyToken,
+  getSigningKey,
+  getVerificationKey,
   hashToken,
   hashPassword,
   verifyPassword,

@@ -6,8 +6,8 @@
  */
 
 import { Router, json, error } from 'itty-router';
-import { createToken, hashToken, hashPassword, verifyPassword, markTokenAsExpired, getJwtExpiration, isTokenExpired } from '../middleware/auth.js';
-import * as jose from 'jose';
+import { createToken, hashToken, hashPassword, verifyPassword, markTokenAsExpired, getJwtExpiration, isTokenExpired, verifyToken } from '../middleware/auth.js';
+
 import { sendMagicLinkEmail } from '../services/email.js';
 
 const router = Router({ base: '/backend/api/v1/auth' });
@@ -417,15 +417,13 @@ router.get('/me', async (request) => {
     return error(401, { message: 'Authentication required' });
   }
 
-  // Verify JWT using JWT_SECRET
+  // Verify JWT using RSA public key
   let payload;
   try {
-    const secret = new TextEncoder().encode(env.JWT_SECRET);
-    const result = await jose.jwtVerify(token, secret, {
-      issuer: env.JWT_ISSUER || 'spacefurnio-api',
-      audience: env.JWT_AUDIENCE || 'spacefurnio-users'
-    });
-    payload = result.payload;
+    payload = await verifyToken(token, env);
+    if (!payload) {
+      return error(401, { message: 'Invalid or expired token' });
+    }
   } catch (err) {
     console.error('Token verification failed:', err.message);
     return error(401, { message: 'Invalid or expired token' });
@@ -478,15 +476,13 @@ router.patch('/me', async (request) => {
     return error(401, { message: 'Authentication required' });
   }
 
-  // Verify JWT using JWT_SECRET
+  // Verify JWT using RSA public key
   let payload;
   try {
-    const secret = new TextEncoder().encode(env.JWT_SECRET);
-    const result = await jose.jwtVerify(token, secret, {
-      issuer: env.JWT_ISSUER || 'spacefurnio-api',
-      audience: env.JWT_AUDIENCE || 'spacefurnio-users'
-    });
-    payload = result.payload;
+    payload = await verifyToken(token, env);
+    if (!payload) {
+      return error(401, { message: 'Invalid or expired token' });
+    }
   } catch (err) {
     console.error('Token verification failed:', err.message);
     return error(401, { message: 'Invalid or expired token' });
@@ -589,16 +585,14 @@ router.post('/logout', async (request) => {
 
   // Get JWT expiration from the token to set proper KV TTL
   try {
-    const secret = new TextEncoder().encode(env.JWT_SECRET);
-    const { payload } = await jose.jwtVerify(token, secret, {
-      issuer: env.JWT_ISSUER || 'spacefurnio-api',
-      audience: env.JWT_AUDIENCE || 'spacefurnio-users'
-    });
+    const payload = await verifyToken(token, env);
 
-    // Mark token as expired in KV with TTL matching JWT expiration
-    const jwtExp = getJwtExpiration(payload);
-    if (jwtExp) {
-      await markTokenAsExpired(tokenHash, jwtExp, env);
+    if (payload) {
+      // Mark token as expired in KV with TTL matching JWT expiration
+      const jwtExp = getJwtExpiration(payload);
+      if (jwtExp) {
+        await markTokenAsExpired(tokenHash, jwtExp, env);
+      }
     }
   } catch (err) {
     // Token is already invalid/expired, no need to revoke
@@ -631,15 +625,13 @@ router.post('/logout-all', async (request) => {
     return error(401, { message: 'Authentication required' });
   }
 
-  // Verify JWT using JWT_SECRET
+  // Verify JWT using RSA public key
   let payload;
   try {
-    const secret = new TextEncoder().encode(env.JWT_SECRET);
-    const result = await jose.jwtVerify(token, secret, {
-      issuer: env.JWT_ISSUER || 'spacefurnio-api',
-      audience: env.JWT_AUDIENCE || 'spacefurnio-users'
-    });
-    payload = result.payload;
+    payload = await verifyToken(token, env);
+    if (!payload) {
+      return error(401, { message: 'Invalid or expired token' });
+    }
   } catch (err) {
     console.error('Token verification failed:', err.message);
     return error(401, { message: 'Invalid or expired token' });
@@ -671,57 +663,55 @@ router.post('/logout-all', async (request) => {
 // Change Password
 // ===========================================
 router.patch('/change-password', async (request) => {
-	const { db, env } = request;
+  const { db, env } = request;
 
-	// Extract token from header or cookie
-	const token = extractToken(request);
-	if (!token) {
-		return error(401, { message: 'Authentication required' });
-	}
+  // Extract token from header or cookie
+  const token = extractToken(request);
+  if (!token) {
+    return error(401, { message: 'Authentication required' });
+  }
 
-	// Verify JWT using JWT_SECRET
-	let payload;
-	try {
-		const secret = new TextEncoder().encode(env.JWT_SECRET);
-		const result = await jose.jwtVerify(token, secret, {
-			issuer: env.JWT_ISSUER || 'spacefurnio-api',
-			audience: env.JWT_AUDIENCE || 'spacefurnio-users'
-		});
-		payload = result.payload;
-	} catch (err) {
-		console.error('Token verification failed:', err.message);
-		return error(401, { message: 'Invalid or expired token' });
-	}
+  // Verify JWT using RSA public key
+  let payload;
+  try {
+    payload = await verifyToken(token, env);
+    if (!payload) {
+      return error(401, { message: 'Invalid or expired token' });
+    }
+  } catch (err) {
+    console.error('Token verification failed:', err.message);
+    return error(401, { message: 'Invalid or expired token' });
+  }
 
-	// Check if token has been revoked (stored in EXPIRED_SESSIONS KV)
-	const tokenHash = await hashToken(token);
-	const isExpired = await isTokenExpired(tokenHash, env);
+  // Check if token has been revoked (stored in EXPIRED_SESSIONS KV)
+  const tokenHash = await hashToken(token);
+  const isExpired = await isTokenExpired(tokenHash, env);
 
-	if (isExpired) {
-		return error(401, { message: 'Session has been revoked' });
-	}
+  if (isExpired) {
+    return error(401, { message: 'Session has been revoked' });
+  }
 
-	// Get user ID from JWT payload
-	const userId = payload.sub;
+  // Get user ID from JWT payload
+  const userId = payload.sub;
 
-	let body;
-	try {
-		body = await request.json();
-	} catch {
-		return error(400, { message: 'Invalid request body' });
-	}
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return error(400, { message: 'Invalid request body' });
+  }
 
-	const { new_password } = body;
+  const { new_password } = body;
 
-	// Validate inputs
-	if (new_password !== undefined && new_password !== null) {
-		if (new_password.length < 8) {
-			return error(400, { message: 'Password must be at least 8 characters' });
-		}
-	}
+  // Validate inputs
+  if (new_password !== undefined && new_password !== null) {
+    if (new_password.length < 8) {
+      return error(400, { message: 'Password must be at least 8 characters' });
+    }
+  }
 
-	try {
-		const users = await db`
+  try {
+    const users = await db`
 			UPDATE users
 			SET
 				pass = ${await hashPassword(body.new_password)},
@@ -729,20 +719,20 @@ router.patch('/change-password', async (request) => {
 			WHERE id = ${userId}
 			RETURNING id, email, name, avatar_url, phone, is_admin, email_verified
 		`;
-	} catch (err) {
-		console.error('Database error:', err);
-		return error(500, { message: 'Failed to change password' });
-	}
+  } catch (err) {
+    console.error('Database error:', err);
+    return error(500, { message: 'Failed to change password' });
+  }
 
-	return new Response(JSON.stringify({
-		success: true,
-		message: 'Password changed successfully'
-	}), {
-		status: 200,
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	});
+  return new Response(JSON.stringify({
+    success: true,
+    message: 'Password changed successfully'
+  }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 });
 
 
