@@ -301,14 +301,13 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import shopApi from '@/api/shopApi.js'
-import { getShopTypeProducts, useCurrentShop } from '@/composables/productsUtills.js'
 import FilterSidebar from '@/components/shop/FilterSidebar.vue'
 import ProductCardNew from '@/components/shop/ProductCardNew.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-// Determine if we're using JSON data (design routes) or mock API (category routes)
+// Determine if we're using design routes (style/space) or category routes
 const isDesignRoute = computed(() => route.path.includes('/shop/design'))
 
 // State
@@ -457,12 +456,48 @@ const loadProducts = async (append = false) => {
   try {
     const [sort, order] = sortBy.value.split('-')
     
-    // For design routes (style/space), use JSON data
-    if (isDesignRoute.value) {
-      await loadProductsFromJson(sort, order, append)
+    // Determine the filter parameters based on the route
+    const apiParams = {
+      brand: filters.value.brand || null,
+      colors: filters.value.colors,
+      material: filters.value.material || null,
+      minPrice: filters.value.minPrice,
+      maxPrice: filters.value.maxPrice,
+      inStock: filters.value.inStock || null,
+      onSale: filters.value.onSale || null,
+      isNew: filters.value.isNew || null,
+      search: filters.value.search || null,
+      sort,
+      order,
+      page: currentPage.value,
+      limit: 12,
+    }
+
+    // Set category/space/style based on route
+    if (route.path.includes('/shop/design/space')) {
+      apiParams.space = route.params.category || null
+    } else if (route.path.includes('/shop/design/style')) {
+      apiParams.style = route.params.category || null
     } else {
-      // For category routes, use the mock API
-      await loadProductsFromApi(sort, order, append)
+      apiParams.category = route.params.category || null
+    }
+
+    const response = await shopApi.getProducts(apiParams)
+    
+    if (response.success) {
+      if (append) {
+        products.value = [...products.value, ...response.data]
+      } else {
+        products.value = response.data
+      }
+      
+      totalProducts.value = response.meta.total
+      totalPages.value = response.meta.totalPages
+      hasMoreProducts.value = response.meta.hasNextPage
+      
+      if (response.aggregations) {
+        aggregations.value = response.aggregations
+      }
     }
   } catch (error) {
     console.error('Error loading products:', error)
@@ -472,130 +507,10 @@ const loadProducts = async (append = false) => {
   }
 }
 
-// Load products from JSON files (for design style/space routes)
-const loadProductsFromJson = async (sort, order, append) => {
-  const allProducts = await getShopTypeProducts(route)
-  const categorySlug = route.params.category?.toLowerCase()
-  
-  // Determine filter field based on route type
-  const shop = useCurrentShop(route)
-  const filterField = shop.type === 'style' ? 'style' : 'room'
-  
-  // Filter products by style or space category
-  let filteredProducts = categorySlug 
-    ? allProducts.filter(p => {
-        const fieldValue = (p[filterField] || '').toLowerCase().replace(/\s+/g, '-')
-        return fieldValue === categorySlug || fieldValue.includes(categorySlug)
-      })
-    : allProducts
-
-  // Apply additional filters
-  if (filters.value.brand) {
-    filteredProducts = filteredProducts.filter(p => p.brand === filters.value.brand)
-  }
-  if (filters.value.colors.length > 0) {
-    filteredProducts = filteredProducts.filter(p =>
-      filters.value.colors.some(color => (p.colors || []).includes(color))
-    )
-  }
-  if (filters.value.material) {
-    filteredProducts = filteredProducts.filter(p => p.material === filters.value.material)
-  }
-  if (filters.value.minPrice !== null) {
-    filteredProducts = filteredProducts.filter(p => p.price >= filters.value.minPrice)
-  }
-  if (filters.value.maxPrice !== null) {
-    filteredProducts = filteredProducts.filter(p => p.price <= filters.value.maxPrice)
-  }
-  
-  // Apply sorting
-  const sortMultiplier = order === 'desc' ? -1 : 1
-  filteredProducts.sort((a, b) => {
-    switch (sort) {
-      case 'price':
-        return (a.price - b.price) * sortMultiplier
-      case 'rating':
-        return ((a.rating || 0) - (b.rating || 0)) * sortMultiplier
-      case 'newest':
-        return (new Date(a.createdAt || 0) - new Date(b.createdAt || 0)) * sortMultiplier
-      case 'popularity':
-      default:
-        return ((a.popularity || 50) - (b.popularity || 50)) * sortMultiplier
-    }
-  })
-  
-  // Calculate pagination
-  const limit = 12
-  const total = filteredProducts.length
-  const totalPagesCalc = Math.ceil(total / limit)
-  const startIndex = (currentPage.value - 1) * limit
-  const endIndex = startIndex + limit
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
-  
-  if (append) {
-    products.value = [...products.value, ...paginatedProducts]
-  } else {
-    products.value = paginatedProducts
-  }
-  
-  totalProducts.value = total
-  totalPages.value = totalPagesCalc
-  hasMoreProducts.value = currentPage.value < totalPagesCalc
-  
-  // Build aggregations from products
-  aggregations.value = {
-    brands: [...new Set(allProducts.map(p => p.brand).filter(Boolean))].sort(),
-    materials: [...new Set(allProducts.map(p => p.material).filter(Boolean))].sort(),
-    colors: [...new Set(allProducts.flatMap(p => p.colors || []))].sort(),
-    priceRange: {
-      min: Math.min(...allProducts.map(p => p.price)),
-      max: Math.max(...allProducts.map(p => p.price)),
-    },
-  }
-}
-
-// Load products from mock API (for category routes)
-const loadProductsFromApi = async (sort, order, append) => {
-  const response = await shopApi.getProducts({
-    category: route.params.category || null,
-    brand: filters.value.brand || null,
-    colors: filters.value.colors,
-    material: filters.value.material || null,
-    minPrice: filters.value.minPrice,
-    maxPrice: filters.value.maxPrice,
-    inStock: filters.value.inStock || null,
-    onSale: filters.value.onSale || null,
-    isNew: filters.value.isNew || null,
-    search: filters.value.search || null,
-    sort,
-    order,
-    page: currentPage.value,
-    limit: 12,
-  })
-  
-  if (response.success) {
-    if (append) {
-      products.value = [...products.value, ...response.data]
-    } else {
-      products.value = response.data
-    }
-    
-    totalProducts.value = response.meta.total
-    totalPages.value = response.meta.totalPages
-    hasMoreProducts.value = response.meta.hasNextPage
-    
-    if (response.aggregations) {
-      aggregations.value = response.aggregations
-    }
-  }
-}
-
 const loadFilterOptions = async () => {
-  // For design routes, aggregations are set in loadProductsFromJson
-  if (isDesignRoute.value) return
-  
   try {
-    const response = await shopApi.getFilterOptions(route.params.category)
+    const filterParam = route.params.category || null
+    const response = await shopApi.getFilterOptions(filterParam)
     if (response.success) {
       aggregations.value = response.data
     }
@@ -663,11 +578,11 @@ const handleAddToCart = (product) => {
 
 const navigateToProduct = (product) => {
   if (isDesignRoute.value) {
-    const shop = useCurrentShop(route)
-    const categorySlug = route.params.category || ''
-    if (shop.type === 'style') {
+    if (route.path.includes('/shop/design/style')) {
+      const categorySlug = route.params.category || ''
       router.push(`/shop/design/style/${categorySlug}/${product.id}`)
     } else {
+      const categorySlug = route.params.category || ''
       router.push(`/shop/design/space/${categorySlug}/${product.id}`)
     }
   } else {

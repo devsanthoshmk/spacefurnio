@@ -2,18 +2,19 @@
 
 ## Overview
 
-This documentation covers the reimagined shop pages for Space Furnio, a furniture e-commerce platform. The design follows a warm, beige minimalist aesthetic inspired by high-end furniture retailers.
+This documentation covers the shop pages for Space Furnio, a furniture e-commerce platform. The design follows a warm, beige minimalist aesthetic inspired by high-end furniture retailers. The shop is now powered by a production NeonDB (PostgreSQL) database with direct client-side queries.
 
 ## Table of Contents
 
 1. [Project Structure](#project-structure)
 2. [Component Architecture](#component-architecture)
-3. [Mock Backend API](#mock-backend-api)
+3. [Production Database API](#production-database-api)
 4. [Features Overview](#features-overview)
-5. [Migration to Real Database](#migration-to-real-database)
+5. [Database Schema](#database-schema)
 6. [Styling System](#styling-system)
 7. [Responsive Design](#responsive-design)
 8. [Performance Optimizations](#performance-optimizations)
+9. [Known Limitations](#known-limitations)
 
 ---
 
@@ -22,7 +23,7 @@ This documentation covers the reimagined shop pages for Space Furnio, a furnitur
 ```
 frontend/src/
 ├── api/
-│   └── shopApi.js            # Mock backend API service
+│   └── shopApi.js            # Production NeonDB API service
 ├── assets/
 │   ├── main.css              # Global styles
 │   └── shop.css              # Shop design system tokens
@@ -30,11 +31,10 @@ frontend/src/
 │   └── shop/
 │       ├── FilterSidebar.vue     # Filter panel component
 │       ├── ProductCardNew.vue    # Product card with carousel
-│       ├── ProductListing.vue    # Product listing page
-│       ├── ShopCategory.vue      # Category grid (legacy)
-│       └── ShopDesign.vue        # Design grid (legacy)
+│       └── ProductListing.vue    # Product listing page
 ├── views/
-│   └── ShopView.vue          # Shop root page
+│   ├── ShopView.vue          # Shop root page
+│   └── ProductDetailView.vue # Product details page
 └── router/
     └── index.js              # Route definitions
 ```
@@ -49,15 +49,15 @@ The main entry point for the shop section. Features:
 
 - **Special Offers Banner**: Promotional cards with hover effects
 - **Category/Design Toggle**: Smooth animated tab switching
-- **Category Grid**: Icon-based navigation cards
-- **Space-specific Section**: Room-based filtering
-- **Style-specific Section**: Design aesthetic filtering
-- **Featured Products**: Popular items showcase
+- **Category Grid**: Icon-based navigation cards (dynamically loaded from database)
+- **Space-specific Section**: Room-based filtering (9 spaces: Foyer, Dining Room, Kitchen, etc.)
+- **Style-specific Section**: Design aesthetic filtering (10 styles: Minimalist, Japandi, etc.)
+- **Featured Products**: Popular items showcase (from database)
 - **Contact CTA**: Customer service section
 
 ### ProductListing.vue
 
-Full product listing page with:
+Full product listing page with unified data source:
 
 - **Sticky Header**: Breadcrumbs, title, sort controls
 - **Filter Sidebar**: Desktop filter panel (260px width)
@@ -65,16 +65,17 @@ Full product listing page with:
 - **Product Grid**: Responsive 1-4 column layout
 - **Pagination**: Full pagination or "Load More" option
 - **Skeleton Loading**: Animated loading placeholders
+- **Route Support**: Handles category, space, and style routes with single `shopApi.getProducts()` call
 
 ### FilterSidebar.vue
 
-Comprehensive filtering system:
+Comprehensive filtering system with dynamic data:
 
-- **Category Filter**: Radio button selection
+- **Category Filter**: Radio button selection (loaded from database)
 - **Price Range**: Input fields + slider + quick options
-- **Brand Filter**: Searchable radio list
-- **Material Filter**: Collapsible checkbox list
-- **Color Filter**: Visual color swatch grid
+- **Brand Filter**: Searchable radio list (dynamic from database)
+- **Material Filter**: Collapsible radio list (dynamic from database)
+- **Color Filter**: Visual color swatch grid (with hex code mapping)
 - **Availability**: Toggle switches (In Stock, On Sale, New)
 
 ### ProductCardNew.vue
@@ -84,32 +85,59 @@ Feature-rich product card:
 - **Image Carousel**: Touch/swipe and arrow navigation
 - **Quick Actions**: Wishlist heart, cart button
 - **Badges**: New, Sale, Bestseller
-- **Color Options**: Visual color dots
+- **Color Options**: Visual color dots with hex codes
 - **Grid/List Views**: Adapts layout based on view mode
+
+### ProductDetailView.vue
+
+Detailed product page:
+
+- **Image Gallery**: Main image with thumbnails
+- **Product Information**: Brand, name, rating, price
+- **Color Selection**: Visual color swatches
+- **Quantity Selector**: +/- controls
+- **Add to Cart**: Primary action button
+- **Features List**: Product highlights
+- **Dimensions**: Width, height, depth display
+- **Related Products**: Recommendations from same category/space/style
 
 ---
 
-## Mock Backend API
+## Production Database API
 
 ### Location: `src/api/shopApi.js`
 
-The mock API simulates real backend responses with realistic data and delays.
+The shop now connects directly to NeonDB using `@neondatabase/serverless` HTTP driver. All queries run client-side via fetch API to Neon's HTTP SQL endpoint.
+
+### Database Connection
+
+```javascript
+import { neon } from '@neondatabase/serverless'
+
+const DATABASE_URL = import.meta.env.VITE_PRODUCTS_DB_URL
+const sql = neon(DATABASE_URL)
+```
 
 ### Available Functions
 
 ```javascript
-// Get all product categories
+// Get all product categories (with counts)
 await shopApi.getCategories()
+// Returns: { success: true, data: [{ id, name, slug, icon, productCount }], meta: { total } }
 
 // Get room/space options
 await shopApi.getSpaces()
+// Returns: { success: true, data: [{ id, name, slug, icon }], meta: { total } }
 
 // Get design styles
 await shopApi.getStyles()
+// Returns: { success: true, data: [{ id, name, slug, image, description }], meta: { total } }
 
-// Get products with filtering
+// Get products with filtering (supports category, space, OR style)
 await shopApi.getProducts({
-  category: 'furniture',
+  category: 'furniture',     // OR
+  space: 'bedroom',          // OR
+  style: 'minimalist',       // (mutually exclusive - route determines which)
   brand: 'Nordic Home',
   colors: ['Natural', 'White'],
   material: 'Oak Wood',
@@ -124,21 +152,28 @@ await shopApi.getProducts({
   page: 1,
   limit: 12,
 })
+// Returns: { success, data, meta, aggregations }
 
-// Get single product
-await shopApi.getProduct('product_id')
+// Get single product (by ID or slug)
+await shopApi.getProduct('3')
+await shopApi.getProduct('modern-oak-dining-table')
+// Returns: { success, data: { ...product, relatedProducts: [...] } }
 
 // Get featured products
 await shopApi.getFeaturedProducts()
+// Returns: { success, data: { featured, newArrivals, bestSellers, onSale } }
 
-// Get filter options
+// Get filter options (scoped by category, space, or style)
 await shopApi.getFilterOptions('furniture')
+// Returns: { success, data: { brands, materials, colors, priceRange } }
 
 // Search products
 await shopApi.searchProducts('dining table', 10)
+// Returns: { success, data: [...], meta: { query, total } }
 
 // Get special offers
 await shopApi.getSpecialOffers()
+// Returns: { success, data: [{ id, title, subtitle, image, link, badge }] }
 ```
 
 ### Response Format
@@ -155,12 +190,74 @@ await shopApi.getSpecialOffers()
     hasNextPage: true,
     hasPrevPage: false,
   },
-  aggregations: {        // For filtering
-    brands: [...],
-    materials: [...],
-    colors: [...],
-    priceRange: { min: 0, max: 5000 },
+  aggregations: {        // For filtering (scoped to current route filter)
+    brands: ['Nordic Home', 'Urban Steel', ...],
+    materials: ['Oak Wood', 'Velvet', ...],
+    colors: [
+      { name: 'Natural', hex: '#E5D3B3' },
+      { name: 'Charcoal', hex: '#4A4641' },
+      ...
+    ],
+    priceRange: { min: 79, max: 2999 },
   },
+}
+```
+
+### Data Transformation
+
+The `transformProduct()` function bridges the gap between database schema and frontend requirements:
+
+```javascript
+{
+  // Database provides these directly
+  id: 3,
+  name: 'Modern Oak Dining Table',
+  slug: 'modern-oak-dining-table',
+  price: 899,  // Converted from price_cents
+  brand: 'Nordic Home',
+  category: 'furniture',
+  material: 'Oak Wood',
+  rating: 4.5,
+  reviews: 127,
+
+  // Database provides as arrays
+  images: ['url1', 'url2', ...],
+  colors: ['Natural', 'Dark Brown'],
+  colorData: [
+    { name: 'Natural', hex: '#E5D3B3' },    // hex from COLOR_HEX_MAP if DB is null
+    { name: 'Dark Brown', hex: '#4A3728' },
+  ],
+
+  // Derived/hardcoded (DB doesn't have these yet)
+  inStock: true,        // Hardcoded
+  stockCount: 10,       // Hardcoded
+  isNew: false,         // Hardcoded
+  isBestSeller: true,   // Derived from popularity >= 90
+  isFeatured: true,     // Derived from popularity >= 85
+  
+  // Generated if missing
+  description: 'Default description...',  // Generated from product name/material
+  features: ['Premium Oak Wood construction', ...],
+}
+```
+
+### Caching Strategy
+
+```javascript
+const cache = new Map()
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+function getCached(key) {
+  const cached = cache.get(key)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data
+  }
+  cache.delete(key)
+  return null
+}
+
+function setCache(key, data) {
+  cache.set(key, { data, timestamp: Date.now() })
 }
 ```
 
@@ -172,20 +269,22 @@ await shopApi.getSpecialOffers()
 
 | Filter Type | Implementation | Notes |
 |-------------|---------------|-------|
-| Category | Radio buttons | Single selection |
+| Category | Radio buttons | Single selection, 4 categories |
+| Space | Route parameter | 9 room types (Foyer, Dining, Kitchen, etc.) |
+| Style | Route parameter | 10 design styles (Minimalist, Japandi, etc.) |
 | Price | Range inputs + slider | Quick options available |
-| Brand | Searchable radio list | With count indicators |
-| Material | Radio list | Collapsible |
-| Color | Visual swatches | Multi-select |
+| Brand | Searchable radio list | Dynamic from database |
+| Material | Radio list | Dynamic from database |
+| Color | Visual swatches | Multi-select with hex codes |
 | Availability | Toggle switches | In Stock, On Sale, New |
 
 ### 2. Sorting Options
 
-- Most Popular (default)
-- Best Rating
-- Newest First
-- Price: Low to High
-- Price: High to Low
+- Most Popular (default) - `sort=popularity&order=desc`
+- Best Rating - `sort=rating&order=desc`
+- Newest First - `sort=newest&order=desc`
+- Price: Low to High - `sort=price&order=asc`
+- Price: High to Low - `sort=price&order=desc`
 
 ### 3. View Modes
 
@@ -198,6 +297,7 @@ await shopApi.getSpecialOffers()
 - Arrow buttons on desktop hover
 - Dot indicators for position
 - Auto-advance on hover (shows second image)
+- Multiple images per product from `product_images` table
 
 ### 5. Loading States
 
@@ -208,257 +308,157 @@ All components include skeleton loading states that match the warm beige theme:
 
 ---
 
-## Migration to Real Database
+## Database Schema
 
-### Overview
+### Current Implementation
 
-The mock API is designed for easy migration to NeonDB (PostgreSQL) with Row-Level Security (RLS) and Cloudflare Workers for backend logic.
+**NeonDB Project**: `icy-union-81751721`  
+**Database**: `neondb`  
+**Total Products**: 49
 
-### Step 1: Set Up NeonDB
+### Core Tables
 
+#### products
 ```sql
--- Create products table
 CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(255) UNIQUE NOT NULL,
-  price DECIMAL(10,2) NOT NULL,
-  original_price DECIMAL(10,2),
-  discount INTEGER DEFAULT 0,
-  brand VARCHAR(100),
-  category VARCHAR(50) NOT NULL,
-  material VARCHAR(100),
-  colors JSONB DEFAULT '[]',
+  price_cents INTEGER NOT NULL,           -- Stored in cents
+  listing_type VARCHAR(50),
   rating DECIMAL(2,1) DEFAULT 0,
-  reviews INTEGER DEFAULT 0,
-  popularity INTEGER DEFAULT 50,
-  in_stock BOOLEAN DEFAULT true,
-  stock_count INTEGER DEFAULT 0,
-  is_new BOOLEAN DEFAULT false,
-  is_best_seller BOOLEAN DEFAULT false,
-  is_featured BOOLEAN DEFAULT false,
-  images JSONB DEFAULT '[]',
-  thumbnail VARCHAR(500),
+  review_count INTEGER DEFAULT 0,
+  popularity INTEGER DEFAULT 50,          -- Used for bestseller calculation
   description TEXT,
-  features JSONB DEFAULT '[]',
-  dimensions JSONB,
-  weight DECIMAL(10,2),
+  href VARCHAR(500),
+  brand_id INTEGER REFERENCES brands(id),
+  category_id INTEGER REFERENCES categories(id),
+  space_id INTEGER REFERENCES spaces(id),
+  style_id INTEGER REFERENCES styles(id),
+  material_id INTEGER REFERENCES materials(id),
+  room_id INTEGER REFERENCES rooms(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+```
 
--- Create categories table
+#### categories (4 entries)
+```sql
 CREATE TABLE categories (
-  id VARCHAR(50) PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  slug VARCHAR(100) UNIQUE NOT NULL,
-  description TEXT,
-  icon TEXT,
-  product_count INTEGER DEFAULT 0,
-  display_order INTEGER DEFAULT 0
+  slug VARCHAR(100) UNIQUE NOT NULL
 );
+-- Data: Furniture, Wall Art, Decor, Lights
+```
 
--- Create spaces table (rooms)
+#### spaces (9 entries)
+```sql
 CREATE TABLE spaces (
-  id VARCHAR(50) PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  slug VARCHAR(100) UNIQUE NOT NULL,
-  icon VARCHAR(50)
+  slug VARCHAR(100) UNIQUE NOT NULL
 );
+-- Data: Foyer, Dining Room, Kitchen, Home Office, Bedroom, Bathroom, Balcony, Lounge, Poolside
+```
 
--- Create styles table
+#### styles (10 entries)
+```sql
 CREATE TABLE styles (
-  id VARCHAR(50) PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  slug VARCHAR(100) UNIQUE NOT NULL,
-  image VARCHAR(500),
-  description TEXT
+  slug VARCHAR(100) UNIQUE NOT NULL
 );
-
--- Enable RLS
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE spaces ENABLE ROW LEVEL SECURITY;
-ALTER TABLE styles ENABLE ROW LEVEL SECURITY;
-
--- Public read policy (no auth required for browsing)
-CREATE POLICY "Allow public read" ON products
-  FOR SELECT USING (true);
-
-CREATE POLICY "Allow public read" ON categories
-  FOR SELECT USING (true);
-
--- Indexes for performance
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_brand ON products(brand);
-CREATE INDEX idx_products_price ON products(price);
-CREATE INDEX idx_products_created ON products(created_at DESC);
-CREATE INDEX idx_products_popularity ON products(popularity DESC);
+-- Data: Brutalist, Minimalist, Sustainable, Parametric, Wabi-Sabi, Traditional, Vintage Retro, Victorian, Japandi, Moroccan
 ```
 
-### Step 2: Create Cloudflare Worker
-
-```javascript
-// worker.js
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
-
-    // CORS headers
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    };
-
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
-
-    try {
-      // Route handling
-      if (path === '/api/products') {
-        return handleProducts(request, env, corsHeaders);
-      }
-      
-      if (path === '/api/categories') {
-        return handleCategories(env, corsHeaders);
-      }
-
-      if (path.match(/^\/api\/products\/[\w-]+$/)) {
-        const id = path.split('/').pop();
-        return handleProduct(id, env, corsHeaders);
-      }
-
-      return new Response('Not Found', { status: 404 });
-    } catch (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-  },
-};
-
-async function handleProducts(request, env, corsHeaders) {
-  const url = new URL(request.url);
-  const params = url.searchParams;
-  
-  // Build query
-  let query = 'SELECT * FROM products WHERE 1=1';
-  const values = [];
-  let paramIndex = 1;
-
-  if (params.get('category')) {
-    query += ` AND category = $${paramIndex++}`;
-    values.push(params.get('category'));
-  }
-
-  if (params.get('brand')) {
-    query += ` AND brand = $${paramIndex++}`;
-    values.push(params.get('brand'));
-  }
-
-  if (params.get('minPrice')) {
-    query += ` AND price >= $${paramIndex++}`;
-    values.push(parseFloat(params.get('minPrice')));
-  }
-
-  if (params.get('maxPrice')) {
-    query += ` AND price <= $${paramIndex++}`;
-    values.push(parseFloat(params.get('maxPrice')));
-  }
-
-  // Sorting
-  const sort = params.get('sort') || 'popularity';
-  const order = params.get('order') || 'desc';
-  const sortColumn = {
-    price: 'price',
-    rating: 'rating',
-    newest: 'created_at',
-    popularity: 'popularity',
-  }[sort] || 'popularity';
-  
-  query += ` ORDER BY ${sortColumn} ${order.toUpperCase()}`;
-
-  // Pagination
-  const page = parseInt(params.get('page')) || 1;
-  const limit = Math.min(parseInt(params.get('limit')) || 12, 50);
-  const offset = (page - 1) * limit;
-  
-  query += ` LIMIT ${limit} OFFSET ${offset}`;
-
-  // Execute query using Neon serverless driver
-  const { neon } = await import('@neondatabase/serverless');
-  const sql = neon(env.DATABASE_URL);
-  
-  const products = await sql(query, values);
-  
-  // Get total count
-  const countResult = await sql`SELECT COUNT(*) FROM products`;
-  const total = parseInt(countResult[0].count);
-
-  return new Response(JSON.stringify({
-    success: true,
-    data: products,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      hasNextPage: page * limit < total,
-      hasPrevPage: page > 1,
-    },
-  }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
+#### brands
+```sql
+CREATE TABLE brands (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE
+);
 ```
 
-### Step 3: Update API Service
-
-Replace the mock API with real API calls:
-
-```javascript
-// src/api/shopApi.js
-
-const API_BASE = 'https://your-worker.your-subdomain.workers.dev/api';
-
-export async function getProducts(options = {}) {
-  const params = new URLSearchParams();
-  
-  Object.entries(options).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
-      if (Array.isArray(value)) {
-        value.forEach(v => params.append(key, v));
-      } else {
-        params.append(key, value);
-      }
-    }
-  });
-
-  const response = await fetch(`${API_BASE}/products?${params}`);
-  return response.json();
-}
-
-export async function getCategories() {
-  const response = await fetch(`${API_BASE}/categories`);
-  return response.json();
-}
-
-// ... similar updates for other functions
+#### materials
+```sql
+CREATE TABLE materials (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE
+);
 ```
 
-### Step 4: Environment Variables
+#### colors
+```sql
+CREATE TABLE colors (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  hex_code VARCHAR(7)  -- Many are NULL, fallback to COLOR_HEX_MAP
+);
+```
 
-```bash
-# .env.local (Vite)
-VITE_API_BASE_URL=https://your-worker.your-subdomain.workers.dev/api
+#### product_colors (many-to-many)
+```sql
+CREATE TABLE product_colors (
+  product_id INTEGER REFERENCES products(id),
+  color_id INTEGER REFERENCES colors(id),
+  PRIMARY KEY (product_id, color_id)
+);
+```
 
-# wrangler.toml (Cloudflare Worker)
-[vars]
-DATABASE_URL = "postgresql://user:pass@ep-xxx.region.neon.tech/dbname?sslmode=require"
+#### product_images
+```sql
+CREATE TABLE product_images (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER REFERENCES products(id),
+  src VARCHAR(500) NOT NULL,
+  is_primary BOOLEAN DEFAULT FALSE,
+  sort_order INTEGER DEFAULT 0
+);
+```
+
+### Query Patterns
+
+#### Base Product Query
+```sql
+SELECT
+  p.id, p.name, p.slug, p.price_cents, p.rating, p.review_count, p.popularity,
+  b.name AS brand_name,
+  c.name AS category_name, c.slug AS category_slug,
+  s.name AS space_name, s.slug AS space_slug,
+  st.name AS style_name, st.slug AS style_slug,
+  m.name AS material_name,
+  (SELECT pi.src FROM product_images pi WHERE pi.product_id = p.id AND pi.is_primary = true LIMIT 1) AS thumbnail,
+  (SELECT json_agg(pi2.src ORDER BY pi2.sort_order) FROM product_images pi2 WHERE pi2.product_id = p.id) AS images,
+  (SELECT json_agg(json_build_object('name', cl.name, 'hex', cl.hex_code))
+   FROM product_colors pc JOIN colors cl ON cl.id = pc.color_id
+   WHERE pc.product_id = p.id) AS colors
+FROM products p
+LEFT JOIN brands b ON b.id = p.brand_id
+LEFT JOIN categories c ON c.id = p.category_id
+LEFT JOIN spaces s ON s.id = p.space_id
+LEFT JOIN styles st ON st.id = p.style_id
+LEFT JOIN materials m ON m.id = p.material_id
+```
+
+#### Dynamic Filtering
+```sql
+-- Example: Get bedroom products
+WHERE s.slug = 'bedroom'
+
+-- Example: Get minimalist style products
+WHERE st.slug = 'minimalist'
+
+-- Example: Multiple filters
+WHERE c.slug = 'furniture'
+  AND b.name = 'Nordic Home'
+  AND p.price_cents >= 10000
+  AND p.price_cents <= 100000
+  AND EXISTS (
+    SELECT 1 FROM product_colors pc2
+    JOIN colors cl2 ON cl2.id = pc2.color_id
+    WHERE pc2.product_id = p.id AND cl2.name = ANY($1)
+  )
 ```
 
 ---
@@ -534,61 +534,121 @@ DATABASE_URL = "postgresql://user:pass@ep-xxx.region.neon.tech/dbname?sslmode=re
 
 ## Performance Optimizations
 
+### Direct NeonDB Connection
+
+- Uses `@neondatabase/serverless` HTTP driver
+- Queries run over fetch API (no WebSocket needed)
+- Works in browser environments (Vite dev server, static hosting)
+
 ### Image Loading
 
 - Lazy loading with `loading="lazy"`
 - Proper aspect ratios to prevent layout shift
 - Placeholder backgrounds during load
 
+### Query Optimization
+
+- Uses SQL `json_agg()` for colors and images (single query per product)
+- Parallel execution with `Promise.all()` for count, products, and aggregations
+- Indexed columns: category_id, brand_id, price_cents, popularity, created_at
+
+### Caching
+
+- In-memory cache with 5-minute TTL
+- Caches categories, spaces, styles, and featured products
+- Cache key based on query parameters
+
 ### Code Splitting
 
 - Dynamic imports for route components
 - Async component loading
 
-### Caching Strategy
+---
+
+## Known Limitations
+
+### Missing Database Columns
+
+The following fields are not in the database and are currently hardcoded or derived:
+
+| Field | Current Implementation | Recommended Fix |
+|-------|----------------------|-----------------|
+| `in_stock` | Hardcoded to `true` | Add `in_stock BOOLEAN` column |
+| `stock_count` | Hardcoded to `10` | Add `stock_count INTEGER` column |
+| `is_new` | Hardcoded to `false` | Add `is_new BOOLEAN` column or derive from `created_at` |
+| `is_best_seller` | Derived from `popularity >= 90` | Current approach is acceptable |
+| `is_featured` | Derived from `popularity >= 85` | Current approach is acceptable |
+| `original_price` | Not available (no discounts) | Add `original_price_cents INTEGER` column |
+| `discount` | Always `0` | Derive from `(original_price - price) / original_price * 100` |
+
+### Color Hex Codes
+
+Many color entries in the `colors` table have `NULL` hex_code values. The `COLOR_HEX_MAP` constant in `shopApi.js` provides fallback hex codes for common colors:
 
 ```javascript
-// In shopApi.js - simple in-memory cache
-const cache = new Map();
-
-export async function getProducts(options) {
-  const cacheKey = JSON.stringify(options);
-  
-  if (cache.has(cacheKey)) {
-    const cached = cache.get(cacheKey);
-    if (Date.now() - cached.timestamp < 60000) { // 1 minute
-      return cached.data;
-    }
-  }
-  
-  const data = await fetchProducts(options);
-  cache.set(cacheKey, { data, timestamp: Date.now() });
-  return data;
+const COLOR_HEX_MAP = {
+  'Natural': '#E5D3B3',
+  'Dark Brown': '#4A3728',
+  'Navy Blue': '#1F3A5F',
+  // ... 20+ more colors
 }
+```
+
+**Recommended**: Update the database to populate hex_code values.
+
+### Product Associations
+
+Not all products have `space_id` and `style_id` associations. This is expected — products primarily belong to categories. Space and style are optional design filters.
+
+### Special Offers
+
+The `getSpecialOffers()` function returns static data. There is no database table for promotional banners.
+
+**Recommended**: Create a `special_offers` table with fields: id, title, subtitle, image, link, badge, active, display_order.
+
+---
+
+## Environment Variables
+
+```bash
+# frontend/.env
+VITE_API_URL="http://localhost:8787/backend"  # Existing backend API
+VITE_PRODUCTS_DB_URL="postgresql://neondb_owner:npg_tnCUizvkR76D@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
 ```
 
 ---
 
 ## Testing Checklist
 
-- [ ] Page loads without errors
-- [ ] Category toggle animation works
-- [ ] Filters apply correctly
-- [ ] Filters persist on page navigation
-- [ ] Mobile filter drawer opens/closes
-- [ ] Sort changes product order
-- [ ] Pagination/Load More works
-- [ ] Product cards show correct data
-- [ ] Image carousel swipe works on mobile
-- [ ] Quick actions (wishlist, cart) trigger events
-- [ ] Skeleton loading shows during data fetch
-- [ ] Empty state displays when no products
-- [ ] Breadcrumbs navigate correctly
-- [ ] Responsive layout at all breakpoints
+- [x] Page loads without errors
+- [x] Category routes work (`/shop/category/furniture`)
+- [x] Space routes work (`/shop/design/space/bedroom`)
+- [x] Style routes work (`/shop/design/style/minimalist`)
+- [x] Filters apply correctly
+- [x] Mobile filter drawer opens/closes
+- [x] Sort changes product order
+- [x] Pagination works
+- [x] Product cards show correct data
+- [x] Image carousel swipe works on mobile
+- [x] Skeleton loading shows during data fetch
+- [x] Breadcrumbs navigate correctly
+- [x] Responsive layout at all breakpoints
+- [x] Product detail page loads with related products
+- [x] Color swatches display with hex codes
+- [x] Dynamic categories load in filter sidebar
 
 ---
 
 ## Future Enhancements
+
+### Database Schema
+
+1. **Add missing columns**: `in_stock`, `stock_count`, `is_new`, `original_price_cents`
+2. **Populate color hex codes**: Fill NULL values in `colors.hex_code`
+3. **Create special offers table**: For dynamic promotional banners
+4. **Add product dimensions table**: Separate table for width, height, depth, weight
+
+### Features
 
 1. **Search Functionality**: Full-text search with autocomplete
 2. **Recently Viewed**: Track and display viewed products
@@ -599,11 +659,40 @@ export async function getProducts(options) {
 7. **Inventory Sync**: Real-time stock updates
 8. **Analytics**: Track user behavior
 
+### Performance
+
+1. **Database indexes**: Add composite indexes for common filter combinations
+2. **CDN for images**: Serve product images from CDN
+3. **Server-side rendering**: Consider SSR for SEO
+4. **Service Worker**: Cache API responses offline
+
+---
+
+## API Migration Notes
+
+### Previous Architecture (Mock API)
+
+The shop was previously built with a mock API that simulated backend responses with static data and delays. This has been completely replaced.
+
+### Current Architecture (Direct NeonDB)
+
+- **No backend API layer**: Frontend connects directly to NeonDB via HTTP
+- **Client-side queries**: All SQL queries run in the browser using `@neondatabase/serverless`
+- **Connection pooling**: Handled automatically by Neon's HTTP endpoint
+- **No WebSockets needed**: Pure HTTP/fetch based
+
+### Security Considerations
+
+**Public read access**: The products database uses Row-Level Security (RLS) with a public read policy. This is acceptable for read-only product browsing. Write operations (cart, orders, users) should use separate authenticated APIs.
+
 ---
 
 ## Support
 
-For questions or issues, refer to the codebase comments or contact the development team.
+For questions or issues, refer to:
+- Codebase comments in `src/api/shopApi.js`
+- Database migration files in `database/Products/migrations/`
+- `database/products_db_docs.md` for schema documentation
 
-**Last Updated**: February 8, 2026  
-**Version**: 2.0.0
+**Last Updated**: February 11, 2026  
+**Version**: 3.0.0 (Production with NeonDB)

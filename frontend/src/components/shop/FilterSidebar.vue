@@ -330,7 +330,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import shopApi from '@/api/shopApi.js'
 
 const props = defineProps({
   filters: {
@@ -367,14 +368,31 @@ const openSections = ref({
   availability: true,
 })
 
-// Categories (could be fetched from API)
+// Categories (loaded from API)
 const categories = ref([
-  { id: 'all', name: 'All Products', slug: '', count: 148 },
-  { id: 'furniture', name: 'Furniture', slug: 'furniture', count: 48 },
-  { id: 'wall-art', name: 'Wall Art', slug: 'wall-art', count: 32 },
-  { id: 'decor', name: 'Decor', slug: 'decor', count: 40 },
-  { id: 'lights', name: 'Lights', slug: 'lights', count: 28 },
+  { id: 'all', name: 'All Products', slug: '', count: 0 },
 ])
+
+const loadCategories = async () => {
+  try {
+    const response = await shopApi.getCategories()
+    if (response.success && response.data) {
+      categories.value = [
+        { id: 'all', name: 'All Products', slug: '', count: response.data.reduce((sum, c) => sum + (c.productCount || 0), 0) },
+        ...response.data.map(c => ({
+          id: c.slug,
+          name: c.name,
+          slug: c.slug,
+          count: c.productCount || 0,
+        })),
+      ]
+    }
+  } catch (err) {
+    console.error('Error loading categories for filter sidebar:', err)
+  }
+}
+
+onMounted(loadCategories)
 
 // Price options
 const priceOptions = [
