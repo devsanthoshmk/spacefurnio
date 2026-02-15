@@ -107,7 +107,7 @@ Detailed product page:
 
 ### Location: `src/api/shopApi.js`
 
-The shop now connects directly to NeonDB using `@neondatabase/serverless` HTTP driver. All queries run client-side via fetch API to Neon's HTTP SQL endpoint.
+The shop connects directly to NeonDB using the `@neondatabase/serverless` HTTP driver. It uses a **Guest JWT** for secure, rate-limited access to the database.
 
 ### Database Connection
 
@@ -683,7 +683,7 @@ The shop was previously built with a mock API that simulated backend responses w
 
 ### Security Considerations
 
-**Public read access**: The products database uses Row-Level Security (RLS) with a public read policy. This is acceptable for read-only product browsing. Write operations (cart, orders, users) should use separate authenticated APIs.
+**Guest Authentication**: The application can use a long-lived Guest JWT (`VITE_GUEST_JWT`) mapped to an anonymous role. If present, it must be issued for the same Neon project as `VITE_PRODUCTS_DB_URL`; otherwise Neon may return `jwk not found`.
 
 ---
 

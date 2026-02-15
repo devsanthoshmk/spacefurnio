@@ -69,7 +69,7 @@ materials ───┘         │
 
 Products are categorized into **three listing types** via the `product_listing_type` ENUM:
 
-| Type            | Source JSON                   | Products | Key FK          |
+| Type            | Source (Migrated)             | Products | Key FK          |
 | --------------- | ----------------------------- | -------- | --------------- |
 | `category`      | `category-products.json`      | 12       | `category_id`   |
 | `design-space`  | `design-space-products.json`  | 17       | `space_id`      |

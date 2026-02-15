@@ -21,7 +21,72 @@ const DATABASE_URL =
     import.meta.env.VITE_PRODUCTS_DB_URL ||
     'postgresql://neondb_owner:npg_tnCUizvkR76D@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require'
 
-const sql = neon(DATABASE_URL)
+function sanitizeGuestJwt(token) {
+    if (typeof token !== 'string') return null
+    const trimmed = token.trim()
+    if (!trimmed) return null
+
+    // Accept env values written as "token" or 'token'
+    const unquoted = trimmed.replace(/^['"]|['"]$/g, '')
+    if (!unquoted || unquoted === 'your_guest_jwt_token_here') return null
+    return unquoted
+}
+
+function isAuthTokenError(error) {
+    const message = String(error?.message || error || '').toLowerCase()
+    return (
+        message.includes('jwk not found') ||
+        message.includes('invalid jwt') ||
+        message.includes('jwt') ||
+        message.includes('invalid token') ||
+        message.includes('token is expired') ||
+        message.includes('invalid authorization')
+    )
+}
+
+const GUEST_JWT = sanitizeGuestJwt(import.meta.env.VITE_GUEST_JWT)
+const sqlPublic = neon(DATABASE_URL)
+const sqlWithGuest = GUEST_JWT ? neon(DATABASE_URL, { authToken: GUEST_JWT }) : null
+
+let shouldUseGuestAuth = Boolean(sqlWithGuest)
+let authFallbackLogged = false
+
+async function runWithAuthFallback(executor) {
+    const useGuestForThisCall = Boolean(shouldUseGuestAuth && sqlWithGuest)
+    const client = useGuestForThisCall ? sqlWithGuest : sqlPublic
+
+    try {
+        return await executor(client)
+    } catch (error) {
+        if (useGuestForThisCall && isAuthTokenError(error)) {
+            shouldUseGuestAuth = false
+
+            if (!authFallbackLogged) {
+                console.warn(
+                    'Guest JWT authentication failed. Retrying with public Neon connection:',
+                    error?.message || error,
+                )
+                authFallbackLogged = true
+            }
+
+            return executor(sqlPublic)
+        }
+
+        throw error
+    }
+}
+
+// Query wrapper with one-time auth fallback.
+const sql = Object.assign(
+    async function sqlTag(strings, ...values) {
+        return runWithAuthFallback(client => client(strings, ...values))
+    },
+    {
+        query(text, params = []) {
+            return runWithAuthFallback(client => client.query(text, params))
+        },
+    },
+)
 
 // ============================================
 // COLOR HEX MAP  (DB has null hex_code values)
