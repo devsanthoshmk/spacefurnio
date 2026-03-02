@@ -617,6 +617,10 @@ onMounted(() => {
    PRODUCT LISTING PAGE STYLES
    ============================================ */
 
+/* ============================================
+   PRODUCT LISTING PAGE STYLES
+   ============================================ */
+
 .listing-page {
   min-height: 100vh;
   background: var(--shop-cream, #FAF8F5);
@@ -635,9 +639,9 @@ onMounted(() => {
 }
 
 .listing-container {
-  max-width: 1400px;
+  max-width: 1800px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 /* Header */
@@ -996,6 +1000,12 @@ onMounted(() => {
 @media (min-width: 1280px) {
   .products-grid.view-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .products-grid.view-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 

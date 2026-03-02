@@ -1,0 +1,33 @@
+meta {
+  name: Add to Cart
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1/cart_items
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Prefer: return=representation
+}
+
+body:json {
+  {
+    "cart_id": "33333333-3333-3333-3333-333333333333",
+    "product_id": "22222222-2222-2222-2222-222222222222",
+    "quantity": 1,
+    "price_snapshot": 149.50
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body: isArray
+}

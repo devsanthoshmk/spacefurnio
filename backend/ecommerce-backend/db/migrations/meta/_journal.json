@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1771572970924,
+      "tag": "0000_lyrical_the_liberteens",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772191211606,
+      "tag": "0001_big_dormammu",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772464847616,
+      "tag": "0002_amusing_wendell_vaughn",
+      "breakpoints": true
+    }
+  ]
+}

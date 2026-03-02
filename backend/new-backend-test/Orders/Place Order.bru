@@ -1,0 +1,32 @@
+meta {
+  name: Place Order
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/orders/checkout
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "cartItems": [
+      {
+        "productId": "df47e6ac-fdd1-426b-87b4-9da9e685f4bb",
+        "quantity": 2
+      }
+    ],
+    "shippingAddressId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "paymentMethod": "stripe"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

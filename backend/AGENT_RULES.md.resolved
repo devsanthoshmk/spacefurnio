@@ -1,0 +1,46 @@
+# 🏗️ Agent Rules: Maintenance & Expansion of E-commerce Database
+
+This document outlines explicitly how future AI agents (like Antigravity) should interact with, extend, and maintain the neon e-commerce database (`ecommerce-backend`).
+
+## Core Technologies
+- **PostgreSQL Provider:** [Neon Serverless Postgres](https://neon.com/docs/introduction)
+    - Separates compute/storage. Scale to zero is enabled.
+    - Project ID: `proud-shadow-42759289`
+- **ORM:** [Drizzle ORM](https://orm.drizzle.team/docs/overview) (written in TypeScript inside `/db/schema/`)
+- **Backend Server:** Node.js Express Server (written in JS inside `/server/`)
+
+## 🛡️ Database Architecture and Permissions Protocol
+This database follows a strict Zero-Trust / Segregation of Duties architecture model. **DO NOT deviate from this unless expressly requested by the User.**
+
+### 1. Non-Sensitive Structures (Direct Database Access via RLS)
+Tables such as `carts`, `wishlists`, `user_addresses`, and basic `users` profile reads are non-sensitive.
+- **Rule:** These structures are meant to be accessed via the **Neon Data API** directly from the frontend (browser) using a JWT issued by the backend.
+- **Rule:** ALL these tables MUST have Drizzle definitions and strict PostgreSQL Row Level Security (RLS) policies ensuring a user (`current_setting('request.jwt.claim.sub', true)`) can only modify their own rows.
+
+### 2. Sensitive Structures (Backend Access Only)
+Tables such as `orders`, `order_status_history`, `payments`, `shipments`, `coupons`, `refunds`, and `audit_logs` are HIGHLY sensitive. 
+- **Rule:** Row Level Security (RLS) must be enabled on these. Normal users can at best `SELECT` their own `orders`. 
+- **Rule:** ALL writes (Create, Update, Delete) for these tables MUST NOT be done directly from the browser. 
+- **Rule:** They must be handled by the Express.js backend under `/server/routes/` utilizing elevated database credentials (like the default `neondb_owner` role) or database transactions.
+
+## 🛠️ Modifying the Database Schema
+When the user asks you to add a new table (e.g. `subscriptions`) or modify an existing table:
+1. **Locate the domain file** in `/db/schema/` (e.g., [orders.ts](file:///home/santhoshmk/EDUCATION%20CONTENT/LEARNING/dizzle%20orm/ecommerce-backend/db/schema/orders.ts) or create a new file and export it in [index.ts](file:///home/santhoshmk/EDUCATION%20CONTENT/LEARNING/dizzle%20orm/ecommerce-backend/db/index.ts)).
+2. **Write the Drizzle table exactly in TS**. Do not inject raw SQL migrations manually.
+3. **Execute standard generation:**
+   From `/ecommerce-backend` directory, run: 
+   ```bash
+   npx drizzle-kit generate
+   ```
+4. **Apply Migration:**
+   This project uses raw `postgres-js` for migrations due to local environment fetch issues with `neon-http`. Run:
+   ```bash
+   npx tsx db/migrate.ts
+   ```
+5. **Add RLS Policies:**
+   If the new table requires security, generate an MCP tool call executing `ALTER TABLE "new_table" ENABLE ROW LEVEL SECURITY;` and attach the respective `CREATE POLICY` logic directly via the `mcp-server-neon` DB tool or via a raw `execute()` block inside a subsequent migration script.
+
+## 🌐 Navigating Authentication (Neon Auth + JWKS)
+- The Express server (`/server/utils/jwks.js`) owns the Private Key to generate robust signed RS256 JSON Web Tokens.
+- The Public Key is exposed at `http://localhost:5000/auth/.well-known/jwks.json`.
+- In production, this URL needs to be plugged into the Neon Console (`Auth` -> `Add JWKS URL`) to allow direct frontend queries dynamically tied to backend sessions.

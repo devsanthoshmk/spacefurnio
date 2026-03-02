@@ -5,8 +5,8 @@
       <div class="shop-hero-content">
         <!-- Special Offers Banner -->
         <div class="special-offers" v-if="!loading">
-          <div 
-            v-for="offer in specialOffers" 
+          <div
+            v-for="offer in specialOffers"
             :key="offer.id"
             class="offer-card"
             @click="navigateToOffer(offer.link)"
@@ -29,7 +29,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Loading Skeleton for Offers -->
         <div v-else class="special-offers">
           <div v-for="n in 2" :key="n" class="offer-card skeleton-card">
@@ -49,23 +49,23 @@
         <!-- Section Header -->
         <header class="shop-header">
           <h1 class="shop-title">Shop All Products</h1>
-          
+
           <!-- Toggle Pills -->
           <div class="shop-toggle">
-            <button 
+            <button
               :class="['toggle-btn', { active: activeTab === 'category' }]"
               @click="switchTab('category')"
             >
               Shop by Category
             </button>
-            <button 
+            <button
               :class="['toggle-btn', { active: activeTab === 'design' }]"
               @click="switchTab('design')"
             >
               Shop by Design
             </button>
-            <div 
-              class="toggle-indicator" 
+            <div
+              class="toggle-indicator"
               :style="{ transform: `translateX(${activeTab === 'design' ? '100%' : '0'})` }"
             ></div>
           </div>
@@ -76,8 +76,8 @@
           <div v-if="activeTab === 'category'" key="category" class="tab-content">
             <!-- Categories Grid -->
             <div class="categories-grid shop-stagger" v-if="!loading">
-              <div 
-                v-for="category in categories" 
+              <div
+                v-for="category in categories"
                 :key="category.id"
                 class="category-card"
                 @click="navigateToCategory(category.slug)"
@@ -88,7 +88,7 @@
                 <span class="category-name">{{ category.name }}</span>
               </div>
             </div>
-            
+
             <!-- Loading Skeleton -->
             <div v-else class="categories-grid">
               <div v-for="n in 4" :key="n" class="category-card skeleton-category">
@@ -103,10 +103,10 @@
             <div class="design-section">
               <h2 class="section-title">Space-specific</h2>
               <p class="section-subtitle">Shop furniture designed for specific rooms</p>
-              
+
               <div class="spaces-grid shop-stagger" v-if="!loading">
-                <div 
-                  v-for="space in spaces" 
+                <div
+                  v-for="space in spaces"
                   :key="space.id"
                   class="space-card"
                   @click="navigateToSpace(space.slug)"
@@ -117,7 +117,7 @@
                   <span class="space-name">{{ space.name }}</span>
                 </div>
               </div>
-              
+
               <!-- Loading Skeleton -->
               <div v-else class="spaces-grid">
                 <div v-for="n in 4" :key="n" class="space-card skeleton-space">
@@ -133,10 +133,10 @@
             <div class="design-section">
               <h2 class="section-title">Style-specific</h2>
               <p class="section-subtitle">Browse collections curated by design aesthetic</p>
-              
+
               <div class="styles-grid shop-stagger" v-if="!loading">
-                <div 
-                  v-for="style in styles" 
+                <div
+                  v-for="style in styles"
                   :key="style.id"
                   class="style-card"
                   @click="navigateToStyle(style.slug)"
@@ -150,7 +150,7 @@
                   <span class="style-name">{{ style.name }}</span>
                 </div>
               </div>
-              
+
               <!-- Loading Skeleton -->
               <div v-else class="styles-grid">
                 <div v-for="n in 4" :key="n" class="style-card skeleton-style">
@@ -179,10 +179,10 @@
             </svg>
           </router-link>
         </header>
-        
+
         <div class="featured-grid shop-stagger">
-          <div 
-            v-for="product in featuredProducts.slice(0, 6)" 
+          <div
+            v-for="product in featuredProducts.slice(0, 6)"
             :key="product.id"
             class="featured-product"
             @click="navigateToProduct(product)"
@@ -328,7 +328,7 @@ const getSpaceIcon = (iconName) => {
 // Load data
 const loadData = async () => {
   loading.value = true
-  
+
   try {
     const [categoriesRes, spacesRes, stylesRes, offersRes, featuredRes] = await Promise.all([
       shopApi.getCategories(),
@@ -337,13 +337,13 @@ const loadData = async () => {
       shopApi.getSpecialOffers(),
       shopApi.getFeaturedProducts(),
     ])
-    
+
     if (categoriesRes.success) categories.value = categoriesRes.data
     if (spacesRes.success) spaces.value = spacesRes.data
     if (stylesRes.success) styles.value = stylesRes.data
     if (offersRes.success) specialOffers.value = offersRes.data
     if (featuredRes.success) featuredProducts.value = featuredRes.data.bestSellers || []
-    
+
   } catch (error) {
     console.error('Error loading shop data:', error)
   } finally {
@@ -377,8 +377,8 @@ onMounted(() => {
 
 /* Hero Section */
 .shop-hero {
-  padding: 2rem 1.5rem 3rem;
-  max-width: 1400px;
+  padding: 2rem 2rem 3rem;
+  max-width: 1800px;
   margin: 0 auto;
 }
 
@@ -502,11 +502,11 @@ onMounted(() => {
 
 /* Main Shop Section */
 .shop-main {
-  padding: 0 1.5rem 4rem;
+  padding: 0 2rem 4rem;
 }
 
 .shop-container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -574,17 +574,11 @@ onMounted(() => {
 /* Categories Grid */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 180px));
   gap: 1.25rem;
-  max-width: 700px;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-@media (min-width: 640px) {
-  .categories-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-  }
+  justify-content: center;
 }
 
 .category-card {
@@ -669,14 +663,21 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 @media (min-width: 640px) {
   .spaces-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spaces-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
@@ -729,13 +730,20 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {
   .styles-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .styles-grid {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -811,7 +819,7 @@ onMounted(() => {
 /* Featured Section */
 .shop-featured {
   background: white;
-  padding: 4rem 1.5rem;
+  padding: 4rem 2rem;
   margin-top: 2rem;
 }
 
@@ -866,8 +874,14 @@ onMounted(() => {
 
 @media (min-width: 1024px) {
   .featured-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .featured-grid {
     grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
   }
 }
 

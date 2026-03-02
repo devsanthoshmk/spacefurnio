@@ -1,0 +1,22 @@
+meta {
+  name: Get Orders
+  type: http
+  seq: 5
+}
+
+get {
+  url: https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1/orders?select=*,order_items(*)
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}

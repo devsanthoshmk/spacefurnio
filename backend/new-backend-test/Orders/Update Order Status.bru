@@ -1,0 +1,26 @@
+meta {
+  name: Update Order Status
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/orders/123e4567-e89b-12d3-a456-426614174000/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "status": "shipped",
+    "trackingNumber": "TRK123456789"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

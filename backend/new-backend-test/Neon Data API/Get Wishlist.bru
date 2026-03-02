@@ -1,0 +1,22 @@
+meta {
+  name: Get Wishlist
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1/wishlists?select=*,wishlist_items(*)
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
