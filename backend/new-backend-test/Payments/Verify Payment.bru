@@ -1,0 +1,29 @@
+meta {
+  name: Verify Payment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/payments/verify
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "razorpay_order_id": "order_12345",
+    "razorpay_payment_id": "pay_xyz987",
+    "razorpay_signature": "mock_signature_abc123"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

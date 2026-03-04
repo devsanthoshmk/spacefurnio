@@ -1,0 +1,39 @@
+meta {
+  name: Get Products (Data API)
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1/products?limit=5
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  neon-connection-string: postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
+
+tests {
+  test("has products", function() {
+    expect(res.body.length).to.be.greaterThan(0);
+  });
+
+  test("product has name", function() {
+    expect(res.body[0].name).to.be.a("string");
+  });
+
+  test("product has price", function() {
+    expect(res.body[0].price_cents).to.be.a("number");
+  });
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Register
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "testuser+2@store.com",
+    "password": "supersecurepassword123",
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+vars:post-response {
+  testToken: res.body.token
+}
+
+tests {
+  test("status is 200 or 409", function() {
+    expect([200, 409]).to.include(res.getStatus());
+  });
+}

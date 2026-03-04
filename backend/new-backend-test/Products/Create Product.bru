@@ -1,0 +1,36 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/products
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Admin Test Product",
+    "slug": "admin-test-product-{{$timestamp}}",
+    "price_cents": 10000,
+    "brand_id": 1,
+    "listing_type": "category",
+    "description": "Created via Worker API test"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returned product has id", function() {
+    expect(res.body.product).to.not.be.undefined;
+  });
+}

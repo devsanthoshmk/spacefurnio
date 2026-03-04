@@ -1,0 +1,31 @@
+meta {
+  name: Get Brands (Data API)
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1/brands
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  neon-connection-string: postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
+
+tests {
+  test("has brands", function() {
+    expect(res.body.length).to.be.greaterThan(0);
+  });
+}
