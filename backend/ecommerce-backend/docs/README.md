@@ -12,6 +12,7 @@
 ```
 docs/
 ├── README.md                          ← You are here (Index)
+├── FAQ.md                             ← Resolved queries and quick answers
 ├── architecture/
 │   └── ARCHITECTURE_STRATEGY.md       ← Core split-access model overview
 ├── guides/

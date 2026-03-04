@@ -38,3 +38,36 @@ authRouter.post('/login', async (request, env) => {
         return error(500, { message: 'Login failed' });
     }
 });
+
+authRouter.post('/register', async (request, env) => {
+    try {
+        const body = await request.json() as any;
+        const { email, password, firstName, lastName } = body;
+
+        const { sql } = getDb(env);
+
+        // Check if user already exists
+        const existing = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+        if (existing.length > 0) {
+            return error(409, { message: 'User already exists' });
+        }
+
+        // Insert new user
+        // (Password hashing would go here!)
+        const result = await sql`
+            INSERT INTO users (email, password_hash)
+            VALUES (${email}, ${password})
+            RETURNING id, email
+        `;
+
+        const user = result[0] as any;
+        user.role = 'customer';
+
+        const token = await generateToken(user, env.RSA_PRIVATE_KEY_PEM);
+
+        return { message: 'Registration successful', token, user };
+    } catch (e) {
+        console.error(e);
+        return error(500, { message: 'Registration failed' });
+    }
+});

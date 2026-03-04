@@ -52,16 +52,39 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-    schema: "./db/schema/index.ts",   // Entry point: exports ALL tables
-    out: "./db/migrations",            // Where .sql migration files are saved
+    schema: "./db/schema/index.ts",   // Entry point: exports ALL core tables
+    out: "./db/migrations",            // Where core .sql migration files are saved
     dialect: "postgresql",
     dbCredentials: {
-        url: process.env.DATABASE_URL!, // neondb_owner connection string
+        url: process.env.DATABASE_URL!, // core neondb_owner connection string
     },
 });
 ```
 
+### `drizzle.products.config.ts` (For External Catalog DB)
+
+Since the `products` table was permanently relocated to the external `icy-union-81751721` Neon database to follow strict decoupling guidelines, all schema and migrations exist separately.
+
+```typescript
+// ecommerce-backend/drizzle.products.config.ts
+import { defineConfig } from "drizzle-kit";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+export default defineConfig({
+    schema: "./db/products-schema/index.ts",
+    out: "./db/products-migrations",
+    dialect: "postgresql",
+    dbCredentials: {
+        url: process.env.PRODUCTS_DATABASE_URL || "postgresql://authenticator@ep-icy-union-81751721... (User Override)", 
+    },
+});
+```
+> **Migrating Products:** Run `npx drizzle-kit generate --config=drizzle.products.config.ts` to generate these isolated migrations.
+
 ### `db/schema/index.ts` — The Schema Barrel
+
 
 ALL schema files MUST be re-exported here. `drizzle-kit` reads only this file.
 
@@ -289,19 +312,30 @@ npx drizzle-kit check            # Validate schema for drift without generating
 
 ## 6. Querying With Drizzle (Worker Context)
 
-All database operations in the Worker go through `getDb(env)`:
+All database operations in the Worker go through `getDb(env)` (core tables) or `getProductsDb(env)` (catalog tables):
 
 ```typescript
 // server-worker/src/utils/db.ts
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '../../../db/schema/index';
+import * as productSchema from '../../../db/products-schema/index';
 
+// Core database (ep-ancient-frog-aimehta7)
 export const getDb = (env: { DATABASE_URL: string }) => {
     const sql = neon(env.DATABASE_URL);
     return { db: drizzle(sql, { schema }), sql };
 };
+
+// Products database (icy-union-81751721 / ep-flat-brook-a1h1dgii)
+export const getProductsDb = (env: { PRODUCTS_DATABASE_URL: string }) => {
+    if (!env.PRODUCTS_DATABASE_URL) throw new Error("PRODUCTS_DATABASE_URL missing");
+    const sql = neon(env.PRODUCTS_DATABASE_URL);
+    return { db: drizzle(sql, { schema: productSchema }), sql };
+};
 ```
+
+> **Important:** The `PRODUCTS_DATABASE_URL` env var must be set as a Wrangler secret (`wrangler secret put PRODUCTS_DATABASE_URL`) and in `.dev.vars` for local development.
 
 ### SELECT Queries
 

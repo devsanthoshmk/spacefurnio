@@ -56,7 +56,7 @@ Neon Account
 | Schema File | Tables |
 |---|---|
 | `db/schema/users.ts` | `roles`, `users`, `user_roles`, `user_addresses`, `user_sessions` |
-| `db/schema/catalog.ts` | `products`, `inventory`, `inventory_movements`, `reviews` |
+| `db/schema/catalog.ts` | *(Empty — products moved to separate `icy-union-81751721` Neon project)* |
 | `db/schema/shopping.ts` | `carts`, `cart_items`, `wishlists`, `wishlist_items` |
 | `db/schema/orders.ts` | `orders`, `order_items`, `order_status_history`, `payments`, `payment_transactions`, `shipments`, `shipment_items`, `return_requests`, `return_items`, `refunds` |
 | `db/schema/promotions.ts` | `coupons`, `coupon_redemptions` |
@@ -216,8 +216,9 @@ WITH CHECK (
 | `user_addresses` | ✅ Yes | `user_id = jwt.sub` | Full CRUD for own addresses |
 | `orders` | ✅ Yes | `SELECT WHERE user_id = jwt.sub` | Read-only. Writes blocked (403) |
 | `order_items` | ✅ Yes | order's `user_id = jwt.sub` | Read-only. Writes blocked (403) |
-| `products` | 🚫 Removed | [Separate Project] | Moved to `icy-union-81751721` |
-| `reviews` | 🚫 Removed | [Separate Project] | Moved to `icy-union-81751721` |
+| `products` | ✅ Yes (separate project) | `anon read`, `admin full access`, `customer read` | In `icy-union-81751721` — roles: `admin`, `customer`, `anonymous` |
+| `brands` | ✅ Yes (separate project) | Same as products | In `icy-union-81751721` |
+| `categories` | ✅ Yes (separate project) | Same as products | In `icy-union-81751721` |
 | `users` | 🚫 Not via Data API | Managed by Worker only | DO NOT expose to `authenticator` role |
 | `payments` | 🚫 Not via Data API | Managed by Worker only | Financial data — backend only |
 | `audit_logs` | 🚫 Not via Data API | Internal system table | No client access at all |
