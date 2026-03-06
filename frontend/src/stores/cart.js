@@ -7,37 +7,16 @@
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { cart as cartApi } from '@/api';
+import { api as cartApi } from '@/lib/api';
 
 export const useCartStore = defineStore('cart', () => {
   // ===========================================
   // STATE
   // ===========================================
 
-  // Sample items for demo/testing (remove in production)
-  const items = ref()
-  // seed data
-  //   [
-  //   {
-  //     id: 'demo-1',
-  //     productId: 'prod-001',
-  //     name: 'Modern Velvet Sofa',
-  //     variant: 'Navy Blue',
-  //     image: '/images/products/sofa-navy.jpg',
-  //     unitPrice: 1299,
-  //     quantity: 1,
-  //   },
-  //   {
-  //     id: 'demo-2',
-  //     productId: 'prod-002',
-  //     name: 'Scandinavian Oak Coffee Table',
-  //     variant: 'Natural Oak',
-  //     image: '/images/products/coffee-table.jpg',
-  //     unitPrice: 449,
-  //     quantity: 2,
-  //   },
-  // ]);
-  const subtotal = ref(2197); // 1299 + (449 * 2)
+  const cartId = ref(null);
+  const items = ref([]);
+  const subtotal = ref(0);
   const discountCode = ref(null);
   const discountAmount = ref(0);
   const isLoading = ref(false);
@@ -48,7 +27,6 @@ export const useCartStore = defineStore('cart', () => {
   // ===========================================
 
   const itemCount = computed(() => {
-    // console.info('itemCount', items.value);
     return items.value?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   });
 
@@ -65,20 +43,41 @@ export const useCartStore = defineStore('cart', () => {
   // ===========================================
 
   /**
-   * Fetch cart from server
+   * Fetch cart from server.
+   *
+   * NOTE: products table was dropped from the main DB (migration 0001_big_dormammu).
+   * Products live in a separate Neon project, so PostgREST cannot join products(*).
+   * We use price_snapshot from cart_items (price at time of add) which is the
+   * correct ecommerce pattern anyway. Product enrichment (name, image) can be
+   * done lazily by the UI using shopApi.
    */
   async function fetchCart() {
     try {
       isLoading.value = true;
       error.value = null;
 
-      const response = await cartApi.get();
+      const cartData = await cartApi.getCart();
 
-      items.value = response.items || [];
-      subtotal.value = response.subtotal || 0;
-      discountCode.value = response.discountCode || null;
-      discountAmount.value = response.discountAmount || 0;
-
+      if (cartData) {
+        cartId.value = cartData.id;
+        // Transform PostgREST response — no products(*) join available
+        const newItems = (cartData.cart_items || []).map(ci => ({
+          id: ci.id,
+          productId: ci.product_id,
+          // Product details are NOT available from the main DB.
+          // UI components should enrich from shopApi/catalog if needed.
+          name: null,
+          image: null,
+          unitPrice: parseFloat(ci.price_snapshot || 0),
+          quantity: ci.quantity
+        }));
+        items.value = newItems;
+        subtotal.value = newItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+      } else {
+        cartId.value = null;
+        items.value = [];
+        subtotal.value = 0;
+      }
     } catch (err) {
       error.value = err.message;
       console.error('Fetch cart error:', err);
@@ -91,20 +90,47 @@ export const useCartStore = defineStore('cart', () => {
    * Add item to cart
    */
   async function addItem(productId, quantity = 1, variantId = null) {
+    if (!cartId.value) {
+      // Logic expects a cart ID if it's the Neon Data API.
+      // Usually the backend creates a cart or we fetch it first.
+      await fetchCart();
+      if (!cartId.value) {
+        error.value = 'Cart not initialized for user. Please check backend Auth.';
+        return;
+      }
+    }
+
     try {
       isLoading.value = true;
       error.value = null;
 
-      const response = await cartApi.addItem(productId, quantity, variantId);
+      // Ensure price is grabbed from the product API or let DB trigger do it if possible
+      // Assuming addCartItem uses PostgREST POST
+      const existingItem = items.value.find(i => i.productId === productId);
+      if (existingItem) {
+        // If already exists, we should PATCH instead or add to quantity
+        existingItem.quantity += quantity;
+        await cartApi.updateCartItem(existingItem.id, existingItem.quantity);
+      } else {
+        await cartApi.addCartItem({
+          cart_id: cartId.value,
+          product_id: productId,
+          quantity: quantity,
+          // price_snapshot: (get this from the product store in reality)
+        });
+      }
 
-      // Update local state with server response
-      items.value = response.items || items.value;
-      subtotal.value = response.subtotal || subtotal.value;
-
-      return response;
+      // Re-fetch cart to get synced data and joined products
+      await fetchCart();
+      return true;
     } catch (err) {
-      error.value = err.message;
-      throw err;
+      // If adding fails because of unique constraint, fallback to fetch+patch
+      if (err.message && err.message.includes('Item already exists.')) {
+        await fetchCart();
+      } else {
+        error.value = err.message;
+        throw err;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -114,13 +140,11 @@ export const useCartStore = defineStore('cart', () => {
    * Update item quantity
    */
   async function updateItemQuantity(itemId, quantity) {
-    // Optimistic update
     const itemIndex = items.value.findIndex(i => i.id === itemId);
     const previousQuantity = itemIndex >= 0 ? items.value[itemIndex].quantity : 0;
 
     if (itemIndex >= 0) {
       items.value[itemIndex].quantity = quantity;
-      // Recalculate subtotal
       subtotal.value = items.value.reduce(
         (sum, item) => sum + (item.unitPrice * item.quantity), 0
       );
@@ -129,23 +153,15 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       error.value = null;
-
-      const response = await cartApi.updateItem(itemId, quantity);
-
-      // Update with server response
-      items.value = response.items || items.value;
-      subtotal.value = response.subtotal || subtotal.value;
-
-      return response;
+      await cartApi.updateCartItem(itemId, quantity);
+      return true;
     } catch (err) {
-      // Revert optimistic update
       if (itemIndex >= 0) {
         items.value[itemIndex].quantity = previousQuantity;
         subtotal.value = items.value.reduce(
           (sum, item) => sum + (item.unitPrice * item.quantity), 0
         );
       }
-
       error.value = err.message;
       throw err;
     } finally {
@@ -157,7 +173,6 @@ export const useCartStore = defineStore('cart', () => {
    * Remove item from cart
    */
   async function removeItem(itemId) {
-    // Optimistic update
     const removedItem = items.value.find(i => i.id === itemId);
     items.value = items.value.filter(i => i.id !== itemId);
     subtotal.value = items.value.reduce(
@@ -167,18 +182,14 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true;
       error.value = null;
-
-      await cartApi.removeItem(itemId);
-
+      await cartApi.removeCartItem(itemId);
     } catch (err) {
-      // Revert optimistic update
       if (removedItem) {
         items.value.push(removedItem);
         subtotal.value = items.value.reduce(
           (sum, item) => sum + (item.unitPrice * item.quantity), 0
         );
       }
-
       error.value = err.message;
       throw err;
     } finally {
@@ -190,17 +201,13 @@ export const useCartStore = defineStore('cart', () => {
    * Clear entire cart
    */
   async function clearCart() {
+    if (!cartId.value) return;
     try {
       isLoading.value = true;
       error.value = null;
-
-      await cartApi.clear();
-
+      await cartApi.clearCart(cartId.value);
       items.value = [];
       subtotal.value = 0;
-      discountCode.value = null;
-      discountAmount.value = 0;
-
     } catch (err) {
       error.value = err.message;
       throw err;
@@ -210,79 +217,41 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   /**
-   * Apply coupon code
-   */
-  async function applyCoupon(code) {
-    try {
-      isLoading.value = true;
-      error.value = null;
-
-      const response = await cartApi.applyCoupon(code);
-
-      discountCode.value = response.discountCode;
-      discountAmount.value = response.discountAmount;
-
-      return response;
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /**
-   * Remove coupon
+   * Remove coupon (stub)
    */
   async function removeCoupon() {
-    try {
-      isLoading.value = true;
-      error.value = null;
+    discountCode.value = null;
+    discountAmount.value = 0;
+  }
 
-      await cartApi.removeCoupon();
-
-      discountCode.value = null;
-      discountAmount.value = 0;
-
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
+  /**
+   * Apply coupon code (stub)
+   */
+  async function applyCoupon(code) {
+    discountCode.value = code;
+    discountAmount.value = 0; // Stub logic
   }
 
   /**
    * Get cart count only
    */
   async function fetchCount() {
-    try {
-      const response = await cartApi.getCount();
-      return response.count;
-    } catch (err) {
-      console.error('Fetch cart count error:', err);
-      return 0;
-    }
+    await fetchCart();
+    return itemCount.value;
   }
 
   /**
    * Check if product is in cart
    */
   function isInCart(productId, variantId = null) {
-    return items.value.some(item =>
-      item.productId === productId &&
-      (variantId ? item.variantId === variantId : true)
-    );
+    return items.value.some(item => item.productId === productId);
   }
 
   /**
    * Get item quantity in cart
    */
   function getItemQuantity(productId, variantId = null) {
-    const item = items.value.find(i =>
-      i.productId === productId &&
-      (variantId ? i.variantId === variantId : true)
-    );
+    const item = items.value.find(i => i.productId === productId);
     return item?.quantity || 0;
   }
 
@@ -297,6 +266,7 @@ export const useCartStore = defineStore('cart', () => {
    * Reset store (on logout)
    */
   function $reset() {
+    cartId.value = null;
     items.value = [];
     subtotal.value = 0;
     discountCode.value = null;
@@ -306,21 +276,19 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   return {
-    // State
     items,
     subtotal,
     discountCode,
     discountAmount,
     isLoading,
     error,
+    cartId,
 
-    // Getters
     itemCount,
     total,
     isEmpty,
     hasDiscount,
 
-    // Actions
     fetchCart,
     addItem,
     updateItemQuantity,

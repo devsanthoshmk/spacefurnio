@@ -15,11 +15,20 @@
     <FooterComponent v-show="showFoo"/>
   </footer>
 
-  <!-- Route-driven Cart Off-Canvas Overlay (hidden on admin) -->
+  <!-- State-driven Cart Off-Canvas Overlay (hidden on admin) -->
   <CartOffCanvas v-if="!isAdminRoute" />
 
-  <!-- Route-driven Wishlist Off-Canvas Overlay (hidden on admin) -->
+  <!-- State-driven Wishlist Off-Canvas Overlay (hidden on admin) -->
   <WishlistOffCanvas v-if="!isAdminRoute" />
+
+  <!-- State-driven Auth Modal (hidden on admin) -->
+  <AuthModal v-if="!isAdminRoute" />
+
+  <!-- State-driven Orders Modal (hidden on admin) -->
+  <OrdersModal v-if="!isAdminRoute" />
+
+  <!-- State-driven Checkout Modal (hidden on admin) -->
+  <CheckoutModal v-if="!isAdminRoute" />
 
   <!-- Highlight overlay for admin preview -->
   <div v-if="highlightKey" class="highlight-indicator">
@@ -35,8 +44,12 @@
   import FooterComponent from './components/Footer-component.vue'
   import CartOffCanvas from './components/CartOffCanvas.vue'
   import WishlistOffCanvas from './components/WishlistOffCanvas.vue'
+  import AuthModal from './components/AuthModal.vue'
+  import OrdersModal from './components/OrdersModal.vue'
+  import CheckoutModal from './components/CheckoutModal.vue'
   import { useCartStore } from '@/stores/cart'
   import { useWishlistStore } from '@/stores/wishlist'
+  import { useAuthStore } from '@/stores/auth'
 
   // Nav visibility
   const showNav = ref(true)
@@ -50,6 +63,7 @@
   const route = useRoute()
   const cart = useCartStore()
   const wishlist = useWishlistStore()
+  const authStore = useAuthStore()
 
   // Check if current route is admin
   const isAdminRoute = computed(() => route.path.startsWith('/admin-spacefurnio'))
@@ -63,31 +77,75 @@
   // Wishlist item count for nav badge
   const wishlistItemCount = computed(() => wishlist.itemCount)
 
+  // ==========================================================
+  // MODAL STATE (State-based, NOT route-based)
+  // ==========================================================
+  // Each modal is controlled by a simple reactive boolean.
+  // The page stays intact behind the overlay — no routing issues.
+  // ==========================================================
+  const isCartOpen = ref(false)
+  const isWishlistOpen = ref(false)
+  const isLoginOpen = ref(false)
+  const isOrdersOpen = ref(false)
+  const isCheckoutOpen = ref(false)
+
   /**
-   * Open cart by appending /cart to current route
-   * This triggers the CartOffCanvas component to show
+   * Helper: close any open overlay before opening a new one
    */
+  function closeAllModals() {
+    isCartOpen.value = false
+    isWishlistOpen.value = false
+    isLoginOpen.value = false
+    isOrdersOpen.value = false
+    isCheckoutOpen.value = false
+  }
+
   function openCart() {
-    if (!route.path.endsWith('/cart') && !route.path.endsWith('/wishlist')) {
-      router.push(route.fullPath + '/cart')
-    }
+    closeAllModals()
+    isCartOpen.value = true
+  }
+  function closeCart() {
+    isCartOpen.value = false
   }
 
-  /**
-   * Open wishlist by appending /wishlist to current route
-   * This triggers the WishlistOffCanvas component to show
-   */
   function openWishlist() {
-    if (!route.path.endsWith('/wishlist') && !route.path.endsWith('/cart')) {
-      router.push(route.fullPath + '/wishlist')
-    }
+    closeAllModals()
+    isWishlistOpen.value = true
+  }
+  function closeWishlist() {
+    isWishlistOpen.value = false
   }
 
-  // Provide cart utilities to child components (Nav, etc.)
-  provide('cartUtils', { openCart, cartItemCount })
+  function openLogin() {
+    closeAllModals()
+    isLoginOpen.value = true
+  }
+  function closeLogin() {
+    isLoginOpen.value = false
+  }
 
-  // Provide wishlist utilities to child components (Nav, etc.)
-  provide('wishlistUtils', { openWishlist, wishlistItemCount })
+  function openOrders() {
+    closeAllModals()
+    isOrdersOpen.value = true
+  }
+  function closeOrders() {
+    isOrdersOpen.value = false
+  }
+
+  function openCheckout() {
+    closeAllModals()
+    isCheckoutOpen.value = true
+  }
+  function closeCheckout() {
+    isCheckoutOpen.value = false
+  }
+
+  // Provide modal utilities to child components
+  provide('cartUtils', { openCart, closeCart, isCartOpen, cartItemCount })
+  provide('wishlistUtils', { openWishlist, closeWishlist, isWishlistOpen, wishlistItemCount })
+  provide('authUtils', { openLogin, closeLogin, isLoginOpen, authStore })
+  provide('ordersUtils', { openOrders, closeOrders, isOrdersOpen })
+  provide('checkoutUtils', { openCheckout, closeCheckout, isCheckoutOpen })
 
   /**
    * Highlight element with matching data-key attribute
@@ -139,6 +197,9 @@
       }
     `
     document.head.appendChild(style)
+
+    // Initialize auth state from localStorage
+    authStore.initialize()
   })
 </script>
 

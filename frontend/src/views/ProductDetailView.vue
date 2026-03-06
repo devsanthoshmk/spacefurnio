@@ -270,19 +270,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import shopApi from '@/api/shopApi.js'
+import { useCartStore } from '@/stores/cart'
+import { useWishlistStore } from '@/stores/wishlist'
 
 const route = useRoute()
 const router = useRouter()
+const cartStore = useCartStore()
+const wishlistStore = useWishlistStore()
+
+const { openLogin } = inject('authUtils', { openLogin: () => {} })
+const { openCart } = inject('cartUtils', { openCart: () => {} })
+const { openWishlist } = inject('wishlistUtils', { openWishlist: () => {} })
 
 // State
 const loading = ref(false)
 const currentImageIndex = ref(0)
 const selectedColor = ref('')
 const quantity = ref(1)
-const isWishlisted = ref(false)
+const isWishlisted = computed(() => product.value?.id && wishlistStore.isInWishlist(product.value.id))
 const relatedProducts = ref([])
 
 // Preset product data for immediate display
@@ -405,18 +413,32 @@ const nextImage = () => {
   currentImageIndex.value = (currentImageIndex.value + 1) % product.value.images.length
 }
 
-const addToCart = () => {
-  console.log('Adding to cart:', {
-    product: product.value,
-    color: selectedColor.value || product.value.colorData?.[0]?.name,
-    quantity: quantity.value,
-  })
-  // TODO: Integrate with cart store
+const addToCart = async () => {
+  try {
+    const variantStr = selectedColor.value || product.value.colorData?.[0]?.name || ''
+    await cartStore.addItem(product.value.id, quantity.value, variantStr)
+    openCart()
+  } catch (error) {
+    console.error('Failed to add to cart:', error)
+    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+      openLogin()
+    }
+  }
 }
 
-const toggleWishlist = () => {
-  isWishlisted.value = !isWishlisted.value
-  console.log('Wishlist toggled:', product.value.id)
+const toggleWishlist = async () => {
+  try {
+    if (!product.value?.id) return
+    await wishlistStore.toggleItem(product.value.id, product.value)
+    if (wishlistStore.isInWishlist(product.value.id)) {
+      openWishlist()
+    }
+  } catch (error) {
+    console.error('Failed to toggle wishlist:', error)
+    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+      openLogin()
+    }
+  }
 }
 
 const navigateToProduct = (item) => {

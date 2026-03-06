@@ -23,7 +23,7 @@
 
 ### Login
 
-Exchanges email/password for an RS256 JWT token. Use this token for **ALL** subsequent requests.
+Exchanges email/password for an RS256 JWT token. Passwords are securely verified using PBKDF2 with SHA-256.
 
 * **Endpoint:** `POST {WORKER_URL}/auth/login`
 * **Body:**
@@ -47,7 +47,7 @@ Exchanges email/password for an RS256 JWT token. Use this token for **ALL** subs
 
 ### Register
 
-Creates a new user account.
+Creates a new user account. Passwords are automatically hashed using PBKDF2 before storage.
 
 * **Endpoint:** `POST {WORKER_URL}/auth/register`
 * **Body:**
@@ -94,7 +94,8 @@ Every request to the Neon Data API **MUST** include:
 ### 🛍️ Cart API
 
 **Get User's Cart (with items & products)**
-* **Endpoint:** `GET {NEON_URL}/carts?select=*,cart_items(*,products(*))`
+* **Endpoint:** `GET {NEON_URL}/carts?select=*,cart_items(*)`
+> ⚠️ **Note:** `products(*)` joins are NOT available here because the `products` table was moved to a separate Neon project (`icy-union-81751721`). Product enrichment (name, image, price) must be done client-side using the Catalog API.
 
 **Add Item to Cart**
 * **Endpoint:** `POST {NEON_URL}/cart_items`
@@ -121,7 +122,8 @@ Every request to the Neon Data API **MUST** include:
 ### ❤️ Wishlist API
 
 **Get User's Wishlist**
-* **Endpoint:** `GET {NEON_URL}/wishlist_items?select=id,created_at,products(*)`
+* **Endpoint:** `GET {NEON_URL}/wishlist_items?select=id,created_at,product_id`
+> ⚠️ **Note:** `products(*)` joins are NOT available here — see Cart note above.
 
 **Add to Wishlist**
 * **Endpoint:** `POST {NEON_URL}/wishlist_items`
@@ -227,16 +229,29 @@ You can use this unified `api.js` client to handle all backend communication gra
 ```javascript
 // frontend/src/lib/api.js
 
-const WORKER_URL = 'https://backend.spacefurnio.workers.dev';
-const NEON_URL = 'https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1';
-const CATALOG_URL = 'https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1';
+const WORKER_URL = import.meta.env.VITE_WORKER_URL || 'https://backend.spacefurnio.workers.dev';
+const NEON_URL = import.meta.env.VITE_NEON_URL || 'https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1';
+const CATALOG_URL = import.meta.env.VITE_CATALOG_URL || 'https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1';
 
-const NEON_CONN = 'postgresql://authenticator@ep-ancient-frog-aimehta7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require';
-const CATALOG_CONN = 'postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+const NEON_CONN = import.meta.env.VITE_NEON_CONN || 'postgresql://authenticator@ep-ancient-frog-aimehta7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require';
+const CATALOG_CONN = import.meta.env.VITE_CATALOG_CONN || 'postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 
 class ApiClient {
-    constructor() { this.token = null; }
-    setToken(token) { this.token = token; }
+    constructor() {
+        this.token = null;
+        if (typeof window !== 'undefined') {
+            this.token = localStorage.getItem('spacefurnio_token');
+        }
+    }
+
+    setToken(token) {
+        this.token = token;
+        if (token) {
+            localStorage.setItem('spacefurnio_token', token);
+        } else {
+            localStorage.removeItem('spacefurnio_token');
+        }
+    }
 
     // --- AUTH ---
     async login(email, password) {
@@ -247,6 +262,17 @@ class ApiClient {
         if (!res.ok) throw new Error('Login failed');
         const data = await res.json();
         this.setToken(data.token);
+        return data;
+    }
+
+    async register(userData) {
+        const res = await fetch(`${WORKER_URL}/auth/register`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        if (!res.ok) throw new Error('Registration failed');
+        const data = await res.json();
+        if (data.token) this.setToken(data.token);
         return data;
     }
 
@@ -271,12 +297,12 @@ class ApiClient {
     }
 
     // --- CARTS & WISHLISTS ---
-    getCart() { return this._neonFetch('/carts?select=*,cart_items(*,products(*))'); }
+    getCart() { return this._neonFetch('/carts?select=*,cart_items(*)'); }
     addCartItem(data) { return this._neonFetch('/cart_items', { method: 'POST', body: JSON.stringify(data) }); }
     updateCartItem(id, qty) { return this._neonFetch(`/cart_items?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ quantity: qty }) }); }
     removeCartItem(id) { return this._neonFetch(`/cart_items?id=eq.${id}`, { method: 'DELETE' }); }
     
-    getWishlist() { return this._neonFetch('/wishlist_items?select=id,products(*)'); }
+    getWishlist() { return this._neonFetch('/wishlist_items?select=id,product_id'); }
     addWishlistItem(data) { return this._neonFetch('/wishlist_items', { method: 'POST', body: JSON.stringify(data) }); }
     removeWishlistItem(id) { return this._neonFetch(`/wishlist_items?id=eq.${id}`, { method: 'DELETE' }); }
 

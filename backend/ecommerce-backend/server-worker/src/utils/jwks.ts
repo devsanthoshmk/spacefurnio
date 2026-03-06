@@ -1,4 +1,4 @@
-import { importPKCS8, importSPKI, exportJWK, SignJWT } from 'jose';
+import { importPKCS8, importSPKI, exportJWK, SignJWT, jwtVerify } from 'jose';
 
 // In-memory cache for the isolate lifetime
 let cachedPrivateKey: any = null;
@@ -59,4 +59,36 @@ export const generateToken = async (user: any, privateKeyPem: string) => {
         .sign(privateKey);
 
     return token;
+};
+
+export const generateRefreshToken = async (userId: string, privateKeyPem: string) => {
+    const privateKey = await loadPrivateKey(privateKeyPem);
+
+    const payload = {
+        sub: userId,
+        type: 'refresh'
+    };
+
+    const token = await new SignJWT(payload)
+        .setProtectedHeader({ alg: 'RS256', kid: 'neon-ecommerce-key-1' })
+        .setExpirationTime('30d')
+        .setIssuedAt()
+        .setJti(crypto.randomUUID())
+        .sign(privateKey);
+
+    return token;
+};
+
+export const verifyRefreshToken = async (token: string, publicKeyPem: string) => {
+    const publicKey = await loadPublicKey(publicKeyPem);
+    
+    const { payload } = await jwtVerify(token, publicKey, {
+        algorithms: ['RS256'],
+    });
+
+    if (payload.type !== 'refresh') {
+        throw new Error('Invalid token type');
+    }
+
+    return payload;
 };

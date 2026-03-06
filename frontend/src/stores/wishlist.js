@@ -7,36 +7,15 @@
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { wishlist as wishlistApi } from '@/api';
+import { api as wishlistApi } from '@/lib/api';
+import { useCartStore } from './cart'; // For moving to cart
 
 export const useWishlistStore = defineStore('wishlist', () => {
   // ===========================================
   // STATE
   // ===========================================
 
-  // Sample data for UI demonstration
-  const items = ref([
-    {
-      id: 'sample-1',
-      productId: 'prod-001',
-      product: {
-        name: 'Modern Velvet Sofa',
-        price: 1299,
-        primaryImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'
-      },
-      variant: '3-Seater, Navy Blue'
-    },
-    {
-      id: 'sample-2',
-      productId: 'prod-002',
-      product: {
-        name: 'Minimalist Coffee Table',
-        price: 449,
-        primaryImage: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=400'
-      },
-      variant: 'Walnut Wood'
-    }
-  ]);
+  const items = ref([]);
   const isPublic = ref(false);
   const isLoading = ref(false);
   const error = ref(null);
@@ -56,20 +35,42 @@ export const useWishlistStore = defineStore('wishlist', () => {
   // ===========================================
 
   /**
-   * Fetch wishlist from server
+   * Fetch wishlist from server.
+   *
+   * NOTE: products table was dropped from the main DB (migration 0001_big_dormammu).
+   * Products live in a separate Neon project (icy-union-81751721), so PostgREST
+   * cannot do embedded resource joins like products(*).
+   * We fetch flat wishlist_items rows and store product_id for lookup.
+   * Product enrichment (name, price, image) is done lazily by the UI
+   * using shopApi.getProduct() from the catalog DB.
    */
   async function fetchWishlist() {
     try {
       isLoading.value = true;
       error.value = null;
 
-      const response = await wishlistApi.get();
+      const data = await wishlistApi.getWishlist();
 
-      items.value = response.items || [];
-      isPublic.value = response.isPublic || false;
+      if (Array.isArray(data)) {
+        items.value = data.map(wi => ({
+          id: wi.id,
+          productId: wi.product_id,
+          createdAt: wi.created_at,
+          // Product details are NOT available from the main DB.
+          // UI components should enrich from shopApi/catalog if needed.
+          product: {
+            name: null,
+            price: null,
+            primaryImage: null,
+            slug: null
+          },
+          variant: ''
+        }));
+      } else {
+        items.value = [];
+      }
     } catch (err) {
-      // Not logged in - clear wishlist silently
-      if (err.status === 401) {
+      if (err.message && err.message.includes('Unauthorized')) {
         items.value = [];
         return;
       }
@@ -88,17 +89,18 @@ export const useWishlistStore = defineStore('wishlist', () => {
       isLoading.value = true;
       error.value = null;
 
-      const response = await wishlistApi.addItem(productId, variantId);
-
-      // Add to local state
-      if (response.item && !productIds.value.has(productId)) {
-        items.value.push(response.item);
+      if (!productIds.value.has(productId)) {
+        await wishlistApi.addWishlistItem({ product_id: productId });
+        await fetchWishlist(); // sync
       }
-
-      return response;
+      return true;
     } catch (err) {
-      error.value = err.message;
-      throw err;
+      if (err.message && err.message.includes('Item already exists')) {
+        await fetchWishlist();
+      } else {
+        error.value = err.message;
+        throw err;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -108,7 +110,6 @@ export const useWishlistStore = defineStore('wishlist', () => {
    * Remove item from wishlist
    */
   async function removeItem(itemId) {
-    // Optimistic update
     const removedIndex = items.value.findIndex((i) => i.id === itemId);
     const removedItem = items.value[removedIndex];
 
@@ -119,14 +120,11 @@ export const useWishlistStore = defineStore('wishlist', () => {
     try {
       isLoading.value = true;
       error.value = null;
-
-      await wishlistApi.removeItem(itemId);
+      await wishlistApi.removeWishlistItem(itemId);
     } catch (err) {
-      // Revert optimistic update
       if (removedItem && removedIndex >= 0) {
         items.value.splice(removedIndex, 0, removedItem);
       }
-
       error.value = err.message;
       throw err;
     } finally {
@@ -141,19 +139,15 @@ export const useWishlistStore = defineStore('wishlist', () => {
     const item = items.value.find((i) => i.productId === productId);
     if (!item) return;
 
-    // Optimistic update
     const removedIndex = items.value.findIndex((i) => i.productId === productId);
     items.value.splice(removedIndex, 1);
 
     try {
       isLoading.value = true;
       error.value = null;
-
-      await wishlistApi.removeByProductId(productId);
+      await wishlistApi.removeWishlistItemByProductId(productId);
     } catch (err) {
-      // Revert optimistic update
       items.value.splice(removedIndex, 0, item);
-
       error.value = err.message;
       throw err;
     } finally {
@@ -184,12 +178,16 @@ export const useWishlistStore = defineStore('wishlist', () => {
       isLoading.value = true;
       error.value = null;
 
-      const response = await wishlistApi.moveToCart(itemId, quantity);
+      const itemToMove = items.value.find(i => i.id === itemId);
+      if (!itemToMove) return;
 
-      // Remove from local wishlist
+      const cartStore = useCartStore();
+      await cartStore.addItem(itemToMove.productId, quantity);
+
+      await wishlistApi.removeWishlistItem(itemId);
       items.value = items.value.filter((i) => i.id !== itemId);
 
-      return response;
+      return true;
     } catch (err) {
       error.value = err.message;
       throw err;
@@ -199,34 +197,18 @@ export const useWishlistStore = defineStore('wishlist', () => {
   }
 
   /**
-   * Update wishlist visibility
+   * Update wishlist visibility (stub)
    */
   async function setVisibility(isPublicValue) {
-    try {
-      isLoading.value = true;
-      error.value = null;
-
-      await wishlistApi.setVisibility(isPublicValue);
-      isPublic.value = isPublicValue;
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
+    isPublic.value = isPublicValue;
   }
 
   /**
    * Get wishlist count only
    */
   async function fetchCount() {
-    try {
-      const response = await wishlistApi.getCount();
-      return response.count;
-    } catch (err) {
-      console.error('Fetch wishlist count error:', err);
-      return 0;
-    }
+    await fetchWishlist();
+    return itemCount.value;
   }
 
   /**
@@ -261,18 +243,14 @@ export const useWishlistStore = defineStore('wishlist', () => {
   }
 
   return {
-    // State
     items,
     isPublic,
     isLoading,
     error,
-
-    // Getters
     itemCount,
     isEmpty,
     productIds,
 
-    // Actions
     fetchWishlist,
     addItem,
     removeItem,

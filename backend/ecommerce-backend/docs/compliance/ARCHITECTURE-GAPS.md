@@ -137,13 +137,13 @@ authRouter.post('/register', async (request, env) => {
 
 ## Gap #4 — No Refresh Token Implementation
 
-**Severity:** ⚠️ IMPORTANT  
-**Location:** `server-worker/src/routes/auth.ts`;  `db/schema/users.ts` (`user_sessions` table exists but unused)
+**Severity:** ✅ FIXED  
+**Location:** `server-worker/src/routes/auth.ts`;  `db/schema/users.ts` (`user_sessions` table)
 
 ### What Was Asked For
 The `user_sessions` table was defined in the schema, strongly implying a refresh token lifecycle was expected.
 
-### What Is Wrong
+### What Was Wrong
 The current architecture issues a **single 7-day JWT** with no `POST /auth/refresh` endpoint. The `user_sessions` table (`refresh_token` column) is entirely unused.
 
 **Impact:**
@@ -151,13 +151,26 @@ The current architecture issues a **single 7-day JWT** with no `POST /auth/refre
 - Users cannot log out in a meaningful way (since the token is stateless).
 - There's no session management.
 
-### The Fix
+### The Fix ✅ IMPLEMENTED
 
-See `docs/guides/05-AUTH-AND-JWT-GUIDE.md` — Section 9 for the recommended pattern. Short version:
-1. Issue a 15-minute access token + 30-day refresh token at login.
-2. Store refresh token in `user_sessions` table (Worker-managed).
-3. Add `POST /auth/refresh` to issue new access tokens.
-4. Add `POST /auth/logout` to invalidate the refresh token.
+The refresh token system has been fully implemented:
+
+1. **Dual-token issued at login/register:**
+   - `access_token` (7 days) - for API authentication
+   - `refresh_token` (30 days) - for getting new access tokens
+
+2. **Refresh token stored in `user_sessions` table** with expiry tracking
+
+3. **New endpoints added:**
+   - `POST /auth/refresh` - exchanges refresh token for new access token
+   - `POST /auth/logout` - invalidates refresh token
+
+4. **Frontend handles auto-refresh:**
+   - `authStore.initialize()` called on app mount
+   - Auto-refresh on initialization if access token expired
+   - Stores user ID in localStorage for quick access
+
+See `docs/guides/05-AUTH-AND-JWT-GUIDE.md` — Section 9 for full implementation details.
 
 ---
 

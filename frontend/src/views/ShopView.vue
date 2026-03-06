@@ -172,7 +172,7 @@
             <h2 class="featured-title">What's Popular</h2>
             <p class="featured-subtitle">Curated picks loved by our community</p>
           </div>
-          <router-link to="/shop/category?sort=popularity" class="see-all-link">
+          <router-link to="/shop/products?sort=popularity" class="see-all-link">
             See All
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -194,7 +194,7 @@
                 <span v-if="product.discount" class="shop-badge shop-badge-sale">-{{ product.discount }}%</span>
               </div>
               <button class="quick-action wishlist-btn" @click.stop="toggleWishlist(product)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" :fill="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'none'" :stroke="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'currentColor'" stroke-width="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
               </button>
@@ -237,12 +237,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, h } from 'vue'
+import { ref, onMounted, watch, h, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import shopApi from '@/api/shopApi.js'
+import { useWishlistStore } from '@/stores/wishlist'
 
 const router = useRouter()
 const route = useRoute()
+const wishlistStore = useWishlistStore()
+const { openLogin } = inject('authUtils', { openLogin: () => {} })
+const { openWishlist } = inject('wishlistUtils', { openWishlist: () => {} })
 
 // State
 const activeTab = ref('category')
@@ -286,8 +290,18 @@ const navigateToProduct = (product) => {
   router.push(`/shop/category/${product.category}/${product.id}`)
 }
 
-const toggleWishlist = (product) => {
-  console.log('Toggle wishlist:', product.id)
+const toggleWishlist = async (product) => {
+  try {
+    await wishlistStore.toggleItem(product.id, product)
+    if (wishlistStore.isInWishlist(product.id)) {
+      openWishlist()
+    }
+  } catch (error) {
+    console.error('Failed to toggle wishlist:', error)
+    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+      openLogin()
+    }
+  }
 }
 
 // Space icons as functional components

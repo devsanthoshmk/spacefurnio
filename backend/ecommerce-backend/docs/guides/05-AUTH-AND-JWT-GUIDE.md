@@ -3,7 +3,8 @@
 > **JWT Algorithm:** RS256 (RSA + SHA-256 asymmetric signing)  
 > **JWT Library:** `jose` v6 (`jose` is the IETF standard Web Crypto implementation)  
 > **Key Storage:** Cloudflare Worker Secrets (`RSA_PRIVATE_KEY_PEM`, `RSA_PUBLIC_KEY_PEM`)  
-> **Token Expiry:** 7 days  
+> **Access Token Expiry:** 7 days  
+> **Refresh Token Expiry:** 30 days  
 > **JWKS Endpoint:** `GET /auth/.well-known/jwks.json`
 
 ---
@@ -18,7 +19,7 @@
 6. [Token Verification (Worker Middleware)](#6-token-verification-worker-middleware)
 7. [Token Verification (Neon Data API)](#7-token-verification-neon-data-api)
 8. [The Complete Auth Lifecycle](#8-the-complete-auth-lifecycle)
-9. [Token Refresh Strategy](#9-token-refresh-strategy)
+9. [Refresh Token Implementation](#9-refresh-token-implementation)
 10. [Security Best Practices](#10-security-best-practices)
 
 ---
@@ -312,46 +313,175 @@ RLS policies: WHERE user_id = current_setting('request.jwt.claim.sub')
 Response → [{ id, quantity, product_id, ... }]
 
 STEP 5: Token expires (after 7 days)
-Any request returns 401 Unauthorized
-Browser redirects to login
-[TODO: Implement refresh token flow]
+Browser detects 401, attempts refresh using stored refresh_token
+Browser → POST /auth/refresh { refresh_token: "eyJ..." }
+Worker validates refresh_token against user_sessions table
+Worker issues new access_token
+Response → { access_token: "eyJ..." }
+Browser retries original request
 ```
 
 ---
 
-## 9. Token Refresh Strategy
+## 9. Refresh Token Implementation
 
-The current implementation uses **7-day expiry** with no refresh token system. This is acceptable for development but for production, implement:
+The system now implements a **dual-token** pattern with access tokens (7 days) and refresh tokens (30 days).
+
+### Token Types
+
+| Token | Expiry | Purpose | Storage |
+|-------|--------|---------|---------|
+| **access_token** | 7 days | API authentication | localStorage (`spacefurnio_token`) |
+| **refresh_token** | 30 days | Get new access tokens | localStorage (`spacefurnio_refresh_token`) |
+| **user_id** | Persisted | Quick user ID access | localStorage (`spacefurnio_user_id`) |
+
+### Token Generation
 
 ```typescript
-// RECOMMENDED: Refresh Token Pattern
+// src/utils/jwks.ts
 
-// At login, issue two tokens:
-return {
-    access_token: await generateToken(user, env.RSA_PRIVATE_KEY_PEM, '15m'),  // Short-lived
-    refresh_token: await generateRefreshToken(user.id, env),                    // Long-lived (30d), stored in DB
+// Access token (7 days)
+export const generateToken = async (user: any, privateKeyPem: string) => {
+    const privateKey = await loadPrivateKey(privateKeyPem);
+
+    const payload = {
+        sub: user.id,
+        email: user.email,
+        role: user.role
+    };
+
+    const token = await new SignJWT(payload)
+        .setProtectedHeader({ alg: 'RS256', kid: 'neon-ecommerce-key-1' })
+        .setExpirationTime('7d')
+        .sign(privateKey);
+
+    return token;
 };
 
-// Add a refresh endpoint:
+// Refresh token (30 days) - includes type: 'refresh' claim
+export const generateRefreshToken = async (userId: string, privateKeyPem: string) => {
+    const privateKey = await loadPrivateKey(privateKeyPem);
+
+    const payload = {
+        sub: userId,
+        type: 'refresh'
+    };
+
+    const token = await new SignJWT(payload)
+        .setProtectedHeader({ alg: 'RS256', kid: 'neon-ecommerce-key-1' })
+        .setExpirationTime('30d')
+        .setIssuedAt()
+        .setJti(crypto.randomUUID())  // Unique ID for rotation
+        .sign(privateKey);
+
+    return token;
+};
+```
+
+### Login Response
+
+```json
+{
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
+    "refresh_token": "eyJhbGciOiJSUzI1NiIs...",
+    "user": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "email": "user@example.com",
+        "role": "customer"
+    }
+}
+```
+
+### Refresh Endpoint
+
+```typescript
+// POST /auth/refresh
+// Body: { "refresh_token": "eyJ..." }
+// Response: { "access_token": "eyJ..." }
+
 authRouter.post('/refresh', async (request, env) => {
     const { refresh_token } = await request.json();
-    // 1. Verify refresh token against user_sessions table
-    // 2. Issue new access_token
-    // 3. Optionally rotate refresh_token
-    return { access_token: newToken };
+
+    // 1. Verify refresh token signature and expiry
+    const payload = await verifyRefreshToken(refresh_token, env.RSA_PUBLIC_KEY_PEM);
+
+    // 2. Check token exists in database and not expired
+    const sessionResult = await sql`
+        SELECT * FROM user_sessions 
+        WHERE refresh_token = ${refresh_token}
+          AND expires_at > NOW()
+        LIMIT 1
+    `;
+
+    // 3. Generate new access token
+    const accessToken = await generateToken(user, env.RSA_PRIVATE_KEY_PEM);
+
+    return { access_token: accessToken };
 });
 ```
 
-The `user_sessions` table in `db/schema/users.ts` is already defined for this purpose:
+### Frontend Auto-Refresh
+
+The frontend automatically handles token refresh:
+
+1. On initialization, checks for stored tokens
+2. If access_token expired, tries to refresh using refresh_token
+3. On 401 response from API, attempts refresh before failing
+
+```javascript
+// frontend/src/lib/api.js
+
+async refresh(refreshToken) {
+    const res = await fetch(`${WORKER_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken })
+    });
+    const data = await res.json();
+    this.setToken(data.access_token);
+    return data;
+}
+```
+
+### Logout
 
 ```typescript
-export const userSessions = pgTable('user_sessions', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    refreshToken: text('refresh_token').unique().notNull(),
-    expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
+// POST /auth/logout
+// Body: { "refresh_token": "eyJ..." }
+// Response: { "message": "Logged out successfully" }
+
+authRouter.post('/logout', async (request, env) => {
+    const { refresh_token } = await request.json();
+    await sql`DELETE FROM user_sessions WHERE refresh_token = ${refresh_token}`;
+    return { message: 'Logged out successfully' };
 });
+```
+
+### Database Schema
+
+The `user_sessions` table stores refresh tokens:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | FK to users |
+| `refresh_token` | TEXT | The JWT refresh token (unique) |
+| `expires_at` | TIMESTAMP | When token expires |
+| `created_at` | TIMESTAMP | When session created |
+
+### Token Rotation (Optional)
+
+Token rotation is available but disabled by default. To enable, uncomment the rotation code in `/auth/refresh`:
+
+```typescript
+// Generate new refresh token on each use
+const newRefreshToken = await generateRefreshToken(user.id, env.RSA_PRIVATE_KEY_PEM);
+await sql`
+    UPDATE user_sessions
+    SET refresh_token = ${newRefreshToken}, expires_at = ${newExpiresAt}
+    WHERE refresh_token = ${refresh_token}
+`;
+return { access_token: accessToken, refresh_token: newRefreshToken };
 ```
 
 ---
@@ -363,11 +493,13 @@ export const userSessions = pgTable('user_sessions', {
 | **RS256 asymmetric signing** | ✅ Implemented | Private key never shared |
 | **Private key stored as Worker secret** | ✅ Implemented | Encrypted by Cloudflare |
 | **JWKS endpoint publicly served** | ✅ Implemented | Required for Neon verification |
-| **JWT expiry set** | ✅ Implemented | 7-day expiry via `setExpirationTime` |
-| **Password hashing** | ❌ NOT implemented | Critical gap — must add bcrypt/argon2 |
+| **JWT expiry set** | ✅ Implemented | 7-day access token expiry |
+| **Password hashing** | ✅ Implemented | PBKDF2 via crypto.ts |
 | **`kid` in JWT header** | ✅ Implemented | Supports future key rotation |
 | **Correct key for verification** | ✅ Implemented | Uses public key in middleware |
-| **Access + Refresh token pair** | ❌ Not implemented | Single 7-day token — no refresh |
-| **Token stored in sessionStorage** | ⚠️ Recommendation only | Application code is not provided |
+| **Access + Refresh token pair** | ✅ Implemented | 7d access + 30d refresh |
+| **Refresh token in localStorage** | ✅ Implemented | Required by architecture |
+| **Refresh token stored in DB** | ✅ Implemented | user_sessions table |
 | **HTTPS only** | ✅ Cloudflare enforces this | All traffic is TLS 1.3 |
 | **CORS scope** | ⚠️ Needs production lock-down | Currently `origin: '*'` |
+| **Token rotation** | ⚠️ Optional | Disabled by default |

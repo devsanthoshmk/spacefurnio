@@ -74,7 +74,7 @@
           <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Search">
             <i class="fas fa-search"></i>
           </button>
-          <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
+          <button @click="handleUserClick" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
             <i class="fas fa-user"></i>
           </button>
           <button @click="openWishlist" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
@@ -140,7 +140,7 @@
           <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Search">
             <i class="fas fa-search text-sm"></i>
           </button>
-          <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
+          <button @click="handleUserClick(); closeMobileMenu()" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
             <i class="fas fa-user text-sm"></i>
           </button>
           <button @click="openWishlist(); closeMobileMenu()" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
@@ -164,14 +164,31 @@ import { ref, inject, onMounted, onBeforeUnmount } from 'vue'
 // ===========================================
 // CART UTILITIES (from App.vue)
 // ===========================================
-// Get openCart function and cartItemCount from parent via inject
 const { openCart, cartItemCount } = inject('cartUtils')
 
 // ===========================================
 // WISHLIST UTILITIES (from App.vue)
 // ===========================================
-// Get openWishlist function and wishlistItemCount from parent via inject
-const { openWishlist } = inject('wishlistUtils') // wishlistItemCount add if needed
+const { openWishlist } = inject('wishlistUtils')
+
+// ===========================================
+// AUTH & ORDERS UTILITIES (from App.vue)
+// ===========================================
+const { openLogin, authStore } = inject('authUtils')
+const { openOrders } = inject('ordersUtils')
+
+/**
+ * Handle user icon click:
+ * - If logged in → open orders
+ * - If guest → open login/signup modal
+ */
+function handleUserClick() {
+  if (authStore.isAuthenticated) {
+    openOrders()
+  } else {
+    openLogin()
+  }
+}
 
 const mobileMenuOpen = ref(false)
 
