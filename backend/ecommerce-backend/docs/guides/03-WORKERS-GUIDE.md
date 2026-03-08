@@ -100,9 +100,12 @@ export default router;
 
 ```typescript
 export interface Env {
-    DATABASE_URL: string;           // neondb_owner connection string
-    RSA_PRIVATE_KEY_PEM: string;    // PEM-formatted RSA-2048 private key
-    RSA_PUBLIC_KEY_PEM: string;     // PEM-formatted RSA-2048 public key
+    DATABASE_URL: string;           // Primary application database (Neon)
+    PRODUCTS_DATABASE_URL: string;  // Products-specific database connection
+    RSA_PRIVATE_KEY_PEM: string;    // PEM-formatted RSA-2048 private key (for JWT signing)
+    RSA_PUBLIC_KEY_PEM: string;     // PEM-formatted RSA-2048 public key (for JWT verification)
+    JWT_SECRET: string;             // Secret for legacy JWT operations or backup
+    RESEND_API_KEY: string;         // API key for Resend email service
 }
 ```
 
@@ -397,10 +400,13 @@ RSA_PUBLIC_KEY_PEM="-----BEGIN PUBLIC KEY-----\n[base64]\n-----END PUBLIC KEY---
 ### Production Secrets (Wrangler)
 
 ```bash
-# Set each secret individually via wrangler CLI
+# Set secrets individually via wrangler CLI
 wrangler secret put DATABASE_URL
+wrangler secret put PRODUCTS_DATABASE_URL
 wrangler secret put RSA_PRIVATE_KEY_PEM
 wrangler secret put RSA_PUBLIC_KEY_PEM
+wrangler secret put JWT_SECRET
+wrangler secret put RESEND_API_KEY
 
 # List all secrets for the worker
 wrangler secret list

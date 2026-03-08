@@ -4,4 +4,5 @@ export type Env = {
     RSA_PRIVATE_KEY_PEM: string;
     RSA_PUBLIC_KEY_PEM: string;
     RESEND_API_KEY: string;
+    JWT_SECRET: string;
 };

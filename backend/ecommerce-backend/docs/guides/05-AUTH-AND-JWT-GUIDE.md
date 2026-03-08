@@ -282,12 +282,17 @@ Neon Console → Your Project → Auth tab
 │                          COMPLETE AUTH LIFECYCLE                                │
 └─────────────────────────────────────────────────────────────────────────────────┘
 
-STEP 1: User registers or logs in
 Browser → POST /auth/login { email, password }
 Worker reads users table (raw sql, neondb_owner)
-Worker verifies password hash [TODO: implement]
+Worker verifies password hash
 Worker generates RS256 JWT (signed with PRIVATE key)
 Response → { token: "eyJ..." }
+
+STEP 1.1: Password Reset (Optional)
+Browser → POST /auth/forgot-password { email }
+Worker generates unique token and 6-digit code
+Worker sends email via Resend (Requires `RESEND_API_KEY`)
+Response → { message: "Reset link sent" }
 
 STEP 2: Browser stores the token
 sessionStorage.setItem('auth_token', token)
