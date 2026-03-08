@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 
 // Image data as requested
 const images = [

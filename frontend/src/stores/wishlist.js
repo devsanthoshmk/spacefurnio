@@ -144,44 +144,58 @@ export const useWishlistStore = defineStore('wishlist', () => {
     }
   }
 
-  /**
-   * Add item to wishlist
-   */
-  async function addItem(productId, variantId = null) {
-    try {
-      isLoading.value = true
-      error.value = null
+/**
+ * Add item to wishlist
+ */
+async function addItem(productId, variantId = null) {
+  console.log('[Wishlist] addItem called with productId:', productId)
+  try {
+    isLoading.value = true
+    error.value = null
 
-      if (!productIds.value.has(productId)) {
-        let wishlistId = await wishlistApi.getWishlistId()
-        if (!wishlistId) {
-          try {
-            await wishlistApi.createWishlist()
-            wishlistId = await wishlistApi.getWishlistId()
-          } catch (e) {
-            error.value = 'Failed to create wishlist. Please login again.'
-            return false
-          }
-        }
-        if (!wishlistId) {
-          error.value = 'Wishlist not found. Please login again.'
+    if (!productIds.value.has(productId)) {
+      console.log('[Wishlist] Product not in wishlist, proceeding to add')
+      let wishlistId = await wishlistApi.getWishlistId()
+      console.log('[Wishlist] Got wishlistId:', wishlistId)
+      if (!wishlistId) {
+        console.log('[Wishlist] No wishlist found, creating new one')
+        try {
+          await wishlistApi.createWishlist()
+          wishlistId = await wishlistApi.getWishlistId()
+          console.log('[Wishlist] Created wishlist, new wishlistId:', wishlistId)
+        } catch (e) {
+          console.error('[Wishlist] Failed to create wishlist:', e)
+          error.value = 'Failed to create wishlist. Please login again.'
           return false
         }
-        await wishlistApi.addWishlistItem({ wishlist_id: wishlistId, product_id: productId })
-        await fetchWishlist()
       }
-      return true
-    } catch (err) {
-      if (err.message && err.message.includes('Item already exists')) {
-        await fetchWishlist()
-      } else {
-        error.value = err.message
-        throw err
+      if (!wishlistId) {
+        console.error('[Wishlist] Still no wishlistId after creation')
+        error.value = 'Wishlist not found. Please login again.'
+        return false
       }
-    } finally {
-      isLoading.value = false
+      console.log('[Wishlist] Adding item to wishlist, productId:', productId, 'wishlistId:', wishlistId)
+      await wishlistApi.addWishlistItem({ wishlist_id: wishlistId, product_id: productId })
+      console.log('[Wishlist] Item added successfully, fetching updated wishlist')
+      await fetchWishlist()
+      console.log('[Wishlist] Wishlist fetched, items now:', items.value.length)
+    } else {
+      console.log('[Wishlist] Product already in wishlist')
     }
+    return true
+  } catch (err) {
+    console.error('[Wishlist] Error in addItem:', err)
+    if (err.message && err.message.includes('Item already exists')) {
+      console.log('[Wishlist] Item already exists, fetching wishlist')
+      await fetchWishlist()
+    } else {
+      error.value = err.message
+      throw err
+    }
+  } finally {
+    isLoading.value = false
   }
+}
 
 /**
  * Remove item from wishlist
@@ -248,20 +262,24 @@ async function removeByProductId(productId) {
   }
 }
 
-  /**
-   * Toggle wishlist item
-   */
-  async function toggleItem(productId, productData = null, variantId = null) {
-    const inWishlist = isInWishlist(productId)
+/**
+ * Toggle wishlist item
+ */
+async function toggleItem(productId, productData = null, variantId = null) {
+  console.log('[Wishlist] toggleItem called, productId:', productId, 'inWishlist:', isInWishlist(productId))
+  const inWishlist = isInWishlist(productId)
 
-    if (inWishlist) {
-      await removeByProductId(productId)
-      return false
-    } else {
-      await addItem(productId, variantId)
-      return true
-    }
+  if (inWishlist) {
+    console.log('[Wishlist] Removing from wishlist')
+    await removeByProductId(productId)
+    return false
+  } else {
+    console.log('[Wishlist] Adding to wishlist')
+    const result = await addItem(productId, variantId)
+    console.log('[Wishlist] Add result:', result, 'isInWishlist now:', isInWishlist(productId))
+    return result
   }
+}
 
 /**
  * Move item to cart

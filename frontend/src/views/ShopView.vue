@@ -328,13 +328,15 @@ const navigateToProduct = (product) => {
 }
 
 const toggleWishlist = async (product) => {
+  console.log('[ShopView] toggleWishlist called, product:', product.id, product.name)
   try {
-    await wishlistStore.toggleItem(product.id, product)
+    const result = await wishlistStore.toggleItem(product.id, product)
+    console.log('[ShopView] toggleItem returned:', result, 'isInWishlist:', wishlistStore.isInWishlist(product.id))
     if (wishlistStore.isInWishlist(product.id)) {
       openWishlist()
     }
   } catch (error) {
-    console.error('Failed to toggle wishlist:', error)
+    console.error('[ShopView] Failed to toggle wishlist:', error)
     if (
       String(error).includes('401') ||
       String(error).toLowerCase().includes('unauthorized') ||

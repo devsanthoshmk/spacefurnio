@@ -6,6 +6,7 @@ const featuredCollabs = ref([
     id: 1,
     name: 'Puma',
     bgClass: 'bg-[#36393B]',
+    bgImage: '/images/collabs-bg/puma.png',
     textClass: 'text-white',
     imgSrc:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuC7nTLa00S3jc_0Xqul2qyFo6fxE-rYsiIBHeTI-vQ3kN47jezx2q7AqlExV29C8oO7IpFAnCiGpSPUhLqE-UBqLahycnNlasxbEPSU6MgkVr1juEULhPIlVmc7fYt9iBoswGAG8oz8NWlOJdDJ0bXgMekZvtMN8ukEB2fa4_o12VnYYG4m7Pb1j4dcufkoMNWIvoiUmHAiN8Xg1tg6z6BbR6GhM8d30D3JKeH3I-Ljse1FQtlkZzIqNcz4KacwtqoUO7eorAKccw',
@@ -16,6 +17,7 @@ const featuredCollabs = ref([
     id: 2,
     name: 'New Balance',
     bgClass: 'bg-[#ACA596]',
+    bgImage: '/images/collabs-bg/new_balance.png',
     textClass: 'text-gray-900',
     imgSrc:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuBnYtqqjZDe6MKA-jR4S31i_w3oNTmHrDwfFMonGFafUsrNpe_bK9UBVpL2ftKUT5Ts6SwUI08oQwRNZLN4WBgn78AlL_N2ZvP6UWyJqwJ-CFR3dpQiKtn3TrtF8PPml2kRYQwJDhR3L4ZlTVFRZOrPiXYoNM-WlYDrBURN1hjtLtI4VrhHxGwF56gWj4wGBtBKPD40-G_SJWAU_q78Z3Fz0Xz1BAyLmzEX-ZD_1ZLspXyEfsgT2B6f4yJSvnKaNgfKSIlpelECnA',
@@ -26,6 +28,7 @@ const featuredCollabs = ref([
     id: 3,
     name: 'Vans',
     bgClass: 'bg-[#D6CEC2]',
+    bgImage: '/images/collabs-bg/vans.png',
     textClass: 'text-gray-900',
     imgSrc:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuA0VN2l5Zn7Zkd3d-FnES8tLTL-BQZGAjR1Gn7TnZijjhnMWcdvlTQ-30E9OWmvj2KltZ0jmRQLjTQTLRTW9DKzNMrJGUhAJvFhDelEuINWp1e9Ya1pXp2zfDgs2jgyA7TXFdxXsyvJ4wy_ecI3jORAXPRWktr9Z0mnxVKB4SC864dFNnhBYNahiIc0gfLo-uNZrtrD9RmCwv5elpQZS5M-sRkPQHMH40LABTcQ3HzQd7rgt7yGUGRh0or4If1e2vtr65HpAc-lpg',
@@ -36,6 +39,7 @@ const featuredCollabs = ref([
     id: 4,
     name: 'Nike',
     bgClass: 'bg-[#1a1a1a]',
+    bgImage: '/images/collabs-bg/nike.png',
     textClass: 'text-white',
     imgSrc:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuAzXcasJPb17NDR0BsH2TpE0vX59ulBzW6wgih51wMoqFmJ7IfoJKLvPTpDdOIU0UXyHiHmjkXIEmbiVxqCtLyqjRH1B3ZvCn1_ylu_od3nZFQF4mmprcNPOG9au6G6M3nzfmRUnVW5z_q6h_IdZ29BTT-iEwhmQS6syizXFwkagSkuZEo0BRwlIqtk8bRyB3GZp9BcDVKSmRyDJrNECD0TNOM1MGbxr_i8s5Oj6YVAcJcftCzHtc4A7loxzonmc6RQfsxhFEOs0A',
@@ -46,6 +50,7 @@ const featuredCollabs = ref([
     id: 5,
     name: 'Adidas',
     bgClass: 'bg-[#f0ebe3]',
+    bgImage: '/images/collabs-bg/adidas.png',
     textClass: 'text-gray-900',
     imgSrc:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuDHWkjPisX3GoEFw1CgzuodDa_BNiFqDjG23ej7Aa36wWaYNJqRveIAyNOKxRxd3JDPxiy-g--xpWF7mFxn6Y0nLNEQp4WZx0rshJiQxw41wngnplgComGU8LXerRR8toAZ8ugeLSLNFdjBeqtQHa_cECXMQ6XsEbaRltOJTG5opY7RrcagOC7zrQ5iAgtfH4FzdjmPvbYo8GLVnX2NRZr9jxJzZ152XjMupSm3HbaJCsHjlQ0saI5v0mq3kHkixJzRvytd-Dz7kA',
@@ -92,10 +97,22 @@ const navigate = (direction) => {
 <template>
   <div class="collabs-section font-sans">
     <main
-      class="collabs-main w-full max-w-7xl rounded-[2rem] overflow-hidden relative border border-white/20 shadow-soft-xl bg-radial-gradient"
+      class="collabs-main w-full max-w-7xl rounded-[2rem] overflow-hidden relative border border-white/20 shadow-soft-xl bg-gray-900"
     >
+      <!-- Animated Background Layer -->
+      <Transition name="bg-crossfade">
+        <div
+          :key="visibleCollabs.center.id"
+          class="absolute inset-0 bg-cover bg-center z-0 will-change-[opacity,transform]"
+          :style="{ backgroundImage: `url(${visibleCollabs.center.bgImage})` }"
+        ></div>
+      </Transition>
+      
+      <!-- Overlay to enhance text readability -->
+      <div class="absolute inset-0 bg-black/20 mix-blend-multiply z-0 pointer-events-none"></div>
+
       <div
-        class="section-inner px-4 py-6 md:px-8 md:py-8 lg:py-8 flex flex-col items-center h-full"
+        class="section-inner relative z-10 px-4 py-6 md:px-8 md:py-8 lg:py-8 flex flex-col items-center h-full"
       >
         <!-- Header with Logo and X -->
         <header
@@ -906,5 +923,23 @@ const navigate = (direction) => {
     width: 200px !important;
     height: 240px !important;
   }
+}
+
+/* ========================================
+   BACKGROUND CROSSFADE ANIMATION
+   ======================================== */
+.bg-crossfade-enter-active,
+.bg-crossfade-leave-active {
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-crossfade-enter-from {
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+.bg-crossfade-leave-to {
+  opacity: 0;
+  transform: scale(0.97);
 }
 </style>

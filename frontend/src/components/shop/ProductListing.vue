@@ -366,17 +366,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import shopApi from '@/api/shopApi.js'
 import FilterSidebar from '@/components/shop/FilterSidebar.vue'
 import ProductCardNew from '@/components/shop/ProductCardNew.vue'
+import { useWishlistStore } from '@/stores/wishlist'
 
 const route = useRoute()
 const router = useRouter()
-
-// Determine if we're using design routes (style/space) or category routes
-const isDesignRoute = computed(() => route.path.includes('/shop/design'))
+const wishlistStore = useWishlistStore()
+const { openWishlist } = inject('wishlistUtils', { openWishlist: () => {} })
 
 // State
 const loading = ref(true)
@@ -391,9 +391,11 @@ const viewMode = ref('grid')
 const sortBy = ref('popularity-desc')
 const usePagination = ref(true)
 
-// Filter state
+// Filter state - synced with URL query params
 const filters = ref({
-  category: '',
+  categories: [],
+  spaces: [],
+  styles: [],
   brand: '',
   colors: [],
   material: '',
@@ -405,6 +407,55 @@ const filters = ref({
   search: '',
 })
 
+// Parse query params into filters
+const parseQueryParams = () => {
+  const query = route.query
+
+  filters.value.categories = query.categories ? query.categories.split(',') : []
+  filters.value.spaces = query.spaces ? query.spaces.split(',') : []
+  filters.value.styles = query.styles ? query.styles.split(',') : []
+  filters.value.brand = query.brand || ''
+  filters.value.colors = query.colors ? query.colors.split(',') : []
+  filters.value.material = query.material || ''
+  filters.value.minPrice = query.minPrice ? parseFloat(query.minPrice) : null
+  filters.value.maxPrice = query.maxPrice ? parseFloat(query.maxPrice) : null
+  filters.value.inStock = query.inStock === 'true'
+  filters.value.onSale = query.onSale === 'true'
+  filters.value.isNew = query.isNew === 'true'
+  filters.value.search = query.search || ''
+
+  currentPage.value = query.page ? parseInt(query.page, 10) : 1
+  sortBy.value = query.sort || 'popularity-desc'
+}
+
+// Sync filters to URL query params
+const syncFiltersToUrl = () => {
+  const query = {}
+
+  if (filters.value.categories.length > 0) {
+    query.categories = filters.value.categories.join(',')
+  }
+  if (filters.value.spaces.length > 0) {
+    query.spaces = filters.value.spaces.join(',')
+  }
+  if (filters.value.styles.length > 0) {
+    query.styles = filters.value.styles.join(',')
+  }
+  if (filters.value.brand) query.brand = filters.value.brand
+  if (filters.value.colors.length > 0) query.colors = filters.value.colors.join(',')
+  if (filters.value.material) query.material = filters.value.material
+  if (filters.value.minPrice !== null) query.minPrice = filters.value.minPrice
+  if (filters.value.maxPrice !== null) query.maxPrice = filters.value.maxPrice
+  if (filters.value.inStock) query.inStock = 'true'
+  if (filters.value.onSale) query.onSale = 'true'
+  if (filters.value.isNew) query.isNew = 'true'
+  if (filters.value.search) query.search = filters.value.search
+  if (currentPage.value > 1) query.page = currentPage.value
+  if (sortBy.value !== 'popularity-desc') query.sort = sortBy.value
+
+  router.replace({ path: '/shop', query })
+}
+
 // Aggregations from API
 const aggregations = ref({
   brands: [],
@@ -415,12 +466,26 @@ const aggregations = ref({
 
 // Computed
 const pageTitle = computed(() => {
-  const category = route.params.category
-  if (!category) return 'All Products'
-  return category
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  const cats = filters.value.categories
+  const spcs = filters.value.spaces
+  const stys = filters.value.styles
+
+  if (cats.length === 0 && spcs.length === 0 && stys.length === 0) {
+    return 'All Products'
+  }
+
+  const parts = []
+  if (cats.length > 0) {
+    parts.push(cats.map(c => c.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
+  }
+  if (spcs.length > 0) {
+    parts.push('Space: ' + spcs.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
+  }
+  if (stys.length > 0) {
+    parts.push('Style: ' + stys.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
+  }
+
+  return parts.join(' | ')
 })
 
 const breadcrumbs = computed(() => {
@@ -429,7 +494,11 @@ const breadcrumbs = computed(() => {
     { name: 'Shop', route: '/shop' },
   ]
 
-  if (route.params.category) {
+  const cats = filters.value.categories
+  const spcs = filters.value.spaces
+  const stys = filters.value.styles
+
+  if (cats.length > 0 || spcs.length > 0 || stys.length > 0) {
     crumbs.push({
       name: pageTitle.value,
       route: null,
@@ -441,6 +510,9 @@ const breadcrumbs = computed(() => {
 
 const activeFilterCount = computed(() => {
   let count = 0
+  count += filters.value.categories.length
+  count += filters.value.spaces.length
+  count += filters.value.styles.length
   if (filters.value.brand) count++
   if (filters.value.colors.length > 0) count += filters.value.colors.length
   if (filters.value.material) count++
@@ -453,6 +525,18 @@ const activeFilterCount = computed(() => {
 
 const activeFilterTags = computed(() => {
   const tags = []
+
+  filters.value.categories.forEach((cat) => {
+    tags.push({ key: 'categories', value: cat, label: cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })
+  })
+
+  filters.value.spaces.forEach((space) => {
+    tags.push({ key: 'spaces', value: space, label: 'Space: ' + space.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })
+  })
+
+  filters.value.styles.forEach((style) => {
+    tags.push({ key: 'styles', value: style, label: 'Style: ' + style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })
+  })
 
   if (filters.value.brand) {
     tags.push({ key: 'brand', value: filters.value.brand, label: filters.value.brand })
@@ -524,8 +608,10 @@ const loadProducts = async (append = false) => {
   try {
     const [sort, order] = sortBy.value.split('-')
 
-    // Determine the filter parameters based on the route
     const apiParams = {
+      categories: filters.value.categories.length > 0 ? filters.value.categories : null,
+      spaces: filters.value.spaces.length > 0 ? filters.value.spaces : null,
+      styles: filters.value.styles.length > 0 ? filters.value.styles : null,
       brand: filters.value.brand || null,
       colors: filters.value.colors,
       material: filters.value.material || null,
@@ -539,15 +625,6 @@ const loadProducts = async (append = false) => {
       order,
       page: currentPage.value,
       limit: 12,
-    }
-
-    // Set category/space/style based on route
-    if (route.path.includes('/shop/design/space')) {
-      apiParams.space = route.params.category || null
-    } else if (route.path.includes('/shop/design/style')) {
-      apiParams.style = route.params.category || null
-    } else {
-      apiParams.category = route.params.category || null
     }
 
     const response = await shopApi.getProducts(apiParams)
@@ -577,8 +654,7 @@ const loadProducts = async (append = false) => {
 
 const loadFilterOptions = async () => {
   try {
-    const filterParam = route.params.category || null
-    const response = await shopApi.getFilterOptions(filterParam)
+    const response = await shopApi.getFilterOptions(null)
     if (response.success) {
       aggregations.value = response.data
     }
@@ -590,27 +666,39 @@ const loadFilterOptions = async () => {
 const updateFilters = (newFilters) => {
   filters.value = { ...filters.value, ...newFilters }
   currentPage.value = 1
+  syncFiltersToUrl()
   loadProducts()
 }
 
 const removeFilter = (key, value) => {
-  if (key === 'colors') {
+  if (key === 'categories') {
+    filters.value.categories = filters.value.categories.filter((c) => c !== value)
+  } else if (key === 'spaces') {
+    filters.value.spaces = filters.value.spaces.filter((s) => s !== value)
+  } else if (key === 'styles') {
+    filters.value.styles = filters.value.styles.filter((s) => s !== value)
+  } else if (key === 'colors') {
     filters.value.colors = filters.value.colors.filter((c) => c !== value)
   } else if (key === 'price') {
     filters.value.minPrice = null
     filters.value.maxPrice = null
   } else if (typeof filters.value[key] === 'boolean') {
     filters.value[key] = false
+  } else if (Array.isArray(filters.value[key])) {
+    filters.value[key] = []
   } else {
     filters.value[key] = ''
   }
   currentPage.value = 1
+  syncFiltersToUrl()
   loadProducts()
 }
 
 const clearAllFilters = () => {
   filters.value = {
-    category: '',
+    categories: [],
+    spaces: [],
+    styles: [],
     brand: '',
     colors: [],
     material: '',
@@ -622,6 +710,7 @@ const clearAllFilters = () => {
     search: '',
   }
   currentPage.value = 1
+  syncFiltersToUrl()
   loadProducts()
 }
 
@@ -636,8 +725,16 @@ const loadMoreProducts = () => {
   loadProducts(true)
 }
 
-const handleWishlist = (product) => {
-  console.log('Toggle wishlist:', product.id)
+const handleWishlist = async (product) => {
+  console.log('[ProductListing] Toggle wishlist:', product.id)
+  try {
+    await wishlistStore.toggleItem(product.id, product)
+    if (wishlistStore.isInWishlist(product.id)) {
+      openWishlist()
+    }
+  } catch (error) {
+    console.error('[ProductListing] Failed to toggle wishlist:', error)
+  }
 }
 
 const handleAddToCart = (product) => {
@@ -645,36 +742,26 @@ const handleAddToCart = (product) => {
 }
 
 const navigateToProduct = (product) => {
-  if (isDesignRoute.value) {
-    if (route.path.includes('/shop/design/style')) {
-      const categorySlug = route.params.category || ''
-      router.push(`/shop/design/style/${categorySlug}/${product.id}`)
-    } else {
-      const categorySlug = route.params.category || ''
-      router.push(`/shop/design/space/${categorySlug}/${product.id}`)
-    }
-  } else {
-    router.push(`/shop/category/${product.category || route.params.category}/${product.id}`)
-  }
+  router.push(`/shop/product/${product.id}`)
 }
 
 // Watchers
 watch(sortBy, () => {
-  currentPage.value = 1
+  syncFiltersToUrl()
   loadProducts()
 })
 
 watch(
-  () => route.params.category,
+  () => route.query,
   () => {
-    currentPage.value = 1
+    parseQueryParams()
     loadProducts()
-    loadFilterOptions()
   },
 )
 
 // Lifecycle
 onMounted(() => {
+  parseQueryParams()
   loadProducts()
   loadFilterOptions()
 })
@@ -1243,29 +1330,31 @@ onMounted(() => {
 .mobile-drawer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 100001;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(2px);
 }
 
 .mobile-drawer {
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 0;
   bottom: 0;
-  width: 100%;
+  width: 85%;
   max-width: 320px;
   background: var(--shop-cream, #faf8f5);
   display: flex;
   flex-direction: column;
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  z-index: 100002;
+  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
 }
 
 .drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
@@ -1280,13 +1369,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   background: transparent;
   border: none;
   color: var(--shop-brown, #a89b8c);
   cursor: pointer;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   transition: all 0.2s ease;
 }
 
@@ -1298,19 +1387,34 @@ onMounted(() => {
 .drawer-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .drawer-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0.5rem));
   border-top: 1px solid var(--shop-beige, #e8e3dc);
   background: white;
 }
 
 .drawer-footer .shop-btn {
   flex: 1;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  min-height: 48px;
+}
+
+@media (max-width: 380px) {
+  .drawer-footer {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .drawer-footer .shop-btn {
+    width: 100%;
+  }
 }
 
 /* Drawer Transition */

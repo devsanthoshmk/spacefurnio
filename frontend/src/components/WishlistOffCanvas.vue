@@ -210,7 +210,7 @@
  * - Staggered grid entrance animation
  */
 
-import { computed, watch, onMounted, onUnmounted, ref, nextTick, inject } from 'vue'
+import { computed, watch, onMounted, onUnmounted, ref, nextTick, inject, onBeforeUnmount } from 'vue'
 import { useWishlistStore } from '@/stores/wishlist'
 
 // ─── Inject modal state from App.vue ───

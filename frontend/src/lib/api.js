@@ -88,6 +88,28 @@ class ApiClient {
     return data
   }
 
+  async forgotPassword(email) {
+    const res = await fetch(WORKER_URL + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Forgot password failed')
+    return data
+  }
+
+  async resetPassword(email, tokenOrCode, newPassword) {
+    const res = await fetch(WORKER_URL + '/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, tokenOrCode, newPassword }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Reset password failed')
+    return data
+  }
+
   async getCurrentUser() {
     if (!this.token) throw new Error('Not authenticated')
     try {
@@ -108,7 +130,7 @@ class ApiClient {
     fetch(WORKER_URL + '/auth/logout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-    }).catch(() => {})
+    }).catch(() => { })
     this.clearAuth()
     return Promise.resolve()
   }
@@ -194,8 +216,8 @@ class ApiClient {
     const cartId = carts[0].id
     const items = await this._neonFetch(
       '/cart_items?cart_id=eq.' +
-        cartId +
-        '&select=id,cart_id,product_id,quantity,price_snapshot,created_at',
+      cartId +
+      '&select=id,cart_id,product_id,quantity,price_snapshot,created_at',
     )
     return { ...carts[0], cart_items: items || [] }
   }
@@ -252,8 +274,8 @@ class ApiClient {
     const wishlistId = wishlists[0].id
     return this._neonFetch(
       '/wishlist_items?wishlist_id=eq.' +
-        wishlistId +
-        '&select=id,wishlist_id,product_id,created_at',
+      wishlistId +
+      '&select=id,wishlist_id,product_id,created_at',
     )
   }
 
@@ -285,8 +307,8 @@ class ApiClient {
   async getOrderById(orderId) {
     return this._neonFetch(
       '/orders?id=eq.' +
-        orderId +
-        '&select=id,status,total_amount,created_at,address_id,shipping_first_name,shipping_last_name,shipping_address,shipping_city,shipping_state,shipping_pincode,shipping_phone,order_items(*),user_addresses(id,address_line_1,address_line_2,city,state,postal_code,country),payments(method,status)',
+      orderId +
+      '&select=id,status,total_amount,created_at,address_id,shipping_first_name,shipping_last_name,shipping_address,shipping_city,shipping_state,shipping_pincode,shipping_phone,order_items(*),user_addresses(id,address_line_1,address_line_2,city,state,postal_code,country),payments(method,status)',
     )
   }
 

@@ -50,14 +50,24 @@
         </div>
 
         <!-- Tab Switcher -->
-        <div class="sf-auth-tabs">
-          <button :class="['sf-auth-tab', { active: isLogin }]" @click="switchTab('login')">
+        <div class="sf-auth-tabs" v-if="authView === 'login' || authView === 'register'">
+          <button :class="['sf-auth-tab', { active: authView === 'login' }]" @click="switchTab('login')">
             Sign In
           </button>
-          <button :class="['sf-auth-tab', { active: !isLogin }]" @click="switchTab('register')">
+          <button :class="['sf-auth-tab', { active: authView === 'register' }]" @click="switchTab('register')">
             Create Account
           </button>
-          <div class="sf-auth-tab-indicator" :style="{ left: isLogin ? '0' : '50%' }"></div>
+          <div class="sf-auth-tab-indicator" :style="{ left: authView === 'login' ? '0' : '50%' }"></div>
+        </div>
+
+        <div v-else-if="authView === 'forgot'" class="sf-auth-header-alt">
+          <h3>Reset Password</h3>
+          <p>Enter your email to receive a reset link.</p>
+        </div>
+
+        <div v-else-if="authView === 'reset'" class="sf-auth-header-alt">
+          <h3>Set New Password</h3>
+          <p>Enter the code sent to your email or link token.</p>
         </div>
 
         <!-- Form Container -->
@@ -78,7 +88,7 @@
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
               <span>{{ errorMessage }}</span>
-              <button @click="errorMessage = ''" class="sf-auth-error-dismiss">×</button>
+              <button type="button" @click="errorMessage = ''" class="sf-auth-error-dismiss">×</button>
             </div>
           </Transition>
 
@@ -100,7 +110,7 @@
           </Transition>
 
           <!-- LOGIN FORM -->
-          <form v-if="isLogin" @submit.prevent="handleLogin" class="sf-auth-form">
+          <form v-if="authView === 'login'" @submit.prevent="handleLogin" class="sf-auth-form">
             <div class="sf-auth-field">
               <label for="login-email" class="sf-auth-label">Email</label>
               <input
@@ -115,7 +125,10 @@
             </div>
 
             <div class="sf-auth-field">
-              <label for="login-password" class="sf-auth-label">Password</label>
+              <div class="sf-auth-field-header">
+                <label for="login-password" class="sf-auth-label">Password</label>
+                <button type="button" class="sf-auth-forgot" @click="switchTab('forgot')">Forgot your password?</button>
+              </div>
               <div class="sf-auth-input-wrap">
                 <input
                   id="login-password"
@@ -169,7 +182,7 @@
           </form>
 
           <!-- REGISTER FORM -->
-          <form v-else @submit.prevent="handleRegister" class="sf-auth-form">
+          <form v-else-if="authView === 'register'" @submit.prevent="handleRegister" class="sf-auth-form">
             <div class="sf-auth-row">
               <div class="sf-auth-field">
                 <label for="reg-fname" class="sf-auth-label">First Name</label>
@@ -265,12 +278,118 @@
             </button>
           </form>
 
+          <!-- FORGOT FORM -->
+          <form v-else-if="authView === 'forgot'" @submit.prevent="handleForgot" class="sf-auth-form">
+            <div class="sf-auth-field">
+              <label for="forgot-email" class="sf-auth-label">Email</label>
+              <input
+                id="forgot-email"
+                v-model="forgotForm.email"
+                type="email"
+                class="sf-auth-input"
+                placeholder="you@example.com"
+                required
+                autocomplete="email"
+              />
+            </div>
+            <button type="submit" :disabled="isSubmitting" class="sf-auth-submit">
+              <span v-if="isSubmitting" class="sf-auth-spinner"></span>
+              <span v-else>Send Reset Link</span>
+            </button>
+            <button type="button" @click="switchTab('login')" class="sf-auth-back">
+              Back to log in
+            </button>
+          </form>
+
+          <!-- RESET FORM -->
+          <form v-else-if="authView === 'reset'" @submit.prevent="handleReset" class="sf-auth-form">
+            <div class="sf-auth-field">
+              <label for="reset-email" class="sf-auth-label">Email</label>
+              <input
+                id="reset-email"
+                v-model="resetForm.email"
+                type="email"
+                class="sf-auth-input readonly-input"
+                placeholder="you@example.com"
+                required
+                readonly
+              />
+            </div>
+            
+            <div class="sf-auth-field" v-if="!$route?.query?.token">
+              <label for="reset-token" class="sf-auth-label">6-Digit Code</label>
+              <input
+                id="reset-token"
+                v-model="resetForm.token"
+                type="text"
+                class="sf-auth-input"
+                placeholder="000000"
+                required
+              />
+            </div>
+
+            <div class="sf-auth-field">
+              <label for="reset-password" class="sf-auth-label">New Password</label>
+              <div class="sf-auth-input-wrap">
+                <input
+                  id="reset-password"
+                  v-model="resetForm.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  class="sf-auth-input"
+                  placeholder="Min 6 characters"
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="sf-auth-eye"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg
+                    v-if="!showPassword"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    v-else
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" :disabled="isSubmitting" class="sf-auth-submit">
+              <span v-if="isSubmitting" class="sf-auth-spinner"></span>
+              <span v-else>Reset Password</span>
+            </button>
+          </form>
+
           <!-- Divider -->
-          <div class="sf-auth-divider">
+          <div class="sf-auth-divider" v-if="authView === 'login' || authView === 'register'">
             <span>or</span>
           </div>
 
-          <!-- Google OAuth -->
+          <!-- Google OAuth (Disabled for now) -->
+          <!--
           <button @click="handleGoogleLogin" class="sf-auth-google">
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path
@@ -292,6 +411,7 @@
             </svg>
             Continue with Google
           </button>
+          -->
         </div>
 
         <!-- Footer */-->
@@ -310,12 +430,6 @@
  * ===========================================
  * LOGIN / SIGNUP MODAL — Reimagined
  * ===========================================
- * Uses:
- * - Injected isLoginOpen ref from App.vue
- * - Injected closeLogin() from App.vue
- * - Worker API: POST /auth/login, POST /auth/register
- * - Google OAuth via auth store
- * - Form validation
  */
 
 import { ref, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
@@ -329,7 +443,7 @@ const authStore = useAuthStore()
 const modalRef = ref(null)
 
 // ─── State ───
-const isLogin = ref(true)
+const authView = ref('login') // 'login' | 'register' | 'forgot' | 'reset'
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
@@ -337,23 +451,55 @@ const successMessage = ref('')
 
 const loginForm = ref({ email: '', password: '' })
 const registerForm = ref({ firstName: '', lastName: '', email: '', password: '' })
+const forgotForm = ref({ email: '' })
+const resetForm = ref({ email: '', token: '', password: '' })
+
+// Add a way to trigger open from within if needed, or read query on mount
+onMounted(() => {
+  document.addEventListener('keydown', handleEscKey)
+  
+  // Check URL specifically for reset
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset') === 'true') {
+      authView.value = 'reset'
+      resetForm.value.email = params.get('email') || ''
+      resetForm.value.token = params.get('token') || ''
+      
+      // We assume App.vue might auto-open if login=true, which we added in link
+    }
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscKey)
+  document.body.style.overflow = ''
+})
 
 watch(isOpen, async (open) => {
   if (open) {
     document.body.style.overflow = 'hidden'
     await nextTick()
     modalRef.value?.focus()
-    // Reset forms
+    // Reset forms error/success
     errorMessage.value = ''
     successMessage.value = ''
+    
+    // Auto-detect reset again just in case
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset') === 'true') {
+      authView.value = 'reset'
+    } else if (authView.value === 'reset') {
+      authView.value = 'login'
+    }
   } else {
     document.body.style.overflow = ''
   }
 })
 
 // ─── Tab Switch ───
-function switchTab(tab) {
-  isLogin.value = tab === 'login'
+function switchTab(view) {
+  authView.value = view
   errorMessage.value = ''
   successMessage.value = ''
 }
@@ -365,13 +511,8 @@ async function handleLogin() {
 
   try {
     isSubmitting.value = true
-
     const data = await api.login(loginForm.value.email, loginForm.value.password)
-
-    // Store token + update auth state
     authStore.user = data.user
-
-    // Sync cart/wishlist
     successMessage.value = 'Welcome back!'
     setTimeout(() => closeModal(), 800)
   } catch (err) {
@@ -393,23 +534,75 @@ async function handleRegister() {
 
   try {
     isSubmitting.value = true
-
     const data = await api.register({
       email: registerForm.value.email,
       password: registerForm.value.password,
       firstName: registerForm.value.firstName,
       lastName: registerForm.value.lastName,
     })
-
-    // Store token + update auth state
     if (data.access_token) {
       authStore.user = data.user
     }
-
     successMessage.value = data.message || 'Account created successfully!'
     setTimeout(() => closeModal(), 800)
   } catch (err) {
     errorMessage.value = err.message || 'Something went wrong. Please try again.'
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// ─── Forgot Password ───
+async function handleForgot() {
+  if (isSubmitting.value) return
+  errorMessage.value = ''
+  
+  try {
+    isSubmitting.value = true
+    const data = await api.forgotPassword(forgotForm.value.email)
+    successMessage.value = data.message || 'Reset link sent!'
+    // Switch to reset mode so they can enter code if they want
+    setTimeout(() => {
+      resetForm.value.email = forgotForm.value.email
+      switchTab('reset')
+    }, 1500)
+  } catch (err) {
+    errorMessage.value = err.message || 'Failed to send reset link.'
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// ─── Reset Password ───
+async function handleReset() {
+  if (isSubmitting.value) return
+  errorMessage.value = ''
+  
+  if (resetForm.value.password.length < 6) {
+    errorMessage.value = 'New password must be at least 6 characters.'
+    return
+  }
+  
+  try {
+    isSubmitting.value = true
+    const data = await api.resetPassword(resetForm.value.email, resetForm.value.token, resetForm.value.password)
+    successMessage.value = data.message || 'Password reset successfully!'
+    
+    // Clean URL if we had tokens
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('reset')
+      url.searchParams.delete('token')
+      url.searchParams.delete('email')
+      window.history.replaceState({}, '', url)
+    }
+    
+    setTimeout(() => {
+      switchTab('login')
+      loginForm.value.email = resetForm.value.email
+    }, 1500)
+  } catch (err) {
+    errorMessage.value = err.message || 'Failed to reset password.'
   } finally {
     isSubmitting.value = false
   }
@@ -434,11 +627,6 @@ function closeModal() {
 function handleEscKey(e) {
   if (e.key === 'Escape' && isOpen.value) closeModal()
 }
-onMounted(() => document.addEventListener('keydown', handleEscKey))
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscKey)
-  document.body.style.overflow = ''
-})
 </script>
 
 <style>
@@ -583,6 +771,58 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+}
+.sf-auth-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.sf-auth-forgot {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--shop-brown, #a89b8c);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.sf-auth-forgot:hover {
+  color: var(--shop-charcoal, #3d3a36);
+  text-decoration: underline;
+}
+.sf-auth-header-alt {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.sf-auth-header-alt h3 {
+  font-size: 1.25rem;
+  color: var(--shop-charcoal, #3d3a36);
+  margin-bottom: 0.5rem;
+}
+.sf-auth-header-alt p {
+  font-size: 0.875rem;
+  color: var(--shop-brown, #a89b8c);
+}
+.sf-auth-back {
+  background: none;
+  border: none;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--shop-brown, #a89b8c);
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-top: 0.5rem;
+}
+.sf-auth-back:hover {
+  color: var(--shop-charcoal, #3d3a36);
+}
+.readonly-input {
+  background: var(--shop-cream-dark, #f5f2ed);
+  color: var(--shop-brown-dark, #8b7d6d);
+  cursor: not-allowed;
 }
 .sf-auth-label {
   font-size: 0.75rem;

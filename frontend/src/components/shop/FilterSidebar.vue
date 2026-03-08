@@ -1,44 +1,143 @@
 <template>
-  <div class="filter-sidebar-content">
-    <!-- Category Filter -->
-    <div class="filter-group">
-      <button
-        class="filter-header"
-        @click="toggleSection('category')"
-        :aria-expanded="openSections.category"
-      >
-        <span class="filter-title">Category</span>
-        <svg
-          class="chevron"
-          :class="{ rotated: openSections.category }"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
+<div class="filter-sidebar-content">
+<!-- Design by Space Dropdown -->
+<div class="filter-group design-dropdown-group">
+<button
+class="filter-header design-dropdown-header"
+@click="toggleDesignSpace()"
+:aria-expanded="openDesignSpace"
+>
+<span class="design-dropdown-label">
+<span class="design-dropdown-icon">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+<polyline points="9,22 9,12 15,12 15,22"/>
+</svg>
+</span>
+Design by Space
+</span>
+<svg
+class="chevron"
+:class="{ rotated: openDesignSpace }"
+width="16"
+height="16"
+viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2"
+>
+<path d="M6 9l6 6 6-6" />
+</svg>
+</button>
 
-      <Transition name="accordion">
-        <div v-if="openSections.category" class="filter-content">
-          <label v-for="cat in categories" :key="cat.id" class="checkbox-label">
-            <input
-              type="radio"
-              name="category"
-              :value="cat.slug"
-              :checked="localFilters.category === cat.slug"
-              @change="updateFilter('category', cat.slug)"
-              class="shop-checkbox"
-            />
-            <span class="checkbox-text">{{ cat.name }}</span>
-            <span v-if="cat.count" class="checkbox-count">{{ cat.count }}</span>
-          </label>
-        </div>
-      </Transition>
-    </div>
+<Transition name="accordion">
+<div v-if="openDesignSpace" class="filter-content design-dropdown-content">
+<div class="design-dropdown-list shop-scrollbar">
+<label v-for="space in spaces" :key="space.id" class="checkbox-label">
+<input
+type="checkbox"
+name="design-space"
+:value="space.slug"
+:checked="localFilters.spaces.includes(space.slug)"
+@change="toggleSpace(space.slug)"
+class="shop-checkbox"
+/>
+<span class="checkbox-text">{{ space.name }}</span>
+</label>
+</div>
+</div>
+</Transition>
+</div>
+
+<!-- Design by Style Dropdown -->
+<div class="filter-group design-dropdown-group">
+<button
+class="filter-header design-dropdown-header"
+@click="toggleDesignStyle()"
+:aria-expanded="openDesignStyle"
+>
+<span class="design-dropdown-label">
+<span class="design-dropdown-icon">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+<circle cx="12" cy="12" r="10"/>
+<path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+<path d="M2 12h20"/>
+</svg>
+</span>
+Design by Style
+</span>
+<svg
+class="chevron"
+:class="{ rotated: openDesignStyle }"
+width="16"
+height="16"
+viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2"
+>
+<path d="M6 9l6 6 6-6" />
+</svg>
+</button>
+
+<Transition name="accordion">
+<div v-if="openDesignStyle" class="filter-content design-dropdown-content">
+<div class="design-dropdown-list shop-scrollbar">
+<label v-for="style in styles" :key="style.id" class="checkbox-label">
+<input
+type="checkbox"
+name="design-style"
+:value="style.slug"
+:checked="localFilters.styles.includes(style.slug)"
+@change="toggleStyle(style.slug)"
+class="shop-checkbox"
+/>
+<span class="checkbox-text">{{ style.name }}</span>
+</label>
+</div>
+</div>
+</Transition>
+</div>
+
+<!-- Category Filter -->
+<div class="filter-group">
+<button
+class="filter-header"
+@click="toggleSection('category')"
+:aria-expanded="openSections.category"
+>
+<span class="filter-title">Category</span>
+<svg
+class="chevron"
+:class="{ rotated: openSections.category }"
+width="16"
+height="16"
+viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2"
+>
+<path d="M6 9l6 6 6-6" />
+</svg>
+</button>
+
+<Transition name="accordion">
+<div v-if="openSections.category" class="filter-content">
+<label v-for="cat in categories" :key="cat.id" class="checkbox-label">
+<input
+type="checkbox"
+name="category"
+:value="cat.slug"
+:checked="localFilters.categories.includes(cat.slug)"
+@change="toggleCategory(cat.slug)"
+class="shop-checkbox"
+/>
+<span class="checkbox-text">{{ cat.name }}</span>
+<span v-if="cat.count" class="checkbox-count">{{ cat.count }}</span>
+</label>
+</div>
+</Transition>
+</div>
 
     <!-- Price Range Filter -->
     <div class="filter-group">
@@ -395,10 +494,15 @@ const props = defineProps({
 const emit = defineEmits(['update:filters', 'clear-all'])
 
 // Local state
-const localFilters = ref({ ...props.filters })
+const localFilters = ref({
+  ...props.filters,
+  designSpace: '',
+  designStyle: '',
+})
 const brandSearch = ref('')
 
 const openSections = ref({
+  design: true,
   category: true,
   price: true,
   brand: true,
@@ -407,6 +511,74 @@ const openSections = ref({
   availability: true,
 })
 
+const spaces = ref([])
+const styles = ref([])
+const openDesignSpace = ref(false)
+const openDesignStyle = ref(false)
+
+const toggleDesignSpace = () => {
+  openDesignSpace.value = !openDesignSpace.value
+}
+
+const toggleDesignStyle = () => {
+  openDesignStyle.value = !openDesignStyle.value
+}
+
+const loadSpaces = async () => {
+  try {
+    const response = await shopApi.getSpaces()
+    if (response.success && response.data) {
+      spaces.value = response.data
+    }
+  } catch (err) {
+    console.error('Error loading spaces:', err)
+  }
+}
+
+const loadStyles = async () => {
+  try {
+    const response = await shopApi.getStyles()
+    if (response.success && response.data) {
+      styles.value = response.data
+    }
+  } catch (err) {
+    console.error('Error loading styles:', err)
+  }
+}
+
+const toggleSpace = (slug) => {
+  const spaces = [...localFilters.value.spaces]
+  const index = spaces.indexOf(slug)
+  if (index > -1) {
+    spaces.splice(index, 1)
+  } else {
+    spaces.push(slug)
+  }
+  emit('update:filters', { spaces })
+}
+
+const toggleStyle = (slug) => {
+  const styles = [...localFilters.value.styles]
+  const index = styles.indexOf(slug)
+  if (index > -1) {
+    styles.splice(index, 1)
+  } else {
+    styles.push(slug)
+  }
+  emit('update:filters', { styles })
+}
+
+const toggleCategory = (slug) => {
+  const categories = [...localFilters.value.categories]
+  const index = categories.indexOf(slug)
+  if (index > -1) {
+    categories.splice(index, 1)
+  } else {
+    categories.push(slug)
+  }
+  emit('update:filters', { categories })
+}
+
 // Categories (loaded from API)
 const categories = ref([{ id: 'all', name: 'All Products', slug: '', count: 0 }])
 
@@ -414,27 +586,23 @@ const loadCategories = async () => {
   try {
     const response = await shopApi.getCategories()
     if (response.success && response.data) {
-      categories.value = [
-        {
-          id: 'all',
-          name: 'All Products',
-          slug: '',
-          count: response.data.reduce((sum, c) => sum + (c.productCount || 0), 0),
-        },
-        ...response.data.map((c) => ({
-          id: c.slug,
-          name: c.name,
-          slug: c.slug,
-          count: c.productCount || 0,
-        })),
-      ]
+      categories.value = response.data.map((c) => ({
+        id: c.slug,
+        name: c.name,
+        slug: c.slug,
+        count: c.productCount || 0,
+      }))
     }
   } catch (err) {
     console.error('Error loading categories for filter sidebar:', err)
   }
 }
 
-onMounted(loadCategories)
+onMounted(() => {
+  loadCategories()
+  loadSpaces()
+  loadStyles()
+})
 
 // Price options
 const priceOptions = [
@@ -841,5 +1009,118 @@ watch(
 .accordion-leave-from {
   opacity: 1;
   max-height: 500px;
+}
+
+/* Design Filter Options */
+.design-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.design-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--shop-cream-dark, #f5f2ed);
+  border: 1px solid var(--shop-beige, #e8e3dc);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.design-option-btn:hover {
+  border-color: var(--shop-tan, #c4b8a9);
+  background: white;
+}
+
+.design-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: white;
+  border-radius: 0.375rem;
+  color: var(--shop-brown, #a89b8c);
+}
+
+.design-option-text {
+  flex: 1;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--shop-charcoal, #3d3a36);
+}
+
+/* Design Dropdown Styles */
+.design-dropdown-group {
+  padding-bottom: 0.5rem;
+}
+
+.design-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.625rem 0.5rem;
+  background: var(--shop-cream-dark, #f5f2ed);
+  border: 1px solid var(--shop-beige, #e8e3dc);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.design-dropdown-header:hover {
+  border-color: var(--shop-tan, #c4b8a9);
+}
+
+.design-dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--shop-charcoal, #3d3a36);
+}
+
+.design-dropdown-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: white;
+  border-radius: 0.375rem;
+  color: var(--shop-brown, #a89b8c);
+}
+
+.design-dropdown-header .chevron {
+  color: var(--shop-tan, #c4b8a9);
+  transition: transform 0.3s ease;
+}
+
+.design-dropdown-content {
+  padding-top: 0.5rem;
+}
+
+.design-dropdown-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.design-option-arrow {
+  color: var(--shop-tan, #c4b8a9);
+}
+
+.design-sub-options {
+  padding-left: 0.5rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
+  padding-top: 0.75rem;
 }
 </style>

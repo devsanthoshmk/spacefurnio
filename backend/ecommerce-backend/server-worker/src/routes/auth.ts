@@ -6,6 +6,8 @@ import { hashPassword, verifyPassword } from '../utils/crypto';
 
 export const authRouter = AutoRouter<any, [env: Env, ctx: ExecutionContext]>({ base: '/auth' });
 
+import { Resend } from 'resend';
+
 authRouter.get('/.well-known/jwks.json', async (request, env) => {
     const jwks = await getJwks(env.RSA_PUBLIC_KEY_PEM);
     return jwks; // itty-router v5 auto-jsonifies
@@ -237,5 +239,141 @@ authRouter.post('/logout', async (request, env) => {
     } catch (e) {
         console.error(e);
         return error(500, { message: 'Logout failed' });
+    }
+});
+
+authRouter.post('/forgot-password', async (request, env) => {
+    try {
+        const body = await request.json() as any;
+        const { email } = body;
+
+        const { sql } = getDb(env);
+
+        const result = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+        if (result.length === 0) {
+            return error(404, { message: 'User with this email not found.' });
+        }
+        const user = result[0] as any;
+
+        const token = crypto.randomUUID(); // simple unique token
+        // Also a 6 digit code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiry
+
+        // Store both token and code separated by colon, or store the code and send both
+        const combinedToken = `${token}:${code}`;
+
+        await sql`
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                token TEXT NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            )
+        `;
+
+        await sql`
+            INSERT INTO password_resets (user_id, token, expires_at)
+            VALUES (${user.id}, ${combinedToken}, ${expiresAt})
+        `;
+
+        // Wait for resend to finish or handle quietly
+        if (!env.RESEND_API_KEY) {
+            console.error('RESEND_API_KEY is missing');
+            return error(500, { message: 'Email service is not configured.' });
+        }
+
+        const resend = new Resend(env.RESEND_API_KEY);
+        // Replace with your actual frontend URL later, or read from request headers
+        const origin = request.headers.get('origin') || 'http://localhost:5173';
+        const resetLink = `${origin}/?login=true&reset=true&token=${token}&email=${encodeURIComponent(email)}`;
+
+        const { error: sendError } = await resend.emails.send({
+            from: 'Spacefurnio <noreply@spacefurnio.in>',
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+                <p>You requested a password reset.</p>
+                <p>Click the link below to reset your password:</p>
+                <a href="${resetLink}">Reset Password</a>
+                <p>Or use this 6-digit code: <strong>${code}</strong> in the app.</p>
+            `
+        });
+
+        if (sendError) {
+            console.error('Email send error:', sendError);
+            return error(500, { message: `Email failed to send: ${sendError.message}` });
+        }
+
+        return new Response(JSON.stringify({ message: 'Password reset link sent to your email.' }), {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (e) {
+        console.error(e);
+        return error(500, { message: 'Failed to process forgot password' });
+    }
+});
+
+authRouter.post('/reset-password', async (request, env) => {
+    try {
+        const body = await request.json() as any;
+        const { email, tokenOrCode, newPassword } = body;
+
+        if (!email || !tokenOrCode || !newPassword) {
+            return error(400, { message: 'Invalid request payload' });
+        }
+
+        const { sql } = getDb(env);
+        const result = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+        if (result.length === 0) {
+            return error(400, { message: 'Invalid request' });
+        }
+        const user = result[0] as any;
+
+        // Check if token/code exists for this user
+        const resetResult = await sql`
+            SELECT id, token FROM password_resets 
+            WHERE user_id = ${user.id} AND expires_at > NOW()
+            ORDER BY created_at DESC
+        `;
+
+        if (resetResult.length === 0) {
+            return error(400, { message: 'Invalid or expired reset token' });
+        }
+
+        let validToken = false;
+        let usedResetId = null;
+
+        for (const row of resetResult as any[]) {
+            const rowToken = String(row.token);
+            const [storedToken, storedCode] = rowToken.split(':');
+            if (storedToken === tokenOrCode || storedCode === tokenOrCode) {
+                validToken = true;
+                usedResetId = row.id;
+                break;
+            }
+        }
+
+        if (!validToken) {
+            return error(400, { message: 'Invalid or expired reset token/code' });
+        }
+
+        const passwordHash = await hashPassword(newPassword);
+
+        // Update user password
+        await sql`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${user.id}`;
+
+        // Delete all reset tokens for this user
+        await sql`DELETE FROM password_resets WHERE user_id = ${user.id}`;
+
+        return new Response(JSON.stringify({ message: 'Password reset successfully' }), {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (e) {
+        console.error(e);
+        return error(500, { message: 'Failed to reset password' });
     }
 });

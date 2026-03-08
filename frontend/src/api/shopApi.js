@@ -437,22 +437,19 @@ export async function getStyles() {
 /**
  * Get products with filtering, sorting, and pagination.
  *
- * Supports filtering by category, space, style, brand, colors,
+ * Supports filtering by categories, spaces, styles (arrays), brand, colors,
  * material, price range, search, and sorting/pagination.
  */
 export async function getProducts(options = {}) {
   const {
-    category,
-    space,
-    style,
+    categories,
+    spaces,
+    styles,
     brand,
     colors = [],
     material,
     minPrice,
     maxPrice,
-    inStock,
-    onSale,
-    isNew,
     search,
     sort = 'popularity',
     order = 'desc',
@@ -467,20 +464,35 @@ export async function getProducts(options = {}) {
     const params = []
     let idx = 1
 
-    if (category) {
-      conditions.push(`c.slug = $${idx++}`)
-      params.push(category)
-    }
+// Categories - can be array or single value
+// Include products with NULL category_id (uncategorized products)
+if (categories && Array.isArray(categories) && categories.length > 0) {
+  conditions.push(`(c.slug = ANY($${idx++}) OR p.category_id IS NULL)`)
+  params.push(categories)
+} else if (categories && typeof categories === 'string') {
+  conditions.push(`(c.slug = $${idx++} OR p.category_id IS NULL)`)
+  params.push(categories)
+}
 
-    if (space) {
-      conditions.push(`s.slug = $${idx++}`)
-      params.push(space)
-    }
+// Spaces - can be array or single value
+// Include products with NULL space_id (can be used in any space)
+if (spaces && Array.isArray(spaces) && spaces.length > 0) {
+  conditions.push(`(s.slug = ANY($${idx++}) OR p.space_id IS NULL)`)
+  params.push(spaces)
+} else if (spaces && typeof spaces === 'string') {
+  conditions.push(`(s.slug = $${idx++} OR p.space_id IS NULL)`)
+  params.push(spaces)
+}
 
-    if (style) {
-      conditions.push(`st.slug = $${idx++}`)
-      params.push(style)
-    }
+// Styles - can be array or single value
+// Include products with NULL style_id (no specific style)
+if (styles && Array.isArray(styles) && styles.length > 0) {
+  conditions.push(`(st.slug = ANY($${idx++}) OR p.style_id IS NULL)`)
+  params.push(styles)
+} else if (styles && typeof styles === 'string') {
+  conditions.push(`(st.slug = $${idx++} OR p.style_id IS NULL)`)
+  params.push(styles)
+}
 
     if (listingType) {
       conditions.push(`p.listing_type = $${idx++}`)
@@ -556,60 +568,37 @@ export async function getProducts(options = {}) {
       ${whereClause}
       ORDER BY ${sortCol} ${sortDir} NULLS LAST
       LIMIT ${safeLimit} OFFSET ${offset}
-    `
+`
 
-    // --- Aggregations query (for filters) ---
-    // Determine the scoping filter for aggregations
-    let aggJoin = ''
-    let aggWhere = ''
-    const aggParams = []
+// --- Aggregations query (for filters) ---
+// No scoping needed - show all filter options
+const aggQuery = `
+SELECT
+  (SELECT json_agg(DISTINCT b2.name ORDER BY b2.name)
+  FROM products p2 JOIN brands b2 ON b2.id = p2.brand_id
+  ) AS brands,
+  (SELECT json_agg(DISTINCT m2.name ORDER BY m2.name)
+  FROM products p2 JOIN materials m2 ON m2.id = p2.material_id
+  ) AS materials,
+  (SELECT json_agg(json_build_object('name', cl.name, 'hex', cl.hex_code))
+  FROM (SELECT DISTINCT cl.name, cl.hex_code
+  FROM product_colors pc JOIN colors cl ON cl.id = pc.color_id
+  JOIN products p2 ON p2.id = pc.product_id
+  ORDER BY cl.name) cl
+  ) AS colors,
+  (SELECT json_build_object(
+    'min', COALESCE(MIN(p2.price_cents) / 100, 0),
+    'max', COALESCE(MAX(p2.price_cents) / 100, 5000))
+  FROM products p2
+  ) AS price_range
+`
 
-    if (category) {
-      aggJoin = 'JOIN categories c_agg ON c_agg.id = p2.category_id'
-      aggWhere = 'WHERE c_agg.slug = $1'
-      aggParams.push(category)
-    } else if (space) {
-      aggJoin = 'JOIN spaces s_agg ON s_agg.id = p2.space_id'
-      aggWhere = 'WHERE s_agg.slug = $1'
-      aggParams.push(space)
-    } else if (style) {
-      aggJoin = 'JOIN styles st_agg ON st_agg.id = p2.style_id'
-      aggWhere = 'WHERE st_agg.slug = $1'
-      aggParams.push(style)
-    }
-
-    const aggFilter = aggJoin ? `${aggJoin} ${aggWhere}` : ''
-
-    const aggQuery = `
-      SELECT
-        (SELECT json_agg(DISTINCT b2.name ORDER BY b2.name)
-         FROM products p2 JOIN brands b2 ON b2.id = p2.brand_id
-         ${aggFilter}
-        ) AS brands,
-        (SELECT json_agg(DISTINCT m2.name ORDER BY m2.name)
-         FROM products p2 JOIN materials m2 ON m2.id = p2.material_id
-         ${aggFilter}
-        ) AS materials,
-        (SELECT json_agg(json_build_object('name', cl2.name, 'hex', cl2.hex_code))
-         FROM (SELECT DISTINCT cl.name, cl.hex_code
-               FROM product_colors pc JOIN colors cl ON cl.id = pc.color_id
-               ${aggFilter ? `JOIN products p2 ON p2.id = pc.product_id ${aggFilter}` : ''}
-               ORDER BY cl.name) cl2
-        ) AS colors,
-        (SELECT json_build_object(
-           'min', COALESCE(MIN(p2.price_cents) / 100, 0),
-           'max', COALESCE(MAX(p2.price_cents) / 100, 5000))
-         FROM products p2
-         ${aggFilter}
-        ) AS price_range
-    `
-
-    // Execute in parallel
-    const [countResult, productRows, aggResult] = await Promise.all([
-      sql.query(countQuery, params),
-      sql.query(productsQuery, params),
-      sql.query(aggQuery, aggParams),
-    ])
+// Execute in parallel
+const [countResult, productRows, aggResult] = await Promise.all([
+  sql.query(countQuery, params),
+  sql.query(productsQuery, params),
+  sql.query(aggQuery),
+])
 
     const total = countResult[0]?.total || 0
     const totalPages = Math.ceil(total / safeLimit)

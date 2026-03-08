@@ -1,215 +1,80 @@
 import { createRouter, createWebHistory } from 'vue-router'
 const comingSoon = () => import('@/components/Coming-Soon.vue')
 
-/**
- * ===========================================
- * ROUTER CONFIGURATION
- * ===========================================
- *
- * MODALS (Cart, Wishlist, Login, Orders, Checkout):
- *   Modals are NOT route-driven anymore. They use reactive
- *   state via provide/inject from App.vue. This avoids the
- *   "blank page" bug caused by component: null routes.
- *
- * PAGE ROUTES:
- *   All standard page routes remain unchanged.
- * ===========================================
- */
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // ===========================================
-    // STATIC PAGES
-    // ===========================================
     // Static pages
-    {
-      path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue'),
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('@/views/AboutView.vue'),
-    },
+    { path: '/', name: 'home', component: () => import('@/views/HomeView.vue') },
+    { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
 
-    // Shop redirects
+    // Shop - single route with query param filtering
     {
       path: '/shop',
-      redirect: '/shop/category',
+      name: 'Shop',
+      component: () => import('@/components/shop/ProductListing.vue'),
+      meta: { title: 'Shop - Space Furnio' },
     },
 
-    // Shop overview views
+    // Shop overview (redirects to /shop with query)
+    { path: '/shop/category', redirect: '/shop' },
+    { path: '/shop/design', redirect: '/shop' },
+
+    // Product detail (single route, category from query)
     {
-      path: '/shop/category',
-      name: 'ShopCategory',
-      component: () => import('@/views/ShopView.vue'),
-      meta: { title: 'Shop by Category - Space Furnio' },
-    },
-    {
-      path: '/shop/design',
-      name: 'ShopDesign',
-      component: () => import('@/views/ShopView.vue'),
-      meta: { title: 'Shop by Design - Space Furnio' },
+      path: '/shop/product/:id',
+      name: 'ProductDetail',
+      component: () => import('@/views/ProductDetailView.vue'),
+      meta: { title: 'Product Details - Space Furnio' },
     },
 
-    // // Product detail views — placed first to avoid collision with listing routes
-    {
-      path: '/shop/category/:category/:id',
-      name: 'CategoryProductDetail',
-      component: () => import('@/views/ProductDetailView.vue'),
-      meta: {
-        title: (route) => `Product Details - ${route.params.category} - Space Furnio`,
-      },
-    },
-    {
-      path: '/shop/design/space/:category/:id',
-      name: 'DesignSpaceProductDetail',
-      component: () => import('@/views/ProductDetailView.vue'),
-      meta: {
-        title: (route) => `Product Details - ${route.params.category} Space Design - Space Furnio`,
-      },
-    },
-    {
-      path: '/shop/design/style/:category/:id',
-      name: 'DesignStyleProductDetail',
-      component: () => import('@/views/ProductDetailView.vue'),
-      meta: {
-        title: (route) => `Product Details - ${route.params.category} Style Design - Space Furnio`,
-      },
-    },
-    {
-      path: '/shop/design/:category/:id',
-      name: 'DesignProductDetail',
-      component: () => import('@/views/ProductDetailView.vue'),
-      meta: {
-        title: (route) => `Product Details - ${route.params.category} Design - Space Furnio`,
-      },
-    },
+    // Legacy product routes redirect
+    { path: '/shop/category/:category/:id', redirect: (to) => `/shop/product/${to.params.id}` },
+    { path: '/shop/design/space/:category/:id', redirect: (to) => `/shop/product/${to.params.id}` },
+    { path: '/shop/design/style/:category/:id', redirect: (to) => `/shop/product/${to.params.id}` },
+    { path: '/shop/design/:category/:id', redirect: (to) => `/shop/product/${to.params.id}` },
 
-    // Product listing views
+    // Legacy listing routes redirect to /shop with query
     {
       path: '/shop/category/:category',
-      name: 'CategoryProducts',
-      component: () => import('@/components/shop/ProductListing.vue'),
-      meta: {
-        title: (route) => `${route.params.category} - Shop by Category - Space Furnio`,
-      },
+      redirect: (to) => `/shop?categories=${to.params.category}`
     },
     {
       path: '/shop/design/space/:category',
-      name: 'DesignSpaceProducts',
-      component: () => import('@/components/shop/ProductListing.vue'),
-      meta: {
-        title: (route) => `${route.params.category} Design - Shop by Design - Space Furnio`,
-      },
+      redirect: (to) => `/shop?spaces=${to.params.category}`
     },
     {
       path: '/shop/design/style/:category',
-      name: 'DesignStyleProducts',
-      component: () => import('@/components/shop/ProductListing.vue'),
-      meta: {
-        title: (route) => `${route.params.category} Style - Shop by Design - Space Furnio`,
-      },
+      redirect: (to) => `/shop?styles=${to.params.category}`
     },
-    {
-      path: '/shop/design/:category',
-      name: 'DesignProducts',
-      component: () => import('@/components/shop/ProductListing.vue'),
-      meta: {
-        title: (route) => `${route.params.category} - Shop by Design - Space Furnio`,
-      },
-    },
-    {
-      path: '/collabs',
-      name: 'collabs',
-      component: () => import('@/views/sfCollabs.vue'),
-      meta: {
-        title: 'SF Collabs - Spacefurnio',
-      },
-    },
-    {
-      path: '/portfolio',
-      name: 'Portfolio',
-      component: () => import('@/views/PortfolioView.vue'),
-      meta: {
-        title: 'Portfolio - Spacefurnio',
-      },
-    },
-    {
-      path: '/shop/products',
-      name: 'AllProducts',
-      component: () => import('@/components/shop/ProductListing.vue'),
-      meta: { title: 'All Products - Space Furnio' },
-    },
-    { path: '/shopping', name: 'shopping', component: comingSoon },
-    {
-      path: '/contact',
-      name: 'contact',
-      component: () => import('@/views/ContactView.vue'),
-      meta: { title: 'Contact Us - Spacefurnio' },
-    },
+    { path: '/shop/design/:category', redirect: '/shop' },
 
-    // ===========================================
-    // ADMIN PANEL
-    // ===========================================
+    // Other pages
+    { path: '/collabs', name: 'collabs', component: () => import('@/views/sfCollabs.vue'), meta: { title: 'SF Collabs - Spacefurnio' } },
+    { path: '/portfolio', name: 'Portfolio', component: () => import('@/views/PortfolioView.vue'), meta: { title: 'Portfolio - Spacefurnio' } },
+    { path: '/shop/products', redirect: '/shop' },
+    { path: '/shopping', name: 'shopping', component: comingSoon },
+    { path: '/contact', name: 'contact', component: () => import('@/views/ContactView.vue'), meta: { title: 'Contact Us - Spacefurnio' } },
+
+    // Admin Panel
     {
       path: '/admin-spacefurnio',
       name: 'Admin',
       component: () => import('@/views/AdminView.vue'),
-      meta: {
-        title: 'Admin Panel - Spacefurnio',
-        hideNav: true,
-        hideFooter: true,
-      },
+      meta: { title: 'Admin Panel - Spacefurnio', hideNav: true, hideFooter: true },
       children: [
-        {
-          path: '',
-          redirect: '/admin-spacefurnio/contents',
-        },
-        {
-          path: 'dashboard',
-          name: 'AdminDashboard',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Dashboard' },
-        },
-        {
-          path: 'contents',
-          name: 'AdminContents',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Content Management' },
-        },
-        {
-          path: 'products',
-          name: 'AdminProducts',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Products' },
-        },
-        {
-          path: 'orders',
-          name: 'AdminOrders',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Orders' },
-        },
-        {
-          path: 'reviews',
-          name: 'AdminReviews',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Reviews' },
-        },
-        {
-          path: 'settings',
-          name: 'AdminSettings',
-          component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Settings' },
-        },
+        { path: '', redirect: '/admin-spacefurnio/contents' },
+        { path: 'dashboard', name: 'AdminDashboard', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Dashboard' } },
+        { path: 'contents', name: 'AdminContents', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Content Management' } },
+        { path: 'products', name: 'AdminProducts', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Products' } },
+        { path: 'orders', name: 'AdminOrders', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Orders' } },
+        { path: 'reviews', name: 'AdminReviews', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Reviews' } },
+        { path: 'settings', name: 'AdminSettings', component: () => import('@/views/admin/AdminContentsPage.vue'), meta: { title: 'Settings' } },
       ],
     },
   ],
 })
 
-// Navigation guard for dynamic page titles
 router.beforeEach((to, from, next) => {
   const { title } = to.meta
   if (title) {
