@@ -1,68 +1,95 @@
 <template>
-  <nav id="navbar" class="fixed top-0 w-full z-50 py-6 px-4" style="z-index: 100000;">
-    <div class="nav-pill bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg mx-auto max-w-5xl px-8 py-3 flex items-center justify-between">
-
+  <nav id="navbar" class="fixed top-0 w-full z-50 py-6 px-4" style="z-index: 100000">
+    <div
+      class="nav-pill bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg mx-auto max-w-5xl px-8 py-3 flex items-center justify-between"
+    >
       <div class="nav-left flex items-center me-2">
-        <img src="/images/Spacefurnio-Logo.png" alt="spacefurnio logo" class="h-9 w-7 object-contain">
+        <img
+          src="/images/Spacefurnio-Logo.png"
+          alt="spacefurnio logo"
+          class="h-9 w-7 object-contain"
+        />
       </div>
 
       <!-- Desktop Menu - Centered -->
-      <ul class="menu hidden md:flex items-center flex-1 justify-center text-sm font-medium tracking-wide">
+      <ul
+        class="menu hidden md:flex items-center flex-1 justify-center text-sm font-medium tracking-wide"
+      >
         <li>
-          <router-link to="/" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Home
           </router-link>
         </li>
         <li>
-          <router-link to="/about" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/about"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             About Us
           </router-link>
         </li>
         <li>
-          <router-link to="/collabs" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/collabs"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             SF x Collabs
           </router-link>
         </li>
         <li>
-          <router-link to="/shop" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/shop"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Shopping
           </router-link>
         </li>
         <li>
-          <router-link to="/portfolio" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/portfolio"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Portfolio
           </router-link>
         </li>
         <li>
-          <router-link to="/contact" class="nav-link flex text-center
- relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/contact"
+            class="nav-link flex text-center relative py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Contact Us
           </router-link>
         </li>
       </ul>
 
       <!-- Small Screen Navigation -->
-      <ul class="menu flex md:hidden items-center space-x-4 flex-1 justify-center text-xs font-medium">
+      <ul
+        class="menu flex md:hidden items-center space-x-4 flex-1 justify-center text-xs font-medium"
+      >
         <li>
-          <router-link to="/" class="nav-link flex text-center
- py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/"
+            class="nav-link flex text-center py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Home
           </router-link>
         </li>
         <li>
-          <router-link to="/shopping" class="nav-link flex text-center
- py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/shopping"
+            class="nav-link flex text-center py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Shop
           </router-link>
         </li>
         <li>
-          <router-link to="/portfolio" class="nav-link flex text-center
- py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50">
+          <router-link
+            to="/portfolio"
+            class="nav-link flex text-center py-2 px-3 rounded-full transition-all duration-300 hover:bg-gray-50"
+          >
             Work
           </router-link>
         </li>
@@ -71,18 +98,36 @@
       <!-- Right Side Icons -->
       <div class="nav-right flex items-center space-x-4">
         <div class="icons hidden sm:flex items-center space-x-4 text-base">
-          <button class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Search">
+          <button
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100"
+            aria-label="Search"
+          >
             <i class="fas fa-search"></i>
           </button>
-          <button @click="handleUserClick" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
+          <button
+            @click="handleUserClick"
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100"
+            aria-label="User Account"
+          >
             <i class="fas fa-user"></i>
           </button>
-          <button @click="openWishlist" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
+          <button
+            @click="openWishlist"
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100"
+            aria-label="Wishlist"
+          >
             <i class="fas fa-heart"></i>
           </button>
-          <button @click="openCart" class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
+          <button
+            @click="openCart"
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-gray-100 relative"
+            aria-label="Cart"
+          >
             <i class="fas fa-shopping-cart"></i>
-            <span v-if="cartItemCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            <span
+              v-if="cartItemCount > 0"
+              class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
+            >
               {{ cartItemCount > 99 ? '99+' : cartItemCount }}
             </span>
           </button>
@@ -137,18 +182,36 @@
 
         <!-- Mobile Icons -->
         <div class="flex items-center justify-center space-x-6 mt-6 pt-4 border-t border-gray-100">
-          <button class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Search">
+          <button
+            class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100"
+            aria-label="Search"
+          >
             <i class="fas fa-search text-sm"></i>
           </button>
-          <button @click="handleUserClick(); closeMobileMenu()" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="User Account">
+<button
+  @click="handleUserClick(); closeMobileMenu()"
+  class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100"
+  aria-label="User Account"
+>
             <i class="fas fa-user text-sm"></i>
           </button>
-          <button @click="openWishlist(); closeMobileMenu()" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100" aria-label="Wishlist">
+<button
+  @click="openWishlist(); closeMobileMenu()"
+  class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100"
+  aria-label="Wishlist"
+>
             <i class="fas fa-heart text-sm"></i>
           </button>
-          <button @click="openCart" class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100 relative" aria-label="Cart">
+          <button
+            @click="openCart"
+            class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-gray-100 relative"
+            aria-label="Cart"
+          >
             <i class="fas fa-shopping-cart text-sm"></i>
-            <span v-if="cartItemCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full text-[10px]">
+            <span
+              v-if="cartItemCount > 0"
+              class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full text-[10px]"
+            >
               {{ cartItemCount > 99 ? '99+' : cartItemCount }}
             </span>
           </button>
@@ -226,8 +289,7 @@ onBeforeUnmount(() => {
 }
 
 /* Navigation links */
-.nav-link flex text-center
- {
+.nav-link flex text-center {
   color: #374151;
   text-decoration: none;
   position: relative;
@@ -235,14 +297,12 @@ onBeforeUnmount(() => {
   letter-spacing: 0.025em;
 }
 
-.nav-link flex text-center
-:hover {
+.nav-link flex text-center :hover {
   color: #1f2937;
   background-color: rgba(243, 244, 246, 0.6);
 }
 
-.nav-link flex text-center
-.router-link-active {
+.nav-link flex text-center .router-link-active {
   color: #1f2937;
   background-color: rgba(243, 244, 246, 0.8);
 }
@@ -311,30 +371,30 @@ onBeforeUnmount(() => {
 }
 
 .nav-pill:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* the little hover‑image */
 .nav-link::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 50%;
-  bottom: -8px;              /* tweak up/down as needed */
+  bottom: -8px; /* tweak up/down as needed */
   transform: translateX(-50%);
-  width: 10px;                /* your icon’s width */
-  height: 10px;               /* your icon’s height */
+  width: 10px; /* your icon’s width */
+  height: 10px; /* your icon’s height */
   background: url('/images/nav-img.png') no-repeat center/contain;
   opacity: 0;
   transition: opacity 0.2s ease;
-  pointer-events: none;       /* so it never steals your hover */
+  pointer-events: none; /* so it never steals your hover */
 }
 
 /* fade it in on hover */
 .nav-link:hover::after {
   opacity: 1;
 }
-
-
 
 /* Remove default focus outline and add custom */
 /* button:focus,

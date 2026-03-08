@@ -106,7 +106,7 @@ Each modal has:
 
 ```env
 # Existing
-VITE_API_URL="http://localhost:8787/backend"
+VITE_API_URL="http://localhost:8787"
 
 # New — Hybrid Backend URLs
 VITE_WORKER_URL="https://backend.spacefurnio.workers.dev"

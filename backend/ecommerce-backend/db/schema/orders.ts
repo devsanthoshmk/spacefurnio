@@ -8,15 +8,22 @@ export const orders = pgTable('orders', {
     addressId: uuid('address_id').references(() => userAddresses.id), // Snapshot of address details
     status: text('status').notNull().default('pending'), // 'pending', 'paid', 'shipped', 'delivered', 'cancelled'
     totalAmount: decimal('total_amount', { precision: 10, scale: 2 }).notNull(),
+    shippingFirstName: text('shipping_first_name'),
+    shippingLastName: text('shipping_last_name'),
+    shippingAddress: text('shipping_address'),
+    shippingCity: text('shipping_city'),
+    shippingState: text('shipping_state'),
+    shippingPincode: text('shipping_pincode'),
+    shippingPhone: text('shipping_phone'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const orderItems = pgTable('order_items', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
-    productId: uuid('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721)
-    quantity: integer('quantity').notNull(),
-    unitPrice: decimal('unit_price', { precision: 10, scale: 2 }).notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721), uses INT
+  quantity: integer('quantity').notNull(),
+  unitPrice: decimal('unit_price', { precision: 10, scale: 2 }).notNull(),
 });
 
 export const orderStatusHistory = pgTable('order_status_history', {
@@ -31,7 +38,7 @@ export const payments = pgTable('payments', {
     id: uuid('id').primaryKey().defaultRandom(),
     orderId: uuid('order_id').unique().notNull().references(() => orders.id, { onDelete: 'cascade' }),
     amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
-    method: text('method').notNull(), // 'stripe', 'paypal'
+    method: text('method').notNull(), // 'card', 'upi', 'cod', 'razorpay', 'paypal', 'stripe'
     status: text('status').notNull().default('pending'), // 'pending', 'completed', 'failed', 'refunded'
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });

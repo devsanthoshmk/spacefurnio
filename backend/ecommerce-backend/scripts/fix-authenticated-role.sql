@@ -28,6 +28,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE wishlists TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE wishlist_items TO authenticated;
 GRANT SELECT ON TABLE orders TO authenticated;
 GRANT SELECT ON TABLE order_items TO authenticated;
+GRANT SELECT ON TABLE payments TO authenticated;
 GRANT SELECT ON TABLE user_addresses TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE user_addresses TO authenticated;
 

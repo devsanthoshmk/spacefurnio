@@ -14,186 +14,270 @@
     ================================================================
   -->
   <Teleport to="body">
-    <div
-      v-if="isCartOpen"
-      class="sf-cart-backdrop"
-      @click.self="closeCart"
-    ></div>
+    <div v-if="isCartOpen" class="sf-cart-backdrop" @click.self="closeCart"></div>
 
     <aside
       v-if="isCartOpen"
       class="sf-cart-drawer"
-        role="dialog"
-        aria-label="Shopping Cart"
-        @keydown.esc="closeCart"
-        tabindex="-1"
-        ref="drawerRef"
-      >
-        <!-- ─── Header ─── -->
-        <header class="sf-cart-header">
-          <div class="sf-cart-header-inner">
-            <div class="sf-cart-title-group">
-              <div class="sf-cart-icon-wrap">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                </svg>
-              </div>
-              <h2 class="sf-cart-title">Cart</h2>
-              <Transition name="badge-pop">
-                <span v-if="cart.itemCount > 0" class="sf-cart-badge">
-                  {{ cart.itemCount }}
-                </span>
-              </Transition>
-            </div>
-            <button @click="closeCart" class="sf-cart-close" aria-label="Close cart">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      role="dialog"
+      aria-label="Shopping Cart"
+      @keydown.esc="closeCart"
+      tabindex="-1"
+      ref="drawerRef"
+    >
+      <!-- ─── Header ─── -->
+      <header class="sf-cart-header">
+        <div class="sf-cart-header-inner">
+          <div class="sf-cart-title-group">
+            <div class="sf-cart-icon-wrap">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
-            </button>
+            </div>
+            <h2 class="sf-cart-title">Cart</h2>
+            <Transition name="badge-pop">
+              <span v-if="cart.itemCount > 0" class="sf-cart-badge">
+                {{ cart.itemCount }}
+              </span>
+            </Transition>
           </div>
+          <button @click="closeCart" class="sf-cart-close" aria-label="Close cart">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
 
-          <!-- Free Shipping Progress -->
-          <div v-if="!cart.isEmpty && !cart.isLoading" class="sf-shipping-bar">
-            <div class="sf-shipping-bar-track">
+        <!-- Free Shipping Progress -->
+        <div v-if="!cart.isEmpty && !cart.isLoading" class="sf-shipping-bar">
+          <div class="sf-shipping-bar-track">
+            <div class="sf-shipping-bar-fill" :style="{ width: shippingProgress + '%' }"></div>
+          </div>
+          <p class="sf-shipping-msg">
+            <template v-if="shippingProgress >= 100">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--shop-success)"
+                stroke-width="2.5"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <span style="color: var(--shop-success)">Free shipping unlocked!</span>
+            </template>
+            <template v-else>
+              Add <strong>${{ amountToFreeShipping.toFixed(2) }}</strong> more for free shipping
+            </template>
+          </p>
+        </div>
+      </header>
+
+      <!-- ─── Body ─── -->
+      <div class="sf-cart-body shop-scrollbar">
+        <!-- Loading Skeleton -->
+        <div v-if="cart.isLoading" class="sf-cart-skeleton-list">
+          <div v-for="i in 3" :key="i" class="sf-cart-skeleton-item">
+            <div class="sf-cart-skeleton-img shop-skeleton"></div>
+            <div class="sf-cart-skeleton-info">
+              <div class="shop-skeleton" style="height: 14px; width: 70%; border-radius: 6px"></div>
               <div
-                class="sf-shipping-bar-fill"
-                :style="{ width: shippingProgress + '%' }"
+                class="shop-skeleton"
+                style="height: 12px; width: 40%; border-radius: 6px; margin-top: 8px"
+              ></div>
+              <div
+                class="shop-skeleton"
+                style="height: 28px; width: 50%; border-radius: 8px; margin-top: 12px"
               ></div>
             </div>
-            <p class="sf-shipping-msg">
-              <template v-if="shippingProgress >= 100">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--shop-success)" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                <span style="color: var(--shop-success);">Free shipping unlocked!</span>
-              </template>
-              <template v-else>
-                Add <strong>${{ amountToFreeShipping.toFixed(2) }}</strong> more for free shipping
-              </template>
-            </p>
           </div>
-        </header>
+        </div>
 
-        <!-- ─── Body ─── -->
-        <div class="sf-cart-body shop-scrollbar">
-          <!-- Loading Skeleton -->
-          <div v-if="cart.isLoading" class="sf-cart-skeleton-list">
-            <div v-for="i in 3" :key="i" class="sf-cart-skeleton-item">
-              <div class="sf-cart-skeleton-img shop-skeleton"></div>
-              <div class="sf-cart-skeleton-info">
-                <div class="shop-skeleton" style="height:14px;width:70%;border-radius:6px;"></div>
-                <div class="shop-skeleton" style="height:12px;width:40%;border-radius:6px;margin-top:8px;"></div>
-                <div class="shop-skeleton" style="height:28px;width:50%;border-radius:8px;margin-top:12px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="cart.isEmpty" class="sf-cart-empty">
-            <div class="sf-cart-empty-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--shop-tan)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-              </svg>
-            </div>
-            <h3 class="sf-cart-empty-title">Your cart is empty</h3>
-            <p class="sf-cart-empty-text">Explore our collection and find something you love.</p>
-            <button @click="closeCart" class="shop-btn shop-btn-primary sf-cart-empty-btn">
-              Continue Shopping
-            </button>
-          </div>
-
-          <!-- Cart Items -->
-          <TransitionGroup v-else name="cart-item" tag="div" class="sf-cart-items">
-            <div
-              v-for="(item, index) in cart.items"
-              :key="item.id"
-              class="sf-cart-item"
-              :style="{ '--stagger': index }"
+        <!-- Empty State -->
+        <div v-else-if="cart.isEmpty" class="sf-cart-empty">
+          <div class="sf-cart-empty-icon">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--shop-tan)"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <div class="sf-cart-item-img shop-img-zoom">
-                <img
-                  v-if="item.image"
-                  :src="item.image"
-                  :alt="item.name"
-                  loading="lazy"
-                />
-                <div v-else class="sf-cart-item-img-placeholder">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--shop-tan)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                </div>
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+          </div>
+          <h3 class="sf-cart-empty-title">Your cart is empty</h3>
+          <p class="sf-cart-empty-text">Explore our collection and find something you love.</p>
+          <button @click="closeCart" class="shop-btn shop-btn-primary sf-cart-empty-btn">
+            Continue Shopping
+          </button>
+        </div>
+
+        <!-- Cart Items -->
+        <TransitionGroup v-else name="cart-item" tag="div" class="sf-cart-items">
+          <div
+            v-for="(item, index) in cart.displayItems"
+            :key="item.id"
+            class="sf-cart-item"
+            :style="{ '--stagger': index }"
+          >
+            <div class="sf-cart-item-img shop-img-zoom">
+              <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" />
+              <div v-else class="sf-cart-item-img-placeholder">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--shop-tan)"
+                  stroke-width="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
               </div>
+            </div>
 
-              <div class="sf-cart-item-details">
-                <h4 class="sf-cart-item-name">{{ item.name }}</h4>
-                <p v-if="item.variant" class="sf-cart-item-variant">{{ item.variant }}</p>
-                <p class="sf-cart-item-price">${{ formatPrice(item.unitPrice) }}</p>
+            <div class="sf-cart-item-details">
+              <h4 class="sf-cart-item-name">{{ item.name }}</h4>
+              <p v-if="item.variant" class="sf-cart-item-variant">{{ item.variant }}</p>
+              <p class="sf-cart-item-price">${{ formatPrice(item.unitPrice) }}</p>
 
-                <div class="sf-cart-item-actions">
-                  <!-- Quantity Stepper -->
-                  <div class="sf-qty-stepper">
-                    <button
-                      @click="decrementQuantity(item)"
-                      :disabled="item.quantity <= 1"
-                      class="sf-qty-btn"
-                      aria-label="Decrease quantity"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                    <span class="sf-qty-value">{{ item.quantity }}</span>
-                    <button
-                      @click="incrementQuantity(item)"
-                      class="sf-qty-btn"
-                      aria-label="Increase quantity"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  </div>
-
-                  <!-- Remove -->
+              <div class="sf-cart-item-actions">
+                <!-- Quantity Stepper -->
+                <div class="sf-qty-stepper">
                   <button
-                    @click="removeItem(item.id)"
-                    class="sf-cart-remove"
-                    aria-label="Remove item"
+                    @click="decrementQuantity(item)"
+                    :disabled="item.quantity <= 1"
+                    class="sf-qty-btn"
+                    aria-label="Decrease quantity"
                   >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <span class="sf-qty-value">{{ item.quantity }}</span>
+                  <button
+                    @click="incrementQuantity(item)"
+                    class="sf-qty-btn"
+                    aria-label="Increase quantity"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                   </button>
                 </div>
-              </div>
 
-              <div class="sf-cart-item-total">
-                ${{ formatPrice(item.unitPrice * item.quantity) }}
+                <!-- Remove -->
+                <button
+                  @click="removeItem(item.id)"
+                  class="sf-cart-remove"
+                  aria-label="Remove item"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
+                  </svg>
+                </button>
               </div>
             </div>
-          </TransitionGroup>
+
+            <div class="sf-cart-item-total">${{ formatPrice(item.unitPrice * item.quantity) }}</div>
+          </div>
+        </TransitionGroup>
+      </div>
+
+      <!-- ─── Footer ─── -->
+      <footer v-if="!cart.isEmpty && !cart.isLoading" class="sf-cart-footer">
+        <div class="sf-cart-summary">
+          <div class="sf-cart-summary-row">
+            <span>Subtotal</span>
+            <span>${{ formatPrice(cart.subtotal) }}</span>
+          </div>
+          <div v-if="cart.hasDiscount" class="sf-cart-summary-row sf-discount">
+            <span>Discount ({{ cart.discountCode }})</span>
+            <span>−${{ formatPrice(cart.discountAmount) }}</span>
+          </div>
+          <div class="sf-cart-summary-total">
+            <span>Total</span>
+            <span>${{ formatPrice(cart.total) }}</span>
+          </div>
         </div>
 
-        <!-- ─── Footer ─── -->
-        <footer v-if="!cart.isEmpty && !cart.isLoading" class="sf-cart-footer">
-          <div class="sf-cart-summary">
-            <div class="sf-cart-summary-row">
-              <span>Subtotal</span>
-              <span>${{ formatPrice(cart.subtotal) }}</span>
-            </div>
-            <div v-if="cart.hasDiscount" class="sf-cart-summary-row sf-discount">
-              <span>Discount ({{ cart.discountCode }})</span>
-              <span>−${{ formatPrice(cart.discountAmount) }}</span>
-            </div>
-            <div class="sf-cart-summary-total">
-              <span>Total</span>
-              <span>${{ formatPrice(cart.total) }}</span>
-            </div>
-          </div>
-
-          <div class="sf-cart-footer-actions">
-            <button @click="handleCheckout" class="sf-checkout-btn">
-              <span>Proceed to Checkout</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            <button @click="closeCart" class="sf-continue-btn">Continue Shopping</button>
-          </div>
-        </footer>
-      </aside>
+        <div class="sf-cart-footer-actions">
+          <button @click="handleCheckout" class="sf-checkout-btn">
+            <span>Proceed to Checkout</span>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+          <button @click="closeCart" class="sf-continue-btn">Continue Shopping</button>
+        </div>
+      </footer>
+    </aside>
   </Teleport>
 </template>
 
@@ -230,11 +314,9 @@ const drawerRef = ref(null)
 const FREE_SHIPPING_THRESHOLD = 150 // dollars
 
 const shippingProgress = computed(() =>
-  Math.min(100, (cart.subtotal / FREE_SHIPPING_THRESHOLD) * 100)
+  Math.min(100, (cart.subtotal / FREE_SHIPPING_THRESHOLD) * 100),
 )
-const amountToFreeShipping = computed(() =>
-  Math.max(0, FREE_SHIPPING_THRESHOLD - cart.subtotal)
-)
+const amountToFreeShipping = computed(() => Math.max(0, FREE_SHIPPING_THRESHOLD - cart.subtotal))
 
 // When cart opens, focus the drawer for keyboard access + lock scroll
 watch(isCartOpen, async (open) => {
@@ -242,7 +324,7 @@ watch(isCartOpen, async (open) => {
     document.body.style.overflow = 'hidden'
     await nextTick()
     drawerRef.value?.focus()
-    cart.fetchCart()
+    await cart.fetchCart()
   } else {
     document.body.style.overflow = ''
   }
@@ -281,9 +363,10 @@ function formatPrice(val) {
 function handleEscKey(event) {
   if (event.key === 'Escape' && isCartOpen.value) closeCart()
 }
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('keydown', handleEscKey)
-  cart.fetchCart()
+  await cart.fetchCart()
+  await cart.enrichItems()
 })
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscKey)
@@ -307,8 +390,12 @@ onUnmounted(() => {
   animation: cartBackdropIn 0.3s ease forwards;
 }
 @keyframes cartBackdropIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Drawer */
@@ -319,7 +406,7 @@ onUnmounted(() => {
   bottom: 0;
   width: 100%;
   max-width: 26rem;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   z-index: 100002;
   display: flex;
   flex-direction: column;
@@ -328,8 +415,12 @@ onUnmounted(() => {
   animation: cartSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes cartSlideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* Header */
@@ -353,15 +444,15 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
   border-radius: 10px;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
 }
 .sf-cart-title {
   font-family: var(--shop-font-display, 'Playfair Display', serif);
   font-size: 1.375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   letter-spacing: -0.01em;
 }
 .sf-cart-badge {
@@ -374,15 +465,21 @@ onUnmounted(() => {
   font-size: 0.6875rem;
   font-weight: 700;
   color: white;
-  background: var(--shop-accent, #B8956C);
+  background: var(--shop-accent, #b8956c);
   border-radius: 999px;
 }
 .badge-pop-enter-active {
   animation: badgePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes badgePop {
-  0% { transform: scale(0); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .sf-cart-close {
   width: 36px;
@@ -393,31 +490,31 @@ onUnmounted(() => {
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   transition: all 0.2s;
 }
 .sf-cart-close:hover {
-  background: var(--shop-beige, #E8E3DC);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-beige, #e8e3dc);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Shipping Progress */
 .sf-shipping-bar {
   margin-top: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 .sf-shipping-bar-track {
   width: 100%;
   height: 4px;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
   border-radius: 999px;
   overflow: hidden;
 }
 .sf-shipping-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--shop-accent, #B8956C), var(--shop-accent-dark, #8C6D4D));
+  background: linear-gradient(90deg, var(--shop-accent, #b8956c), var(--shop-accent-dark, #8c6d4d));
   border-radius: 999px;
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -427,10 +524,10 @@ onUnmounted(() => {
   gap: 0.375rem;
   margin-top: 0.5rem;
   font-size: 0.75rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 .sf-shipping-msg strong {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Body */
@@ -448,7 +545,7 @@ onUnmounted(() => {
   display: flex;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 .sf-cart-skeleton-img {
   width: 72px;
@@ -478,7 +575,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
   border-radius: 50%;
   margin-bottom: 1.5rem;
 }
@@ -486,12 +583,12 @@ onUnmounted(() => {
   font-family: var(--shop-font-display, 'Playfair Display', serif);
   font-size: 1.25rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.5rem;
 }
 .sf-cart-empty-text {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-bottom: 1.5rem;
   max-width: 240px;
 }
@@ -507,7 +604,7 @@ onUnmounted(() => {
   display: flex;
   gap: 0.875rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   transition: background 0.2s;
   animation: cartItemIn 0.4s ease forwards;
   animation-delay: calc(var(--stagger, 0) * 60ms);
@@ -552,7 +649,7 @@ onUnmounted(() => {
   border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--shop-cream-dark, #F5F2ED);
+  background: var(--shop-cream-dark, #f5f2ed);
 }
 .sf-cart-item-img img {
   width: 100%;
@@ -574,7 +671,7 @@ onUnmounted(() => {
 .sf-cart-item-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -582,13 +679,13 @@ onUnmounted(() => {
 }
 .sf-cart-item-variant {
   font-size: 0.75rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-top: 2px;
 }
 .sf-cart-item-price {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--shop-accent-dark, #8C6D4D);
+  color: var(--shop-accent-dark, #8c6d4d);
   margin-top: 4px;
 }
 .sf-cart-item-actions {
@@ -602,7 +699,7 @@ onUnmounted(() => {
 .sf-qty-stepper {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 999px;
   overflow: hidden;
   background: white;
@@ -615,13 +712,15 @@ onUnmounted(() => {
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .sf-qty-btn:hover:not(:disabled) {
-  background: var(--shop-cream-dark, #F5F2ED);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-cream-dark, #f5f2ed);
+  color: var(--shop-charcoal, #3d3a36);
 }
 .sf-qty-btn:disabled {
   opacity: 0.35;
@@ -635,7 +734,7 @@ onUnmounted(() => {
   text-align: center;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   user-select: none;
 }
 
@@ -648,7 +747,7 @@ onUnmounted(() => {
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--shop-error, #C47575);
+  color: var(--shop-error, #c47575);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -663,7 +762,7 @@ onUnmounted(() => {
 .sf-cart-item-total {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   white-space: nowrap;
   flex-shrink: 0;
   align-self: flex-start;
@@ -675,7 +774,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   padding: 1.25rem 1.5rem 1.5rem;
   background: white;
-  border-top: 1px solid var(--shop-beige, #E8E3DC);
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
 }
 .sf-cart-summary {
   margin-bottom: 1rem;
@@ -684,21 +783,21 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   font-size: 0.8125rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   padding: 4px 0;
 }
 .sf-cart-summary-row.sf-discount {
-  color: var(--shop-success, #7D9B76);
+  color: var(--shop-success, #7d9b76);
 }
 .sf-cart-summary-total {
   display: flex;
   justify-content: space-between;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   padding-top: 0.625rem;
   margin-top: 0.375rem;
-  border-top: 1px solid var(--shop-beige, #E8E3DC);
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
 }
 .sf-cart-footer-actions {
   display: flex;
@@ -716,14 +815,14 @@ onUnmounted(() => {
   font-weight: 600;
   letter-spacing: 0.02em;
   color: white;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   border: none;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.25s ease;
 }
 .sf-checkout-btn:hover {
-  background: var(--shop-black, #1A1816);
+  background: var(--shop-black, #1a1816);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(61, 58, 54, 0.2);
 }
@@ -735,16 +834,16 @@ onUnmounted(() => {
   padding: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   background: transparent;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s;
 }
 .sf-continue-btn:hover {
-  background: var(--shop-cream-dark, #F5F2ED);
-  border-color: var(--shop-tan, #C4B8A9);
+  background: var(--shop-cream-dark, #f5f2ed);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 /* Responsive */

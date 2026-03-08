@@ -1,5 +1,5 @@
 <template>
-<section class="product-section pt-28">
+  <section class="product-section pt-28">
     <!-- Section Header -->
     <div class="section-header">
       <div class="header-decoration header-decoration--left"></div>
@@ -35,17 +35,14 @@
 
       <!-- Products Grid Section -->
       <section class="products-section" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
-        <div
-          ref="productsGrid"
-          class="products-grid"
-        >
+        <div ref="productsGrid" class="products-grid">
           <div
             v-for="(product, index) in formattedProducts"
             :key="product.id"
             class="product-card-wrapper group"
             v-animateonscroll="{
               enterClass: 'animate__fadeInUp',
-              delay: index * 50
+              delay: index * 50,
             }"
           >
             <!-- ProductCard with grayscale effect -->
@@ -66,7 +63,9 @@
                 <!-- Glass card -->
                 <div class="glass-card">
                   <i class="pi pi-clock coming-soon-icon"></i>
-                  <span class="coming-soon-text" data-key="coming_soon">{{ homePageText.coming_soon.text }}</span>
+                  <span class="coming-soon-text" data-key="coming_soon">{{
+                    homePageText.coming_soon.text
+                  }}</span>
                   <div class="sparkle-line"></div>
                 </div>
               </div>
@@ -87,13 +86,13 @@
             v-for="(_, idx) in totalPages"
             :key="idx"
             class="page-dot"
-            :class="{ 'active': idx === currentPage }"
+            :class="{ active: idx === currentPage }"
             @click="goToPage(idx)"
           ></span>
         </div>
       </div>
     </div>
-</section>
+  </section>
 </template>
 
 <script setup>
@@ -115,7 +114,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 899,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 2,
@@ -123,7 +124,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 249,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 3,
@@ -131,7 +134,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 449,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 4,
@@ -139,7 +144,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 199,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 5,
@@ -147,7 +154,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 329,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 6,
@@ -155,7 +164,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 179,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 7,
@@ -163,7 +174,9 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 599,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop']
+    images: [
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop',
+    ],
   },
   {
     id: 8,
@@ -171,8 +184,10 @@ const products = ref([
     brand: 'Spacefurnio',
     price: 149,
     rating: 5,
-    images: ['https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop']
-  }
+    images: [
+      'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop',
+    ],
+  },
 ])
 
 // Computed properties
@@ -254,7 +269,8 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   padding: clamp(1rem, 3vh, 2rem) 0;
-  background: linear-gradient(180deg,
+  background: linear-gradient(
+    180deg,
     rgba(255, 255, 255, 0) 0%,
     rgba(249, 250, 251, 0.5) 50%,
     rgba(255, 255, 255, 0) 100%
@@ -280,24 +296,17 @@ onUnmounted(() => {
   flex: 1;
   max-width: 120px;
   height: 2px;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(230, 126, 34, 0.5),
-    rgba(230, 126, 34, 0.8)
-  );
+  background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.5), rgba(230, 126, 34, 0.8));
   border-radius: 1px;
 }
 
 .header-decoration--left {
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(230, 126, 34, 0.5),
-    rgba(230, 126, 34, 0.8)
-  );
+  background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.5), rgba(230, 126, 34, 0.8));
 }
 
 .header-decoration--right {
-  background: linear-gradient(270deg,
+  background: linear-gradient(
+    270deg,
     transparent,
     rgba(230, 126, 34, 0.5),
     rgba(230, 126, 34, 0.8)
@@ -542,8 +551,13 @@ onUnmounted(() => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .coming-soon-text {
@@ -563,11 +577,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(249, 115, 22, 0.9) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.9) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: none;
 }
@@ -577,8 +587,12 @@ onUnmounted(() => {
 }
 
 @keyframes sparkle {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Disabled Badge */

@@ -5,7 +5,7 @@
  */
 const SCROLL_DIRECTION = {
   UP: -1,
-  DOWN: 1
+  DOWN: 1,
 }
 
 /**
@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS = Object.freeze({
   touchThreshold: 30,
   transitionTiming: 'cubic-bezier(0.5, 0, 0.2, 1)',
   emmitSectionChangeEvent: true,
-  enableResizeListener: true
+  enableResizeListener: true,
 })
 // Add pixel snap tolerance
 const ALIGN_EPSILON = 2
@@ -41,7 +41,7 @@ const ALIGN_EPSILON = 2
  * @param {T | { value: T } | null | undefined} candidate
  * @returns {T | null}
  */
-const toElement = candidate => candidate?.value ?? candidate ?? null
+const toElement = (candidate) => candidate?.value ?? candidate ?? null
 
 /**
  * Retrieves all child sections matching the configured class name.
@@ -128,18 +128,18 @@ const highlightDots = (navDotsEl, activeIndex) => {
  *
  * @param {ReturnType<typeof createScrollState>} state
  */
-const updateActiveState = state => {
-  highlightSections(state.childElements, state.currentIndex);
-  highlightDots(state.navDotsEl, state.currentIndex);
+const updateActiveState = (state) => {
+  highlightSections(state.childElements, state.currentIndex)
+  highlightDots(state.navDotsEl, state.currentIndex)
   // Emit custom event for section change
   if (state.options.emmitSectionChangeEvent) {
     const event = new CustomEvent('sectionChange', {
       detail: {
         currentIndex: state.currentIndex,
-        currentSection: state.childElements[state.currentIndex]
-       }
-    });
-    window.dispatchEvent(event);
+        currentSection: state.childElements[state.currentIndex],
+      },
+    })
+    window.dispatchEvent(event)
   }
 }
 
@@ -162,7 +162,7 @@ const applyOffset = (state, nextOffset) => {
  *
  * @param {ReturnType<typeof createScrollState>} state
  */
-const updateDimensions = state => {
+const updateDimensions = (state) => {
   state.viewportHeight = getViewportHeight()
   state.minOffset = computeMinOffset(state.wrapperEl, state.viewportHeight)
   applyOffset(state, state.offset)
@@ -221,7 +221,7 @@ const setupNavDots = (state, onSelectIndex) => {
 
   state.navDotsEl.appendChild(fragment)
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     const target = event.target.closest('.dot')
     if (!target || !state.navDotsEl.contains(target)) return
     const index = Number.parseInt(target.dataset.index ?? '', 10)
@@ -243,7 +243,7 @@ const setupNavDots = (state, onSelectIndex) => {
  * @param {ReturnType<typeof createScrollState>} state
  * @returns {boolean}
  */
-const isThrottled = state => Date.now() - state.lastScrollTime < state.options.scrollDelay
+const isThrottled = (state) => Date.now() - state.lastScrollTime < state.options.scrollDelay
 
 /**
  * Determines if the scroll is already at the boundary in the requested direction.
@@ -294,7 +294,7 @@ const scrollWithinSection = (state, direction) => {
       // Snap precisely, then let performDirectionalScroll proceed to moveToAdjacentSection
       // console.info("Top boundary within epsilon, snapping to section with offset:", getOffsetForIndex(state, state.currentIndex));
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
-      state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
+      state.balanceOffset = true // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, Math.abs(rect.top))
@@ -309,7 +309,7 @@ const scrollWithinSection = (state, direction) => {
     if (overflow < ALIGN_EPSILON) {
       // console.info("Bottom boundary within epsilon, snapping to section with getoffsetforindex:", getOffsetForIndex(state, state.currentIndex),);
       applyOffset(state, getOffsetForIndex(state, state.currentIndex))
-      state.balanceOffset = true; // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
+      state.balanceOffset = true // setting this here so that it can be used in moveToAdjacentSection to calculate the next offset correctly
       return false
     }
     const scrollAmount = Math.min(state.viewportHeight, overflow)
@@ -333,13 +333,18 @@ const moveToAdjacentSection = (state, direction) => {
   const nextIndex = state.currentIndex + direction
   if (nextIndex < 0 || nextIndex >= state.itemCount) return false
 
-  const sectionOffsetHeight = state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex].offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
-  const sectionHeight = sectionOffsetHeight + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginTop) + parseFloat(getComputedStyle(state.childElements[nextIndex]).marginBottom) // the property el.offsetHeight does not include margins, so we need to add them manually to get the total height of the section
+  const sectionOffsetHeight =
+    state.childElements[direction === SCROLL_DIRECTION.DOWN ? nextIndex : state.currentIndex]
+      .offsetHeight //for down, we look at nextIndex, for up, currentIndex because we are moving up from current
+  const sectionHeight =
+    sectionOffsetHeight +
+    parseFloat(getComputedStyle(state.childElements[nextIndex]).marginTop) +
+    parseFloat(getComputedStyle(state.childElements[nextIndex]).marginBottom) // the property el.offsetHeight does not include margins, so we need to add them manually to get the total height of the section
   const delta = sectionHeight > state.viewportHeight ? state.viewportHeight : sectionHeight
   // the scroll after scroll within set the offset one step back like for index 0 to 1 where index 0 is scrollwithin-ed to its bottom the offset is set to 0 so the next scroll should add the exces height that the prev section has to offset
-  const balanceOffset = (state.childElements[state.currentIndex].offsetHeight-state.viewportHeight)
-  const nextOffset = (state.offset - delta * direction) - (state.balanceOffset ? balanceOffset : 0)
-  state.balanceOffset = false; // reset after use
+  const balanceOffset = state.childElements[state.currentIndex].offsetHeight - state.viewportHeight
+  const nextOffset = state.offset - delta * direction - (state.balanceOffset ? balanceOffset : 0)
+  state.balanceOffset = false // reset after use
 
   // console.info("Moving to adjacent section:", {
   //   nextIndex,
@@ -365,21 +370,21 @@ const moveToAdjacentSection = (state, direction) => {
 // eslint-disable-next-line no-unused-vars
 function getNextElement(node) {
   if (!(node instanceof Element)) {
-    throw new TypeError('getNextElement: argument must be a DOM Element');
+    throw new TypeError('getNextElement: argument must be a DOM Element')
   }
 
-  let next = node.nextElementSibling;
+  let next = node.nextElementSibling
 
   while (!next && node.parentElement) {
-    node = node.parentElement;
-    next = node.nextElementSibling;
+    node = node.parentElement
+    next = node.nextElementSibling
   }
 
   if (!next) {
-    throw new Error('No next element found in the DOM hierarchy.');
+    throw new Error('No next element found in the DOM hierarchy.')
   }
 
-  return next;
+  return next
 }
 
 /**
@@ -401,7 +406,7 @@ const performDirectionalScroll = (state, direction) => {
   }
 
   if (scrollWithinSection(state, direction)) {
-    state.lastScrollTime = now;
+    state.lastScrollTime = now
     return
   }
 
@@ -409,7 +414,6 @@ const performDirectionalScroll = (state, direction) => {
     state.lastScrollTime = now
     return
   }
-
 }
 
 /**
@@ -418,7 +422,7 @@ const performDirectionalScroll = (state, direction) => {
  * @param {ReturnType<typeof createScrollState>} state
  * @returns {(event: WheelEvent) => void}
  */
-const createWheelHandler = state => event => {
+const createWheelHandler = (state) => (event) => {
   event.preventDefault()
   event.stopPropagation()
   const direction = event.deltaY < 0 ? SCROLL_DIRECTION.UP : SCROLL_DIRECTION.DOWN
@@ -432,12 +436,12 @@ const createWheelHandler = state => event => {
  * @param {ReturnType<typeof createScrollState>} state
  * @returns {{ touchStart: (event: TouchEvent) => void, touchMove: (event: TouchEvent) => void }}
  */
-const createTouchHandlers = state => {
-  const touchStart = event => {
+const createTouchHandlers = (state) => {
+  const touchStart = (event) => {
     state.touchStartY = event.touches[0].clientY
   }
 
-  const touchMove = event => {
+  const touchMove = (event) => {
     event.preventDefault()
     event.stopPropagation()
 
@@ -459,7 +463,7 @@ const createTouchHandlers = state => {
  * @param {ReturnType<typeof createScrollState>} state
  * @returns {(event: KeyboardEvent) => void}
  */
-const createKeyHandler = state => event => {
+const createKeyHandler = (state) => (event) => {
   event.stopPropagation()
 
   switch (event.key) {
@@ -491,7 +495,7 @@ const createKeyHandler = state => event => {
  * @param {ReturnType<typeof createScrollState>} state
  * @returns {() => void}
  */
-const setupEventHandlers = state => {
+const setupEventHandlers = (state) => {
   const wheelHandler = createWheelHandler(state)
   const { touchStart, touchMove } = createTouchHandlers(state)
   const keyHandler = createKeyHandler(state)
@@ -558,7 +562,7 @@ const createScrollState = (wrapperEl, childClass, navDotsEl, options) => {
     currentIndex: 0,
     lastScrollTime: 0,
     touchStartY: 0,
-    options
+    options,
   }
 }
 
@@ -591,7 +595,7 @@ export const scroller = (wrapper, childClass, navDotsContainer, config = {}) => 
 
   applyTransition(state.wrapperEl, state.options.scrollDelay, state.options.transitionTiming)
 
-  const navDotsCleanup = setupNavDots(state, index => jumpToIndex(state, index))
+  const navDotsCleanup = setupNavDots(state, (index) => jumpToIndex(state, index))
 
   updateActiveState(state)
 
@@ -602,5 +606,3 @@ export const scroller = (wrapper, childClass, navDotsContainer, config = {}) => 
     navDotsCleanup()
   }
 }
-
-

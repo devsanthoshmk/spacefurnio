@@ -3,172 +3,174 @@
  * AdminContentsPage.vue - Contents management page
  * Lists content files and provides editing functionality
  */
-import { ref, onMounted, computed, watch } from 'vue';
-import ContentEditor from '@/components/admin/ContentEditor.vue';
-import PreviewModal from '@/components/admin/PreviewModal.vue';
-import Button from 'primevue/button';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
-import ProgressSpinner from 'primevue/progressspinner';
+import { ref, onMounted, computed, watch } from 'vue'
+import ContentEditor from '@/components/admin/ContentEditor.vue'
+import PreviewModal from '@/components/admin/PreviewModal.vue'
+import Button from 'primevue/button'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+import ProgressSpinner from 'primevue/progressspinner'
 
 // Import content source files directly to get actual arrow functions for components
-import homePageContent from '@/assets/contents/homePage.js';
+import homePageContent from '@/assets/contents/homePage.js'
 
 const props = defineProps({
   patToken: {
     type: String,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const toast = useToast();
+const toast = useToast()
 
 // API base URL
-const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend'
 
 // State
-const isLoading = ref(true);
-const isSaving = ref(false);
-const contentFiles = ref([]);
-const activeFile = ref(null);
-const fileContent = ref({});
-const fileSha = ref('');
-const pendingChanges = ref({});
-const hasUnsavedChanges = computed(() => Object.keys(pendingChanges.value).length > 0);
+const isLoading = ref(true)
+const isSaving = ref(false)
+const contentFiles = ref([])
+const activeFile = ref(null)
+const fileContent = ref({})
+const fileSha = ref('')
+const pendingChanges = ref({})
+const hasUnsavedChanges = computed(() => Object.keys(pendingChanges.value).length > 0)
 
 // Preview modal state
-const isPreviewOpen = ref(false);
-const previewKey = ref('');
-const previewUrl = ref('');
-const previewComponent = ref(null);
+const isPreviewOpen = ref(false)
+const previewKey = ref('')
+const previewUrl = ref('')
+const previewComponent = ref(null)
 
 // Page mapping for preview URLs
 const pageMapping = {
-  'homePage.js': '/'
-};
+  'homePage.js': '/',
+}
 
 // Map of content files to their imported modules
 // Uses the local import to get actual arrow functions for component loading
 const contentSourceMap = {
-  'homePage.js': homePageContent
-};
+  'homePage.js': homePageContent,
+}
 
 // Get component loader(s) from the original content source
 // Returns the actual arrow function(s) for dynamic imports
 // The component property can be a single function or an array showing all impacted components
 function getComponentLoader(key) {
-  const fileName = activeFile.value?.name;
-  if (!fileName || !key) return null;
-  
-  const contentSource = contentSourceMap[fileName];
-  if (!contentSource || !contentSource[key]) return null;
-  
-  const component = contentSource[key].component;
-  if (!component) return null;
-  
+  const fileName = activeFile.value?.name
+  if (!fileName || !key) return null
+
+  const contentSource = contentSourceMap[fileName]
+  if (!contentSource || !contentSource[key]) return null
+
+  const component = contentSource[key].component
+  if (!component) return null
+
   // Return the component loader(s) directly
   // If it's an array, it means the content appears in multiple components
   // (e.g., child component and parent component - shows full impact of changes)
-  return component;
+  return component
 }
 
 // Load content files on mount
 onMounted(async () => {
   // Check for pending changes in localStorage FIRST
-  const stored = localStorage.getItem('admin_pending_changes');
+  const stored = localStorage.getItem('admin_pending_changes')
   if (stored) {
     try {
-      pendingChanges.value = JSON.parse(stored);
+      pendingChanges.value = JSON.parse(stored)
     } catch (e) {
-      console.error('Failed to parse stored changes:', e);
+      console.error('Failed to parse stored changes:', e)
     }
   }
 
-  await loadContentFiles();
-});
+  await loadContentFiles()
+})
 
 // Watch pending changes and save to localStorage
-watch(pendingChanges, (newVal) => {
-  if (Object.keys(newVal).length > 0) {
-    localStorage.setItem('admin_pending_changes', JSON.stringify(newVal));
-  } else {
-    localStorage.removeItem('admin_pending_changes');
-  }
-  // Trigger update for reactive content files
-  window.dispatchEvent(new Event('content:update'));
-}, { deep: true });
+watch(
+  pendingChanges,
+  (newVal) => {
+    if (Object.keys(newVal).length > 0) {
+      localStorage.setItem('admin_pending_changes', JSON.stringify(newVal))
+    } else {
+      localStorage.removeItem('admin_pending_changes')
+    }
+    // Trigger update for reactive content files
+    window.dispatchEvent(new Event('content:update'))
+  },
+  { deep: true },
+)
 
 // Load list of content files
 async function loadContentFiles() {
-  isLoading.value = true;
+  isLoading.value = true
 
   try {
     const response = await fetch(
-      `${API_BASE}/api/v1/admin/content/files?pat=${encodeURIComponent(props.patToken)}`
-    );
+      `${API_BASE}/api/v1/admin/content/files?pat=${encodeURIComponent(props.patToken)}`,
+    )
 
-    const data = await response.json();
+    const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to load files');
+      throw new Error(data.message || 'Failed to load files')
     }
 
-    contentFiles.value = data.files;
+    contentFiles.value = data.files
 
     // Auto-select first file
     if (data.files.length > 0) {
-      await selectFile(data.files[0]);
+      await selectFile(data.files[0])
     }
-
   } catch (err) {
-    console.error('Load content files error:', err);
+    console.error('Load content files error:', err)
     toast.add({
       severity: 'error',
       summary: 'Error',
       detail: err.message || 'Failed to load content files',
-      life: 5000
-    });
+      life: 5000,
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
 // Select and load a file
 async function selectFile(file) {
-  console.log('Selecting file:', file.name);
-  if (activeFile.value?.name === file.name) return;
+  console.log('Selecting file:', file.name)
+  if (activeFile.value?.name === file.name) return
 
-  activeFile.value = file;
-  isLoading.value = true;
+  activeFile.value = file
+  isLoading.value = true
 
   try {
     const response = await fetch(
-      `${API_BASE}/api/v1/admin/content/files/${file.name}?pat=${encodeURIComponent(props.patToken)}`
-    );
+      `${API_BASE}/api/v1/admin/content/files/${file.name}?pat=${encodeURIComponent(props.patToken)}`,
+    )
 
-    const data = await response.json();
+    const data = await response.json()
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to load file');
+      throw new Error(data.message || 'Failed to load file')
     }
 
-    fileContent.value = data.content;
-    fileSha.value = data.sha;
+    fileContent.value = data.content
+    fileSha.value = data.sha
 
     // Merge with any pending changes for this file
     if (pendingChanges.value[file.name]) {
-      fileContent.value = { ...fileContent.value, ...pendingChanges.value[file.name] };
+      fileContent.value = { ...fileContent.value, ...pendingChanges.value[file.name] }
     }
-
   } catch (err) {
-    console.error('Load file error:', err);
+    console.error('Load file error:', err)
     toast.add({
       severity: 'error',
       summary: 'Error',
       detail: err.message || 'Failed to load file content',
-      life: 5000
-    });
+      life: 5000,
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
@@ -178,114 +180,113 @@ function handleValueChange(key, value) {
   // We recreate the object to ensure Vue detects the change and propagates it to ContentEditor props
   fileContent.value = {
     ...fileContent.value,
-    [key]: value
-  };
+    [key]: value,
+  }
 
   // Track pending changes
-  if (!activeFile.value) return;
-  
+  if (!activeFile.value) return
+
   if (!pendingChanges.value[activeFile.value.name]) {
-    pendingChanges.value[activeFile.value.name] = {};
+    pendingChanges.value[activeFile.value.name] = {}
   }
-  pendingChanges.value[activeFile.value.name][key] = value;
+  pendingChanges.value[activeFile.value.name][key] = value
 }
 
 // Open preview modal
 function openPreview(key) {
-  previewKey.value = key;
+  previewKey.value = key
 
   // Get the page URL for this file
-  const pageUrl = pageMapping[activeFile.value?.name] || '/';
-  previewUrl.value = `${window.location.origin}${pageUrl}?highlight=${key}`;
+  const pageUrl = pageMapping[activeFile.value?.name] || '/'
+  previewUrl.value = `${window.location.origin}${pageUrl}?highlight=${key}`
 
   // Get the component loader(s) directly from the original content source
   // This uses the actual arrow functions defined in homePage.js
-  previewComponent.value = getComponentLoader(key);
+  previewComponent.value = getComponentLoader(key)
 
-  isPreviewOpen.value = true;
+  isPreviewOpen.value = true
 }
 
 // Close preview modal
 function closePreview() {
-  isPreviewOpen.value = false;
-  previewKey.value = '';
-  previewUrl.value = '';
-  previewComponent.value = null;
+  isPreviewOpen.value = false
+  previewKey.value = ''
+  previewUrl.value = ''
+  previewComponent.value = null
 }
 
 // Save changes to GitHub
 async function saveChanges() {
-  if (!hasUnsavedChanges.value || !activeFile.value) return;
+  if (!hasUnsavedChanges.value || !activeFile.value) return
 
-  isSaving.value = true;
+  isSaving.value = true
 
   try {
     // Get the full content with merged changes
-    const updatedContent = { ...fileContent.value };
+    const updatedContent = { ...fileContent.value }
 
     const response = await fetch(`${API_BASE}/api/v1/admin/content/update`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         pat: props.patToken,
         filename: activeFile.value.name,
         content: updatedContent,
         sha: fileSha.value,
-        commitMessage: `Update content: ${Object.keys(pendingChanges.value[activeFile.value.name] || {}).join(', ')}`
-      })
-    });
+        commitMessage: `Update content: ${Object.keys(pendingChanges.value[activeFile.value.name] || {}).join(', ')}`,
+      }),
+    })
 
-    const data = await response.json();
+    const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to save changes');
+      throw new Error(data.message || 'Failed to save changes')
     }
 
     // Update SHA for future updates
-    fileSha.value = data.newSha;
+    fileSha.value = data.newSha
 
     // Clear pending changes for this file
-    delete pendingChanges.value[activeFile.value.name];
-    pendingChanges.value = { ...pendingChanges.value }; // Trigger reactivity
+    delete pendingChanges.value[activeFile.value.name]
+    pendingChanges.value = { ...pendingChanges.value } // Trigger reactivity
 
     toast.add({
       severity: 'success',
       summary: 'Saved!',
       detail: data.message || 'Changes saved to GitHub',
-      life: 5000
-    });
-
+      life: 5000,
+    })
   } catch (err) {
-    console.error('Save error:', err);
+    console.error('Save error:', err)
     toast.add({
       severity: 'error',
       summary: 'Save Failed',
       detail: err.message || 'Failed to save changes to GitHub',
-      life: 5000
-    });
+      life: 5000,
+    })
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
 }
 
 // Discard pending changes
 function discardChanges() {
-  if (!activeFile.value) return;
+  if (!activeFile.value) return
 
-  delete pendingChanges.value[activeFile.value.name];
-  pendingChanges.value = { ...pendingChanges.value };
+  delete pendingChanges.value[activeFile.value.name]
+  pendingChanges.value = { ...pendingChanges.value }
 
   // Reload file content
-  selectFile(activeFile.value);
+  selectFile(activeFile.value)
 
   toast.add({
     severity: 'info',
     summary: 'Changes Discarded',
     detail: 'Local changes have been discarded',
-    life: 3000
-  });
+    life: 3000,
+  })
 }
 
 // Format filename for display
@@ -293,8 +294,8 @@ function formatFilename(filename) {
   return filename
     .replace('.json', '')
     .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase())
-    .trim();
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim()
 }
 </script>
 

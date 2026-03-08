@@ -21,6 +21,8 @@ authRouter.post('/login', async (request, env) => {
         const result = await sql`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
 
         if (result.length === 0) {
+            // const temp = await sql`SELECT * FROM users`;
+            // console.log("Invalid credentials", temp, { email, password, result })
             return error(401, { message: 'Invalid credentials' });
         }
 
@@ -51,9 +53,9 @@ authRouter.post('/login', async (request, env) => {
         `;
 
         // Return access token in body, set refresh token as httpOnly cookie
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
             access_token: accessToken,
-            user: { id: user.id, email: user.email, role: user.role } 
+            user: { id: user.id, email: user.email, role: user.role }
         }), {
             headers: {
                 'Content-Type': 'application/json',
@@ -84,13 +86,17 @@ authRouter.post('/register', async (request, env) => {
 
         // Insert new user
         const result = await sql`
-            INSERT INTO users (email, password_hash)
-            VALUES (${email}, ${passwordHash})
-            RETURNING id, email
-        `;
+      INSERT INTO users (email, password_hash)
+      VALUES (${email}, ${passwordHash})
+      RETURNING id, email
+    `;
 
         const user = result[0] as any;
         user.role = 'authenticated';
+
+        // Create cart and wishlist for the new user
+        await sql`INSERT INTO carts (user_id) VALUES (${user.id})`;
+        await sql`INSERT INTO wishlists (user_id) VALUES (${user.id})`;
 
         // Generate access token (7 days)
         const accessToken = await generateToken(user, env.RSA_PRIVATE_KEY_PEM);
@@ -108,7 +114,7 @@ authRouter.post('/register', async (request, env) => {
         `;
 
         // Return access token in body, set refresh token as httpOnly cookie
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
             message: 'Registration successful',
             access_token: accessToken,
             user
@@ -129,7 +135,7 @@ authRouter.post('/refresh', async (request, env) => {
         // Read refresh token from cookie
         const cookieHeader = request.headers.get('Cookie') || request.headers.get('cookie');
         let refreshToken = null;
-        
+
         if (cookieHeader) {
             const cookies = cookieHeader.split(';').map((c: string) => c.trim());
             for (const cookie of cookies) {
@@ -203,7 +209,7 @@ authRouter.post('/logout', async (request, env) => {
         // Read refresh token from cookie
         const cookieHeader = request.headers.get('Cookie') || request.headers.get('cookie');
         let refreshToken = null;
-        
+
         if (cookieHeader) {
             const cookies = cookieHeader.split(';').map((c: string) => c.trim());
             for (const cookie of cookies) {

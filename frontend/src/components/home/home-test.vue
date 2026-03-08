@@ -1,27 +1,38 @@
 <template>
   <div id="scroll-wrapper" ref="wrapper">
-    <section class="section" id="section-0" style="height: 150vh;">
-      <div class="image-side"
-        style="background-image: url('https://picsum.photos/1200/900?image=1011'); height: 100%;"></div>
+    <section class="section" id="section-0" style="height: 150vh">
+      <div
+        class="image-side"
+        style="background-image: url('https://picsum.photos/1200/900?image=1011'); height: 100%"
+      ></div>
       <div class="content-side">
         <h2>Section One</h2>
-        <p>Welcome to the full-page scroller. Use your mouse wheel, keyboard, or touch to navigate.</p>
+        <p>
+          Welcome to the full-page scroller. Use your mouse wheel, keyboard, or touch to navigate.
+        </p>
       </div>
     </section>
 
-    <section class="section" id="section-1" style="height: 150vh;">
-      <div class="image-side"
-        style="background-image: url('https://picsum.photos/1200/900?image=1012'); height: 100%;"></div>
+    <section class="section" id="section-1" style="height: 150vh">
+      <div
+        class="image-side"
+        style="background-image: url('https://picsum.photos/1200/900?image=1012'); height: 100%"
+      ></div>
       <div class="content-side">
         <h2>Section Two</h2>
-        <p>The logic is identical to your original code, but we use `window.innerHeight` as the scroll distance.</p>
+        <p>
+          The logic is identical to your original code, but we use `window.innerHeight` as the
+          scroll distance.
+        </p>
       </div>
     </section>
 
     <section>
       <section class="section" id="section-2">
-        <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1013')">
-        </div>
+        <div
+          class="image-side"
+          style="background-image: url('https://picsum.photos/1200/900?image=1013')"
+        ></div>
         <div class="content-side">
           <h2>Section Three</h2>
           <p>We use an `isScrolling` flag based on the `transitionend` event for robust control.</p>
@@ -29,8 +40,10 @@
       </section>
 
       <section class="section" id="section-3">
-        <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1014')">
-        </div>
+        <div
+          class="image-side"
+          style="background-image: url('https://picsum.photos/1200/900?image=1014')"
+        ></div>
         <div class="content-side">
           <h2>Section Four</h2>
           <p>This layout also adapts to window resizing, recalculating heights and positions.</p>
@@ -39,7 +52,10 @@
     </section>
 
     <section class="section" id="section-4">
-      <div class="image-side" style="background-image: url('https://picsum.photos/1200/900?image=1014')"></div>
+      <div
+        class="image-side"
+        style="background-image: url('https://picsum.photos/1200/900?image=1014')"
+      ></div>
       <div class="content-side">
         <h2>Section Four</h2>
         <p>This layout also adapts to window resizing, recalculating heights and positions.</p>
@@ -89,7 +105,7 @@ onMounted(() => {
       dot.classList.add('dot')
       dot.addEventListener('click', () => {
         let heights = 0
-        child_elms.slice(0, i).forEach(section => {
+        child_elms.slice(0, i).forEach((section) => {
           heights += section.offsetHeight
         })
         offset = -heights
@@ -164,7 +180,16 @@ onMounted(() => {
     if (now - lastScrollTime < scrollDelay) return
 
     const h = child_elms[currentIndex].offsetHeight
-    console.log('Current index:', currentIndex, 'Item count:', itemCount, 'Height:', h, "offset:", offset)
+    console.log(
+      'Current index:',
+      currentIndex,
+      'Item count:',
+      itemCount,
+      'Height:',
+      h,
+      'offset:',
+      offset,
+    )
 
     if (currentIndex === itemCount - 1 && offset <= minOffset) {
       wrapperEl.style.transform = `translateY(${offset - 100}px)`
@@ -289,7 +314,6 @@ onMounted(() => {
 <style scoped>
 /* using the same CSS as your original */
 
-
 #scroll-wrapper {
   width: 100%;
   height: 100%;
@@ -344,7 +368,9 @@ onMounted(() => {
 .content-side p {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+  transition:
+    opacity 0.6s ease-out 0.4s,
+    transform 0.6s ease-out 0.4s;
 }
 
 .section.active .content-side h2,

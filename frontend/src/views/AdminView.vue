@@ -3,98 +3,97 @@
  * AdminView.vue - Main admin wrapper with passcode protection
  * Shows passcode input initially, then renders AdminLayout
  */
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import AdminLayout from '@/components/admin/AdminLayout.vue';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import AdminLayout from '@/components/admin/AdminLayout.vue'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 
-const router = useRouter();
-const toast = useToast();
+const router = useRouter()
+const toast = useToast()
 
 // State
-const passcode = ref('');
-const isLoading = ref(false);
-const isAuthenticated = ref(false);
-const patToken = ref('');
-const errorMessage = ref('');
+const passcode = ref('')
+const isLoading = ref(false)
+const isAuthenticated = ref(false)
+const patToken = ref('')
+const errorMessage = ref('')
 
 // API base URL
-const API_BASE= import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://spacefurnio.in/backend'
 
 // Check for existing session on mount
 onMounted(() => {
-  const storedToken = sessionStorage.getItem('admin_pat_token');
+  const storedToken = sessionStorage.getItem('admin_pat_token')
   if (storedToken) {
-    patToken.value = storedToken;
-    isAuthenticated.value = true;
+    patToken.value = storedToken
+    isAuthenticated.value = true
   }
-});
+})
 
 // Verify passcode
 async function verifyPasscode() {
   if (!passcode.value.trim()) {
-    errorMessage.value = 'Please enter the passcode';
-    return;
+    errorMessage.value = 'Please enter the passcode'
+    return
   }
 
-  isLoading.value = true;
-  errorMessage.value = '';
+  isLoading.value = true
+  errorMessage.value = ''
 
   try {
     const response = await fetch(`${API_BASE}/api/v1/admin/content/verify`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ passcode: passcode.value.trim() })
-    });
+      body: JSON.stringify({ passcode: passcode.value.trim() }),
+    })
 
-    const data = await response.json();
+    const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.message || 'Verification failed');
+      throw new Error(data.message || 'Verification failed')
     }
 
     // Store token in session
-    patToken.value = data.pat;
-    sessionStorage.setItem('admin_pat_token', data.pat);
-    isAuthenticated.value = true;
+    patToken.value = data.pat
+    sessionStorage.setItem('admin_pat_token', data.pat)
+    isAuthenticated.value = true
 
     toast.add({
       severity: 'success',
       summary: 'Access Granted',
       detail: 'Welcome to the admin panel',
-      life: 3000
-    });
-
+      life: 3000,
+    })
   } catch (err) {
-    errorMessage.value = err.message || 'Invalid passcode';
+    errorMessage.value = err.message || 'Invalid passcode'
     toast.add({
       severity: 'error',
       summary: 'Access Denied',
       detail: err.message || 'Invalid passcode',
-      life: 5000
-    });
+      life: 5000,
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
 // Logout
 function logout() {
-  sessionStorage.removeItem('admin_pat_token');
-  patToken.value = '';
-  isAuthenticated.value = false;
-  passcode.value = '';
+  sessionStorage.removeItem('admin_pat_token')
+  patToken.value = ''
+  isAuthenticated.value = false
+  passcode.value = ''
 }
 
 // Handle keypress for enter
 function handleKeypress(e) {
   if (e.key === 'Enter') {
-    verifyPasscode();
+    verifyPasscode()
   }
 }
 </script>
@@ -103,11 +102,7 @@ function handleKeypress(e) {
   <Toast />
 
   <!-- Authenticated: Show Admin Layout -->
-  <AdminLayout
-    v-if="isAuthenticated"
-    :pat-token="patToken"
-    @logout="logout"
-  />
+  <AdminLayout v-if="isAuthenticated" :pat-token="patToken" @logout="logout" />
 
   <!-- Not Authenticated: Show Passcode Form -->
   <div v-else class="passcode-container">

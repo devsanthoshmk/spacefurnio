@@ -1,10 +1,10 @@
 # Guide 05 — Authentication & JWT: JWKS, Key Management & Token Lifecycle
 
-> **JWT Algorithm:** RS256 (RSA + SHA-256 asymmetric signing)  
-> **JWT Library:** `jose` v6 (`jose` is the IETF standard Web Crypto implementation)  
-> **Key Storage:** Cloudflare Worker Secrets (`RSA_PRIVATE_KEY_PEM`, `RSA_PUBLIC_KEY_PEM`)  
-> **Access Token Expiry:** 7 days  
-> **Refresh Token Expiry:** 30 days  
+> **JWT Algorithm:** RS256 (RSA + SHA-256 asymmetric signing)
+> **JWT Library:** `jose` v6 (`jose` is the IETF standard Web Crypto implementation)
+> **Key Storage:** Cloudflare Worker Secrets (`RSA_PRIVATE_KEY_PEM`, `RSA_PUBLIC_KEY_PEM`)
+> **Access Token:** 7 days, stored in localStorage
+> **Refresh Token:** 30 days, stored in httpOnly cookie (Secure, SameSite=Strict)
 > **JWKS Endpoint:** `GET /auth/.well-known/jwks.json`
 
 ---
@@ -325,98 +325,98 @@ Browser retries original request
 
 ## 9. Refresh Token Implementation
 
-The system now implements a **dual-token** pattern with access tokens (7 days) and refresh tokens (30 days).
+The system implements a **dual-token** pattern with access tokens (7 days) and refresh tokens (30 days).
 
 ### Token Types
 
 | Token | Expiry | Purpose | Storage |
 |-------|--------|---------|---------|
 | **access_token** | 7 days | API authentication | localStorage (`spacefurnio_token`) |
-| **refresh_token** | 30 days | Get new access tokens | localStorage (`spacefurnio_refresh_token`) |
-| **user_id** | Persisted | Quick user ID access | localStorage (`spacefurnio_user_id`) |
+| **refresh_token** | 30 days | Get new access tokens | httpOnly cookie (sent automatically) |
 
-### Token Generation
+### Token Storage Architecture
 
-```typescript
-// src/utils/jwks.ts
-
-// Access token (7 days)
-export const generateToken = async (user: any, privateKeyPem: string) => {
-    const privateKey = await loadPrivateKey(privateKeyPem);
-
-    const payload = {
-        sub: user.id,
-        email: user.email,
-        role: user.role
-    };
-
-    const token = await new SignJWT(payload)
-        .setProtectedHeader({ alg: 'RS256', kid: 'neon-ecommerce-key-1' })
-        .setExpirationTime('7d')
-        .sign(privateKey);
-
-    return token;
-};
-
-// Refresh token (30 days) - includes type: 'refresh' claim
-export const generateRefreshToken = async (userId: string, privateKeyPem: string) => {
-    const privateKey = await loadPrivateKey(privateKeyPem);
-
-    const payload = {
-        sub: userId,
-        type: 'refresh'
-    };
-
-    const token = await new SignJWT(payload)
-        .setProtectedHeader({ alg: 'RS256', kid: 'neon-ecommerce-key-1' })
-        .setExpirationTime('30d')
-        .setIssuedAt()
-        .setJti(crypto.randomUUID())  // Unique ID for rotation
-        .sign(privateKey);
-
-    return token;
-};
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        BROWSER                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  localStorage:                                                  │
+│    └── spacefurnio_token (JWT access_token)                    │
+│         ↓ decoded → { sub: user.id, email, role }              │
+│                                                                 │
+│  httpOnly Cookie:                                               │
+│    └── refresh_token (JWT, HttpOnly, Secure, SameSite=Strict)  │
+│         ↓ automatically sent with every request                │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     CLOUDFLARE WORKER                           │
+├─────────────────────────────────────────────────────────────────┤
+│  /auth/login    → returns access_token + sets refresh cookie   │
+│  /auth/refresh  → reads cookie, returns new access_token       │
+│  /auth/logout   → deletes refresh cookie + clears DB session   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Login Response
 
+The refresh token is set as an httpOnly cookie, not returned in the body:
+
 ```json
+// Response Body:
 {
     "access_token": "eyJhbGciOiJSUzI1NiIs...",
-    "refresh_token": "eyJhbGciOiJSUzI1NiIs...",
     "user": {
         "id": "550e8400-e29b-41d4-a716-446655440000",
         "email": "user@example.com",
         "role": "customer"
     }
 }
+
+// Response Headers:
+Set-Cookie: refresh_token=eyJhbGciOiJSUzI1NiIs...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000
 ```
 
 ### Refresh Endpoint
 
+The refresh endpoint reads the refresh token from the httpOnly cookie automatically:
+
 ```typescript
 // POST /auth/refresh
-// Body: { "refresh_token": "eyJ..." }
+// Cookie: refresh_token=eyJ... (automatically sent)
 // Response: { "access_token": "eyJ..." }
 
 authRouter.post('/refresh', async (request, env) => {
-    const { refresh_token } = await request.json();
+    // Read refresh token from cookie (automatically sent)
+    const cookieHeader = request.headers.get('Cookie');
+    let refreshToken = null;
+    
+    if (cookieHeader) {
+        const cookies = cookieHeader.split(';').map(c => c.trim());
+        for (const cookie of cookies) {
+            if (cookie.startsWith('refresh_token=')) {
+                refreshToken = cookie.substring('refresh_token='.length);
+                break;
+            }
+        }
+    }
 
-    // 1. Verify refresh token signature and expiry
-    const payload = await verifyRefreshToken(refresh_token, env.RSA_PUBLIC_KEY_PEM);
-
-    // 2. Check token exists in database and not expired
+    // Verify token and check database
+    const payload = await verifyRefreshToken(refreshToken, env.RSA_PUBLIC_KEY_PEM);
     const sessionResult = await sql`
         SELECT * FROM user_sessions 
-        WHERE refresh_token = ${refresh_token}
-          AND expires_at > NOW()
-        LIMIT 1
+        WHERE refresh_token = ${refreshToken} AND expires_at > NOW()
     `;
 
-    // 3. Generate new access token
+    // Generate new access token
     const accessToken = await generateToken(user, env.RSA_PRIVATE_KEY_PEM);
 
-    return { access_token: accessToken };
+    // Return new access token, refresh cookie is automatically refreshed
+    return new Response(JSON.stringify({ access_token: accessToken }), {
+        headers: {
+            'Set-Cookie': `refresh_token=${refreshToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000`
+        }
+    });
 });
 ```
 
@@ -424,18 +424,18 @@ authRouter.post('/refresh', async (request, env) => {
 
 The frontend automatically handles token refresh:
 
-1. On initialization, checks for stored tokens
-2. If access_token expired, tries to refresh using refresh_token
+1. On initialization, checks for stored access token in localStorage
+2. If access_token expired, calls refresh endpoint (cookie is sent automatically)
 3. On 401 response from API, attempts refresh before failing
 
 ```javascript
 // frontend/src/lib/api.js
 
-async refresh(refreshToken) {
+async refresh() {
+    // Refresh token is sent automatically via httpOnly cookie
     const res = await fetch(`${WORKER_URL}/auth/refresh`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken })
+        headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
     this.setToken(data.access_token);
@@ -447,13 +447,36 @@ async refresh(refreshToken) {
 
 ```typescript
 // POST /auth/logout
-// Body: { "refresh_token": "eyJ..." }
+// Cookie: refresh_token=eyJ... (automatically sent)
 // Response: { "message": "Logged out successfully" }
+// Header: Set-Cookie: refresh_token=; Max-Age=0 (clears cookie)
 
 authRouter.post('/logout', async (request, env) => {
-    const { refresh_token } = await request.json();
-    await sql`DELETE FROM user_sessions WHERE refresh_token = ${refresh_token}`;
-    return { message: 'Logged out successfully' };
+    // Read refresh token from cookie
+    const cookieHeader = request.headers.get('Cookie');
+    let refreshToken = null;
+    
+    if (cookieHeader) {
+        const cookies = cookieHeader.split(';').map(c => c.trim());
+        for (const cookie of cookies) {
+            if (cookie.startsWith('refresh_token=')) {
+                refreshToken = cookie.substring('refresh_token='.length);
+                break;
+            }
+        }
+    }
+
+    // Delete from database
+    if (refreshToken) {
+        await sql`DELETE FROM user_sessions WHERE refresh_token = ${refreshToken}`;
+    }
+
+    // Clear cookie
+    return new Response(JSON.stringify({ message: 'Logged out successfully' }), {
+        headers: {
+            'Set-Cookie': 'refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'
+        }
+    });
 });
 ```
 
@@ -498,8 +521,10 @@ return { access_token: accessToken, refresh_token: newRefreshToken };
 | **`kid` in JWT header** | ✅ Implemented | Supports future key rotation |
 | **Correct key for verification** | ✅ Implemented | Uses public key in middleware |
 | **Access + Refresh token pair** | ✅ Implemented | 7d access + 30d refresh |
-| **Refresh token in localStorage** | ✅ Implemented | Required by architecture |
+| **Access token in localStorage** | ✅ Implemented | For API authentication |
+| **Refresh token in httpOnly cookie** | ✅ Implemented | Secure, XSS resistant |
 | **Refresh token stored in DB** | ✅ Implemented | user_sessions table |
 | **HTTPS only** | ✅ Cloudflare enforces this | All traffic is TLS 1.3 |
+| **SameSite=Strict cookies** | ✅ Implemented | CSRF protection |
 | **CORS scope** | ⚠️ Needs production lock-down | Currently `origin: '*'` |
 | **Token rotation** | ⚠️ Optional | Disabled by default |

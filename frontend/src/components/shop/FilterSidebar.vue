@@ -2,30 +2,31 @@
   <div class="filter-sidebar-content">
     <!-- Category Filter -->
     <div class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('category')"
         :aria-expanded="openSections.category"
       >
         <span class="filter-title">Category</span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.category }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.category" class="filter-content">
-          <label 
-            v-for="cat in categories" 
-            :key="cat.id" 
-            class="checkbox-label"
-          >
-            <input 
-              type="radio" 
+          <label v-for="cat in categories" :key="cat.id" class="checkbox-label">
+            <input
+              type="radio"
               name="category"
               :value="cat.slug"
               :checked="localFilters.category === cat.slug"
@@ -41,28 +42,33 @@
 
     <!-- Price Range Filter -->
     <div class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('price')"
         :aria-expanded="openSections.price"
       >
         <span class="filter-title">Price</span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.price }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.price" class="filter-content">
           <div class="price-inputs">
             <div class="price-input-group">
               <span class="currency-symbol">$</span>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 v-model.number="localFilters.minPrice"
                 :placeholder="aggregations.priceRange?.min || 0"
                 min="0"
@@ -73,8 +79,8 @@
             <span class="price-separator">—</span>
             <div class="price-input-group">
               <span class="currency-symbol">$</span>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 v-model.number="localFilters.maxPrice"
                 :placeholder="aggregations.priceRange?.max || 5000"
                 min="0"
@@ -83,11 +89,11 @@
               />
             </div>
           </div>
-          
+
           <!-- Price Range Slider -->
           <div class="price-slider">
-            <input 
-              type="range" 
+            <input
+              type="range"
               :min="aggregations.priceRange?.min || 0"
               :max="aggregations.priceRange?.max || 5000"
               :value="localFilters.maxPrice || aggregations.priceRange?.max || 5000"
@@ -95,11 +101,11 @@
               class="shop-range-slider"
             />
           </div>
-          
+
           <!-- Quick Price Options -->
           <div class="price-quick-options">
-            <button 
-              v-for="option in priceOptions" 
+            <button
+              v-for="option in priceOptions"
               :key="option.label"
               :class="['price-option', { active: isPriceOptionActive(option) }]"
               @click="selectPriceOption(option)"
@@ -113,45 +119,54 @@
 
     <!-- Brand Filter -->
     <div v-if="aggregations.brands?.length > 0" class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('brand')"
         :aria-expanded="openSections.brand"
       >
         <span class="filter-title">Brand</span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.brand }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.brand" class="filter-content">
           <!-- Search Brands -->
           <div class="filter-search">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="M21 21l-4.35-4.35"/>
+            <svg
+              class="search-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
             </svg>
-            <input 
-              type="text" 
+            <input
+              type="text"
               v-model="brandSearch"
               placeholder="Search brands..."
               class="search-input"
             />
           </div>
-          
+
           <div class="checkbox-list shop-scrollbar">
-            <label 
-              v-for="brand in filteredBrands" 
-              :key="brand" 
-              class="checkbox-label"
-            >
-              <input 
-                type="radio" 
+            <label v-for="brand in filteredBrands" :key="brand" class="checkbox-label">
+              <input
+                type="radio"
                 name="brand"
                 :value="brand"
                 :checked="localFilters.brand === brand"
@@ -161,9 +176,9 @@
               <span class="checkbox-text">{{ brand }}</span>
             </label>
           </div>
-          
-          <button 
-            v-if="localFilters.brand" 
+
+          <button
+            v-if="localFilters.brand"
             class="clear-filter-btn"
             @click="updateFilter('brand', '')"
           >
@@ -175,31 +190,36 @@
 
     <!-- Material Filter -->
     <div v-if="aggregations.materials?.length > 0" class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('material')"
         :aria-expanded="openSections.material"
       >
         <span class="filter-title">Material</span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.material }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.material" class="filter-content">
           <div class="checkbox-list">
-            <label 
-              v-for="material in aggregations.materials" 
-              :key="material" 
+            <label
+              v-for="material in aggregations.materials"
+              :key="material"
               class="checkbox-label"
             >
-              <input 
-                type="radio" 
+              <input
+                type="radio"
                 name="material"
                 :value="material"
                 :checked="localFilters.material === material"
@@ -209,9 +229,9 @@
               <span class="checkbox-text">{{ material }}</span>
             </label>
           </div>
-          
-          <button 
-            v-if="localFilters.material" 
+
+          <button
+            v-if="localFilters.material"
             class="clear-filter-btn"
             @click="updateFilter('material', '')"
           >
@@ -223,7 +243,7 @@
 
     <!-- Color Filter -->
     <div v-if="aggregations.colors?.length > 0" class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('color')"
         :aria-expanded="openSections.color"
@@ -232,34 +252,48 @@
         <span v-if="localFilters.colors?.length > 0" class="filter-count">
           {{ localFilters.colors.length }}
         </span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.color }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.color" class="filter-content">
           <div class="color-grid">
-            <button 
-              v-for="color in aggregations.colors" 
+            <button
+              v-for="color in aggregations.colors"
               :key="color.name"
               :class="['color-swatch', { selected: localFilters.colors?.includes(color.name) }]"
               :style="{ '--swatch-color': color.hex }"
               :title="color.name"
               @click="toggleColor(color.name)"
             >
-              <svg v-if="localFilters.colors?.includes(color.name)" class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                <path d="M20 6L9 17l-5-5"/>
+              <svg
+                v-if="localFilters.colors?.includes(color.name)"
+                class="check-icon"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <path d="M20 6L9 17l-5-5" />
               </svg>
             </button>
           </div>
-          
-          <button 
-            v-if="localFilters.colors?.length > 0" 
+
+          <button
+            v-if="localFilters.colors?.length > 0"
             class="clear-filter-btn"
             @click="clearColors"
           >
@@ -271,26 +305,31 @@
 
     <!-- Availability Filter -->
     <div class="filter-group">
-      <button 
+      <button
         class="filter-header"
         @click="toggleSection('availability')"
         :aria-expanded="openSections.availability"
       >
         <span class="filter-title">Availability</span>
-        <svg 
-          class="chevron" 
+        <svg
+          class="chevron"
           :class="{ rotated: openSections.availability }"
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path d="M6 9l6 6 6-6"/>
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
-      
+
       <Transition name="accordion">
         <div v-if="openSections.availability" class="filter-content">
           <label class="toggle-label">
             <span class="toggle-text">In Stock Only</span>
-            <button 
+            <button
               :class="['toggle-switch', { active: localFilters.inStock }]"
               @click="updateFilter('inStock', !localFilters.inStock)"
               role="switch"
@@ -299,10 +338,10 @@
               <span class="toggle-thumb"></span>
             </button>
           </label>
-          
+
           <label class="toggle-label">
             <span class="toggle-text">On Sale</span>
-            <button 
+            <button
               :class="['toggle-switch', { active: localFilters.onSale }]"
               @click="updateFilter('onSale', !localFilters.onSale)"
               role="switch"
@@ -311,10 +350,10 @@
               <span class="toggle-thumb"></span>
             </button>
           </label>
-          
+
           <label class="toggle-label">
             <span class="toggle-text">New Arrivals</span>
-            <button 
+            <button
               :class="['toggle-switch', { active: localFilters.isNew }]"
               @click="updateFilter('isNew', !localFilters.isNew)"
               role="switch"
@@ -369,17 +408,20 @@ const openSections = ref({
 })
 
 // Categories (loaded from API)
-const categories = ref([
-  { id: 'all', name: 'All Products', slug: '', count: 0 },
-])
+const categories = ref([{ id: 'all', name: 'All Products', slug: '', count: 0 }])
 
 const loadCategories = async () => {
   try {
     const response = await shopApi.getCategories()
     if (response.success && response.data) {
       categories.value = [
-        { id: 'all', name: 'All Products', slug: '', count: response.data.reduce((sum, c) => sum + (c.productCount || 0), 0) },
-        ...response.data.map(c => ({
+        {
+          id: 'all',
+          name: 'All Products',
+          slug: '',
+          count: response.data.reduce((sum, c) => sum + (c.productCount || 0), 0),
+        },
+        ...response.data.map((c) => ({
           id: c.slug,
           name: c.name,
           slug: c.slug,
@@ -405,13 +447,11 @@ const priceOptions = [
 // Computed
 const filteredBrands = computed(() => {
   if (!props.aggregations.brands) return []
-  
+
   const search = brandSearch.value.toLowerCase()
   if (!search) return props.aggregations.brands
-  
-  return props.aggregations.brands.filter(brand => 
-    brand.toLowerCase().includes(search)
-  )
+
+  return props.aggregations.brands.filter((brand) => brand.toLowerCase().includes(search))
 })
 
 // Methods
@@ -425,7 +465,7 @@ const updateFilter = (key, value) => {
 }
 
 const applyPriceFilter = () => {
-  emit('update:filters', { 
+  emit('update:filters', {
     minPrice: localFilters.value.minPrice || null,
     maxPrice: localFilters.value.maxPrice || null,
   })
@@ -437,8 +477,7 @@ const handleSliderChange = (event) => {
 }
 
 const isPriceOptionActive = (option) => {
-  return localFilters.value.minPrice === option.min && 
-         localFilters.value.maxPrice === option.max
+  return localFilters.value.minPrice === option.min && localFilters.value.maxPrice === option.max
 }
 
 const selectPriceOption = (option) => {
@@ -450,13 +489,13 @@ const selectPriceOption = (option) => {
 const toggleColor = (colorName) => {
   const colors = localFilters.value.colors || []
   const index = colors.indexOf(colorName)
-  
+
   if (index > -1) {
     colors.splice(index, 1)
   } else {
     colors.push(colorName)
   }
-  
+
   localFilters.value.colors = [...colors]
   emit('update:filters', { colors: localFilters.value.colors })
 }
@@ -467,9 +506,13 @@ const clearColors = () => {
 }
 
 // Watchers
-watch(() => props.filters, (newFilters) => {
-  localFilters.value = { ...newFilters }
-}, { deep: true })
+watch(
+  () => props.filters,
+  (newFilters) => {
+    localFilters.value = { ...newFilters }
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>
@@ -481,7 +524,7 @@ watch(() => props.filters, (newFilters) => {
 
 /* Filter Group */
 .filter-group {
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   padding-bottom: 1rem;
   margin-bottom: 1rem;
 }
@@ -507,7 +550,7 @@ watch(() => props.filters, (newFilters) => {
 .filter-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .filter-count {
@@ -517,7 +560,7 @@ watch(() => props.filters, (newFilters) => {
   min-width: 1.25rem;
   height: 1.25rem;
   padding: 0 0.375rem;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -527,7 +570,7 @@ watch(() => props.filters, (newFilters) => {
 }
 
 .chevron {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   transition: transform 0.3s ease;
 }
 
@@ -555,19 +598,19 @@ watch(() => props.filters, (newFilters) => {
 }
 
 .checkbox-label:hover .checkbox-text {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .checkbox-text {
   flex: 1;
   font-size: 0.875rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   transition: color 0.2s ease;
 }
 
 .checkbox-count {
   font-size: 0.75rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 /* Search Input */
@@ -581,27 +624,27 @@ watch(() => props.filters, (newFilters) => {
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 .search-input {
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 2.25rem;
   font-size: 0.8125rem;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   background: white;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--shop-accent, #B8956C);
+  border-color: var(--shop-accent, #b8956c);
 }
 
 .search-input::placeholder {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 /* Price Inputs */
@@ -623,26 +666,26 @@ watch(() => props.filters, (newFilters) => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.8125rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 .price-input {
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 1.5rem;
   font-size: 0.8125rem;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   background: white;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .price-input:focus {
   outline: none;
-  border-color: var(--shop-accent, #B8956C);
+  border-color: var(--shop-accent, #b8956c);
 }
 
 .price-separator {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   font-size: 0.875rem;
 }
 
@@ -662,22 +705,22 @@ watch(() => props.filters, (newFilters) => {
   padding: 0.375rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--shop-brown-dark, #8B7D6D);
-  background: var(--shop-cream-dark, #F5F2ED);
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  color: var(--shop-brown-dark, #8b7d6d);
+  background: var(--shop-cream-dark, #f5f2ed);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .price-option:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 .price-option.active {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
-  border-color: var(--shop-charcoal, #3D3A36);
+  border-color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Color Grid */
@@ -707,12 +750,12 @@ watch(() => props.filters, (newFilters) => {
 }
 
 .color-swatch.selected {
-  border-color: var(--shop-charcoal, #3D3A36);
-  box-shadow: 0 0 0 2px var(--shop-cream, #FAF8F5);
+  border-color: var(--shop-charcoal, #3d3a36);
+  box-shadow: 0 0 0 2px var(--shop-cream, #faf8f5);
 }
 
 .check-icon {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Light colors need dark check icon */
@@ -730,14 +773,14 @@ watch(() => props.filters, (newFilters) => {
 
 .toggle-text {
   font-size: 0.875rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
 }
 
 .toggle-switch {
   position: relative;
   width: 2.5rem;
   height: 1.5rem;
-  background: var(--shop-beige-dark, #D4CFC6);
+  background: var(--shop-beige-dark, #d4cfc6);
   border: none;
   border-radius: 9999px;
   cursor: pointer;
@@ -745,7 +788,7 @@ watch(() => props.filters, (newFilters) => {
 }
 
 .toggle-switch.active {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
 }
 
 .toggle-thumb {
@@ -769,7 +812,7 @@ watch(() => props.filters, (newFilters) => {
   margin-top: 0.5rem;
   padding: 0;
   font-size: 0.75rem;
-  color: var(--shop-accent, #B8956C);
+  color: var(--shop-accent, #b8956c);
   background: none;
   border: none;
   cursor: pointer;
@@ -778,7 +821,7 @@ watch(() => props.filters, (newFilters) => {
 }
 
 .clear-filter-btn:hover {
-  color: var(--shop-accent-dark, #8C6D4D);
+  color: var(--shop-accent-dark, #8c6d4d);
 }
 
 /* Accordion Transition */

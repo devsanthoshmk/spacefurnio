@@ -10,14 +10,14 @@ export const carts = pgTable('carts', {
 });
 
 export const cartItems = pgTable('cart_items', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    cartId: uuid('cart_id').notNull().references(() => carts.id, { onDelete: 'cascade' }),
-    productId: uuid('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721)
-    quantity: integer('quantity').notNull().default(1),
-    priceSnapshot: decimal('price_snapshot', { precision: 10, scale: 2 }).notNull(), // To prevent price change issues
-    createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  cartId: uuid('cart_id').notNull().references(() => carts.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721), uses INT
+  quantity: integer('quantity').notNull().default(1),
+  priceSnapshot: decimal('price_snapshot', { precision: 10, scale: 2 }).notNull(), // To prevent price change issues
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({
-    unq: unique().on(t.cartId, t.productId), // Prevent duplicates in cart
+  unq: unique().on(t.cartId, t.productId), // Prevent duplicates in cart
 }));
 
 export const wishlists = pgTable('wishlists', {
@@ -27,12 +27,12 @@ export const wishlists = pgTable('wishlists', {
 });
 
 export const wishlistItems = pgTable('wishlist_items', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    wishlistId: uuid('wishlist_id').notNull().references(() => wishlists.id, { onDelete: 'cascade' }),
-    productId: uuid('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721)
-    createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  wishlistId: uuid('wishlist_id').notNull().references(() => wishlists.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').notNull(), // FK removed — products live in separate Neon project (icy-union-81751721), uses INT
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({
-    unq: unique().on(t.wishlistId, t.productId),
+  unq: unique().on(t.wishlistId, t.productId),
 }));
 
 export const cartsRelations = relations(carts, ({ one, many }) => ({

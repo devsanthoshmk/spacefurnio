@@ -273,11 +273,11 @@ GRANT SELECT ON orders TO authenticator;
 | `id` | `uuid` | `PRIMARY KEY` | |
 | `order_id` | `uuid` | `UNIQUE`, `NOT NULL`, FK → `orders.id` (cascade) | 1-to-1 with order |
 | `amount` | `decimal(10,2)` | `NOT NULL` | |
-| `method` | `text` | `NOT NULL` | `'stripe'`, `'paypal'` |
+| `method` | `text` | `NOT NULL` | `'card'`, `'upi'`, `'cod'`, `'razorpay'`, `'paypal'`, `'stripe'` |
 | `status` | `text` | `NOT NULL`, `DEFAULT 'pending'` | `pending`, `completed`, `failed`, `refunded` |
 | `created_at` | `timestamp` | `NOT NULL`, `DEFAULT NOW()` | |
 
-**Sensitivity:** 🔴 Sensitive — Financial data. Never expose to Data API.
+**Sensitivity:** 🔴 Sensitive — Financial data. Read-only via Data API (embedded under own `orders`) is allowed with strict RLS.
 
 ---
 

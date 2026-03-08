@@ -6,7 +6,18 @@
 > **Schema Location:** `ecommerce-backend/db/schema/`  
 > **Migrations Location:** `ecommerce-backend/db/migrations/`
 
+> **Note on Existing Migrations:** The `db/migrations/` folder contains both historical SQL migrations (applied manually) and DrizzleKit-generated migrations. The database schema currently matches the Drizzle schema - running `pnpm db:generate` shows "No schema changes, nothing to migrate". All future schema changes MUST be made through DrizzleKit (see Section 5 below).
+
 ---
+
+> **Note**: This guide assumes familiarity with Drizzle ORM concepts. For a comprehensive introduction, refer to the [official Drizzle documentation](https://orm.drizzle.team/).
+
+> **Important**: Workflow for future schema changes:
+
+1. Edit schema files in db/schema/
+2. Run pnpm db:generate to generate migration SQL
+3. Review the generated migration in db/migrations/
+4. Run pnpm db:migrate to apply it
 
 ## Table of Contents
 
@@ -34,8 +45,9 @@ Drizzle is chosen because it:
 - **Transaction support:** Full `BEGIN/COMMIT/ROLLBACK` support for complex order workflows.
 
 > **Drizzle vs Prisma vs raw SQL in this project:**
+>
 > - Drizzle = schema type safety + migrations + Worker compatibility ✅
-> - Prisma = too heavy for Workers, no edge support ❌  
+> - Prisma = too heavy for Workers, no edge support ❌
 > - Raw SQL = no type safety, fragile ❌
 
 ---
@@ -52,12 +64,12 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-    schema: "./db/schema/index.ts",   // Entry point: exports ALL core tables
-    out: "./db/migrations",            // Where core .sql migration files are saved
-    dialect: "postgresql",
-    dbCredentials: {
-        url: process.env.DATABASE_URL!, // core neondb_owner connection string
-    },
+  schema: "./db/schema/index.ts", // Entry point: exports ALL core tables
+  out: "./db/migrations", // Where core .sql migration files are saved
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!, // core neondb_owner connection string
+  },
 });
 ```
 
@@ -73,29 +85,31 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-    schema: "./db/products-schema/index.ts",
-    out: "./db/products-migrations",
-    dialect: "postgresql",
-    dbCredentials: {
-        url: process.env.PRODUCTS_DATABASE_URL || "postgresql://authenticator@ep-icy-union-81751721... (User Override)", 
-    },
+  schema: "./db/products-schema/index.ts",
+  out: "./db/products-migrations",
+  dialect: "postgresql",
+  dbCredentials: {
+    url:
+      process.env.PRODUCTS_DATABASE_URL ||
+      "postgresql://authenticator@ep-icy-union-81751721... (User Override)",
+  },
 });
 ```
+
 > **Migrating Products:** Run `npx drizzle-kit generate --config=drizzle.products.config.ts` to generate these isolated migrations.
 
 ### `db/schema/index.ts` — The Schema Barrel
-
 
 ALL schema files MUST be re-exported here. `drizzle-kit` reads only this file.
 
 ```typescript
 // db/schema/index.ts
-export * from './users';
+export * from "./users";
 // catalog.ts no longer exports tables — products/inventory/reviews moved to separate Neon project
-export * from './shopping';
-export * from './orders';
-export * from './promotions';
-export * from './system';
+export * from "./shopping";
+export * from "./orders";
+export * from "./promotions";
+export * from "./system";
 ```
 
 > ⚠️ **If you add a new schema file**, you MUST add it to `index.ts`. Otherwise `drizzle-kit generate` will not see it and your migrations will be incomplete.
@@ -109,11 +123,11 @@ All tables in this project follow consistent patterns. Learn these before writin
 ### Pattern 1: UUIDs as Primary Keys
 
 ```typescript
-import { pgTable, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, uuid } from "drizzle-orm/pg-core";
 
-export const myTable = pgTable('my_table', {
-    // ✅ Correct: auto-generate UUID via defaultRandom()
-    id: uuid('id').primaryKey().defaultRandom(),
+export const myTable = pgTable("my_table", {
+  // ✅ Correct: auto-generate UUID via defaultRandom()
+  id: uuid("id").primaryKey().defaultRandom(),
 });
 ```
 
@@ -146,13 +160,17 @@ userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascad
 ### Pattern 4: Indexes
 
 ```typescript
-import { index } from 'drizzle-orm/pg-core';
+import { index } from "drizzle-orm/pg-core";
 
-export const users = pgTable('users', {
-    email: text('email').unique().notNull(),
-}, (t) => ({
-    emailIdx: index('users_email_idx').on(t.email),
-}));
+export const users = pgTable(
+  "users",
+  {
+    email: text("email").unique().notNull(),
+  },
+  (t) => ({
+    emailIdx: index("users_email_idx").on(t.email),
+  }),
+);
 ```
 
 > The second argument to `pgTable` is the index/constraint builder. Always index columns you `WHERE` or `JOIN` on frequently.
@@ -162,11 +180,11 @@ export const users = pgTable('users', {
 Relations are Drizzle-level declarations — they produce NO SQL. They enable the `db.query.*` relational API.
 
 ```typescript
-import { relations } from 'drizzle-orm';
+import { relations } from "drizzle-orm";
 
 export const usersRelations = relations(users, ({ many }) => ({
-    addresses: many(userAddresses),
-    sessions: many(userSessions),
+  addresses: many(userAddresses),
+  sessions: many(userSessions),
 }));
 ```
 
@@ -180,34 +198,36 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 ```typescript
 // db/schema/subscriptions.ts
-import { pgTable, text, timestamp, uuid, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { users } from './users';
+import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { users } from "./users";
 
-export const subscriptions = pgTable('subscriptions', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    plan: text('plan').notNull().default('free'),       // 'free', 'pro', 'enterprise'
-    status: text('status').notNull().default('active'), // 'active', 'cancelled', 'expired'
-    startedAt: timestamp('started_at').defaultNow().notNull(),
-    expiresAt: timestamp('expires_at'),
-    isActive: boolean('is_active').default(true).notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  plan: text("plan").notNull().default("free"), // 'free', 'pro', 'enterprise'
+  status: text("status").notNull().default("active"), // 'active', 'cancelled', 'expired'
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
-    user: one(users, {
-        fields: [subscriptions.userId],
-        references: [users.id],
-    }),
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
 }));
 ```
 
 ### Step 2: Register in `db/schema/index.ts`
 
 ```typescript
-export * from './subscriptions'; // ADD THIS LINE
+export * from "./subscriptions"; // ADD THIS LINE
 ```
 
 ### Step 3: Generate the migration
@@ -234,6 +254,7 @@ npx tsx db/migrate.ts
 ```
 
 Console output on success:
+
 ```
 Starting migrations via postgres-js...
 Migrations applied successfully!
@@ -316,22 +337,23 @@ All database operations in the Worker go through `getDb(env)` (core tables) or `
 
 ```typescript
 // server-worker/src/utils/db.ts
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from '../../../db/schema/index';
-import * as productSchema from '../../../db/products-schema/index';
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import * as schema from "../../../db/schema/index";
+import * as productSchema from "../../../db/products-schema/index";
 
 // Core database (ep-ancient-frog-aimehta7)
 export const getDb = (env: { DATABASE_URL: string }) => {
-    const sql = neon(env.DATABASE_URL);
-    return { db: drizzle(sql, { schema }), sql };
+  const sql = neon(env.DATABASE_URL);
+  return { db: drizzle(sql, { schema }), sql };
 };
 
 // Products database (icy-union-81751721 / ep-flat-brook-a1h1dgii)
 export const getProductsDb = (env: { PRODUCTS_DATABASE_URL: string }) => {
-    if (!env.PRODUCTS_DATABASE_URL) throw new Error("PRODUCTS_DATABASE_URL missing");
-    const sql = neon(env.PRODUCTS_DATABASE_URL);
-    return { db: drizzle(sql, { schema: productSchema }), sql };
+  if (!env.PRODUCTS_DATABASE_URL)
+    throw new Error("PRODUCTS_DATABASE_URL missing");
+  const sql = neon(env.PRODUCTS_DATABASE_URL);
+  return { db: drizzle(sql, { schema: productSchema }), sql };
 };
 ```
 
@@ -340,65 +362,61 @@ export const getProductsDb = (env: { PRODUCTS_DATABASE_URL: string }) => {
 ### SELECT Queries
 
 ```typescript
-import { eq, and } from 'drizzle-orm';
-import { users } from '../../../db/schema/users';
+import { eq, and } from "drizzle-orm";
+import { users } from "../../../db/schema/users";
 
 // Single record by primary key
 const { db } = getDb(env);
 const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
+  .select()
+  .from(users)
+  .where(eq(users.id, userId))
+  .limit(1);
 
 // Multiple records with condition
 const activeUsers = await db
-    .select({
-        id: users.id,
-        email: users.email,   // Selective columns
-    })
-    .from(users)
-    .where(and(
-        eq(users.isActive, true),
-    ));
+  .select({
+    id: users.id,
+    email: users.email, // Selective columns
+  })
+  .from(users)
+  .where(and(eq(users.isActive, true)));
 ```
 
 ### INSERT Queries
 
 ```typescript
-import { orders } from '../../../db/schema/orders';
+import { orders } from "../../../db/schema/orders";
 
 const [newOrder] = await db
-    .insert(orders)
-    .values({
-        userId: userId,
-        addressId: shippingAddressId,
-        totalAmount: calculatedTotal,
-        status: 'pending',
-    })
-    .returning(); // Returns the inserted row with generated id, timestamps, etc.
+  .insert(orders)
+  .values({
+    userId: userId,
+    addressId: shippingAddressId,
+    totalAmount: calculatedTotal,
+    status: "pending",
+  })
+  .returning(); // Returns the inserted row with generated id, timestamps, etc.
 ```
 
 ### UPDATE Queries
 
 ```typescript
-import { eq } from 'drizzle-orm';
+import { eq } from "drizzle-orm";
 
 await db
-    .update(orders)
-    .set({
-        status: 'shipped',
-        // updatedAt: new Date() // Manually update if needed
-    })
-    .where(eq(orders.id, orderId));
+  .update(orders)
+  .set({
+    status: "shipped",
+    // updatedAt: new Date() // Manually update if needed
+  })
+  .where(eq(orders.id, orderId));
 ```
 
 ### DELETE Queries
 
 ```typescript
-await db
-    .delete(cartItems)
-    .where(eq(cartItems.cartId, cartId));
+await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
 ```
 
 ---
@@ -410,49 +428,54 @@ Transactions are essential for **the Sensitive Layer** — any operation that wr
 ### Checkout Transaction Pattern
 
 ```typescript
-import { orders, orderItems, payments, orderStatusHistory } from '../../../db/schema/orders';
+import {
+  orders,
+  orderItems,
+  payments,
+  orderStatusHistory,
+} from "../../../db/schema/orders";
 
 const { db } = getDb(env);
 
 const result = await db.transaction(async (tx) => {
-    // Step 1: Create the order record
-    const [newOrder] = await tx
-        .insert(orders)
-        .values({
-            userId: userId,
-            addressId: shippingAddressId,
-            totalAmount: calculatedTotal.toString(),
-            status: 'pending',
-        })
-        .returning();
+  // Step 1: Create the order record
+  const [newOrder] = await tx
+    .insert(orders)
+    .values({
+      userId: userId,
+      addressId: shippingAddressId,
+      totalAmount: calculatedTotal.toString(),
+      status: "pending",
+    })
+    .returning();
 
-    // Step 2: Insert all order line items
-    await tx.insert(orderItems).values(
-        cartItems.map(item => ({
-            orderId: newOrder.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: item.priceSnapshot,
-        }))
-    );
+  // Step 2: Insert all order line items
+  await tx.insert(orderItems).values(
+    cartItems.map((item) => ({
+      orderId: newOrder.id,
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: item.priceSnapshot,
+    })),
+  );
 
-    // Step 3: Create payment record
-    await tx.insert(payments).values({
-        orderId: newOrder.id,
-        amount: calculatedTotal.toString(),
-        method: paymentMethod,
-        status: 'pending',
-    });
+  // Step 3: Create payment record
+  await tx.insert(payments).values({
+    orderId: newOrder.id,
+    amount: calculatedTotal.toString(),
+    method: paymentMethod,
+    status: "pending",
+  });
 
-    // Step 4: Record initial status
-    await tx.insert(orderStatusHistory).values({
-        orderId: newOrder.id,
-        status: 'pending',
-        notes: 'Order placed by customer',
-    });
+  // Step 4: Record initial status
+  await tx.insert(orderStatusHistory).values({
+    orderId: newOrder.id,
+    status: "pending",
+    notes: "Order placed by customer",
+  });
 
-    // If ANY insert fails above, the entire transaction rolls back atomically
-    return newOrder;
+  // If ANY insert fails above, the entire transaction rolls back atomically
+  return newOrder;
 });
 ```
 
@@ -469,12 +492,12 @@ Drizzle's relational query API uses the `relations()` declarations in your schem
 const { db } = getDb(env);
 
 const cartWithItems = await db.query.carts.findFirst({
-    where: eq(carts.userId, userId),
-    with: {
-        items: true,
-        // NOTE: product relation removed — products are in a separate Neon project (icy-union-81751721)
-        // To get product details, query the products project via its own connection/Data API
-    }
+  where: eq(carts.userId, userId),
+  with: {
+    items: true,
+    // NOTE: product relation removed — products are in a separate Neon project (icy-union-81751721)
+    // To get product details, query the products project via its own connection/Data API
+  },
 });
 ```
 
@@ -510,12 +533,12 @@ const unsafe = await sql`SELECT * FROM users WHERE email = '${email}'`; // WRONG
 
 ## 10. Common Drizzle Pitfalls
 
-| Pitfall | Cause | Fix |
-|---|---|---|
-| Migration doesn't pick up new table | New schema file not exported in `index.ts` | Add `export * from './new-file'` to `index.ts` |
-| `fetch failed` / `ETIMEDOUT` during `tsx db/migrate.ts` | Using wrong connection string (maybe HTTP endpoint instead of TCP) | Use the **pooler** connection string (the `-pooler.` hostname) |
-| `returning()` returns empty array | Drizzle's `.returning()` requires at least one column to exist | Verify the table has the columns you're selecting |
-| `updatedAt` not updating on `UPDATE` | Drizzle doesn't auto-update `updatedAt` | Add `.set({ updatedAt: new Date() })` manually, or add a DB trigger |
-| TypeScript errors on relational queries | Schema not passed to `drizzle()` | Use `drizzle(sql, { schema })` — see `getDb()` |
-| `drizzle-kit generate` produces empty migration | No schema changes detected | Ensure your schema file is exported from `index.ts` |
-| Double `\n` in PEM keys in Worker | `.dev.vars` stores literal `\\n` | `jwks.ts` handles this with `.replace(/\\n/g, '\n')` — don't change it |
+| Pitfall                                                 | Cause                                                              | Fix                                                                    |
+| ------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Migration doesn't pick up new table                     | New schema file not exported in `index.ts`                         | Add `export * from './new-file'` to `index.ts`                         |
+| `fetch failed` / `ETIMEDOUT` during `tsx db/migrate.ts` | Using wrong connection string (maybe HTTP endpoint instead of TCP) | Use the **pooler** connection string (the `-pooler.` hostname)         |
+| `returning()` returns empty array                       | Drizzle's `.returning()` requires at least one column to exist     | Verify the table has the columns you're selecting                      |
+| `updatedAt` not updating on `UPDATE`                    | Drizzle doesn't auto-update `updatedAt`                            | Add `.set({ updatedAt: new Date() })` manually, or add a DB trigger    |
+| TypeScript errors on relational queries                 | Schema not passed to `drizzle()`                                   | Use `drizzle(sql, { schema })` — see `getDb()`                         |
+| `drizzle-kit generate` produces empty migration         | No schema changes detected                                         | Ensure your schema file is exported from `index.ts`                    |
+| Double `\n` in PEM keys in Worker                       | `.dev.vars` stores literal `\\n`                                   | `jwks.ts` handles this with `.replace(/\\n/g, '\n')` — don't change it |

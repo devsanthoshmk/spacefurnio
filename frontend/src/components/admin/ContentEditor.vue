@@ -4,78 +4,76 @@
  * Displays each key as a human-readable label with editable values
  * Supports nested content structure: { text: string, component: string | string[] }
  */
-import { computed } from 'vue';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
-import Button from 'primevue/button';
+import { computed } from 'vue'
+import InputText from 'primevue/inputtext'
+import Textarea from 'primevue/textarea'
+import Button from 'primevue/button'
 
 const props = defineProps({
   content: {
     type: Object,
-    required: true
+    required: true,
   },
   filename: {
     type: String,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const emit = defineEmits(['value-change', 'preview']);
+const emit = defineEmits(['value-change', 'preview'])
 
 // Convert snake_case key to human-readable label
 function formatLabel(key) {
-  return key
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, char => char.toUpperCase());
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
 // Get the text value from content entry (handles both old flat format and new nested format)
 function getTextValue(value) {
   if (typeof value === 'object' && value !== null && 'text' in value) {
-    return value.text;
+    return value.text
   }
-  return value;
+  return value
 }
 
 // Get component info from content entry
 function getComponentInfo(value) {
   if (typeof value === 'object' && value !== null && 'component' in value) {
-    return value.component;
+    return value.component
   }
-  return null;
+  return null
 }
 
 // Format component info for display - extracts component name from arrow function
 function formatComponentInfo(component) {
   const extractName = (loader) => {
-    if (!loader) return '';
+    if (!loader) return ''
     // If it's a function, convert to string and extract component name
     if (typeof loader === 'function') {
-      const funcStr = loader.toString();
-      const match = funcStr.match(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/);
+      const funcStr = loader.toString()
+      const match = funcStr.match(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/)
       if (match) {
-        const pathMatch = match[1].match(/([^/]+)\.vue$/);
-        return pathMatch ? pathMatch[1] : match[1];
+        const pathMatch = match[1].match(/([^/]+)\.vue$/)
+        return pathMatch ? pathMatch[1] : match[1]
       }
     }
     // Fallback for string paths
     if (typeof loader === 'string') {
-      const match = loader.match(/([^/]+)\.vue$/);
-      return match ? match[1] : loader;
+      const match = loader.match(/([^/]+)\.vue$/)
+      return match ? match[1] : loader
     }
-    return 'Component';
-  };
-  
-  if (Array.isArray(component)) {
-    return component.map(extractName).join(', ');
+    return 'Component'
   }
-  return extractName(component);
+
+  if (Array.isArray(component)) {
+    return component.map(extractName).join(', ')
+  }
+  return extractName(component)
 }
 
 // Check if component is used in multiple places
 function isMultiComponent(value) {
-  const component = getComponentInfo(value);
-  return Array.isArray(component) && component.length > 1;
+  const component = getComponentInfo(value)
+  return Array.isArray(component) && component.length > 1
 }
 
 // Get description/hint for a key
@@ -90,37 +88,37 @@ function getHint(key) {
     grab_now_button: 'Text on the main action button',
     product_section_heading: 'Heading for the products section',
     scroll_text_1: 'First scroll animation text',
-    scroll_text_2: 'Second scroll animation text'
-  };
-  return hints[key] || null;
+    scroll_text_2: 'Second scroll animation text',
+  }
+  return hints[key] || null
 }
 
 // Determine if a value should use textarea (longer text)
 function shouldUseTextarea(value) {
-  const textValue = getTextValue(value);
-  return typeof textValue === 'string' && (textValue.length > 50 || textValue.includes('\n'));
+  const textValue = getTextValue(value)
+  return typeof textValue === 'string' && (textValue.length > 50 || textValue.includes('\n'))
 }
 
 // Get sorted content entries
 const contentEntries = computed(() => {
-  return Object.entries(props.content);
-});
+  return Object.entries(props.content)
+})
 
 // Handle value change - update the text property
 function onValueChange(key, newText) {
-  const currentValue = props.content[key];
+  const currentValue = props.content[key]
   if (typeof currentValue === 'object' && currentValue !== null && 'text' in currentValue) {
     // New format: update only the text property
-    emit('value-change', key, { ...currentValue, text: newText });
+    emit('value-change', key, { ...currentValue, text: newText })
   } else {
     // Old format: update the value directly
-    emit('value-change', key, newText);
+    emit('value-change', key, newText)
   }
 }
 
 // Open preview with component info
 function openPreview(key) {
-  emit('preview', key);
+  emit('preview', key)
 }
 </script>
 
@@ -131,9 +129,7 @@ function openPreview(key) {
         <i class="pi pi-pencil"></i>
         Editing: {{ filename }}
       </h3>
-      <p class="editor-subtitle">
-        {{ contentEntries.length }} editable fields
-      </p>
+      <p class="editor-subtitle">{{ contentEntries.length }} editable fields</p>
     </div>
 
     <div class="fields-grid">
@@ -196,9 +192,7 @@ function openPreview(key) {
         </div>
 
         <div class="field-footer">
-          <span class="char-count">
-            {{ String(getTextValue(value)).length }} characters
-          </span>
+          <span class="char-count"> {{ String(getTextValue(value)).length }} characters </span>
         </div>
       </div>
     </div>

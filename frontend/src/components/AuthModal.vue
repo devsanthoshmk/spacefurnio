@@ -14,11 +14,7 @@
   -->
   <Teleport to="body">
     <Transition name="auth-backdrop">
-      <div
-        v-if="isOpen"
-        class="sf-auth-backdrop"
-        @click.self="closeModal"
-      ></div>
+      <div v-if="isOpen" class="sf-auth-backdrop" @click.self="closeModal"></div>
     </Transition>
 
     <Transition name="auth-content">
@@ -33,8 +29,18 @@
       >
         <!-- Close -->
         <button @click="closeModal" class="sf-auth-close" aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
 
@@ -45,16 +51,10 @@
 
         <!-- Tab Switcher -->
         <div class="sf-auth-tabs">
-          <button
-            :class="['sf-auth-tab', { active: isLogin }]"
-            @click="switchTab('login')"
-          >
+          <button :class="['sf-auth-tab', { active: isLogin }]" @click="switchTab('login')">
             Sign In
           </button>
-          <button
-            :class="['sf-auth-tab', { active: !isLogin }]"
-            @click="switchTab('register')"
-          >
+          <button :class="['sf-auth-tab', { active: !isLogin }]" @click="switchTab('register')">
             Create Account
           </button>
           <div class="sf-auth-tab-indicator" :style="{ left: isLogin ? '0' : '50%' }"></div>
@@ -65,7 +65,18 @@
           <!-- Error Banner -->
           <Transition name="error-slide">
             <div v-if="errorMessage" class="sf-auth-error">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
               <span>{{ errorMessage }}</span>
               <button @click="errorMessage = ''" class="sf-auth-error-dismiss">×</button>
             </div>
@@ -74,7 +85,16 @@
           <!-- Success Banner -->
           <Transition name="error-slide">
             <div v-if="successMessage" class="sf-auth-success">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
               <span>{{ successMessage }}</span>
             </div>
           </Transition>
@@ -106,9 +126,38 @@
                   required
                   autocomplete="current-password"
                 />
-                <button type="button" @click="showPassword = !showPassword" class="sf-auth-eye" aria-label="Toggle password visibility">
-                  <svg v-if="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="sf-auth-eye"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg
+                    v-if="!showPassword"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    v-else
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -174,9 +223,38 @@
                   minlength="6"
                   autocomplete="new-password"
                 />
-                <button type="button" @click="showPassword = !showPassword" class="sf-auth-eye" aria-label="Toggle password visibility">
-                  <svg v-if="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="sf-auth-eye"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg
+                    v-if="!showPassword"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    v-else
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -194,7 +272,24 @@
 
           <!-- Google OAuth -->
           <button @click="handleGoogleLogin" class="sf-auth-google">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
             Continue with Google
           </button>
         </div>
@@ -223,7 +318,7 @@
  * - Form validation
  */
 
-import { computed, ref, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/lib/api'
 
@@ -242,9 +337,6 @@ const successMessage = ref('')
 
 const loginForm = ref({ email: '', password: '' })
 const registerForm = ref({ firstName: '', lastName: '', email: '', password: '' })
-
-// Worker API URL from .env
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || import.meta.env.VITE_API_URL || 'https://backend.spacefurnio.workers.dev'
 
 watch(isOpen, async (open) => {
   if (open) {
@@ -274,29 +366,14 @@ async function handleLogin() {
   try {
     isSubmitting.value = true
 
-    const res = await fetch(`${WORKER_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: loginForm.value.email,
-        password: loginForm.value.password
-      })
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Login failed. Please check your credentials.')
-    }
+    const data = await api.login(loginForm.value.email, loginForm.value.password)
 
     // Store token + update auth state
-    api.setToken(data.token)
     authStore.user = data.user
 
     // Sync cart/wishlist
     successMessage.value = 'Welcome back!'
     setTimeout(() => closeModal(), 800)
-
   } catch (err) {
     errorMessage.value = err.message || 'Something went wrong. Please try again.'
   } finally {
@@ -317,32 +394,20 @@ async function handleRegister() {
   try {
     isSubmitting.value = true
 
-    const res = await fetch(`${WORKER_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: registerForm.value.email,
-        password: registerForm.value.password,
-        firstName: registerForm.value.firstName,
-        lastName: registerForm.value.lastName
-      })
+    const data = await api.register({
+      email: registerForm.value.email,
+      password: registerForm.value.password,
+      firstName: registerForm.value.firstName,
+      lastName: registerForm.value.lastName,
     })
 
-    const data = await res.json()
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Registration failed.')
-    }
-
     // Store token + update auth state
-    if (data.token) {
-      api.setToken(data.token)
+    if (data.access_token) {
       authStore.user = data.user
     }
 
     successMessage.value = data.message || 'Account created successfully!'
     setTimeout(() => closeModal(), 800)
-
   } catch (err) {
     errorMessage.value = err.message || 'Something went wrong. Please try again.'
   } finally {
@@ -355,7 +420,7 @@ async function handleGoogleLogin() {
   try {
     const url = await authStore.getGoogleAuthUrl()
     if (url) window.location.href = url
-  } catch (err) {
+  } catch {
     errorMessage.value = 'Google sign-in is currently unavailable.'
   }
 }
@@ -407,7 +472,7 @@ onUnmounted(() => {
   max-width: 420px;
   max-height: calc(100vh - 3rem);
   overflow-y: auto;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   border-radius: var(--shop-radius-xl, 1.5rem);
   z-index: 100002;
   padding: 2rem;
@@ -440,15 +505,15 @@ onUnmounted(() => {
   justify-content: center;
   border-radius: 50%;
   border: none;
-  background: var(--shop-beige, #E8E3DC);
-  color: var(--shop-brown-dark, #8B7D6D);
+  background: var(--shop-beige, #e8e3dc);
+  color: var(--shop-brown-dark, #8b7d6d);
   cursor: pointer;
   transition: all 0.2s;
   z-index: 1;
 }
 .sf-auth-close:hover {
-  background: var(--shop-beige-dark, #D4CFC6);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-beige-dark, #d4cfc6);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Brand */
@@ -467,7 +532,7 @@ onUnmounted(() => {
 .sf-auth-tabs {
   position: relative;
   display: flex;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
   border-radius: 999px;
   padding: 3px;
   margin-bottom: 1.5rem;
@@ -477,7 +542,7 @@ onUnmounted(() => {
   padding: 0.625rem 0;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   background: transparent;
   border: none;
   border-radius: 999px;
@@ -487,7 +552,7 @@ onUnmounted(() => {
   z-index: 1;
 }
 .sf-auth-tab.active {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 .sf-auth-tab-indicator {
   position: absolute;
@@ -522,26 +587,26 @@ onUnmounted(() => {
 .sf-auth-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   letter-spacing: 0.02em;
 }
 .sf-auth-input {
   width: 100%;
   padding: 0.75rem 0.875rem;
   font-size: 0.875rem;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: var(--shop-radius-md, 0.75rem);
   background: white;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   transition: all 0.2s;
   outline: none;
 }
 .sf-auth-input:focus {
-  border-color: var(--shop-accent, #B8956C);
+  border-color: var(--shop-accent, #b8956c);
   box-shadow: 0 0 0 3px rgba(184, 149, 108, 0.12);
 }
 .sf-auth-input::placeholder {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 .sf-auth-input-wrap {
   position: relative;
@@ -561,13 +626,13 @@ onUnmounted(() => {
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   border-radius: 6px;
   transition: color 0.15s;
 }
 .sf-auth-eye:hover {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Submit */
@@ -577,7 +642,7 @@ onUnmounted(() => {
   font-size: 0.875rem;
   font-weight: 600;
   color: white;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -588,7 +653,7 @@ onUnmounted(() => {
   margin-top: 0.25rem;
 }
 .sf-auth-submit:hover:not(:disabled) {
-  background: var(--shop-black, #1A1816);
+  background: var(--shop-black, #1a1816);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(61, 58, 54, 0.2);
 }
@@ -605,7 +670,9 @@ onUnmounted(() => {
   animation: authSpin 0.6s linear infinite;
 }
 @keyframes authSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Divider */
@@ -620,12 +687,12 @@ onUnmounted(() => {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--shop-beige-dark, #D4CFC6);
+  background: var(--shop-beige-dark, #d4cfc6);
 }
 .sf-auth-divider span {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -640,16 +707,16 @@ onUnmounted(() => {
   padding: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s;
 }
 .sf-auth-google:hover {
-  background: var(--shop-cream-dark, #F5F2ED);
-  border-color: var(--shop-tan, #C4B8A9);
+  background: var(--shop-cream-dark, #f5f2ed);
+  border-color: var(--shop-tan, #c4b8a9);
   transform: translateY(-1px);
 }
 
@@ -663,7 +730,7 @@ onUnmounted(() => {
   border: 1px solid rgba(196, 117, 117, 0.2);
   border-radius: var(--shop-radius-md, 0.75rem);
   font-size: 0.8125rem;
-  color: var(--shop-error, #C47575);
+  color: var(--shop-error, #c47575);
   margin-bottom: 0.75rem;
 }
 .sf-auth-error-dismiss {
@@ -685,7 +752,7 @@ onUnmounted(() => {
   border: 1px solid rgba(125, 155, 118, 0.25);
   border-radius: var(--shop-radius-md, 0.75rem);
   font-size: 0.8125rem;
-  color: var(--shop-success, #5A7D51);
+  color: var(--shop-success, #5a7d51);
   margin-bottom: 0.75rem;
 }
 .error-slide-enter-active,
@@ -702,17 +769,17 @@ onUnmounted(() => {
 .sf-auth-footer {
   text-align: center;
   font-size: 0.6875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-top: 1.25rem;
   line-height: 1.5;
 }
 .sf-auth-link {
-  color: var(--shop-accent-dark, #8C6D4D);
+  color: var(--shop-accent-dark, #8c6d4d);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 .sf-auth-link:hover {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Responsive */

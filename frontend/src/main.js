@@ -41,7 +41,6 @@ setTimeout(() => {
     duration: 1000,
     easing: 'ease-out',
     once: true,
-    offset: 100
+    offset: 100,
   })
 }, 100)
-

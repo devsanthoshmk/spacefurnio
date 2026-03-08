@@ -4,7 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:migrate": "tsx db/migrate.ts",
+    "db:push": "drizzle-kit push --config drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts",
+    "db:generate:products": "drizzle-kit generate --config drizzle.products.config.ts",
+    "db:migrate:products": "drizzle-kit migrate --config drizzle.products.config.ts",
+    "db:push:products": "drizzle-kit push --config drizzle.products.config.ts",
+    "db:studio:products": "drizzle-kit studio --config drizzle.products.config.ts"
   },
   "keywords": [],
   "author": "",

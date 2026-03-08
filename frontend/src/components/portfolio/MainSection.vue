@@ -1,5 +1,4 @@
 <template>
-
   <div
     ref="containerRef"
     class="relative w-full h-[100dvh] pt-20 bg-stone-100 overflow-hidden outline-none flex flex-col"
@@ -17,10 +16,13 @@
 
     <!-- Main Content Flex Wrapper: Centered content with constant gap -->
     <!-- Replaced Grid with Flex to ensure Text and Image move together during size changes -->
-    <div class="relative z-10 w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24 flex-grow h-full">
-
+    <div
+      class="relative z-10 w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24 flex-grow h-full"
+    >
       <!-- Text Block (Fixed width to prevent reflow, moves smoothly) -->
-      <div class="order-2 md:order-1 w-full md:w-[480px] flex-shrink-0 flex flex-col items-start text-left">
+      <div
+        class="order-2 md:order-1 w-full md:w-[480px] flex-shrink-0 flex flex-col items-start text-left"
+      >
         <Transition name="text-fade" mode="out-in">
           <span :key="`label-${currentIndex}`" class="collection-label">
             {{ currentSection.collectionLabel }}
@@ -49,14 +51,21 @@
           <a :key="`cta-${currentIndex}`" href="#" class="section-cta">
             <span class="cta-text">{{ currentSection.ctaText }}</span>
             <svg class="cta-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
             </svg>
           </a>
         </Transition>
       </div>
 
       <!-- Image Block (Moves smoothly towards center) -->
-      <div class="order-1 md:order-2 flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform">
+      <div
+        class="order-1 md:order-2 flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform"
+      >
         <!-- Wrapper morphs aspect ratio via CSS transition -->
         <div
           class="image-wrapper sticker-card"
@@ -90,9 +99,7 @@
 
     <!-- Navigation Hint -->
     <Transition name="fade">
-      <div v-if="currentIndex === 0 && showHint" class="nav-hint">
-        Use ↑ ↓ to navigate
-      </div>
+      <div v-if="currentIndex === 0 && showHint" class="nav-hint">Use ↑ ↓ to navigate</div>
     </Transition>
   </div>
 </template>
@@ -108,9 +115,9 @@
 
 import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
 
-const props=defineProps({
+const props = defineProps({
   simulateKey: Function,
-  innerCustomScollEl: HTMLElement
+  innerCustomScollEl: HTMLElement,
 })
 
 // ============================================
@@ -121,38 +128,42 @@ const sections = ref([
     collectionLabel: 'Collection 01',
     title: 'Light &',
     subtitle: 'Structure',
-    description: 'Spacefurnio and Lumina are collaborating to redefine how light interacts with solid oak surfaces. A study in contrast and clarity.',
+    description:
+      'Spacefurnio and Lumina are collaborating to redefine how light interacts with solid oak surfaces. A study in contrast and clarity.',
     ctaText: 'Explore Chapter',
     imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80',
-    orientation: 'landscape'
+    orientation: 'landscape',
   },
   {
     collectionLabel: 'Collection 02',
     title: 'Earth &',
     subtitle: 'Form',
-    description: 'Spacefurnio and TERRA are collaborating on a limited series of ceramic-inlaid coffee tables. Hand-thrown pottery meets precision joinery.',
+    description:
+      'Spacefurnio and TERRA are collaborating on a limited series of ceramic-inlaid coffee tables. Hand-thrown pottery meets precision joinery.',
     ctaText: 'Explore Chapter',
     imageUrl: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&q=80',
-    orientation: 'portrait'
+    orientation: 'portrait',
   },
   {
     collectionLabel: 'Collection 03',
     title: 'Soft',
     subtitle: 'Resilience',
-    description: 'Spacefurnio and Velvet & Co are collaborating to bring tactile warmth to industrial steel frames. Comfort redefined.',
+    description:
+      'Spacefurnio and Velvet & Co are collaborating to bring tactile warmth to industrial steel frames. Comfort redefined.',
     ctaText: 'Know More',
     imageUrl: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&q=80',
-    orientation: 'square'
+    orientation: 'square',
   },
   {
     collectionLabel: 'Collection 04',
     title: 'Nordic',
     subtitle: 'Essence',
-    description: 'A collection inspired by Scandinavian minimalism. Clean lines, natural materials, and timeless design philosophy.',
+    description:
+      'A collection inspired by Scandinavian minimalism. Clean lines, natural materials, and timeless design philosophy.',
     ctaText: 'Discover',
     imageUrl: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&q=80',
-    orientation: 'landscape'
-  }
+    orientation: 'landscape',
+  },
 ])
 
 // ============================================
@@ -186,8 +197,8 @@ function navigateNext() {
   if (currentIndex.value < sections.value.length - 1) {
     triggerTransition(currentIndex.value + 1)
   } else {
-    scroll100(1);
-    containerRef.value.style.pointerEvents = 'none';
+    scroll100(1)
+    containerRef.value.style.pointerEvents = 'none'
   }
 }
 
@@ -195,8 +206,8 @@ function navigatePrev() {
   if (currentIndex.value > 0) {
     triggerTransition(currentIndex.value - 1)
   } else {
-    scroll100(-1);
-    containerRef.value.style.pointerEvents = 'none';
+    scroll100(-1)
+    containerRef.value.style.pointerEvents = 'none'
   }
 }
 
@@ -221,18 +232,21 @@ function triggerTransition(newIndex) {
 // ============================================
 function getAspectRatioClass(orientation) {
   switch (orientation) {
-    case 'portrait': return 'aspect-portrait'
-    case 'square': return 'aspect-square-custom'
-    default: return 'aspect-landscape'
+    case 'portrait':
+      return 'aspect-portrait'
+    case 'square':
+      return 'aspect-square-custom'
+    default:
+      return 'aspect-landscape'
   }
 }
 
 function scroll100(up) {
   /** up is -1 or +1 whih desides to go up or down */
   if (up > 0) {
-    props.simulateKey('ArrowDown');
+    props.simulateKey('ArrowDown')
   } else {
-    props.simulateKey('ArrowUp');
+    props.simulateKey('ArrowUp')
   }
 }
 
@@ -283,26 +297,29 @@ function handleTouchEnd(event) {
 // enabling auto focus for custom scroll to work properly
 // using custom scroll event to handle scroll
 function handlecustomScroll(e) {
-  console.warn("called",e.detail.currentSection , props.innerCustomScollEl,e.detail.currentSection === props.innerCustomScollEl)
+  console.warn(
+    'called',
+    e.detail.currentSection,
+    props.innerCustomScollEl,
+    e.detail.currentSection === props.innerCustomScollEl,
+  )
   if (e.detail.currentSection === props.innerCustomScollEl) {
-    containerRef.value.style.pointerEvents = 'auto';
-    containerRef.value?.focus({ preventScroll: true });
+    containerRef.value.style.pointerEvents = 'auto'
+    containerRef.value?.focus({ preventScroll: true })
     containerRef.value?.children[0].click() //aditinal ensurance for click verification
   }
 }
-
 
 // ============================================
 // LIFECYCLE
 // ============================================
 onMounted(() => {
-  window.addEventListener('sectionChange', handlecustomScroll);
+  window.addEventListener('sectionChange', handlecustomScroll)
 })
 
 onUnmounted(() => {
   // Cleanup if needed
-  window.removeEventListener('sectionChange', handlecustomScroll);
-
+  window.removeEventListener('sectionChange', handlecustomScroll)
 })
 </script>
 
@@ -312,8 +329,8 @@ onUnmounted(() => {
    ============================================ */
 .pattern-grid {
   background-image:
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -394,10 +411,14 @@ onUnmounted(() => {
    TEXT TRANSITIONS (PRESERVED)
    ============================================ */
 .text-fade-enter-active {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
 }
 .text-fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 .text-fade-enter-from {
   opacity: 0;
@@ -434,8 +455,8 @@ onUnmounted(() => {
 /* We use width-based sizing for all to ensure smooth transitions (avoiding height: auto) */
 
 .aspect-landscape {
-  width: 55vw;          /* Wide relative to screen */
-  max-width: 1100px;    /* Cap max size */
+  width: 55vw; /* Wide relative to screen */
+  max-width: 1100px; /* Cap max size */
   aspect-ratio: 4 / 3;
 }
 
@@ -551,9 +572,18 @@ onUnmounted(() => {
    ============================================ */
 @media (max-width: 1024px) {
   /* Tablet: reduced scale but still width-driven */
-  .aspect-landscape { width: 65vw; max-width: 800px; }
-  .aspect-portrait { width: 50vh; max-width: 500px; }
-  .aspect-square-custom { width: 50vh; max-width: 500px; }
+  .aspect-landscape {
+    width: 65vw;
+    max-width: 800px;
+  }
+  .aspect-portrait {
+    width: 50vh;
+    max-width: 500px;
+  }
+  .aspect-square-custom {
+    width: 50vh;
+    max-width: 500px;
+  }
 }
 
 @media (max-width: 768px) {

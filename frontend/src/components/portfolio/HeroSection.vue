@@ -8,7 +8,7 @@
       <img
         src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=2670&auto=format&fit=crop"
         srcset="
-          https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop 800w,
+          https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop   800w,
           https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1600&auto=format&fit=crop 1600w,
           https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=2670&auto=format&fit=crop 2670w
         "
@@ -16,10 +16,12 @@
         alt="Cinematic modern sofa in elegant interior"
         loading="lazy"
         class="w-full h-full object-cover"
-        :class="{ 'hero-background-animate': !prefersReducedMotion  }"
+        :class="{ 'hero-background-animate': !prefersReducedMotion }"
       />
       <!-- Cinematic Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+      ></div>
     </div>
 
     <!-- Content Container -->
@@ -45,11 +47,12 @@
                 <span
                   v-for="(char, charIndex) in word.chars"
                   :key="`char-${groupIndex}-${wordIndex}-${charIndex}`"
-                  :class="[
-                    'inline-block',
-                    prefersReducedMotion ? 'opacity-100' : 'char-animate'
-                  ]"
-                  :style="prefersReducedMotion ? {} : { animationDelay: `${word.startIndex + charIndex * typeSpeed}ms` }"
+                  :class="['inline-block', prefersReducedMotion ? 'opacity-100' : 'char-animate']"
+                  :style="
+                    prefersReducedMotion
+                      ? {}
+                      : { animationDelay: `${word.startIndex + charIndex * typeSpeed}ms` }
+                  "
                 >
                   {{ char }}
                 </span>
@@ -62,17 +65,14 @@
             class="hero-subheading text-xl sm:text-2xl md:text-3xl font-sans text-gray-200 tracking-wide"
             :class="{
               'opacity-0': !subheadingVisible && !prefersReducedMotion,
-              'subheading-fade-in': subheadingVisible && !prefersReducedMotion
+              'subheading-fade-in': subheadingVisible && !prefersReducedMotion,
             }"
           >
             {{ subheading }}
           </p>
 
           <!-- Optional Scroll Indicator (only shown when motion is reduced) -->
-          <div
-            v-if="prefersReducedMotion"
-            class="mt-12 flex justify-center md:justify-start"
-          >
+          <div v-if="prefersReducedMotion" class="mt-12 flex justify-center md:justify-start">
             <div class="scroll-indicator text-white/60 text-sm uppercase tracking-widest">
               Scroll to explore
             </div>
@@ -86,7 +86,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
 
-const props=defineProps({
+const props = defineProps({
   simulateKey: Object,
 })
 
@@ -113,17 +113,17 @@ const headingWords = computed(() => {
   // Group 1 & 2
   const lineGroups = [
     { text: headingLine1, noBreak: false },
-    { text: headingLine2, noBreak: false }
+    { text: headingLine2, noBreak: false },
   ]
 
   let charIndex = 0
 
   return lineGroups.map((group) => {
     const words = group.text.split(' ')
-    const lineWords = words.map(word => {
+    const lineWords = words.map((word) => {
       const wordData = {
         chars: word.split(''),
-        startIndex: charIndex * typeSpeed
+        startIndex: charIndex * typeSpeed,
       }
       charIndex += word.length + 1 // +1 for the space
       return wordData
@@ -131,7 +131,7 @@ const headingWords = computed(() => {
 
     return {
       noBreak: group.noBreak,
-      words: lineWords
+      words: lineWords,
     }
   })
 })
@@ -196,7 +196,7 @@ const performAutoScroll = () => {
   // })
 
   // for custom scroll
-  props.simulateKey('ArrowDown');
+  props.simulateKey('ArrowDown')
 }
 
 // ========================================
@@ -252,7 +252,8 @@ onMounted(() => {
    Background Parallax Animation
    ======================================== */
 @keyframes backgroundFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1.05) translateY(0);
   }
   50% {

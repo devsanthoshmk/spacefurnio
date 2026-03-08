@@ -12,125 +12,182 @@
     ================================================================
   -->
   <Teleport to="body">
-    <div
-      v-if="isWishlistOpen"
-      class="sf-wl-backdrop"
-      @click.self="closeWishlist"
-    ></div>
+    <div v-if="isWishlistOpen" class="sf-wl-backdrop" @click.self="closeWishlist"></div>
 
     <aside
       v-if="isWishlistOpen"
       class="sf-wl-drawer"
-        role="dialog"
-        aria-label="Wishlist"
-        @keydown.esc="closeWishlist"
-        tabindex="-1"
-        ref="drawerRef"
-      >
-        <!-- ─── Header ─── -->
-        <header class="sf-wl-header">
-          <div class="sf-wl-header-inner">
-            <div class="sf-wl-title-group">
-              <div class="sf-wl-icon-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--shop-error, #C47575)" stroke="none">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-              </div>
-              <h2 class="sf-wl-title">Wishlist</h2>
-              <Transition name="badge-pop">
-                <span v-if="wishlist.itemCount > 0" class="sf-wl-badge">
-                  {{ wishlist.itemCount }}
-                </span>
-              </Transition>
-            </div>
-            <button @click="closeWishlist" class="sf-wl-close" aria-label="Close wishlist">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        </header>
-
-        <!-- ─── Body ─── -->
-        <div class="sf-wl-body shop-scrollbar">
-          <!-- Loading Skeleton -->
-          <div v-if="wishlist.isLoading" class="sf-wl-skeleton-grid">
-            <div v-for="i in 4" :key="i" class="sf-wl-skeleton-card">
-              <div class="sf-wl-skeleton-img shop-skeleton"></div>
-              <div style="padding:0.75rem;">
-                <div class="shop-skeleton" style="height:14px;width:80%;border-radius:6px;"></div>
-                <div class="shop-skeleton" style="height:12px;width:50%;border-radius:6px;margin-top:8px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="wishlist.isEmpty" class="sf-wl-empty">
-            <div class="sf-wl-empty-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--shop-tan)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-            </div>
-            <h3 class="sf-wl-empty-title">No saved items yet</h3>
-            <p class="sf-wl-empty-text">Tap the heart on any product to save it here.</p>
-            <button @click="closeWishlist" class="shop-btn shop-btn-primary sf-wl-empty-btn">
-              Explore Collection
-            </button>
-          </div>
-
-          <!-- Wishlist Items Grid -->
-          <TransitionGroup v-else name="wl-item" tag="div" class="sf-wl-grid">
-            <div
-              v-for="(item, index) in wishlist.items"
-              :key="item.id"
-              class="sf-wl-card"
-              :style="{ '--stagger': index }"
-            >
-              <div class="sf-wl-card-img shop-img-zoom">
-                <img
-                  v-if="item.product?.primaryImage"
-                  :src="item.product.primaryImage"
-                  :alt="item.product?.name"
-                  loading="lazy"
+      role="dialog"
+      aria-label="Wishlist"
+      @keydown.esc="closeWishlist"
+      tabindex="-1"
+      ref="drawerRef"
+    >
+      <!-- ─── Header ─── -->
+      <header class="sf-wl-header">
+        <div class="sf-wl-header-inner">
+          <div class="sf-wl-title-group">
+            <div class="sf-wl-icon-wrap">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="var(--shop-error, #C47575)"
+                stroke="none"
+              >
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
                 />
-                <div v-else class="sf-wl-card-img-placeholder">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--shop-tan)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                </div>
-
-                <!-- Remove heart button (top-right on card) -->
-                <button
-                  @click="removeItem(item.id)"
-                  class="sf-wl-card-heart"
-                  aria-label="Remove from wishlist"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--shop-error, #C47575)" stroke="none">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                </button>
-              </div>
-
-              <div class="sf-wl-card-info">
-                <h4 class="sf-wl-card-name">{{ item.product?.name }}</h4>
-                <p v-if="item.variant" class="sf-wl-card-variant">{{ item.variant }}</p>
-                <p class="sf-wl-card-price">${{ item.product?.price?.toLocaleString() }}</p>
-
-                <button @click="moveToCart(item.id)" class="sf-wl-add-cart-btn">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                  Add to Cart
-                </button>
-              </div>
+              </svg>
             </div>
-          </TransitionGroup>
+            <h2 class="sf-wl-title">Wishlist</h2>
+            <Transition name="badge-pop">
+              <span v-if="wishlist.itemCount > 0" class="sf-wl-badge">
+                {{ wishlist.itemCount }}
+              </span>
+            </Transition>
+          </div>
+          <button @click="closeWishlist" class="sf-wl-close" aria-label="Close wishlist">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ─── Body ─── -->
+      <div class="sf-wl-body shop-scrollbar">
+        <!-- Loading Skeleton -->
+        <div v-if="wishlist.isLoading" class="sf-wl-skeleton-grid">
+          <div v-for="i in 4" :key="i" class="sf-wl-skeleton-card">
+            <div class="sf-wl-skeleton-img shop-skeleton"></div>
+            <div style="padding: 0.75rem">
+              <div class="shop-skeleton" style="height: 14px; width: 80%; border-radius: 6px"></div>
+              <div
+                class="shop-skeleton"
+                style="height: 12px; width: 50%; border-radius: 6px; margin-top: 8px"
+              ></div>
+            </div>
+          </div>
         </div>
 
-        <!-- ─── Footer ─── -->
-        <footer v-if="!wishlist.isEmpty && !wishlist.isLoading" class="sf-wl-footer">
-          <button @click="closeWishlist" class="sf-continue-btn">Continue Shopping</button>
-        </footer>
-      </aside>
+        <!-- Empty State -->
+        <div v-else-if="wishlist.isEmpty" class="sf-wl-empty">
+          <div class="sf-wl-empty-icon">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--shop-tan)"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
+            </svg>
+          </div>
+          <h3 class="sf-wl-empty-title">No saved items yet</h3>
+          <p class="sf-wl-empty-text">Tap the heart on any product to save it here.</p>
+          <button @click="closeWishlist" class="shop-btn shop-btn-primary sf-wl-empty-btn">
+            Explore Collection
+          </button>
+        </div>
+
+        <!-- Wishlist Items Grid -->
+        <TransitionGroup v-else name="wl-item" tag="div" class="sf-wl-grid">
+          <div
+            v-for="(item, index) in wishlist.displayItems"
+            :key="item.id"
+            class="sf-wl-card"
+            :style="{ '--stagger': index }"
+          >
+            <div class="sf-wl-card-img shop-img-zoom">
+              <img
+                v-if="item.product?.primaryImage"
+                :src="item.product.primaryImage"
+                :alt="item.product?.name"
+                loading="lazy"
+              />
+              <div v-else class="sf-wl-card-img-placeholder">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--shop-tan)"
+                  stroke-width="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+              </div>
+
+              <!-- Remove heart button (top-right on card) -->
+              <button
+                @click="removeItem(item.id)"
+                class="sf-wl-card-heart"
+                aria-label="Remove from wishlist"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="var(--shop-error, #C47575)"
+                  stroke="none"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="sf-wl-card-info">
+              <h4 class="sf-wl-card-name">{{ item.product?.name }}</h4>
+              <p v-if="item.variant" class="sf-wl-card-variant">{{ item.variant }}</p>
+              <p class="sf-wl-card-price">${{ item.product?.price?.toLocaleString() }}</p>
+
+              <button @click="moveToCart(item.id)" class="sf-wl-add-cart-btn">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </TransitionGroup>
+      </div>
+
+      <!-- ─── Footer ─── -->
+      <footer v-if="!wishlist.isEmpty && !wishlist.isLoading" class="sf-wl-footer">
+        <button @click="closeWishlist" class="sf-continue-btn">Continue Shopping</button>
+      </footer>
+    </aside>
   </Teleport>
 </template>
 
@@ -167,7 +224,7 @@ watch(isWishlistOpen, async (open) => {
     document.body.style.overflow = 'hidden'
     await nextTick()
     drawerRef.value?.focus()
-    wishlist.fetchWishlist()
+    await wishlist.fetchWishlist()
   } else {
     document.body.style.overflow = ''
   }
@@ -198,9 +255,10 @@ async function removeItem(itemId) {
 function handleEscKey(event) {
   if (event.key === 'Escape' && isWishlistOpen.value) closeWishlist()
 }
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('keydown', handleEscKey)
-  wishlist.fetchWishlist()
+  await wishlist.fetchWishlist()
+  await wishlist.enrichItems()
 })
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscKey)
@@ -224,8 +282,12 @@ onUnmounted(() => {
   animation: wlBackdropIn 0.3s ease forwards;
 }
 @keyframes wlBackdropIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Drawer */
@@ -236,7 +298,7 @@ onUnmounted(() => {
   bottom: 0;
   width: 100%;
   max-width: 26rem;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   z-index: 100002;
   display: flex;
   flex-direction: column;
@@ -245,15 +307,19 @@ onUnmounted(() => {
   animation: wlSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes wlSlideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* Header */
 .sf-wl-header {
   padding: 1.25rem 1.5rem;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 .sf-wl-header-inner {
   display: flex;
@@ -278,7 +344,7 @@ onUnmounted(() => {
   font-family: var(--shop-font-display, 'Playfair Display', serif);
   font-size: 1.375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   letter-spacing: -0.01em;
 }
 .sf-wl-badge {
@@ -291,7 +357,7 @@ onUnmounted(() => {
   font-size: 0.6875rem;
   font-weight: 700;
   color: white;
-  background: var(--shop-error, #C47575);
+  background: var(--shop-error, #c47575);
   border-radius: 999px;
 }
 .sf-wl-close {
@@ -303,13 +369,13 @@ onUnmounted(() => {
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   transition: all 0.2s;
 }
 .sf-wl-close:hover {
-  background: var(--shop-beige, #E8E3DC);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-beige, #e8e3dc);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Body */
@@ -360,12 +426,12 @@ onUnmounted(() => {
   font-family: var(--shop-font-display, 'Playfair Display', serif);
   font-size: 1.25rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.5rem;
 }
 .sf-wl-empty-text {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-bottom: 1.5rem;
   max-width: 240px;
 }
@@ -422,7 +488,7 @@ onUnmounted(() => {
 .sf-wl-card-img {
   width: 100%;
   aspect-ratio: 1;
-  background: var(--shop-cream-dark, #F5F2ED);
+  background: var(--shop-cream-dark, #f5f2ed);
   position: relative;
 }
 .sf-wl-card-img img {
@@ -470,7 +536,7 @@ onUnmounted(() => {
 .sf-wl-card-name {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -478,13 +544,13 @@ onUnmounted(() => {
 }
 .sf-wl-card-variant {
   font-size: 0.6875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-top: 2px;
 }
 .sf-wl-card-price {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-accent-dark, #8C6D4D);
+  color: var(--shop-accent-dark, #8c6d4d);
   margin-top: 4px;
 }
 .sf-wl-add-cart-btn {
@@ -498,14 +564,14 @@ onUnmounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
   color: white;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   border: none;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s;
 }
 .sf-wl-add-cart-btn:hover {
-  background: var(--shop-black, #1A1816);
+  background: var(--shop-black, #1a1816);
   transform: translateY(-1px);
 }
 .sf-wl-add-cart-btn:active {
@@ -516,7 +582,7 @@ onUnmounted(() => {
 .sf-wl-footer {
   flex-shrink: 0;
   padding: 1rem 1.5rem 1.5rem;
-  border-top: 1px solid var(--shop-beige, #E8E3DC);
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 /* Responsive */

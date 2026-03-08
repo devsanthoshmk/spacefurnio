@@ -2,65 +2,86 @@
   <footer class="bg-black text-gray-300 py-12 px-6 md:py-12 md:px-6 sm:py-8 sm:px-4">
     <div class="max-w-7xl mx-auto">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-
         <!-- Navigation Column -->
-        <div >
+        <div>
           <nav aria-label="Footer Navigation">
             <h3 class="text-white text-lg font-semibold mb-4">Navigation</h3>
             <ul class="space-y-2">
-
-        <li>
-          <router-link to="/" class="text-gray-300 hover:text-white transition-colors duration-300">
-            Home
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/about" class="text-gray-300 hover:text-white transition-colors duration-300">
-            About Us
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/collabs" class="text-gray-300 hover:text-white transition-colors duration-300">
-            SF x Collabs
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/shopping" class="text-gray-300 hover:text-white transition-colors duration-300">
-            Shopping
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/portfolio" class="text-gray-300 hover:text-white transition-colors duration-300">
-            Portfolio
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/projects" class="text-gray-300 hover:text-white transition-colors duration-300">
-            Ongoing Projects
-          </router-link>
-        </li>
-      </ul>
-    </nav>
-  </div>
+              <li>
+                <router-link
+                  to="/"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Home
+                </router-link>
+              </li>
+              <li>
+                <router-link
+                  to="/about"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  About Us
+                </router-link>
+              </li>
+              <li>
+                <router-link
+                  to="/collabs"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  SF x Collabs
+                </router-link>
+              </li>
+              <li>
+                <router-link
+                  to="/shopping"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Shopping
+                </router-link>
+              </li>
+              <li>
+                <router-link
+                  to="/portfolio"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Portfolio
+                </router-link>
+              </li>
+              <li>
+                <router-link
+                  to="/projects"
+                  class="text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  Ongoing Projects
+                </router-link>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
         <!-- Contact Column -->
-        <div >
+        <div>
           <h3 class="text-white text-lg font-semibold mb-4">Contact</h3>
           <div class="space-y-3">
             <address class="not-italic">
               <div class="text-gray-300">
-                90/1, North Beach Road
-                Tuticorin,<br>
+                90/1, North Beach Road Tuticorin,<br />
                 Chennai – 628001.
               </div>
             </address>
             <div>
-              <a href="tel:+919751112025" class="text-gray-300 hover:text-white transition-colors duration-300">
+              <a
+                href="tel:+919751112025"
+                class="text-gray-300 hover:text-white transition-colors duration-300"
+              >
                 +91 9751112025
               </a>
             </div>
             <div>
-              <a href="mailto:info.spacefurnio@gmail.com" class="text-gray-300 hover:text-white transition-colors duration-300">
+              <a
+                href="mailto:info.spacefurnio@gmail.com"
+                class="text-gray-300 hover:text-white transition-colors duration-300"
+              >
                 info.spacefurnio@gmail.com
               </a>
             </div>
@@ -68,7 +89,7 @@
         </div>
 
         <!-- Social Column -->
-        <div >
+        <div>
           <h3 class="text-white text-lg font-semibold mb-4">Follow Us</h3>
           <div class="flex space-x-3">
             <Button
@@ -98,15 +119,20 @@
           </div>
         </div>
 
-
         <!-- Legal Column -->
-        <div >
+        <div>
           <h3 class="text-white text-lg font-semibold mb-4">Legal</h3>
           <div class="text-gray-300">
-            <p>© {{ currentYear }} <span class="phitagate-font bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent text-[2.5vw] p-2">spacefurnio</span> – All rights reserved.</p>
+            <p>
+              © {{ currentYear }}
+              <span
+                class="phitagate-font bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent text-[2.5vw] p-2"
+                >spacefurnio</span
+              >
+              – All rights reserved.
+            </p>
           </div>
         </div>
-
       </div>
     </div>
   </footer>
@@ -126,7 +152,7 @@ const handleSocialClick = (platform) => {
     facebook: 'https://facebook.com/spacefurnio',
     twitter: 'https://twitter.com/spacefurnio',
     instagram: 'https://instagram.com/spacefurnio',
-    linkedin: 'https://linkedin.com/company/spacefurnio'
+    linkedin: 'https://linkedin.com/company/spacefurnio',
   }
 
   // In a real app, you'd navigate to the URL

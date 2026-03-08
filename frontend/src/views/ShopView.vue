@@ -22,8 +22,15 @@
               <p class="offer-subtitle">{{ offer.subtitle }}</p>
               <span class="offer-link">
                 See All
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>
             </div>
@@ -174,8 +181,15 @@
           </div>
           <router-link to="/shop/products?sort=popularity" class="see-all-link">
             See All
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </router-link>
         </header>
@@ -191,11 +205,22 @@
               <img :src="product.thumbnail" :alt="product.name" loading="lazy" />
               <div class="product-badges">
                 <span v-if="product.isNew" class="shop-badge shop-badge-new">New</span>
-                <span v-if="product.discount" class="shop-badge shop-badge-sale">-{{ product.discount }}%</span>
+                <span v-if="product.discount" class="shop-badge shop-badge-sale"
+                  >-{{ product.discount }}%</span
+                >
               </div>
               <button class="quick-action wishlist-btn" @click.stop="toggleWishlist(product)">
-                <svg width="20" height="20" viewBox="0 0 24 24" :fill="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'none'" :stroke="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'currentColor'" stroke-width="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  :fill="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'none'"
+                  :stroke="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'currentColor'"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
                 </svg>
               </button>
             </div>
@@ -204,10 +229,14 @@
               <h3 class="product-name">{{ product.name }}</h3>
               <div class="product-meta">
                 <span class="product-price">${{ product.price }}</span>
-                <span v-if="product.originalPrice" class="product-original-price">${{ product.originalPrice }}</span>
+                <span v-if="product.originalPrice" class="product-original-price"
+                  >${{ product.originalPrice }}</span
+                >
                 <div class="product-rating">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
                   </svg>
                   <span>{{ product.rating }}</span>
                 </div>
@@ -223,12 +252,20 @@
       <div class="contact-content">
         <h2 class="contact-title">Talk To Our Staff</h2>
         <p class="contact-text">
-          Have questions about our collection? Our design consultants are here to help you find the perfect pieces for your space.
+          Have questions about our collection? Our design consultants are here to help you find the
+          perfect pieces for your space.
         </p>
         <router-link to="/contact" class="shop-btn shop-btn-primary">
           Let's Talk
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </router-link>
       </div>
@@ -298,7 +335,11 @@ const toggleWishlist = async (product) => {
     }
   } catch (error) {
     console.error('Failed to toggle wishlist:', error)
-    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+    if (
+      String(error).includes('401') ||
+      String(error).toLowerCase().includes('unauthorized') ||
+      String(error).includes('guest token')
+    ) {
       openLogin()
     }
   }
@@ -307,34 +348,82 @@ const toggleWishlist = async (product) => {
 // Space icons as functional components
 const getSpaceIcon = (iconName) => {
   const icons = {
-    sofa: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM6 7h12v3H6V7zm14 9H4v-4h2v2h12v-2h2v4z' })
-    ]),
-    bed: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 12h18v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5zM3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M7 12V9M17 12V9M3 17v2M21 17v2' })
-    ]),
-    utensils: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 2v7c0 1.1.9 2 2 2h3a2 2 0 002-2V2M8 2v20M18 2h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v13' })
-    ]),
-    kitchen: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
-      h('path', { d: 'M3 9h18M9 9v12M9 12h6M9 15h6M9 18h6' })
-    ]),
-    desk: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zM4 9v6M20 9v6M8 15h8M10 15v4M14 15v4' })
-    ]),
-    bath: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M4 12h16a2 2 0 012 2v2a4 4 0 01-4 4H6a4 4 0 01-4-4v-2a2 2 0 012-2zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v7M18 20v2M6 20v2' })
-    ]),
-    tree: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M12 22v-7M12 15l-4 4M12 15l4 4M12 2L5 12h4l-2 5h10l-2-5h4L12 2z' })
-    ]),
-    blocks: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }),
-      h('rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }),
-      h('rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }),
-      h('rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' })
-    ]),
+    sofa: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM6 7h12v3H6V7zm14 9H4v-4h2v2h12v-2h2v4z',
+          }),
+        ],
+      ),
+    bed: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 12h18v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5zM3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M7 12V9M17 12V9M3 17v2M21 17v2',
+          }),
+        ],
+      ),
+    utensils: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 2v7c0 1.1.9 2 2 2h3a2 2 0 002-2V2M8 2v20M18 2h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v13',
+          }),
+        ],
+      ),
+    kitchen: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
+          h('path', { d: 'M3 9h18M9 9v12M9 12h6M9 15h6M9 18h6' }),
+        ],
+      ),
+    desk: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zM4 9v6M20 9v6M8 15h8M10 15v4M14 15v4',
+          }),
+        ],
+      ),
+    bath: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 12h16a2 2 0 012 2v2a4 4 0 01-4 4H6a4 4 0 01-4-4v-2a2 2 0 012-2zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v7M18 20v2M6 20v2',
+          }),
+        ],
+      ),
+    tree: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [h('path', { d: 'M12 22v-7M12 15l-4 4M12 15l4 4M12 2L5 12h4l-2 5h10l-2-5h4L12 2z' })],
+      ),
+    blocks: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }),
+          h('rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }),
+          h('rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }),
+          h('rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' }),
+        ],
+      ),
   }
   return icons[iconName] || icons.sofa
 }
@@ -357,7 +446,6 @@ const loadData = async () => {
     if (stylesRes.success) styles.value = stylesRes.data
     if (offersRes.success) specialOffers.value = offersRes.data
     if (featuredRes.success) featuredProducts.value = featuredRes.data.bestSellers || []
-
   } catch (error) {
     console.error('Error loading shop data:', error)
   } finally {
@@ -385,7 +473,7 @@ onMounted(() => {
 
 .shop-root {
   min-height: 100vh;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   padding-top: 7rem;
 }
 
@@ -442,7 +530,7 @@ onMounted(() => {
 .offer-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 60%);
   display: flex;
   align-items: flex-end;
   padding: 1.5rem;
@@ -450,7 +538,7 @@ onMounted(() => {
 
 .offer-badge {
   background: white;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   padding: 0.375rem 0.875rem;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -467,13 +555,13 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.75rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.25rem;
 }
 
 .offer-subtitle {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-bottom: 0.75rem;
   line-height: 1.5;
 }
@@ -484,7 +572,7 @@ onMounted(() => {
   gap: 0.375rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   transition: gap 0.2s ease;
 }
 
@@ -498,7 +586,7 @@ onMounted(() => {
 }
 
 .skeleton-card .offer-image-wrapper {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .skeleton-title {
@@ -534,7 +622,7 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 2rem;
   letter-spacing: -0.02em;
 }
@@ -555,7 +643,7 @@ onMounted(() => {
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   background: transparent;
   border: none;
   border-radius: 9999px;
@@ -565,7 +653,7 @@ onMounted(() => {
 }
 
 .toggle-btn.active {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .toggle-indicator {
@@ -574,7 +662,7 @@ onMounted(() => {
   left: 0.375rem;
   width: calc(50% - 0.375rem);
   height: calc(100% - 0.75rem);
-  background: var(--shop-cream-dark, #F5F2ED);
+  background: var(--shop-cream-dark, #f5f2ed);
   border-radius: 9999px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -602,14 +690,14 @@ onMounted(() => {
   gap: 1rem;
   padding: 1.5rem 1rem;
   background: white;
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .category-card:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
   box-shadow: 0 8px 24px rgba(61, 58, 54, 0.1);
   transform: translateY(-2px);
 }
@@ -625,7 +713,7 @@ onMounted(() => {
 .category-icon {
   width: 48px;
   height: 48px;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .category-icon :deep(svg) {
@@ -636,7 +724,7 @@ onMounted(() => {
 .category-name {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .skeleton-category .category-icon-wrapper {
@@ -660,14 +748,14 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   text-align: center;
   margin-bottom: 0.5rem;
 }
 
 .section-subtitle {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -702,14 +790,14 @@ onMounted(() => {
   gap: 0.75rem;
   padding: 1.25rem 1rem;
   background: white;
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .space-card:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
   box-shadow: 0 6px 16px rgba(61, 58, 54, 0.08);
 }
 
@@ -724,13 +812,13 @@ onMounted(() => {
 .space-icon {
   width: 32px;
   height: 32px;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .space-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .skeleton-space .space-icon-wrapper {
@@ -775,7 +863,7 @@ onMounted(() => {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .style-image-wrapper img {
@@ -823,11 +911,11 @@ onMounted(() => {
 .style-name {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .skeleton-style .style-image-wrapper {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 /* Featured Section */
@@ -850,13 +938,13 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.75rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.25rem;
 }
 
 .featured-subtitle {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 .see-all-link {
@@ -865,7 +953,7 @@ onMounted(() => {
   gap: 0.375rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   text-decoration: none;
   transition: gap 0.2s ease;
 }
@@ -908,7 +996,7 @@ onMounted(() => {
   aspect-ratio: 1;
   border-radius: 0.75rem;
   overflow: hidden;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   margin-bottom: 0.75rem;
 }
 
@@ -943,7 +1031,7 @@ onMounted(() => {
   opacity: 0;
   transform: scale(0.8);
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .featured-product:hover .quick-action {
@@ -964,13 +1052,13 @@ onMounted(() => {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 .product-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0.25rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -988,12 +1076,12 @@ onMounted(() => {
 .product-price {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .product-original-price {
   font-size: 0.8125rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   text-decoration: line-through;
 }
 
@@ -1002,7 +1090,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 .product-rating svg {
@@ -1011,7 +1099,7 @@ onMounted(() => {
 
 /* Contact Section */
 .shop-contact {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
   padding: 4rem 1.5rem;
   margin-top: 2rem;
 }
@@ -1026,13 +1114,13 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.75rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.75rem;
 }
 
 .contact-text {
   font-size: 0.9375rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }

@@ -20,7 +20,7 @@
             :to="item.route"
             :class="[
               index > 0 ? 'ml-2' : '',
-              'text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center'
+              'text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center',
             ]"
           >
             <!-- Optional Icon for the first item (Home) if needed, or just text -->
@@ -47,10 +47,7 @@
 
           <span
             v-else
-            :class="[
-              index > 0 ? 'ml-2' : '',
-              'text-sm font-medium text-gray-900'
-            ]"
+            :class="[index > 0 ? 'ml-2' : '', 'text-sm font-medium text-gray-900']"
             aria-current="page"
           >
             {{ item.name }}
@@ -67,6 +64,6 @@ defineProps({
     type: Array,
     required: true,
     // Expected format: [{ name: 'Home', route: '/' }, { name: 'Shop', route: '/shop' }, { name: 'Current Page' }]
-  }
+  },
 })
 </script>

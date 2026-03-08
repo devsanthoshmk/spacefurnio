@@ -6,13 +6,24 @@
     <!-- Mobile Filter Drawer -->
     <Teleport to="body">
       <Transition name="drawer">
-        <div v-if="showMobileFilters" class="mobile-drawer-overlay" @click="showMobileFilters = false">
+        <div
+          v-if="showMobileFilters"
+          class="mobile-drawer-overlay"
+          @click="showMobileFilters = false"
+        >
           <div class="mobile-drawer" @click.stop>
             <div class="drawer-header">
               <h3 class="drawer-title">Filters</h3>
               <button class="drawer-close" @click="showMobileFilters = false">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 6L6 18M6 6l12 12"/>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -50,8 +61,17 @@
                 {{ crumb.name }}
               </router-link>
               <span v-else class="breadcrumb-current">{{ crumb.name }}</span>
-              <svg v-if="index < breadcrumbs.length - 1" class="breadcrumb-separator" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
+              <svg
+                v-if="index < breadcrumbs.length - 1"
+                class="breadcrumb-separator"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 18l6-6-6-6" />
               </svg>
             </li>
           </ol>
@@ -84,25 +104,39 @@
 
             <!-- View Toggle -->
             <div class="view-toggle">
-              <button 
+              <button
                 :class="['view-btn', { active: viewMode === 'grid' }]"
                 @click="viewMode = 'grid'"
                 aria-label="Grid view"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="7" height="7"/>
-                  <rect x="14" y="3" width="7" height="7"/>
-                  <rect x="3" y="14" width="7" height="7"/>
-                  <rect x="14" y="14" width="7" height="7"/>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
                 </svg>
               </button>
-              <button 
+              <button
                 :class="['view-btn', { active: viewMode === 'list' }]"
                 @click="viewMode = 'list'"
                 aria-label="List view"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
                 </svg>
               </button>
             </div>
@@ -114,13 +148,20 @@
     <!-- Mobile Sticky Controls -->
     <div class="mobile-controls">
       <button class="mobile-filter-btn" @click="showMobileFilters = true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 21V14M4 10V3M12 21V12M12 8V3M20 21V16M20 12V3M1 14h6M9 8h6M17 16h6"/>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M4 21V14M4 10V3M12 21V12M12 8V3M20 21V16M20 12V3M1 14h6M9 8h6M17 16h6" />
         </svg>
         <span>Filters</span>
         <span v-if="activeFilterCount > 0" class="filter-count">{{ activeFilterCount }}</span>
       </button>
-      
+
       <div class="mobile-sort">
         <select v-model="sortBy" class="mobile-sort-select">
           <option value="popularity-desc">Popular</option>
@@ -140,27 +181,30 @@
           <aside class="filter-sidebar">
             <div class="sidebar-header">
               <h2 class="sidebar-title">Filters</h2>
-              <button 
-                v-if="activeFilterCount > 0" 
-                class="clear-all-btn"
-                @click="clearAllFilters"
-              >
+              <button v-if="activeFilterCount > 0" class="clear-all-btn" @click="clearAllFilters">
                 Clear all
               </button>
             </div>
-            
+
             <!-- Active Filter Tags -->
             <div v-if="activeFilterCount > 0" class="active-filters">
               <div class="filter-tags">
-                <button 
-                  v-for="tag in activeFilterTags" 
+                <button
+                  v-for="tag in activeFilterTags"
                   :key="tag.key"
                   class="filter-tag"
                   @click="removeFilter(tag.key, tag.value)"
                 >
                   {{ tag.label }}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12"/>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
@@ -180,15 +224,22 @@
             <!-- Active Filters Bar (Mobile) -->
             <div v-if="activeFilterCount > 0" class="active-filters-bar">
               <div class="filter-tags-scroll shop-scrollbar">
-                <button 
-                  v-for="tag in activeFilterTags" 
+                <button
+                  v-for="tag in activeFilterTags"
                   :key="tag.key"
                   class="filter-tag-small"
                   @click="removeFilter(tag.key, tag.value)"
                 >
                   {{ tag.label }}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12"/>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
@@ -196,11 +247,7 @@
 
             <!-- Loading State -->
             <div v-if="loading" :class="['products-grid', `view-${viewMode}`]">
-              <div 
-                v-for="n in 12" 
-                :key="n" 
-                class="product-skeleton"
-              >
+              <div v-for="n in 12" :key="n" class="product-skeleton">
                 <div class="skeleton-image shop-skeleton"></div>
                 <div class="skeleton-content">
                   <div class="skeleton-brand shop-skeleton"></div>
@@ -213,8 +260,15 @@
             <!-- Empty State -->
             <div v-else-if="products.length === 0" class="empty-state">
               <div class="empty-icon">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <svg
+                  width="64"
+                  height="64"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1"
+                >
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
               <h3 class="empty-title">No products found</h3>
@@ -239,20 +293,27 @@
 
             <!-- Pagination -->
             <div v-if="!loading && totalPages > 1" class="pagination">
-              <button 
+              <button
                 class="page-btn prev"
                 :disabled="currentPage === 1"
                 @click="goToPage(currentPage - 1)"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M15 18l-6-6 6-6"/>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M15 18l-6-6 6-6" />
                 </svg>
                 Previous
               </button>
-              
+
               <div class="page-numbers">
-                <button 
-                  v-for="page in visiblePages" 
+                <button
+                  v-for="page in visiblePages"
                   :key="page"
                   :class="['page-num', { active: page === currentPage, ellipsis: page === '...' }]"
                   :disabled="page === '...'"
@@ -262,21 +323,28 @@
                 </button>
               </div>
 
-              <button 
+              <button
                 class="page-btn next"
                 :disabled="currentPage === totalPages"
                 @click="goToPage(currentPage + 1)"
               >
                 Next
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 18l6-6-6-6"/>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>
             </div>
 
             <!-- Load More Button (Alternative to Pagination) -->
             <div v-if="!loading && hasMoreProducts && !usePagination" class="load-more-container">
-              <button 
+              <button
                 class="shop-btn shop-btn-secondary load-more-btn"
                 :disabled="loadingMore"
                 @click="loadMoreProducts"
@@ -351,7 +419,7 @@ const pageTitle = computed(() => {
   if (!category) return 'All Products'
   return category
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 })
 
@@ -360,14 +428,14 @@ const breadcrumbs = computed(() => {
     { name: 'Home', route: '/' },
     { name: 'Shop', route: '/shop' },
   ]
-  
+
   if (route.params.category) {
     crumbs.push({
       name: pageTitle.value,
       route: null,
     })
   }
-  
+
   return crumbs
 })
 
@@ -385,37 +453,37 @@ const activeFilterCount = computed(() => {
 
 const activeFilterTags = computed(() => {
   const tags = []
-  
+
   if (filters.value.brand) {
     tags.push({ key: 'brand', value: filters.value.brand, label: filters.value.brand })
   }
-  
-  filters.value.colors.forEach(color => {
+
+  filters.value.colors.forEach((color) => {
     tags.push({ key: 'colors', value: color, label: color })
   })
-  
+
   if (filters.value.material) {
     tags.push({ key: 'material', value: filters.value.material, label: filters.value.material })
   }
-  
+
   if (filters.value.minPrice !== null || filters.value.maxPrice !== null) {
     const min = filters.value.minPrice || 0
     const max = filters.value.maxPrice || '∞'
     tags.push({ key: 'price', value: 'price', label: `$${min} - $${max}` })
   }
-  
+
   if (filters.value.inStock) {
     tags.push({ key: 'inStock', value: true, label: 'In Stock' })
   }
-  
+
   if (filters.value.onSale) {
     tags.push({ key: 'onSale', value: true, label: 'On Sale' })
   }
-  
+
   if (filters.value.isNew) {
     tags.push({ key: 'isNew', value: true, label: 'New Arrivals' })
   }
-  
+
   return tags
 })
 
@@ -423,24 +491,24 @@ const visiblePages = computed(() => {
   const pages = []
   const total = totalPages.value
   const current = currentPage.value
-  
+
   if (total <= 7) {
     for (let i = 1; i <= total; i++) pages.push(i)
   } else {
     pages.push(1)
-    
+
     if (current > 3) pages.push('...')
-    
+
     const start = Math.max(2, current - 1)
     const end = Math.min(total - 1, current + 1)
-    
+
     for (let i = start; i <= end; i++) pages.push(i)
-    
+
     if (current < total - 2) pages.push('...')
-    
+
     pages.push(total)
   }
-  
+
   return pages
 })
 
@@ -452,10 +520,10 @@ const loadProducts = async (append = false) => {
   } else {
     loadingMore.value = true
   }
-  
+
   try {
     const [sort, order] = sortBy.value.split('-')
-    
+
     // Determine the filter parameters based on the route
     const apiParams = {
       brand: filters.value.brand || null,
@@ -483,18 +551,18 @@ const loadProducts = async (append = false) => {
     }
 
     const response = await shopApi.getProducts(apiParams)
-    
+
     if (response.success) {
       if (append) {
         products.value = [...products.value, ...response.data]
       } else {
         products.value = response.data
       }
-      
+
       totalProducts.value = response.meta.total
       totalPages.value = response.meta.totalPages
       hasMoreProducts.value = response.meta.hasNextPage
-      
+
       if (response.aggregations) {
         aggregations.value = response.aggregations
       }
@@ -527,7 +595,7 @@ const updateFilters = (newFilters) => {
 
 const removeFilter = (key, value) => {
   if (key === 'colors') {
-    filters.value.colors = filters.value.colors.filter(c => c !== value)
+    filters.value.colors = filters.value.colors.filter((c) => c !== value)
   } else if (key === 'price') {
     filters.value.minPrice = null
     filters.value.maxPrice = null
@@ -596,11 +664,14 @@ watch(sortBy, () => {
   loadProducts()
 })
 
-watch(() => route.params.category, () => {
-  currentPage.value = 1
-  loadProducts()
-  loadFilterOptions()
-})
+watch(
+  () => route.params.category,
+  () => {
+    currentPage.value = 1
+    loadProducts()
+    loadFilterOptions()
+  },
+)
 
 // Lifecycle
 onMounted(() => {
@@ -623,7 +694,7 @@ onMounted(() => {
 
 .listing-page {
   min-height: 100vh;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   padding-top: 5rem;
 }
 
@@ -651,7 +722,7 @@ onMounted(() => {
   z-index: 30;
   background: rgba(250, 248, 245, 0.98);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   padding: 1.5rem 0;
 }
 
@@ -673,23 +744,23 @@ onMounted(() => {
 
 .breadcrumb-link {
   font-size: 0.8125rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .breadcrumb-link:hover {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .breadcrumb-current {
   font-size: 0.8125rem;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   font-weight: 500;
 }
 
 .breadcrumb-separator {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 /* Title Row */
@@ -705,20 +776,20 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .results-count {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin: 0.5rem 0 0 0;
 }
 
 .count-number {
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Header Controls */
@@ -742,7 +813,7 @@ onMounted(() => {
 
 .sort-label {
   font-size: 0.8125rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   white-space: nowrap;
 }
 
@@ -756,7 +827,7 @@ onMounted(() => {
   border-radius: 0.5rem;
   padding: 0.25rem;
   gap: 0.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .view-btn {
@@ -768,18 +839,18 @@ onMounted(() => {
   border: none;
   background: transparent;
   border-radius: 0.375rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .view-btn:hover {
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 .view-btn.active {
-  background: var(--shop-cream-dark, #F5F2ED);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-cream-dark, #f5f2ed);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Mobile Controls */
@@ -792,7 +863,7 @@ onMounted(() => {
   backdrop-filter: blur(8px);
   padding: 0.75rem 1.5rem;
   gap: 0.75rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 @media (min-width: 1024px) {
@@ -807,17 +878,17 @@ onMounted(() => {
   gap: 0.5rem;
   padding: 0.625rem 1rem;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .mobile-filter-btn:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 .filter-count {
@@ -827,7 +898,7 @@ onMounted(() => {
   min-width: 1.25rem;
   height: 1.25rem;
   padding: 0 0.375rem;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -841,12 +912,14 @@ onMounted(() => {
 .mobile-sort-select {
   width: 100%;
   padding: 0.625rem 2rem 0.625rem 1rem;
-  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B7D6D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  background: white
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B7D6D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 0.75rem center;
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   appearance: none;
   cursor: pointer;
 }
@@ -880,19 +953,19 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .sidebar-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0;
 }
 
 .clear-all-btn {
   font-size: 0.8125rem;
-  color: var(--shop-accent, #B8956C);
+  color: var(--shop-accent, #b8956c);
   background: none;
   border: none;
   cursor: pointer;
@@ -901,7 +974,7 @@ onMounted(() => {
 }
 
 .clear-all-btn:hover {
-  color: var(--shop-accent-dark, #8C6D4D);
+  color: var(--shop-accent-dark, #8c6d4d);
 }
 
 /* Active Filters */
@@ -920,18 +993,18 @@ onMounted(() => {
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  background: var(--shop-cream-dark, #F5F2ED);
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  background: var(--shop-cream-dark, #f5f2ed);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filter-tag:hover {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 /* Products Section */
@@ -966,11 +1039,11 @@ onMounted(() => {
   gap: 0.25rem;
   padding: 0.25rem 0.625rem;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 9999px;
   font-size: 0.6875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   white-space: nowrap;
   cursor: pointer;
 }
@@ -1023,7 +1096,7 @@ onMounted(() => {
 
 .skeleton-image {
   aspect-ratio: 1;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .skeleton-content {
@@ -1061,20 +1134,20 @@ onMounted(() => {
 }
 
 .empty-icon {
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   margin-bottom: 1.5rem;
 }
 
 .empty-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 0.5rem 0;
 }
 
 .empty-text {
   font-size: 0.9375rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin: 0 0 1.5rem 0;
 }
 
@@ -1094,18 +1167,18 @@ onMounted(() => {
   gap: 0.375rem;
   padding: 0.625rem 1rem;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: var(--shop-tan, #C4B8A9);
-  background: var(--shop-cream-dark, #F5F2ED);
+  border-color: var(--shop-tan, #c4b8a9);
+  background: var(--shop-cream-dark, #f5f2ed);
 }
 
 .page-btn:disabled {
@@ -1129,18 +1202,18 @@ onMounted(() => {
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .page-num:hover:not(.active):not(.ellipsis) {
-  background: var(--shop-cream-dark, #F5F2ED);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-cream-dark, #f5f2ed);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .page-num.active {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
 }
 
@@ -1163,7 +1236,7 @@ onMounted(() => {
 
 .showing-count {
   font-size: 0.8125rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 /* Mobile Drawer */
@@ -1182,7 +1255,7 @@ onMounted(() => {
   bottom: 0;
   width: 100%;
   max-width: 320px;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   display: flex;
   flex-direction: column;
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
@@ -1193,13 +1266,13 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .drawer-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0;
 }
 
@@ -1211,15 +1284,15 @@ onMounted(() => {
   height: 2rem;
   background: transparent;
   border: none;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   border-radius: 0.375rem;
   transition: all 0.2s ease;
 }
 
 .drawer-close:hover {
-  background: var(--shop-beige, #E8E3DC);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-beige, #e8e3dc);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .drawer-content {
@@ -1232,7 +1305,7 @@ onMounted(() => {
   display: flex;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border-top: 1px solid var(--shop-beige, #E8E3DC);
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
   background: white;
 }
 

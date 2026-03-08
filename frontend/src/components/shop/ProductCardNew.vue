@@ -1,11 +1,8 @@
 <template>
-  <article 
-    :class="['product-card', `view-${viewMode}`]"
-    @click="$emit('click')"
-  >
+  <article :class="['product-card', `view-${viewMode}`]" @click="$emit('click')">
     <!-- Product Image -->
     <div class="product-image-container">
-      <div 
+      <div
         class="product-image"
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
@@ -13,12 +10,12 @@
         @touchend="handleTouchEnd"
       >
         <!-- Image Carousel -->
-        <div 
+        <div
           class="image-slider"
           :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }"
         >
-          <img 
-            v-for="(image, index) in productImages" 
+          <img
+            v-for="(image, index) in productImages"
             :key="index"
             :src="image"
             :alt="`${product.name} - Image ${index + 1}`"
@@ -36,31 +33,45 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <button 
+          <button
             class="action-btn wishlist"
             :class="{ active: isWishlisted }"
             @click.stop="handleWishlist"
             aria-label="Add to wishlist"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" :fill="isWishlisted ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              :fill="isWishlisted ? 'currentColor' : 'none'"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
             </svg>
           </button>
-          <button 
-            class="action-btn cart"
-            @click.stop="handleAddToCart"
-            aria-label="Add to cart"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>
+          <button class="action-btn cart" @click.stop="handleAddToCart" aria-label="Add to cart">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"
+              />
             </svg>
           </button>
         </div>
 
         <!-- Image Dots -->
         <div v-if="productImages.length > 1" class="image-dots">
-          <button 
-            v-for="(_, index) in productImages.slice(0, 4)" 
+          <button
+            v-for="(_, index) in productImages.slice(0, 4)"
             :key="index"
             :class="['dot', { active: currentImageIndex === index }]"
             @click.stop="currentImageIndex = index"
@@ -69,24 +80,38 @@
         </div>
 
         <!-- Navigation Arrows (visible on hover) -->
-        <button 
+        <button
           v-if="productImages.length > 1"
           class="nav-arrow prev"
           @click.stop="prevImage"
           aria-label="Previous image"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 18l-6-6 6-6"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <button 
+        <button
           v-if="productImages.length > 1"
           class="nav-arrow next"
           @click.stop="nextImage"
           aria-label="Next image"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18l6-6-6-6"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
 
@@ -101,25 +126,36 @@
     <div class="product-info">
       <!-- Brand -->
       <span class="product-brand">{{ product.brand }}</span>
-      
+
       <!-- Name -->
       <h3 class="product-name">{{ product.name }}</h3>
-      
+
       <!-- Rating (List view) -->
       <div v-if="viewMode === 'list' && product.rating" class="product-rating-full">
         <div class="stars">
-          <svg v-for="n in 5" :key="n" width="14" height="14" viewBox="0 0 24 24" :fill="n <= Math.round(product.rating) ? '#F59E0B' : 'none'" :stroke="n <= Math.round(product.rating) ? '#F59E0B' : '#D4CFC6'" stroke-width="2">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          <svg
+            v-for="n in 5"
+            :key="n"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            :fill="n <= Math.round(product.rating) ? '#F59E0B' : 'none'"
+            :stroke="n <= Math.round(product.rating) ? '#F59E0B' : '#D4CFC6'"
+            stroke-width="2"
+          >
+            <path
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+            />
           </svg>
         </div>
         <span class="rating-text">{{ product.rating }} ({{ product.reviews }} reviews)</span>
       </div>
-      
+
       <!-- Description (List view) -->
       <p v-if="viewMode === 'list'" class="product-description">
         {{ product.description }}
       </p>
-      
+
       <!-- Meta Row -->
       <div class="product-meta">
         <!-- Price -->
@@ -129,20 +165,22 @@
             ${{ formatPrice(product.originalPrice) }}
           </span>
         </div>
-        
+
         <!-- Rating (Grid view) -->
         <div v-if="viewMode === 'grid' && product.rating" class="product-rating">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="none">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <path
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+            />
           </svg>
           <span>{{ product.rating }}</span>
         </div>
       </div>
-      
+
       <!-- Color Options -->
       <div v-if="product.colorData && product.colorData.length > 0" class="color-options">
-        <button 
-          v-for="color in product.colorData.slice(0, 4)" 
+        <button
+          v-for="color in product.colorData.slice(0, 4)"
           :key="color.name"
           class="color-dot"
           :style="{ backgroundColor: color.hex }"
@@ -153,16 +191,23 @@
           +{{ product.colorData.length - 4 }}
         </span>
       </div>
-      
+
       <!-- Add to Cart Button (List view) -->
-      <button 
+      <button
         v-if="viewMode === 'list'"
         class="add-to-cart-btn"
         :disabled="!product.inStock"
         @click.stop="handleAddToCart"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />
         </svg>
         {{ product.inStock ? 'Add to Cart' : 'Notify Me' }}
       </button>
@@ -213,7 +258,8 @@ const nextImage = () => {
 }
 
 const prevImage = () => {
-  currentImageIndex.value = (currentImageIndex.value - 1 + productImages.value.length) % productImages.value.length
+  currentImageIndex.value =
+    (currentImageIndex.value - 1 + productImages.value.length) % productImages.value.length
 }
 
 const handleMouseEnter = () => {
@@ -235,7 +281,7 @@ const handleTouchStart = (e) => {
 const handleTouchEnd = (e) => {
   const touchEndX = e.changedTouches[0].clientX
   const diff = touchStartX.value - touchEndX
-  
+
   if (Math.abs(diff) > 50) {
     if (diff > 0) {
       nextImage()
@@ -282,7 +328,7 @@ const handleAddToCart = () => {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  background: var(--shop-cream-dark, #F5F2ED);
+  background: var(--shop-cream-dark, #f5f2ed);
 }
 
 .image-slider {
@@ -319,18 +365,18 @@ const handleAddToCart = () => {
 }
 
 .badge-new {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
 }
 
 .badge-sale {
-  background: var(--shop-accent, #B8956C);
+  background: var(--shop-accent, #b8956c);
   color: white;
 }
 
 .badge-best {
   background: white;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -365,7 +411,7 @@ const handleAddToCart = () => {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
 }
 
 .action-btn:hover {
@@ -374,11 +420,11 @@ const handleAddToCart = () => {
 
 .action-btn.wishlist:hover,
 .action-btn.wishlist.active {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .action-btn.cart:hover {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
 }
 
@@ -432,11 +478,15 @@ const handleAddToCart = () => {
   opacity: 0;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
-.nav-arrow.prev { left: 0.75rem; }
-.nav-arrow.next { right: 0.75rem; }
+.nav-arrow.prev {
+  left: 0.75rem;
+}
+.nav-arrow.next {
+  right: 0.75rem;
+}
 
 .product-card:hover .nav-arrow {
   opacity: 1;
@@ -464,7 +514,7 @@ const handleAddToCart = () => {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   border-radius: 9999px;
 }
 
@@ -479,14 +529,14 @@ const handleAddToCart = () => {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-bottom: 0.25rem;
 }
 
 .product-name {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 0.5rem 0;
   line-height: 1.3;
   display: -webkit-box;
@@ -512,12 +562,12 @@ const handleAddToCart = () => {
 .product-price {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .original-price {
   font-size: 0.8125rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   text-decoration: line-through;
 }
 
@@ -527,7 +577,7 @@ const handleAddToCart = () => {
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 /* Color Options */
@@ -553,7 +603,7 @@ const handleAddToCart = () => {
 
 .more-colors {
   font-size: 0.6875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   font-weight: 500;
 }
 
@@ -566,7 +616,7 @@ const handleAddToCart = () => {
   flex-direction: row;
   gap: 1.5rem;
   padding: 1rem;
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  border: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .product-card.view-list .product-image-container {
@@ -609,13 +659,13 @@ const handleAddToCart = () => {
 
 .rating-text {
   font-size: 0.8125rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 /* Description (List view) */
 .product-description {
   font-size: 0.875rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   line-height: 1.5;
   margin: 0.5rem 0;
   display: -webkit-box;
@@ -631,7 +681,7 @@ const handleAddToCart = () => {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   margin-top: 1rem;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
   border: none;
   border-radius: 9999px;
@@ -643,7 +693,7 @@ const handleAddToCart = () => {
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
-  background: var(--shop-black, #1A1816);
+  background: var(--shop-black, #1a1816);
   transform: translateY(-1px);
 }
 
@@ -658,7 +708,7 @@ const handleAddToCart = () => {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .product-card.view-list .product-image-container {
     width: 100%;
   }

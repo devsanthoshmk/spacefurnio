@@ -1,25 +1,25 @@
-@import "tailwindcss";
-@import "./shop.css";
+@import 'tailwindcss';
+@import './shop.css';
 
 @theme {
   /* Colors */
   --color-brand: oklch(64.6% 0.222 41.116);
   --color-primary: #1a1a1a;
-  --color-background-light: #FDFBF7;
+  --color-background-light: #fdfbf7;
   --color-background-dark: #050505;
-  --color-accent-light: #E5E5E5;
+  --color-accent-light: #e5e5e5;
   --color-accent-dark: #262626;
 
   /* Fonts */
-  --font-display: "Playfair Display", serif;
-  --font-body: "Lato", sans-serif;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Lato', sans-serif;
 
   /* Border Radius */
   --radius: 2px;
   --radius-lg: 4px;
 
   /* Letter Spacing */
-  --tracking-widest: .25em;
+  --tracking-widest: 0.25em;
 
   /* Animations */
   --animate-fadeIn: fadeIn 400ms ease-out forwards;

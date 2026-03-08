@@ -4,33 +4,64 @@
     <nav class="detail-nav">
       <div class="nav-container">
         <button class="back-btn" @click="goBack">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
           <span>Back</span>
         </button>
-        
+
         <!-- Breadcrumbs -->
         <nav class="breadcrumbs" aria-label="Breadcrumb">
           <ol class="breadcrumb-list">
             <li class="breadcrumb-item">
               <router-link to="/" class="breadcrumb-link">Home</router-link>
-              <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
+              <svg
+                class="breadcrumb-sep"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 18l6-6-6-6" />
               </svg>
             </li>
             <li class="breadcrumb-item">
               <router-link to="/shop/category" class="breadcrumb-link">Shop</router-link>
-              <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
+              <svg
+                class="breadcrumb-sep"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 18l6-6-6-6" />
               </svg>
             </li>
             <li class="breadcrumb-item">
               <router-link :to="`/shop/category/${product.category}`" class="breadcrumb-link">
                 {{ formatCategory(product.category) }}
               </router-link>
-              <svg class="breadcrumb-sep" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
+              <svg
+                class="breadcrumb-sep"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 18l6-6-6-6" />
               </svg>
             </li>
             <li class="breadcrumb-item">
@@ -49,43 +80,47 @@
           <section class="gallery-section">
             <!-- Main Image -->
             <div class="main-image-wrapper">
-              <img 
-                :src="currentImage" 
-                :alt="product.name"
-                class="main-image"
-              />
-              
+              <img :src="currentImage" :alt="product.name" class="main-image" />
+
               <!-- Badges -->
               <div class="image-badges">
                 <span v-if="product.isNew" class="badge badge-new">New</span>
-                <span v-if="product.discount" class="badge badge-sale">-{{ product.discount }}%</span>
+                <span v-if="product.discount" class="badge badge-sale"
+                  >-{{ product.discount }}%</span
+                >
               </div>
-              
+
               <!-- Navigation Arrows -->
-              <button 
-                v-if="product.images.length > 1"
-                class="gallery-nav prev"
-                @click="prevImage"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M15 18l-6-6 6-6"/>
+              <button v-if="product.images.length > 1" class="gallery-nav prev" @click="prevImage">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
-              <button 
-                v-if="product.images.length > 1"
-                class="gallery-nav next"
-                @click="nextImage"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 18l6-6-6-6"/>
+              <button v-if="product.images.length > 1" class="gallery-nav next" @click="nextImage">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>
             </div>
-            
+
             <!-- Thumbnail Strip -->
             <div v-if="product.images.length > 1" class="thumbnails">
-              <button 
-                v-for="(img, index) in product.images" 
+              <button
+                v-for="(img, index) in product.images"
                 :key="index"
                 :class="['thumb', { active: currentImageIndex === index }]"
                 @click="currentImageIndex = index"
@@ -101,23 +136,28 @@
             <div class="product-header">
               <span class="product-brand">{{ product.brand }}</span>
               <h1 class="product-name">{{ product.name }}</h1>
-              
+
               <!-- Rating -->
               <div class="rating-row">
                 <div class="stars">
-                  <svg 
-                    v-for="n in 5" 
-                    :key="n" 
-                    width="16" height="16" 
-                    viewBox="0 0 24 24" 
-                    :fill="n <= Math.round(product.rating) ? '#F59E0B' : 'none'" 
-                    :stroke="n <= Math.round(product.rating) ? '#F59E0B' : '#D4CFC6'" 
+                  <svg
+                    v-for="n in 5"
+                    :key="n"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    :fill="n <= Math.round(product.rating) ? '#F59E0B' : 'none'"
+                    :stroke="n <= Math.round(product.rating) ? '#F59E0B' : '#D4CFC6'"
                     stroke-width="2"
                   >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
                   </svg>
                 </div>
-                <span class="rating-text">{{ product.rating }} ({{ product.reviews }} reviews)</span>
+                <span class="rating-text"
+                  >{{ product.rating }} ({{ product.reviews }} reviews)</span
+                >
               </div>
             </div>
 
@@ -141,10 +181,17 @@
                 Color: <strong>{{ selectedColor || product.colorData[0].name }}</strong>
               </label>
               <div class="color-options">
-                <button 
-                  v-for="color in product.colorData" 
+                <button
+                  v-for="color in product.colorData"
                   :key="color.name"
-                  :class="['color-swatch', { selected: selectedColor === color.name || (!selectedColor && color === product.colorData[0]) }]"
+                  :class="[
+                    'color-swatch',
+                    {
+                      selected:
+                        selectedColor === color.name ||
+                        (!selectedColor && color === product.colorData[0]),
+                    },
+                  ]"
                   :style="{ backgroundColor: color.hex }"
                   :title="color.name"
                   @click="selectedColor = color.name"
@@ -157,27 +204,47 @@
               <label class="option-label">Quantity</label>
               <div class="quantity-selector">
                 <button class="qty-btn" @click="quantity > 1 && quantity--">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14"/>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M5 12h14" />
                   </svg>
                 </button>
-                <input 
-                  type="number" 
-                  v-model.number="quantity" 
-                  min="1" 
+                <input
+                  type="number"
+                  v-model.number="quantity"
+                  min="1"
                   :max="product.stockCount || 10"
                   class="qty-input"
                 />
-                <button class="qty-btn" @click="quantity < (product.stockCount || 10) && quantity++">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
+                <button
+                  class="qty-btn"
+                  @click="quantity < (product.stockCount || 10) && quantity++"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 5v14M5 12h14" />
                   </svg>
                 </button>
               </div>
             </div>
 
             <!-- Stock Status -->
-            <div class="stock-status" :class="{ 'in-stock': product.inStock, 'out-of-stock': !product.inStock }">
+            <div
+              class="stock-status"
+              :class="{ 'in-stock': product.inStock, 'out-of-stock': !product.inStock }"
+            >
               <span v-if="product.inStock" class="status-dot"></span>
               <span v-if="product.inStock">In Stock ({{ product.stockCount }} available)</span>
               <span v-else>Out of Stock</span>
@@ -185,22 +252,33 @@
 
             <!-- Add to Cart Buttons -->
             <div class="action-buttons">
-              <button 
-                class="btn-add-cart"
-                :disabled="!product.inStock"
-                @click="addToCart"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>
+              <button class="btn-add-cart" :disabled="!product.inStock" @click="addToCart">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"
+                  />
                 </svg>
                 Add to Cart
               </button>
-              <button 
-                :class="['btn-wishlist', { active: isWishlisted }]"
-                @click="toggleWishlist"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" :fill="isWishlisted ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              <button :class="['btn-wishlist', { active: isWishlisted }]" @click="toggleWishlist">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  :fill="isWishlisted ? 'currentColor' : 'none'"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
                 </svg>
               </button>
             </div>
@@ -210,8 +288,15 @@
               <h3 class="section-title">Features</h3>
               <ul class="features-list">
                 <li v-for="feature in product.features" :key="feature">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 6L9 17l-5-5"/>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
                   </svg>
                   {{ feature }}
                 </li>
@@ -224,15 +309,21 @@
               <div class="dimensions-grid">
                 <div class="dimension-item">
                   <span class="dim-label">Width</span>
-                  <span class="dim-value">{{ product.dimensions.width }} {{ product.dimensions.unit }}</span>
+                  <span class="dim-value"
+                    >{{ product.dimensions.width }} {{ product.dimensions.unit }}</span
+                  >
                 </div>
                 <div class="dimension-item">
                   <span class="dim-label">Height</span>
-                  <span class="dim-value">{{ product.dimensions.height }} {{ product.dimensions.unit }}</span>
+                  <span class="dim-value"
+                    >{{ product.dimensions.height }} {{ product.dimensions.unit }}</span
+                  >
                 </div>
                 <div class="dimension-item">
                   <span class="dim-label">Depth</span>
-                  <span class="dim-value">{{ product.dimensions.depth }} {{ product.dimensions.unit }}</span>
+                  <span class="dim-value"
+                    >{{ product.dimensions.depth }} {{ product.dimensions.unit }}</span
+                  >
                 </div>
                 <div class="dimension-item">
                   <span class="dim-label">Weight</span>
@@ -247,8 +338,8 @@
         <section v-if="relatedProducts.length > 0" class="related-section">
           <h2 class="related-title">You May Also Like</h2>
           <div class="related-grid">
-            <div 
-              v-for="item in relatedProducts" 
+            <div
+              v-for="item in relatedProducts"
               :key="item.id"
               class="related-product"
               @click="navigateToProduct(item)"
@@ -290,7 +381,9 @@ const loading = ref(false)
 const currentImageIndex = ref(0)
 const selectedColor = ref('')
 const quantity = ref(1)
-const isWishlisted = computed(() => product.value?.id && wishlistStore.isInWishlist(product.value.id))
+const isWishlisted = computed(
+  () => product.value?.id && wishlistStore.isInWishlist(product.value.id),
+)
 const relatedProducts = ref([])
 
 // Preset product data for immediate display
@@ -326,7 +419,8 @@ const product = ref({
     'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop',
   ],
   thumbnail: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop',
-  description: 'Elevate your living space with this beautifully crafted modern sofa. Made with premium Oak Wood, this piece combines timeless design with exceptional quality. The clean lines and warm neutrals create a sophisticated yet inviting atmosphere.',
+  description:
+    'Elevate your living space with this beautifully crafted modern sofa. Made with premium Oak Wood, this piece combines timeless design with exceptional quality. The clean lines and warm neutrals create a sophisticated yet inviting atmosphere.',
   features: [
     'Premium Oak Wood construction',
     'Handcrafted with attention to detail',
@@ -394,7 +488,10 @@ const formatPrice = (price) => {
 
 const formatCategory = (cat) => {
   if (!cat) return 'Shop'
-  return cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  return cat
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 }
 
 const goBack = () => {
@@ -406,7 +503,8 @@ const goBack = () => {
 }
 
 const prevImage = () => {
-  currentImageIndex.value = (currentImageIndex.value - 1 + product.value.images.length) % product.value.images.length
+  currentImageIndex.value =
+    (currentImageIndex.value - 1 + product.value.images.length) % product.value.images.length
 }
 
 const nextImage = () => {
@@ -420,7 +518,11 @@ const addToCart = async () => {
     openCart()
   } catch (error) {
     console.error('Failed to add to cart:', error)
-    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+    if (
+      String(error).includes('401') ||
+      String(error).toLowerCase().includes('unauthorized') ||
+      String(error).includes('guest token')
+    ) {
       openLogin()
     }
   }
@@ -435,7 +537,11 @@ const toggleWishlist = async () => {
     }
   } catch (error) {
     console.error('Failed to toggle wishlist:', error)
-    if (String(error).includes('401') || String(error).toLowerCase().includes('unauthorized') || String(error).includes('guest token')) {
+    if (
+      String(error).includes('401') ||
+      String(error).toLowerCase().includes('unauthorized') ||
+      String(error).includes('guest token')
+    ) {
       openLogin()
     }
   }
@@ -453,12 +559,12 @@ const loadProduct = async () => {
     relatedProducts.value = presetRelatedProducts
     return
   }
-  
+
   loading.value = true
-  
+
   try {
     const response = await shopApi.getProduct(productId)
-    
+
     if (response.success && response.data) {
       product.value = response.data
       relatedProducts.value = response.data.relatedProducts || presetRelatedProducts
@@ -473,12 +579,15 @@ const loadProduct = async () => {
 }
 
 // Watchers
-watch(() => route.params.id, () => {
-  currentImageIndex.value = 0
-  selectedColor.value = ''
-  quantity.value = 1
-  loadProduct()
-})
+watch(
+  () => route.params.id,
+  () => {
+    currentImageIndex.value = 0
+    selectedColor.value = ''
+    quantity.value = 1
+    loadProduct()
+  },
+)
 
 // Lifecycle
 onMounted(() => {
@@ -496,9 +605,13 @@ onMounted(() => {
 
 .product-detail-page {
   min-height: 100vh;
-  background: var(--shop-cream, #FAF8F5);
+  background: var(--shop-cream, #faf8f5);
   padding-top: 5rem;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 /* Navigation */
@@ -508,7 +621,7 @@ onMounted(() => {
   z-index: 30;
   background: rgba(250, 248, 245, 0.98);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   padding: 1rem 0;
 }
 
@@ -527,18 +640,18 @@ onMounted(() => {
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .back-btn:hover {
-  border-color: var(--shop-tan, #C4B8A9);
-  background: var(--shop-cream-dark, #F5F2ED);
+  border-color: var(--shop-tan, #c4b8a9);
+  background: var(--shop-cream-dark, #f5f2ed);
 }
 
 /* Breadcrumbs */
@@ -558,18 +671,18 @@ onMounted(() => {
 
 .breadcrumb-link {
   font-size: 0.8125rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .breadcrumb-link:hover {
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .breadcrumb-current {
   font-size: 0.8125rem;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   font-weight: 500;
   max-width: 200px;
   overflow: hidden;
@@ -579,7 +692,7 @@ onMounted(() => {
 
 .breadcrumb-sep {
   margin: 0 0.5rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
 }
 
 /* Main Content */
@@ -653,12 +766,12 @@ onMounted(() => {
 }
 
 .badge-new {
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
 }
 
 .badge-sale {
-  background: var(--shop-accent, #B8956C);
+  background: var(--shop-accent, #b8956c);
   color: white;
 }
 
@@ -676,7 +789,7 @@ onMounted(() => {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   transition: all 0.2s ease;
 }
 
@@ -684,8 +797,12 @@ onMounted(() => {
   transform: translateY(-50%) scale(1.1);
 }
 
-.gallery-nav.prev { left: 1rem; }
-.gallery-nav.next { right: 1rem; }
+.gallery-nav.prev {
+  left: 1rem;
+}
+.gallery-nav.next {
+  right: 1rem;
+}
 
 .thumbnails {
   display: flex;
@@ -709,11 +826,11 @@ onMounted(() => {
 }
 
 .thumb.active {
-  border-color: var(--shop-charcoal, #3D3A36);
+  border-color: var(--shop-charcoal, #3d3a36);
 }
 
 .thumb:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 .thumb img {
@@ -737,7 +854,7 @@ onMounted(() => {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--shop-accent, #B8956C);
+  color: var(--shop-accent, #b8956c);
   margin-bottom: 0.5rem;
 }
 
@@ -745,7 +862,7 @@ onMounted(() => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 1rem 0;
   line-height: 1.2;
 }
@@ -763,7 +880,7 @@ onMounted(() => {
 
 .rating-text {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 /* Price Section */
@@ -773,25 +890,25 @@ onMounted(() => {
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .current-price {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .original-price {
   font-size: 1.125rem;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   text-decoration: line-through;
 }
 
 .discount-badge {
   padding: 0.25rem 0.75rem;
-  background: var(--shop-accent-light, #D4B896);
-  color: var(--shop-accent-dark, #8C6D4D);
+  background: var(--shop-accent-light, #d4b896);
+  color: var(--shop-accent-dark, #8c6d4d);
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 9999px;
@@ -801,7 +918,7 @@ onMounted(() => {
 .product-description {
   font-size: 0.9375rem;
   line-height: 1.7;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   margin: 0 0 1.5rem 0;
 }
 
@@ -814,7 +931,7 @@ onMounted(() => {
   display: block;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.75rem;
 }
 
@@ -843,8 +960,8 @@ onMounted(() => {
 }
 
 .color-swatch.selected {
-  border-color: var(--shop-charcoal, #3D3A36);
-  box-shadow: 0 0 0 2px var(--shop-cream, #FAF8F5);
+  border-color: var(--shop-charcoal, #3d3a36);
+  box-shadow: 0 0 0 2px var(--shop-cream, #faf8f5);
 }
 
 /* Quantity Selector */
@@ -852,7 +969,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   overflow: hidden;
 }
@@ -865,14 +982,14 @@ onMounted(() => {
   height: 2.5rem;
   background: transparent;
   border: none;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .qty-btn:hover {
-  background: var(--shop-cream-dark, #F5F2ED);
-  color: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-cream-dark, #f5f2ed);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .qty-input {
@@ -882,9 +999,9 @@ onMounted(() => {
   font-size: 0.9375rem;
   font-weight: 500;
   border: none;
-  border-left: 1px solid var(--shop-beige, #E8E3DC);
-  border-right: 1px solid var(--shop-beige, #E8E3DC);
-  color: var(--shop-charcoal, #3D3A36);
+  border-left: 1px solid var(--shop-beige, #e8e3dc);
+  border-right: 1px solid var(--shop-beige, #e8e3dc);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .qty-input::-webkit-inner-spin-button,
@@ -907,18 +1024,18 @@ onMounted(() => {
 }
 
 .stock-status.in-stock {
-  color: var(--shop-success, #7D9B76);
+  color: var(--shop-success, #7d9b76);
 }
 
 .stock-status.out-of-stock {
-  color: var(--shop-error, #C47575);
+  color: var(--shop-error, #c47575);
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--shop-success, #7D9B76);
+  background: var(--shop-success, #7d9b76);
 }
 
 /* Action Buttons */
@@ -927,7 +1044,7 @@ onMounted(() => {
   gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid var(--shop-beige, #E8E3DC);
+  border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .btn-add-cart {
@@ -937,7 +1054,7 @@ onMounted(() => {
   justify-content: center;
   gap: 0.625rem;
   padding: 1rem 2rem;
-  background: var(--shop-charcoal, #3D3A36);
+  background: var(--shop-charcoal, #3d3a36);
   color: white;
   border: none;
   border-radius: 9999px;
@@ -948,7 +1065,7 @@ onMounted(() => {
 }
 
 .btn-add-cart:hover:not(:disabled) {
-  background: var(--shop-black, #1A1816);
+  background: var(--shop-black, #1a1816);
   transform: translateY(-1px);
 }
 
@@ -964,21 +1081,21 @@ onMounted(() => {
   width: 3.25rem;
   height: 3.25rem;
   background: white;
-  border: 1px solid var(--shop-beige-dark, #D4CFC6);
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 50%;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-wishlist:hover {
-  border-color: var(--shop-tan, #C4B8A9);
-  color: #EF4444;
+  border-color: var(--shop-tan, #c4b8a9);
+  color: #ef4444;
 }
 
 .btn-wishlist.active {
-  color: #EF4444;
-  border-color: #EF4444;
+  color: #ef4444;
+  border-color: #ef4444;
 }
 
 /* Features Section */
@@ -990,7 +1107,7 @@ onMounted(() => {
 .section-title {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 1rem 0;
 }
 
@@ -1005,13 +1122,13 @@ onMounted(() => {
   align-items: flex-start;
   gap: 0.75rem;
   font-size: 0.875rem;
-  color: var(--shop-brown-dark, #8B7D6D);
+  color: var(--shop-brown-dark, #8b7d6d);
   padding: 0.5rem 0;
 }
 
 .features-list li svg {
   flex-shrink: 0;
-  color: var(--shop-success, #7D9B76);
+  color: var(--shop-success, #7d9b76);
   margin-top: 0.125rem;
 }
 
@@ -1031,7 +1148,7 @@ onMounted(() => {
 .dimension-item {
   padding: 0.75rem;
   background: white;
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 0.5rem;
   text-align: center;
 }
@@ -1042,28 +1159,28 @@ onMounted(() => {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin-bottom: 0.25rem;
 }
 
 .dim-value {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Related Products Section */
 .related-section {
   margin-top: 4rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--shop-beige, #E8E3DC);
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .related-title {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 2rem 0;
 }
 
@@ -1123,13 +1240,13 @@ onMounted(() => {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
 }
 
 .related-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0.25rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -1141,7 +1258,7 @@ onMounted(() => {
 .related-price {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Mobile Adjustments */

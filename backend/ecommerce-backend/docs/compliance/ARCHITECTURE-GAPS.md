@@ -153,22 +153,27 @@ The current architecture issues a **single 7-day JWT** with no `POST /auth/refre
 
 ### The Fix ✅ IMPLEMENTED
 
-The refresh token system has been fully implemented:
+The refresh token system has been fully implemented with secure httpOnly cookies:
 
 1. **Dual-token issued at login/register:**
-   - `access_token` (7 days) - for API authentication
-   - `refresh_token` (30 days) - for getting new access tokens
+   - `access_token` (7 days) - stored in localStorage, for API authentication
+   - `refresh_token` (30 days) - stored in httpOnly cookie, for token refresh
 
-2. **Refresh token stored in `user_sessions` table** with expiry tracking
+2. **Security features:**
+   - Refresh token stored in httpOnly, Secure, SameSite=Strict cookie
+   - Cookie automatically sent with requests (no JavaScript needed)
+   - XSS resistant (JavaScript cannot read refresh token)
+   - CSRF protected via SameSite=Strict
+   - Refresh token stored in `user_sessions` table with expiry tracking
 
 3. **New endpoints added:**
-   - `POST /auth/refresh` - exchanges refresh token for new access token
-   - `POST /auth/logout` - invalidates refresh token
+   - `POST /auth/refresh` - reads cookie automatically, returns new access token
+   - `POST /auth/logout` - invalidates refresh token in DB, clears cookie
 
 4. **Frontend handles auto-refresh:**
    - `authStore.initialize()` called on app mount
    - Auto-refresh on initialization if access token expired
-   - Stores user ID in localStorage for quick access
+   - Access token decoded to get user ID (no separate storage needed)
 
 See `docs/guides/05-AUTH-AND-JWT-GUIDE.md` — Section 9 for full implementation details.
 

@@ -3,132 +3,133 @@
  * PreviewModal.vue - Preview modal with direct component rendering
  * Renders the component directly and highlights element based on data-key attribute
  */
-import { ref, watch, onMounted, onUnmounted, computed, nextTick, shallowRef } from 'vue';
-import Button from 'primevue/button';
+import { ref, watch, onMounted, onUnmounted, computed, nextTick, shallowRef } from 'vue'
+import Button from 'primevue/button'
 
 const props = defineProps({
   visible: {
     type: Boolean,
-    default: false
+    default: false,
   },
   highlightKey: {
     type: String,
-    default: ''
+    default: '',
   },
   componentName: {
     type: [Function, Array],
-    default: null
-  }
-});
+    default: null,
+  },
+})
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
-const previewContainer = ref(null);
-const isLoading = ref(true);
-const activeTab = ref(0);
+const previewContainer = ref(null)
+const isLoading = ref(true)
+const activeTab = ref(0)
 
 // Get component import functions to render (can be single or multiple)
 const componentsToRender = computed(() => {
-  if (!props.componentName) return [];
+  if (!props.componentName) return []
   if (Array.isArray(props.componentName)) {
-    return props.componentName;
+    return props.componentName
   }
-  return [props.componentName];
-});
+  return [props.componentName]
+})
 
 // Current component import function based on active tab
 const currentComponentLoader = computed(() => {
-  return componentsToRender.value[activeTab.value] || null;
-});
+  return componentsToRender.value[activeTab.value] || null
+})
 
 // Extract display name from the import function string representation
 function getDisplayName(loader) {
-  if (!loader) return '';
+  if (!loader) return ''
   // Convert function to string and extract component name from import path
-  const funcStr = loader.toString();
-  const match = funcStr.match(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/);
+  const funcStr = loader.toString()
+  const match = funcStr.match(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/)
   if (match) {
-    const pathMatch = match[1].match(/([^/]+)\.vue$/);
-    return pathMatch ? pathMatch[1] : match[1];
+    const pathMatch = match[1].match(/([^/]+)\.vue$/)
+    return pathMatch ? pathMatch[1] : match[1]
   }
-  return 'Component';
+  return 'Component'
 }
 
 // Loaded component
-const loadedComponent = shallowRef(null);
+const loadedComponent = shallowRef(null)
 
 // Load and render component by calling the import function directly
 async function loadComponent() {
-  const loader = currentComponentLoader.value;
+  const loader = currentComponentLoader.value
 
   if (!loader || typeof loader !== 'function') {
-    loadedComponent.value = null;
-    isLoading.value = false;
-    return;
+    loadedComponent.value = null
+    isLoading.value = false
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
 
   try {
-    const module = await loader();
-    loadedComponent.value = module.default;
+    const module = await loader()
+    loadedComponent.value = module.default
   } catch (error) {
-    console.error('Failed to load component:', error);
-    loadedComponent.value = null;
+    console.error('Failed to load component:', error)
+    loadedComponent.value = null
   } finally {
-    isLoading.value = false;
-    
+    isLoading.value = false
+
     // Highlight element after render
     if (loadedComponent.value) {
-      await nextTick();
+      await nextTick()
       // Small delay to ensure styles are applied and layout is stable
-      setTimeout(highlightElement, 200);
+      setTimeout(highlightElement, 200)
     }
   }
 }
 
-
 // Highlight the element with matching data-key using vanilla JS
 function highlightElement() {
-  if (!props.highlightKey || !previewContainer.value) return;
+  if (!props.highlightKey || !previewContainer.value) return
 
-  const element = previewContainer.value.querySelector(
-    `[data-key="${props.highlightKey}"]`
-  );
+  const element = previewContainer.value.querySelector(`[data-key="${props.highlightKey}"]`)
 
   if (element) {
-    element.classList.add('preview-data-key-highlight');
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.classList.add('preview-data-key-highlight')
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
 
 // Close modal on escape
 function handleKeydown(e) {
   if (e.key === 'Escape' && props.visible) {
-    emit('close');
+    emit('close')
   }
 }
 
 onMounted(() => {
-  document.addEventListener('keydown', handleKeydown);
-});
+  document.addEventListener('keydown', handleKeydown)
+})
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown);
-});
+  document.removeEventListener('keydown', handleKeydown)
+})
 
 // Load component when modal opens or component changes
-watch([() => props.visible, () => props.componentName], ([visible]) => {
-  if (visible) {
-    activeTab.value = 0;
-    loadComponent();
-  }
-}, { immediate: true });
+watch(
+  [() => props.visible, () => props.componentName],
+  ([visible]) => {
+    if (visible) {
+      activeTab.value = 0
+      loadComponent()
+    }
+  },
+  { immediate: true },
+)
 
 // Reload when active tab changes
 watch(activeTab, () => {
-  loadComponent();
-});
+  loadComponent()
+})
 </script>
 
 <template>
@@ -190,9 +191,8 @@ watch(activeTab, () => {
             <div
               ref="previewContainer"
               class="preview-container"
-              :class="{ 'scrollable': !isLoading }"
+              :class="{ scrollable: !isLoading }"
             >
-
               <component
                 v-if="loadedComponent && !isLoading"
                 :is="loadedComponent"
@@ -404,7 +404,9 @@ watch(activeTab, () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-overlay p {
@@ -530,14 +532,15 @@ watch(activeTab, () => {
 }
 
 /* Target any element with data-highlight-active attribute as extra fallback */
-:global([data-highlight-active="true"]) {
+:global([data-highlight-active='true']) {
   outline: 3px solid #f97316 !important;
   outline-offset: 4px !important;
   animation: preview-pulse-highlight 1.5s ease-in-out infinite !important;
 }
 
 @keyframes preview-pulse-highlight {
-  0%, 100% {
+  0%,
+  100% {
     outline-color: #f97316;
     box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
   }

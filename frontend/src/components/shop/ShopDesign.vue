@@ -65,11 +65,7 @@
           @click="navigateToDesign(item.slug, 'style')"
         >
           <div class="style-image-wrapper">
-            <img 
-              :src="item.image || getStyleFallback(item.slug)" 
-              :alt="item.name" 
-              loading="lazy"
-            />
+            <img :src="item.image || getStyleFallback(item.slug)" :alt="item.name" loading="lazy" />
             <div class="style-overlay">
               <span class="style-explore">Explore</span>
             </div>
@@ -88,16 +84,16 @@ import { useRouter } from 'vue-router'
 const props = defineProps({
   items: {
     type: Object,
-    default: () => ({ spaceSpecific: [], styleSpecific: [] })
+    default: () => ({ spaceSpecific: [], styleSpecific: [] }),
   },
   loading: {
     type: Boolean,
-    default: false
+    default: false,
   },
   error: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 })
 
 const router = useRouter()
@@ -112,37 +108,97 @@ const navigateToDesign = (slug, type) => {
 // Space icons as functional components
 const getSpaceIcon = (slug) => {
   const icons = {
-    living: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2z' })
-    ]),
-    bedroom: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 12h18v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5zM3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M7 12V9M17 12V9M3 17v2M21 17v2' })
-    ]),
-    dining: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 2v7c0 1.1.9 2 2 2h3a2 2 0 002-2V2M8 2v20M18 2h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v13' })
-    ]),
-    kitchen: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
-      h('path', { d: 'M3 9h18M9 9v12' })
-    ]),
-    'home-office': () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zM4 9v6M20 9v6M8 15h8M10 15v4M14 15v4' })
-    ]),
-    bathroom: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M4 12h16a2 2 0 012 2v2a4 4 0 01-4 4H6a4 4 0 01-4-4v-2a2 2 0 012-2zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v7M18 20v2M6 20v2' })
-    ]),
-    balcony: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 12h18M3 12v8M21 12v8M6 12v8M18 12v8M12 12v8M3 7l9-5 9 5' })
-    ]),
-    lounge: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M5 11V7a4 4 0 014-4h6a4 4 0 014 4v4M3 11a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4zM5 17v3M19 17v3' })
-    ]),
-    poolside: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 2v6M8 4l4 4 4-4' })
-    ]),
-    foyer: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' }, [
-      h('path', { d: 'M3 21V9l9-6 9 6v12a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z' })
-    ]),
+    living: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2z',
+          }),
+        ],
+      ),
+    bedroom: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 12h18v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5zM3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M7 12V9M17 12V9M3 17v2M21 17v2',
+          }),
+        ],
+      ),
+    dining: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 2v7c0 1.1.9 2 2 2h3a2 2 0 002-2V2M8 2v20M18 2h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v13',
+          }),
+        ],
+      ),
+    kitchen: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
+          h('path', { d: 'M3 9h18M9 9v12' }),
+        ],
+      ),
+    'home-office': () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zM4 9v6M20 9v6M8 15h8M10 15v4M14 15v4',
+          }),
+        ],
+      ),
+    bathroom: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 12h16a2 2 0 012 2v2a4 4 0 01-4 4H6a4 4 0 01-4-4v-2a2 2 0 012-2zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v7M18 20v2M6 20v2',
+          }),
+        ],
+      ),
+    balcony: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [h('path', { d: 'M3 12h18M3 12v8M21 12v8M6 12v8M18 12v8M12 12v8M3 7l9-5 9 5' })],
+      ),
+    lounge: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M5 11V7a4 4 0 014-4h6a4 4 0 014 4v4M3 11a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4zM5 17v3M19 17v3',
+          }),
+        ],
+      ),
+    poolside: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 2v6M8 4l4 4 4-4',
+          }),
+        ],
+      ),
+    foyer: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [h('path', { d: 'M3 21V9l9-6 9 6v12a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z' })],
+      ),
   }
   return icons[slug] || icons.living
 }
@@ -152,16 +208,23 @@ const getStyleFallback = (slug) => {
     minimalist: 'https://images.unsplash.com/photo-1598928506311-c55efa66a84d?w=400&h=400&fit=crop',
     japandi: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=400&h=400&fit=crop',
     brutalist: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=400&fit=crop',
-    'wabi-sabi': 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=400&fit=crop',
-    scandinavian: 'https://images.unsplash.com/photo-1598928506311-c55efa66a84d?w=400&h=400&fit=crop',
-    'vintage-retro': 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&h=400&fit=crop',
+    'wabi-sabi':
+      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=400&fit=crop',
+    scandinavian:
+      'https://images.unsplash.com/photo-1598928506311-c55efa66a84d?w=400&h=400&fit=crop',
+    'vintage-retro':
+      'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&h=400&fit=crop',
     traditional: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=400&fit=crop',
     victorian: 'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=400&h=400&fit=crop',
     moroccan: 'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=400&h=400&fit=crop',
     parametric: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=400&fit=crop',
-    sustainable: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=400&h=400&fit=crop',
+    sustainable:
+      'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=400&h=400&fit=crop',
   }
-  return fallbacks[slug] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop'
+  return (
+    fallbacks[slug] ||
+    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop'
+  )
 }
 </script>
 
@@ -186,13 +249,13 @@ const getStyleFallback = (slug) => {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 0.5rem 0;
 }
 
 .section-subtitle {
   font-size: 0.875rem;
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   margin: 0;
 }
 
@@ -202,7 +265,7 @@ const getStyleFallback = (slug) => {
   align-items: center;
   gap: 1.5rem;
   margin: 2.5rem 0;
-  color: var(--shop-tan, #C4B8A9);
+  color: var(--shop-tan, #c4b8a9);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -214,7 +277,7 @@ const getStyleFallback = (slug) => {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 /* Spaces Grid */
@@ -240,14 +303,14 @@ const getStyleFallback = (slug) => {
   gap: 0.75rem;
   padding: 1.25rem 1rem;
   background: white;
-  border: 1px solid var(--shop-beige, #E8E3DC);
+  border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .space-card:hover {
-  border-color: var(--shop-tan, #C4B8A9);
+  border-color: var(--shop-tan, #c4b8a9);
   box-shadow: 0 6px 16px rgba(61, 58, 54, 0.08);
   transform: translateY(-2px);
 }
@@ -258,25 +321,25 @@ const getStyleFallback = (slug) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--shop-cream-dark, #F5F2ED);
+  background: var(--shop-cream-dark, #f5f2ed);
   border-radius: 0.5rem;
   transition: all 0.3s ease;
 }
 
 .space-card:hover .space-icon-wrapper {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .space-icon {
   width: 24px;
   height: 24px;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 .space-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Styles Grid */
@@ -308,7 +371,7 @@ const getStyleFallback = (slug) => {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .style-image-wrapper img {
@@ -356,7 +419,7 @@ const getStyleFallback = (slug) => {
 .style-name {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--shop-charcoal, #3D3A36);
+  color: var(--shop-charcoal, #3d3a36);
 }
 
 /* Skeleton */
@@ -366,7 +429,7 @@ const getStyleFallback = (slug) => {
 
 .skeleton .space-icon-wrapper,
 .skeleton .style-image-wrapper {
-  background: var(--shop-beige, #E8E3DC);
+  background: var(--shop-beige, #e8e3dc);
 }
 
 .skeleton-label {
@@ -382,7 +445,7 @@ const getStyleFallback = (slug) => {
 }
 
 .error-text {
-  color: var(--shop-brown, #A89B8C);
+  color: var(--shop-brown, #a89b8c);
   font-size: 0.875rem;
 }
 </style>

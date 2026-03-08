@@ -5,12 +5,12 @@ const comingSoon = () => import('@/components/Coming-Soon.vue')
  * ===========================================
  * ROUTER CONFIGURATION
  * ===========================================
- * 
+ *
  * MODALS (Cart, Wishlist, Login, Orders, Checkout):
  *   Modals are NOT route-driven anymore. They use reactive
  *   state via provide/inject from App.vue. This avoids the
  *   "blank page" bug caused by component: null routes.
- * 
+ *
  * PAGE ROUTES:
  *   All standard page routes remain unchanged.
  * ===========================================
@@ -148,7 +148,7 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: () => import('@/views/ContactView.vue'),
-      meta: { title: 'Contact Us - Spacefurnio' }
+      meta: { title: 'Contact Us - Spacefurnio' },
     },
 
     // ===========================================
@@ -161,50 +161,50 @@ const router = createRouter({
       meta: {
         title: 'Admin Panel - Spacefurnio',
         hideNav: true,
-        hideFooter: true
+        hideFooter: true,
       },
       children: [
         {
           path: '',
-          redirect: '/admin-spacefurnio/contents'
+          redirect: '/admin-spacefurnio/contents',
         },
         {
           path: 'dashboard',
           name: 'AdminDashboard',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Dashboard' }
+          meta: { title: 'Dashboard' },
         },
         {
           path: 'contents',
           name: 'AdminContents',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Content Management' }
+          meta: { title: 'Content Management' },
         },
         {
           path: 'products',
           name: 'AdminProducts',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Products' }
+          meta: { title: 'Products' },
         },
         {
           path: 'orders',
           name: 'AdminOrders',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Orders' }
+          meta: { title: 'Orders' },
         },
         {
           path: 'reviews',
           name: 'AdminReviews',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Reviews' }
+          meta: { title: 'Reviews' },
         },
         {
           path: 'settings',
           name: 'AdminSettings',
           component: () => import('@/views/admin/AdminContentsPage.vue'),
-          meta: { title: 'Settings' }
-        }
-      ]
+          meta: { title: 'Settings' },
+        },
+      ],
     },
   ],
 })

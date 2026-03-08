@@ -36,6 +36,13 @@
       "when": 1772652608526,
       "tag": "0004_wet_shocker",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1772921753941,
+      "tag": "0005_mute_clint_barton",
+      "breakpoints": true
     }
   ]
 }

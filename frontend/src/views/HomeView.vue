@@ -1,39 +1,38 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import scrollAnimation from '@/components/home/Scroll-animation.vue';
-import ProductSection from '@/components/home/Product-section.vue';
-import HeroSection from '@/components/home/HeroSection.vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import scrollAnimation from '@/components/home/Scroll-animation.vue'
+import ProductSection from '@/components/home/Product-section.vue'
+import HeroSection from '@/components/home/HeroSection.vue'
 import FooterComponent from '@/components/Footer-component.vue'
-import { scroller } from '@/utills/customScroll.js';
-import { inject } from 'vue';
+import { scroller } from '@/utills/customScroll.js'
+import { inject } from 'vue'
 
-const { showNav,showFoo } = inject('navShowUtils');
+const { showNav, showFoo } = inject('navShowUtils')
 
 const wrapper = ref(null)
 const navDotsContainer = ref(null)
 
 onMounted(() => {
-  showFoo.value = false;
+  showFoo.value = false
   const cleanup = scroller(wrapper, 'scroll-section', null)
   wrapper.value.addEventListener('sectionChange', (e) => {
-    console.log('Scroll started', e.detail);
+    console.log('Scroll started', e.detail)
     if (e.detail.currentIndex === 0) {
-      showNav.value = false;
-      console.log('Hiding nav');
+      showNav.value = false
+      console.log('Hiding nav')
     } else {
       setTimeout(() => {
-        (showNav.value = true);
-      }, 100);
+        showNav.value = true
+      }, 100)
     }
-  });
-  showNav.value = false;
+  })
+  showNav.value = false
   onBeforeUnmount(() => {
-    cleanup();
-    showNav.value = true;
-    showFoo.value = true;
-  });
+    cleanup()
+    showNav.value = true
+    showFoo.value = true
+  })
 })
-
 </script>
 
 <template>
@@ -54,7 +53,6 @@ onMounted(() => {
       <section class="scroll-section">
         <FooterComponent />
       </section>
-
     </div>
   </div>
 

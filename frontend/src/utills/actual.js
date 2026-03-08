@@ -1,13 +1,11 @@
-
-
-export const scroller = (wrapper,child_class, navDotsContainer) => {
+export const scroller = (wrapper, child_class, navDotsContainer) => {
   const wrapperEl = wrapper.value
   const navDotsEl = navDotsContainer?.value || null
 
   // initialize child elements and counts
-  let child_elms = Array.from(wrapperEl.querySelectorAll("."+child_class))
+  let child_elms = Array.from(wrapperEl.querySelectorAll('.' + child_class))
   let itemCount = child_elms.length
-  console.log('Initialized with', itemCount, 'sections.',child_elms)
+  console.log('Initialized with', itemCount, 'sections.', child_elms)
   let viewportHeight = window.innerHeight || document.documentElement.clientHeight
   let maxOffset = 0
   let minOffset = -(wrapperEl.scrollHeight - viewportHeight)
@@ -25,7 +23,7 @@ export const scroller = (wrapper,child_class, navDotsContainer) => {
       dot.classList.add('dot')
       dot.addEventListener('click', () => {
         let heights = 0
-        child_elms.slice(0, i).forEach(section => {
+        child_elms.slice(0, i).forEach((section) => {
           heights += section.offsetHeight
         })
         offset = -heights
@@ -59,8 +57,8 @@ export const scroller = (wrapper,child_class, navDotsContainer) => {
     if (now - lastScrollTime < scrollDelay) return
 
     if (currentIndex === 0 && offset >= maxOffset) {
-      const h = child_elms[currentIndex].offsetHeight;
-      console.log('At top boundary, cannot scroll up further. Current height:', h);
+      const h = child_elms[currentIndex].offsetHeight
+      console.log('At top boundary, cannot scroll up further. Current height:', h)
       wrapperEl.style.transform = `translateY(${offset + 100}px)`
       lastScrollTime = now
       setTimeout(() => {
@@ -103,7 +101,16 @@ export const scroller = (wrapper,child_class, navDotsContainer) => {
     if (now - lastScrollTime < scrollDelay) return
 
     const h = child_elms[currentIndex].offsetHeight
-    console.log('Current index:', currentIndex, 'Item count:', itemCount, 'Height:', h, "offset:", offset)
+    console.log(
+      'Current index:',
+      currentIndex,
+      'Item count:',
+      itemCount,
+      'Height:',
+      h,
+      'offset:',
+      offset,
+    )
 
     if (currentIndex === itemCount - 1 && offset <= minOffset) {
       wrapperEl.style.transform = `translateY(${offset - 100}px)`

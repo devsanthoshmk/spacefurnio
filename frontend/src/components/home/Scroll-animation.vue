@@ -7,11 +7,13 @@ import homePageText from '@/assets/contents/homePage.js'
     <!-- Panel 1 -->
     <div class="h-[100dvh]">
       <div
-        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative">
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative"
+      >
         <div
           id="text-1"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700"
-          data-key="scroll_text_1">
+          data-key="scroll_text_1"
+        >
           {{ homePageText.scroll_text_1.text }}
         </div>
       </div>
@@ -20,11 +22,13 @@ import homePageText from '@/assets/contents/homePage.js'
     <!-- Panel 2 -->
     <div class="scroll-section h-[100dvh]">
       <div
-        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative">
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative"
+      >
         <div
           id="text-2"
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1"
-          data-key="scroll_text_2">
+          data-key="scroll_text_2"
+        >
           {{ homePageText.scroll_text_2.text }}
         </div>
       </div>
@@ -44,7 +48,9 @@ import homePageText from '@/assets/contents/homePage.js'
 /* floating text animation when active */
 .scroll-section.active .floating-text {
   opacity: 1;
-  animation: fadeInUp 1s ease forwards, blurIn 1.2s ease forwards;
+  animation:
+    fadeInUp 1s ease forwards,
+    blurIn 1.2s ease forwards;
 }
 
 @keyframes blurOut {
@@ -80,5 +86,4 @@ import homePageText from '@/assets/contents/homePage.js'
     transform: translateY(0);
   }
 }
-
 </style>

@@ -3,6 +3,77 @@
 ## Overview
 This document outlines the architectural updates to the frontend's API layer. The primary goal was to connect the `shopApi` and functional stores (`cart`, `wishlist`, `auth`) directly to the Neon Data API and Worker backend, establishing a robust, production-ready ecommerce architecture.
 
+## API URL Structure
+
+The frontend uses two API sources:
+
+| Source | Environment Variable | Default |
+|--------|---------------------|---------|
+| **Worker Backend** | `VITE_WORKER_URL` | `https://backend.spacefurnio.workers.dev` |
+| **Neon Data API (Main)** | `VITE_NEON_URL` | Main DB (users, carts, orders) |
+| **Neon Data API (Catalog)** | `VITE_CATALOG_URL` | Catalog DB (products) |
+
+### Worker Backend Routes
+
+The Worker backend exposes routes under `/api/` (no versioning):
+
+- `GET /api/orders` - Fetch user orders
+- `GET /api/orders/:id` - Get order details
+- `POST /api/orders/checkout` - Create order from cart
+- `GET /api/cart` - Get user's cart
+- `POST /api/cart/items` - Add item to cart
+- `GET /api/wishlist` - Get user's wishlist
+- `POST /api/wishlist/:productId` - Add to wishlist
+- `DELETE /api/wishlist/:productId` - Remove from wishlist
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `GET /api/products` - List products (catalog DB)
+- `GET /api/products/:slug` - Get product details
+
+### API Client Configuration
+
+In `src/api/index.js`:
+- `API_BASE_URL` - Points to the custom domain or worker URL
+- `API_VERSION` - Set to empty string since backend doesn't use `/v1` prefix
+- Requests are constructed as: `${API_BASE_URL}/api${API_VERSION}${endpoint}` (e.g., `/api/orders`)
+
+### Response Format Convention
+
+The Worker backend uses **snake_case** for JSON response keys (e.g., `total_amount`, `created_at`, `order_items`). Frontend components expect this format.
+
+### Orders API
+
+The orders endpoint returns:
+```json
+{
+  "id": "uuid",
+  "status": "placed|processing|shipped|delivered|cancelled",
+  "total_amount": 1234.56,
+  "created_at": "2024-01-15T10:30:00Z",
+  "order_items": [
+    { "id": "uuid", "product_id": "uuid", "quantity": 2, "unit_price": 500.00 }
+  ],
+  "shipping_first_name": "John",
+  "shipping_last_name": "Doe",
+  "shipping_address": "123 Main St",
+  "shipping_city": "Mumbai",
+  "shipping_state": "Maharashtra",
+  "shipping_pincode": "400001",
+  "shipping_phone": "+91 9876543210",
+  "payment_method": "razorpay"
+}
+```
+
+Frontend components (e.g., `OrdersModal.vue`) use `enrichOrderItems()` from `shopApi` to fetch product details (name, image, slug) from the catalog DB and merge them with order items.
+
+### Order Shipping Edit
+
+Users can edit shipping address for orders with status `placed` or `processing`:
+- Edit button appears only for these statuses
+- Users can select from saved addresses or enter new address
+- Updates go directly to Neon Data API with RLS enforcement
+- RLS policy: `user_id = auth.user_id() AND status IN ('placed', 'processing')`
+
 ## ⚠️ Cross-Database Architecture
 
 **Critical design constraint:** The product catalog and the user/shopping data live in **separate Neon projects**:

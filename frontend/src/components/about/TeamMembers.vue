@@ -1,26 +1,21 @@
 <template>
   <section id="founder-section" class="antialiased" aria-label="Meet the Team">
-
     <div
       v-for="(person, index) in team"
       :key="person.id"
       class="scroll-section team-member-section !min-h-[100dvh]"
       :class="index % 2 !== 0 ? 'bg-[#fff4ec]' : 'bg-[#f4f2ed]'"
     >
-    <div class="h-[9vh] block"></div>
+      <div class="h-[9vh] block"></div>
       <div class="team-member-container">
-
         <!-- Main Content Wrapper with Flexbox -->
         <!-- Added 'reversed' class logic for alternating desktop layout -->
-        <div class="team-content-wrapper" :class="{ 'reversed': index % 2 !== 0 }">
-
+        <div class="team-content-wrapper" :class="{ reversed: index % 2 !== 0 }">
           <!-- Photo Frame Column with Diagonal Cut -->
           <div class="photo-frame-wrapper">
             <div class="photo-frame">
               <!-- Hello Text positioned above the clipped container -->
-              <h2 class="hello-text cinzel-font"  aria-hidden="true">
-                HELLO,
-              </h2>
+              <h2 class="hello-text cinzel-font" aria-hidden="true">HELLO,</h2>
 
               <!-- Photo container with diagonal clip -->
               <div class="photo-container">
@@ -35,7 +30,10 @@
               <!-- Name block at bottom right -->
               <div class="name-block">
                 <h1 class="name-title cinzel-font">
-                  <span class="text-black">I'M</span> <span class="name-highlight">{{ person.nickname.toUpperCase() || firstName(person.name) }}</span>
+                  <span class="text-black">I'M</span>
+                  <span class="name-highlight">{{
+                    person.nickname.toUpperCase() || firstName(person.name)
+                  }}</span>
                 </h1>
                 <div class="role-text">
                   <span>{{ person.name }}</span>
@@ -56,17 +54,13 @@
 
               <div v-if="person.Architectural_Perspective" class="perspective-section">
                 <h4 class="perspective-title">Architectural Perspective:</h4>
-                <p class="perspective-quote">
-                  "{{ person.Architectural_Perspective }}"
-                </p>
+                <p class="perspective-quote">"{{ person.Architectural_Perspective }}"</p>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
-
   </section>
 </template>
 
@@ -76,44 +70,47 @@ import { ref } from 'vue'
 const teamMembers = [
   {
     id: 1,
-    name: "Ar. Thaini Jentra",
-    nickname: "Jeni",
-    role: "Founder & Managing Partner",
-    description: "Architect with 3 years of experience in this field",
+    name: 'Ar. Thaini Jentra',
+    nickname: 'Jeni',
+    role: 'Founder & Managing Partner',
+    description: 'Architect with 3 years of experience in this field',
     detailedBio: `I'm an architect with 3 years of experience in this field, and I genuinely enjoy the hands-on side of design, especially bringing ideas to life through thoughtful execution. I'm a naturally curious person, always exploring new tools, materials, and ways to improve what I do. I love turning creative concepts into practical, buildable solutions that are both smart and meaningful.`,
     Architectural_Perspective: `For me, architecture is all about creating smart, simple spaces that work well and feel good to live in. I'm drawn to designs that are minimalist, budget-friendly, and kind to the environment. I believe that with the right ideas and materials, we can build spaces that are both beautiful and practical, without overcomplicating things. Sometimes, the simplest designs speak the loudest—when they're made with care and purpose.`,
-    image: "/images/aboutus/team-main/jentra.png"
+    image: '/images/aboutus/team-main/jentra.png',
   },
   {
     id: 2,
-    name: "Peter Cintra R",
-    nickname: "Cintra",
-    role: "Co-Founder & HR Executive",
-    description: "CA Finalist with a passion for supporting growing businesses through strategic guidance",
+    name: 'Peter Cintra R',
+    nickname: 'Cintra',
+    role: 'Co-Founder & HR Executive',
+    description:
+      'CA Finalist with a passion for supporting growing businesses through strategic guidance',
     detailedBio: `I'm a CA Finalist with a passion for supporting growing businesses through strategic guidance by bringing a blend of analytical thinking and real-world experience. My journey blends people, purpose, and strategy. At Spacefurnio, I wear many hats — from keeping the team motivated and connected, to shaping how the world sees us. As the HR head, I'm all about creating a positive, driven work culture and helping bring our brand's voice to life.`,
     Architectural_Perspective: `As an outsider in the field of architecture, I see architecture as the art of creating meaningful spaces within real-world limits. It's not just about aesthetics — it's about smart, sustainable choices that balance beauty, function, and budget. Great architecture, to me, is where creativity meets constraint, and still manages to feel effortless.`,
-    image: "/images/aboutus/team-main/cintra.png"
+    image: '/images/aboutus/team-main/cintra.png',
   },
   {
     id: 3,
-    name: "Ar. Srimonisha",
-    nickname: "Monisha",
-    role: "Co-Founder & Design Lead",
-    description: "Architect and the Design Lead at Spacefurnio, shaping products with a balance of function and aesthetics",
+    name: 'Ar. Srimonisha',
+    nickname: 'Monisha',
+    role: 'Co-Founder & Design Lead',
+    description:
+      'Architect and the Design Lead at Spacefurnio, shaping products with a balance of function and aesthetics',
     detailedBio: `I'm an architect and the Design Lead at Spacefurnio, where I shape every product with a balance of function and aesthetics. My journey began with sketches in the margins of my notebooks and has grown into creating purposeful spaces that fulfill both design intent and functional needs. From the first line I draw, my focus is clear — to capture every requirement with precision and embed it into our work, ensuring the foundation of every project is laid right from the very beginning.`,
     Architectural_Perspective: `To me, architecture is more than design — it is the art of translating dreams into spaces that tell stories and serve a purpose. It begins with listening — to people, to place, and to intent. I see it as a soulful practice where emotion, function, and aesthetics come together in harmony. True architecture is not just admired; it is felt, lived in, and cherished — evolving with the lives it touches.`,
-    image: "/images/aboutus/team-main/monisha.png"
+    image: '/images/aboutus/team-main/monisha.png',
   },
   {
     id: 4,
-    name: "J. Jeffrina",
-    nickname: "Jeffy",
-    role: "Co-Founder & Financial Manager",
-    description: "MBA graduate with a passion for driving business growth through strategic financial planning",
+    name: 'J. Jeffrina',
+    nickname: 'Jeffy',
+    role: 'Co-Founder & Financial Manager',
+    description:
+      'MBA graduate with a passion for driving business growth through strategic financial planning',
     detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
     Architectural_Perspective: `I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`,
-    image: "/images/aboutus/team-main/jenita.png"
-  }
+    image: '/images/aboutus/team-main/jenita.png',
+  },
 ]
 
 const team = ref(teamMembers)
@@ -128,10 +125,8 @@ function firstName(full) {
 
 function splitRole(roleString) {
   if (!roleString) return []
-  return roleString.split(/\s+&\s+|\s+,\s+/).map(s => s.trim())
+  return roleString.split(/\s+&\s+|\s+,\s+/).map((s) => s.trim())
 }
-
-
 </script>
 
 <style scoped>
@@ -139,7 +134,7 @@ function splitRole(roleString) {
 
 /* ===== BASE STYLES ===== */
 .cinzel-font {
-  font-family: "Cinzel", serif;
+  font-family: 'Cinzel', serif;
   font-optical-sizing: auto;
   font-weight: 400;
 }
@@ -235,7 +230,7 @@ function splitRole(roleString) {
 
 /* Name Block at bottom right */
 .name-block {
-  padding-top:1vw;
+  padding-top: 1vw;
   text-align: right;
   margin-top: auto;
 }
@@ -327,7 +322,7 @@ function splitRole(roleString) {
 
 /* ===== TABLET & DESKTOP (768px and above) ===== */
 @media (min-width: 768px) {
-  .name-block{
+  .name-block {
     padding-top: 0vw;
   }
   .team-member-section {
@@ -588,5 +583,4 @@ function splitRole(roleString) {
     font-size: 0.6rem;
   }
 }
-
 </style>

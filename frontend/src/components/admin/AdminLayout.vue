@@ -3,25 +3,25 @@
  * AdminLayout.vue - Sidebar layout with navigation
  * Inspired by the reference design - clean, modern admin panel
  */
-import { ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 // import Button from 'primevue/button';
 
 const props = defineProps({
   patToken: {
     type: String,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const emit = defineEmits(['logout']);
+const emit = defineEmits(['logout'])
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 // Sidebar collapsed state
-const isSidebarCollapsed = ref(false);
-const isMobileMenuOpen = ref(false);
+const isSidebarCollapsed = ref(false)
+const isMobileMenuOpen = ref(false)
 
 // Navigation items
 const navItems = [
@@ -30,44 +30,44 @@ const navItems = [
     label: 'Dashboard',
     icon: 'pi-th-large',
     route: '/admin-spacefurnio/dashboard',
-    disabled: true
+    disabled: true,
   },
   {
     id: 'products',
     label: 'Products',
     icon: 'pi-box',
     route: '/admin-spacefurnio/products',
-    disabled: true
+    disabled: true,
   },
   {
     id: 'contents',
     label: 'Contents',
     icon: 'pi-file-edit',
     route: '/admin-spacefurnio/contents',
-    disabled: false
+    disabled: false,
   },
   {
     id: 'orders',
     label: 'Orders',
     icon: 'pi-shopping-cart',
     route: '/admin-spacefurnio/orders',
-    disabled: true
+    disabled: true,
   },
   {
     id: 'reviews',
     label: 'Reviews',
     icon: 'pi-star',
     route: '/admin-spacefurnio/reviews',
-    disabled: true
+    disabled: true,
   },
   {
     id: 'analytics',
     label: 'Analytics',
     icon: 'pi-chart-line',
     route: '/admin-spacefurnio/analytics',
-    disabled: true
-  }
-];
+    disabled: true,
+  },
+]
 
 const bottomNavItems = [
   {
@@ -75,36 +75,36 @@ const bottomNavItems = [
     label: 'Settings',
     icon: 'pi-cog',
     route: '/admin-spacefurnio/settings',
-    disabled: true
-  }
-];
+    disabled: true,
+  },
+]
 
 // Check if nav item is active
 function isActive(item) {
-  return route.path === item.route || route.path.startsWith(item.route + '/');
+  return route.path === item.route || route.path.startsWith(item.route + '/')
 }
 
 // Navigate to route
 function navigateTo(item) {
   if (!item.disabled) {
-    router.push(item.route);
-    isMobileMenuOpen.value = false;
+    router.push(item.route)
+    isMobileMenuOpen.value = false
   }
 }
 
 // Toggle sidebar
 function toggleSidebar() {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+  isSidebarCollapsed.value = !isSidebarCollapsed.value
 }
 
 // Toggle mobile menu
 function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
 // Logout
 function handleLogout() {
-  emit('logout');
+  emit('logout')
 }
 </script>
 
@@ -150,7 +150,7 @@ function handleLogout() {
             :class="{
               active: isActive(item),
               disabled: item.disabled,
-              collapsed: isSidebarCollapsed
+              collapsed: isSidebarCollapsed,
             }"
             @click="navigateTo(item)"
           >
@@ -172,7 +172,7 @@ function handleLogout() {
             :class="{
               active: isActive(item),
               disabled: item.disabled,
-              collapsed: isSidebarCollapsed
+              collapsed: isSidebarCollapsed,
             }"
             @click="navigateTo(item)"
           >
@@ -182,7 +182,11 @@ function handleLogout() {
           </li>
 
           <!-- Logout -->
-          <li class="nav-item logout-item" :class="{ collapsed: isSidebarCollapsed }" @click="handleLogout">
+          <li
+            class="nav-item logout-item"
+            :class="{ collapsed: isSidebarCollapsed }"
+            @click="handleLogout"
+          >
             <i class="pi pi-sign-out"></i>
             <span v-if="!isSidebarCollapsed" class="nav-label">Logout</span>
           </li>
@@ -196,11 +200,7 @@ function handleLogout() {
     </aside>
 
     <!-- Mobile Overlay -->
-    <div
-      v-if="isMobileMenuOpen"
-      class="mobile-overlay"
-      @click="toggleMobileMenu"
-    ></div>
+    <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMobileMenu"></div>
 
     <!-- Main Content -->
     <main class="main-content">

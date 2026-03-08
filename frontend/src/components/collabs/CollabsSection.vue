@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 
 const featuredCollabs = ref([
   {
@@ -7,93 +7,101 @@ const featuredCollabs = ref([
     name: 'Puma',
     bgClass: 'bg-[#36393B]',
     textClass: 'text-white',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7nTLa00S3jc_0Xqul2qyFo6fxE-rYsiIBHeTI-vQ3kN47jezx2q7AqlExV29C8oO7IpFAnCiGpSPUhLqE-UBqLahycnNlasxbEPSU6MgkVr1juEULhPIlVmc7fYt9iBoswGAG8oz8NWlOJdDJ0bXgMekZvtMN8ukEB2fa4_o12VnYYG4m7Pb1j4dcufkoMNWIvoiUmHAiN8Xg1tg6z6BbR6GhM8d30D3JKeH3I-Ljse1FQtlkZzIqNcz4KacwtqoUO7eorAKccw',
+    imgSrc:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuC7nTLa00S3jc_0Xqul2qyFo6fxE-rYsiIBHeTI-vQ3kN47jezx2q7AqlExV29C8oO7IpFAnCiGpSPUhLqE-UBqLahycnNlasxbEPSU6MgkVr1juEULhPIlVmc7fYt9iBoswGAG8oz8NWlOJdDJ0bXgMekZvtMN8ukEB2fa4_o12VnYYG4m7Pb1j4dcufkoMNWIvoiUmHAiN8Xg1tg6z6BbR6GhM8d30D3JKeH3I-Ljse1FQtlkZzIqNcz4KacwtqoUO7eorAKccw',
     imgBlend: 'mix-blend-screen',
-    buttonText: 'View Products'
+    buttonText: 'View Products',
   },
   {
     id: 2,
     name: 'New Balance',
     bgClass: 'bg-[#ACA596]',
     textClass: 'text-gray-900',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnYtqqjZDe6MKA-jR4S31i_w3oNTmHrDwfFMonGFafUsrNpe_bK9UBVpL2ftKUT5Ts6SwUI08oQwRNZLN4WBgn78AlL_N2ZvP6UWyJqwJ-CFR3dpQiKtn3TrtF8PPml2kRYQwJDhR3L4ZlTVFRZOrPiXYoNM-WlYDrBURN1hjtLtI4VrhHxGwF56gWj4wGBtBKPD40-G_SJWAU_q78Z3Fz0Xz1BAyLmzEX-ZD_1ZLspXyEfsgT2B6f4yJSvnKaNgfKSIlpelECnA',
+    imgSrc:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBnYtqqjZDe6MKA-jR4S31i_w3oNTmHrDwfFMonGFafUsrNpe_bK9UBVpL2ftKUT5Ts6SwUI08oQwRNZLN4WBgn78AlL_N2ZvP6UWyJqwJ-CFR3dpQiKtn3TrtF8PPml2kRYQwJDhR3L4ZlTVFRZOrPiXYoNM-WlYDrBURN1hjtLtI4VrhHxGwF56gWj4wGBtBKPD40-G_SJWAU_q78Z3Fz0Xz1BAyLmzEX-ZD_1ZLspXyEfsgT2B6f4yJSvnKaNgfKSIlpelECnA',
     imgBlend: 'mix-blend-multiply',
-    buttonText: 'View Products'
+    buttonText: 'View Products',
   },
   {
     id: 3,
     name: 'Vans',
     bgClass: 'bg-[#D6CEC2]',
     textClass: 'text-gray-900',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0VN2l5Zn7Zkd3d-FnES8tLTL-BQZGAjR1Gn7TnZijjhnMWcdvlTQ-30E9OWmvj2KltZ0jmRQLjTQTLRTW9DKzNMrJGUhAJvFhDelEuINWp1e9Ya1pXp2zfDgs2jgyA7TXFdxXsyvJ4wy_ecI3jORAXPRWktr9Z0mnxVKB4SC864dFNnhBYNahiIc0gfLo-uNZrtrD9RmCwv5elpQZS5M-sRkPQHMH40LABTcQ3HzQd7rgt7yGUGRh0or4If1e2vtr65HpAc-lpg',
+    imgSrc:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuA0VN2l5Zn7Zkd3d-FnES8tLTL-BQZGAjR1Gn7TnZijjhnMWcdvlTQ-30E9OWmvj2KltZ0jmRQLjTQTLRTW9DKzNMrJGUhAJvFhDelEuINWp1e9Ya1pXp2zfDgs2jgyA7TXFdxXsyvJ4wy_ecI3jORAXPRWktr9Z0mnxVKB4SC864dFNnhBYNahiIc0gfLo-uNZrtrD9RmCwv5elpQZS5M-sRkPQHMH40LABTcQ3HzQd7rgt7yGUGRh0or4If1e2vtr65HpAc-lpg',
     imgBlend: 'mix-blend-multiply',
-    buttonText: 'View Products'
+    buttonText: 'View Products',
   },
   {
     id: 4,
     name: 'Nike',
     bgClass: 'bg-[#1a1a1a]',
     textClass: 'text-white',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzXcasJPb17NDR0BsH2TpE0vX59ulBzW6wgih51wMoqFmJ7IfoJKLvPTpDdOIU0UXyHiHmjkXIEmbiVxqCtLyqjRH1B3ZvCn1_ylu_od3nZFQF4mmprcNPOG9au6G6M3nzfmRUnVW5z_q6h_IdZ29BTT-iEwhmQS6syizXFwkagSkuZEo0BRwlIqtk8bRyB3GZp9BcDVKSmRyDJrNECD0TNOM1MGbxr_i8s5Oj6YVAcJcftCzHtc4A7loxzonmc6RQfsxhFEOs0A',
+    imgSrc:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAzXcasJPb17NDR0BsH2TpE0vX59ulBzW6wgih51wMoqFmJ7IfoJKLvPTpDdOIU0UXyHiHmjkXIEmbiVxqCtLyqjRH1B3ZvCn1_ylu_od3nZFQF4mmprcNPOG9au6G6M3nzfmRUnVW5z_q6h_IdZ29BTT-iEwhmQS6syizXFwkagSkuZEo0BRwlIqtk8bRyB3GZp9BcDVKSmRyDJrNECD0TNOM1MGbxr_i8s5Oj6YVAcJcftCzHtc4A7loxzonmc6RQfsxhFEOs0A',
     imgBlend: 'mix-blend-screen',
-    buttonText: 'View Products'
+    buttonText: 'View Products',
   },
   {
     id: 5,
     name: 'Adidas',
     bgClass: 'bg-[#f0ebe3]',
     textClass: 'text-gray-900',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHWkjPisX3GoEFw1CgzuodDa_BNiFqDjG23ej7Aa36wWaYNJqRveIAyNOKxRxd3JDPxiy-g--xpWF7mFxn6Y0nLNEQp4WZx0rshJiQxw41wngnplgComGU8LXerRR8toAZ8ugeLSLNFdjBeqtQHa_cECXMQ6XsEbaRltOJTG5opY7RrcagOC7zrQ5iAgtfH4FzdjmPvbYo8GLVnX2NRZr9jxJzZ152XjMupSm3HbaJCsHjlQ0saI5v0mq3kHkixJzRvytd-Dz7kA',
+    imgSrc:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDHWkjPisX3GoEFw1CgzuodDa_BNiFqDjG23ej7Aa36wWaYNJqRveIAyNOKxRxd3JDPxiy-g--xpWF7mFxn6Y0nLNEQp4WZx0rshJiQxw41wngnplgComGU8LXerRR8toAZ8ugeLSLNFdjBeqtQHa_cECXMQ6XsEbaRltOJTG5opY7RrcagOC7zrQ5iAgtfH4FzdjmPvbYo8GLVnX2NRZr9jxJzZ152XjMupSm3HbaJCsHjlQ0saI5v0mq3kHkixJzRvytd-Dz7kA',
     imgBlend: 'mix-blend-multiply',
-    buttonText: 'View Products'
-  }
-]);
+    buttonText: 'View Products',
+  },
+])
 
-const currentIndex = ref(0);
-const isAnimating = ref(false);
-const slideDirection = ref('next');
+const currentIndex = ref(0)
+const isAnimating = ref(false)
+const slideDirection = ref('next')
 
 // Get visible items (3 at a time: left, center, right)
 const visibleCollabs = computed(() => {
-  const total = featuredCollabs.value.length;
-  const prevIndex = (currentIndex.value - 1 + total) % total;
-  const nextIndex = (currentIndex.value + 1) % total;
+  const total = featuredCollabs.value.length
+  const prevIndex = (currentIndex.value - 1 + total) % total
+  const nextIndex = (currentIndex.value + 1) % total
 
   return {
     left: featuredCollabs.value[prevIndex],
     center: featuredCollabs.value[currentIndex.value],
-    right: featuredCollabs.value[nextIndex]
-  };
-});
+    right: featuredCollabs.value[nextIndex],
+  }
+})
 
 const navigate = (direction) => {
-  if (isAnimating.value) return;
-  isAnimating.value = true;
-  slideDirection.value = direction;
+  if (isAnimating.value) return
+  isAnimating.value = true
+  slideDirection.value = direction
 
-  const total = featuredCollabs.value.length;
+  const total = featuredCollabs.value.length
   if (direction === 'next') {
-    currentIndex.value = (currentIndex.value + 1) % total;
+    currentIndex.value = (currentIndex.value + 1) % total
   } else {
-    currentIndex.value = (currentIndex.value - 1 + total) % total;
+    currentIndex.value = (currentIndex.value - 1 + total) % total
   }
 
   setTimeout(() => {
-    isAnimating.value = false;
-  }, 500);
-};
+    isAnimating.value = false
+  }, 500)
+}
 </script>
 
 <template>
   <div class="collabs-section font-sans">
-
     <main
       class="collabs-main w-full max-w-7xl rounded-[2rem] overflow-hidden relative border border-white/20 shadow-soft-xl bg-radial-gradient"
     >
-      <div class="section-inner px-4 py-6 md:px-8 md:py-8 lg:py-8 flex flex-col items-center h-full">
-
+      <div
+        class="section-inner px-4 py-6 md:px-8 md:py-8 lg:py-8 flex flex-col items-center h-full"
+      >
         <!-- Header with Logo and X -->
-        <header class="header-section flex flex-col items-center text-center w-full max-w-3xl mx-auto" v-animateonscroll="{ enterClass: 'animate__fadeInDown' }">
+        <header
+          class="header-section flex flex-col items-center text-center w-full max-w-3xl mx-auto"
+          v-animateonscroll="{ enterClass: 'animate__fadeInDown' }"
+        >
           <!-- Bigger Logo - Using img tag for reliability -->
           <div class="mb-3 md:mb-5 lg:mb-6 logo-container">
             <img
@@ -104,7 +112,9 @@ const navigate = (direction) => {
           </div>
 
           <!-- Animated X with phitagate-font - Much bigger -->
-          <h1 class="phitagate-font text-gray-800 tracking-tight text-6xl md:text-7xl lg:text-7xl animated-x font-light">
+          <h1
+            class="phitagate-font text-gray-800 tracking-tight text-6xl md:text-7xl lg:text-7xl animated-x font-light"
+          >
             ×
           </h1>
         </header>
@@ -113,8 +123,10 @@ const navigate = (direction) => {
         <div class="header-carousel-gap flex-shrink-0 h-10 md:h-12 lg:h-14"></div>
 
         <!-- Carousel Container -->
-        <div class="carousel-wrapper w-full relative flex-1 flex flex-col justify-center" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
-
+        <div
+          class="carousel-wrapper w-full relative flex-1 flex flex-col justify-center"
+          v-animateonscroll="{ enterClass: 'animate__fadeInUp' }"
+        >
           <!-- Navigation Buttons -->
           <button
             @click="navigate('prev')"
@@ -122,7 +134,14 @@ const navigate = (direction) => {
             :disabled="isAnimating"
             aria-label="Previous brand"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -133,7 +152,14 @@ const navigate = (direction) => {
             :disabled="isAnimating"
             aria-label="Next brand"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -141,10 +167,11 @@ const navigate = (direction) => {
           <!-- Cards Container with Transitions -->
           <div class="carousel-container">
             <div class="cards-track">
-
               <!-- Left Card (Previous) -->
               <div class="card-slot">
-                <Transition :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'">
+                <Transition
+                  :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'"
+                >
                   <article
                     :key="visibleCollabs.left.id"
                     :class="[visibleCollabs.left.bgClass, visibleCollabs.left.textClass]"
@@ -164,7 +191,9 @@ const navigate = (direction) => {
 
               <!-- Center Card (Main Focus) -->
               <div class="card-slot card-slot-center">
-                <Transition :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'">
+                <Transition
+                  :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'"
+                >
                   <article
                     :key="visibleCollabs.center.id"
                     :class="[visibleCollabs.center.bgClass, visibleCollabs.center.textClass]"
@@ -186,7 +215,9 @@ const navigate = (direction) => {
 
               <!-- Right Card (Next) -->
               <div class="card-slot">
-                <Transition :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'">
+                <Transition
+                  :name="slideDirection === 'next' ? 'card-slide-left' : 'card-slide-right'"
+                >
                   <article
                     :key="visibleCollabs.right.id"
                     :class="[visibleCollabs.right.bgClass, visibleCollabs.right.textClass]"
@@ -203,7 +234,6 @@ const navigate = (direction) => {
                   </article>
                 </Transition>
               </div>
-
             </div>
           </div>
 
@@ -212,18 +242,21 @@ const navigate = (direction) => {
             <button
               v-for="(collab, index) in featuredCollabs"
               :key="collab.id"
-              @click="() => { if (!isAnimating) { currentIndex = index; } }"
+              @click="
+                () => {
+                  if (!isAnimating) {
+                    currentIndex = index
+                  }
+                }
+              "
               :class="[
                 'w-2 h-2 rounded-full transition-all duration-300',
-                index === currentIndex
-                  ? 'bg-gray-800 w-6'
-                  : 'bg-gray-400 hover:bg-gray-600'
+                index === currentIndex ? 'bg-gray-800 w-6' : 'bg-gray-400 hover:bg-gray-600',
               ]"
               :aria-label="`Go to ${collab.name}`"
             ></button>
           </div>
         </div>
-
       </div>
     </main>
   </div>
@@ -323,7 +356,8 @@ const navigate = (direction) => {
 }
 
 @keyframes logoPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.12));
   }
@@ -348,7 +382,8 @@ const navigate = (direction) => {
 }
 
 @keyframes floatX {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
     opacity: 0.85;
   }
@@ -873,4 +908,3 @@ const navigate = (direction) => {
   }
 }
 </style>
-
