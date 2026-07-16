@@ -3,6 +3,7 @@
  * WISHLIST STORE
  * ===========================================
  * Manages wishlist state
+ * Supports both localStorage (unauthenticated) and database (authenticated) modes
  */
 
 import { defineStore } from 'pinia'
@@ -10,19 +11,29 @@ import { ref, computed } from 'vue'
 import { api as wishlistApi } from '@/lib/api'
 import { getProduct } from '@/api/shopApi'
 import { useCartStore } from './cart'
+import {
+  getLocalWishlist,
+  addToLocalWishlist as addToLocalWishlistFn,
+  removeFromLocalWishlist as removeFromLocalWishlistFn,
+  clearLocalWishlist,
+  hasLocalWishlist
+} from '@/lib/localCart'
 
 export const useWishlistStore = defineStore('wishlist', () => {
-  // ===========================================
-  // STATE
-  // ===========================================
+// ===========================================
+// STATE
+// ===========================================
 
-  const items = ref([])
-  const enrichedItems = ref([])
-  const isPublic = ref(false)
-  const isLoading = ref(false)
-  const error = ref(null)
+const items = ref([])
+const enrichedItems = ref([])
+const isPublic = ref(false)
+const isLoading = ref(false)
+const error = ref(null)
+const isLocalMode = ref(false)
+const isSyncing = ref(false)
+const syncError = ref(null)
 
-  const productIds = computed(() => new Set(items.value.map((i) => i.productId)))
+const productIds = computed(() => new Set(items.value.map((i) => i.productId)))
 
   // ===========================================
   // GETTERS
@@ -39,52 +50,70 @@ export const useWishlistStore = defineStore('wishlist', () => {
   // ACTIONS
   // ===========================================
 
-  /**
-   * Fetch wishlist from server and auto-enrich with product details.
-   *
-   * NOTE: products table was dropped from the main DB (migration 0001_big_dormammu).
-   * Products live in a separate Neon project (icy-union-81751721), so PostgREST
-   * cannot do embedded resource joins like products(*).
-   * We fetch flat wishlist_items rows and store product_id for lookup.
-   * This function automatically enriches items with product data so all
-   * components get full details automatically.
-   */
-  async function fetchWishlist() {
-    try {
-      isLoading.value = true
-      error.value = null
+/**
+ * Set the wishlist mode (local or authenticated)
+ */
+function setMode(authenticated) {
+  isLocalMode.value = !authenticated
+}
 
-      const data = await wishlistApi.getWishlist()
+/**
+ * Fetch wishlist from server or localStorage and auto-enrich with product details.
+ */
+async function fetchWishlist() {
+  try {
+    isLoading.value = true
+    error.value = null
 
-      if (Array.isArray(data)) {
-        items.value = data.map((wi) => ({
-          id: wi.id,
-          productId: wi.product_id,
-          createdAt: wi.created_at,
-          product: {
-            name: null,
-            price: null,
-            primaryImage: null,
-            slug: null,
-          },
-          variant: '',
-        }))
-      } else {
-        items.value = []
-      }
-
+    if (isLocalMode.value) {
+      const localItems = getLocalWishlist()
+      items.value = localItems.map((item) => ({
+        id: `local_${item.productId}`,
+        productId: item.productId,
+        createdAt: item.addedAt,
+        product: {
+          name: null,
+          price: null,
+          primaryImage: null,
+          slug: null,
+        },
+        variant: '',
+      }))
       await enrichItems()
-    } catch (err) {
-      if (err.message && err.message.includes('Unauthorized')) {
-        items.value = []
-        return
-      }
-      error.value = err.message
-      console.error('Fetch wishlist error:', err)
-    } finally {
-      isLoading.value = false
+      return
     }
+
+    const data = await wishlistApi.getWishlist()
+
+    if (Array.isArray(data)) {
+      items.value = data.map((wi) => ({
+        id: wi.id,
+        productId: wi.product_id,
+        createdAt: wi.created_at,
+        product: {
+          name: null,
+          price: null,
+          primaryImage: null,
+          slug: null,
+        },
+        variant: '',
+      }))
+    } else {
+      items.value = []
+    }
+
+    await enrichItems()
+  } catch (err) {
+    if (err.message && err.message.includes('Unauthorized')) {
+      items.value = []
+      return
+    }
+    error.value = err.message
+    console.error('Fetch wishlist error:', err)
+  } finally {
+    isLoading.value = false
   }
+}
 
   /**
    * Enrich wishlist items with product details from catalog DB.
@@ -145,48 +174,45 @@ export const useWishlistStore = defineStore('wishlist', () => {
   }
 
 /**
- * Add item to wishlist
+ * Add item to wishlist (supports both local and authenticated modes)
  */
 async function addItem(productId, variantId = null) {
-  console.log('[Wishlist] addItem called with productId:', productId)
+  if (isLocalMode.value) {
+    try {
+      addToLocalWishlistFn(productId)
+      await fetchWishlist()
+      return true
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
   try {
     isLoading.value = true
     error.value = null
 
     if (!productIds.value.has(productId)) {
-      console.log('[Wishlist] Product not in wishlist, proceeding to add')
       let wishlistId = await wishlistApi.getWishlistId()
-      console.log('[Wishlist] Got wishlistId:', wishlistId)
       if (!wishlistId) {
-        console.log('[Wishlist] No wishlist found, creating new one')
         try {
           await wishlistApi.createWishlist()
           wishlistId = await wishlistApi.getWishlistId()
-          console.log('[Wishlist] Created wishlist, new wishlistId:', wishlistId)
-        } catch (e) {
-          console.error('[Wishlist] Failed to create wishlist:', e)
+        } catch {
           error.value = 'Failed to create wishlist. Please login again.'
           return false
         }
       }
       if (!wishlistId) {
-        console.error('[Wishlist] Still no wishlistId after creation')
         error.value = 'Wishlist not found. Please login again.'
         return false
       }
-      console.log('[Wishlist] Adding item to wishlist, productId:', productId, 'wishlistId:', wishlistId)
       await wishlistApi.addWishlistItem({ wishlist_id: wishlistId, product_id: productId })
-      console.log('[Wishlist] Item added successfully, fetching updated wishlist')
       await fetchWishlist()
-      console.log('[Wishlist] Wishlist fetched, items now:', items.value.length)
-    } else {
-      console.log('[Wishlist] Product already in wishlist')
     }
     return true
   } catch (err) {
-    console.error('[Wishlist] Error in addItem:', err)
     if (err.message && err.message.includes('Item already exists')) {
-      console.log('[Wishlist] Item already exists, fetching wishlist')
       await fetchWishlist()
     } else {
       error.value = err.message
@@ -198,19 +224,36 @@ async function addItem(productId, variantId = null) {
 }
 
 /**
- * Remove item from wishlist
+ * Remove item from wishlist (supports both local and authenticated modes)
  */
 async function removeItem(itemId) {
   const removedIndex = items.value.findIndex((i) => i.id === itemId)
   const removedItem = items.value[removedIndex]
   const removedEnrichedIndex = enrichedItems.value.findIndex((i) => i.id === itemId)
   const removedEnrichedItem = enrichedItems.value[removedEnrichedIndex]
+  const productId = removedItem?.productId
 
   if (removedIndex >= 0) {
     items.value.splice(removedIndex, 1)
   }
   if (removedEnrichedIndex >= 0) {
     enrichedItems.value.splice(removedEnrichedIndex, 1)
+  }
+
+  if (isLocalMode.value && productId) {
+    try {
+      removeFromLocalWishlistFn(productId)
+      return true
+    } catch (err) {
+      if (removedItem && removedIndex >= 0) {
+        items.value.splice(removedIndex, 0, removedItem)
+      }
+      if (removedEnrichedItem && removedEnrichedIndex >= 0) {
+        enrichedItems.value.splice(removedEnrichedIndex, 0, removedEnrichedItem)
+      }
+      error.value = err.message
+      throw err
+    }
   }
 
   try {
@@ -232,7 +275,7 @@ async function removeItem(itemId) {
 }
 
 /**
- * Remove item by product ID
+ * Remove item by product ID (supports both local and authenticated modes)
  */
 async function removeByProductId(productId) {
   const item = items.value.find((i) => i.productId === productId)
@@ -244,6 +287,20 @@ async function removeByProductId(productId) {
   items.value.splice(removedIndex, 1)
   if (removedEnrichedIndex >= 0) {
     enrichedItems.value.splice(removedEnrichedIndex, 1)
+  }
+
+  if (isLocalMode.value) {
+    try {
+      removeFromLocalWishlistFn(productId)
+      return true
+    } catch (err) {
+      items.value.splice(removedIndex, 0, item)
+      if (enrichedItem && removedEnrichedIndex >= 0) {
+        enrichedItems.value.splice(removedEnrichedIndex, 0, enrichedItem)
+      }
+      error.value = err.message
+      throw err
+    }
   }
 
   try {
@@ -274,15 +331,15 @@ async function toggleItem(productId, productData = null, variantId = null) {
     await removeByProductId(productId)
     return false
   } else {
-    console.log('[Wishlist] Adding to wishlist')
-    const result = await addItem(productId, variantId)
+console.log('[Wishlist] Adding to wishlist')
+      const result = await addItem(productId)
     console.log('[Wishlist] Add result:', result, 'isInWishlist now:', isInWishlist(productId))
     return result
   }
 }
 
 /**
- * Move item to cart
+ * Move item to cart (supports both local and authenticated modes)
  */
 async function moveToCart(itemId, quantity = 1) {
   try {
@@ -295,7 +352,12 @@ async function moveToCart(itemId, quantity = 1) {
     const cartStore = useCartStore()
     await cartStore.addItem(itemToMove.productId, quantity)
 
-    await wishlistApi.removeWishlistItem(itemId)
+    if (isLocalMode.value) {
+      removeFromLocalWishlistFn(itemToMove.productId)
+    } else {
+      await wishlistApi.removeWishlistItem(itemId)
+    }
+
     items.value = items.value.filter((i) => i.id !== itemId)
     enrichedItems.value = enrichedItems.value.filter((i) => i.id !== itemId)
 
@@ -323,61 +385,156 @@ async function moveToCart(itemId, quantity = 1) {
     return itemCount.value
   }
 
-  /**
-   * Check if product is in wishlist
-   */
-  function isInWishlist(productId) {
-    return productIds.value.has(productId)
+/**
+ * Check if product is in wishlist (checks both local and DB items)
+ */
+function isInWishlist(productId) {
+  if (isLocalMode.value) {
+    const localItems = getLocalWishlist()
+    return localItems.some(item => item.productId === productId)
   }
+  return productIds.value.has(productId)
+}
 
-  /**
-   * Get wishlist item by product ID
-   */
-  function getItemByProductId(productId) {
-    return items.value.find((i) => i.productId === productId)
+/**
+ * Get wishlist item by product ID
+ */
+function getItemByProductId(productId) {
+  return items.value.find((i) => i.productId === productId)
+}
+
+/**
+ * Clear error
+ */
+function clearError() {
+  error.value = null
+}
+
+/**
+ * Sync local wishlist items to database
+ * Called when user logs in or registers
+ */
+async function syncToDatabase() {
+  if (!isLocalMode.value) return false
+  if (isSyncing.value) return false
+
+  const localItems = getLocalWishlist()
+  if (localItems.length === 0) return true
+
+  try {
+    isSyncing.value = true
+    syncError.value = null
+
+    let wishlistId = await wishlistApi.getWishlistId()
+    if (!wishlistId) {
+      await wishlistApi.createWishlist()
+      wishlistId = await wishlistApi.getWishlistId()
+    }
+
+    if (!wishlistId) {
+      throw new Error('Failed to get or create wishlist')
+    }
+
+    const existingData = await wishlistApi.getWishlist()
+    const existingProductIds = new Set((existingData || []).map(item => item.product_id))
+    const failedItems = []
+
+    for (const localItem of localItems) {
+      try {
+        const productResult = await getProduct(localItem.productId)
+        if (!productResult.success) {
+          failedItems.push({ productId: localItem.productId, reason: 'Product not found' })
+          continue
+        }
+
+        if (!existingProductIds.has(localItem.productId)) {
+          await wishlistApi.addWishlistItem({
+            wishlist_id: wishlistId,
+            product_id: localItem.productId
+          })
+        }
+      } catch (itemErr) {
+        console.error('Failed to sync wishlist item:', localItem.productId, itemErr)
+        failedItems.push({ productId: localItem.productId, reason: itemErr.message })
+      }
+    }
+
+    clearLocalWishlist()
+    isLocalMode.value = false
+    await fetchWishlist()
+
+    if (failedItems.length > 0) {
+      console.warn('Some wishlist items failed to sync:', failedItems)
+      syncError.value = `${failedItems.length} item(s) could not be synced`
+    }
+
+    return true
+  } catch (err) {
+    console.error('Wishlist sync failed:', err)
+    syncError.value = err.message
+    throw err
+  } finally {
+    isSyncing.value = false
   }
+}
 
-  /**
-   * Clear error
-   */
-  function clearError() {
-    error.value = null
+/**
+ * Set mode and optionally sync
+ */
+async function setAuthenticatedMode(doSync = true) {
+  const wasLocal = isLocalMode.value
+  isLocalMode.value = false
+
+  if (wasLocal && doSync && hasLocalWishlist()) {
+    await syncToDatabase()
+  } else if (!wasLocal) {
+    await fetchWishlist()
   }
+}
 
-  /**
-   * Reset store (on logout)
-   */
-  function $reset() {
-    items.value = []
-    enrichedItems.value = []
-    isPublic.value = false
-    isLoading.value = false
-    error.value = null
-  }
+/**
+ * Reset store (on logout)
+ */
+function $reset() {
+  items.value = []
+  enrichedItems.value = []
+  isPublic.value = false
+  isLoading.value = false
+  error.value = null
+  isLocalMode.value = false
+  isSyncing.value = false
+  syncError.value = null
+}
 
-  return {
-    items,
-    enrichedItems,
-    displayItems,
-    isPublic,
-    isLoading,
-    error,
-    itemCount,
-    isEmpty,
-    productIds,
+return {
+  items,
+  enrichedItems,
+  displayItems,
+  isPublic,
+  isLoading,
+  error,
+  itemCount,
+  isEmpty,
+  productIds,
+  isLocalMode,
+  isSyncing,
+  syncError,
 
-    fetchWishlist,
-    enrichItems,
-    addItem,
-    removeItem,
-    removeByProductId,
-    toggleItem,
-    moveToCart,
-    setVisibility,
-    fetchCount,
-    isInWishlist,
-    getItemByProductId,
-    clearError,
-    $reset,
-  }
+  fetchWishlist,
+  enrichItems,
+  addItem,
+  removeItem,
+  removeByProductId,
+  toggleItem,
+  moveToCart,
+  setVisibility,
+  fetchCount,
+  isInWishlist,
+  getItemByProductId,
+  clearError,
+  setMode,
+  syncToDatabase,
+  setAuthenticatedMode,
+  $reset,
+}
 })

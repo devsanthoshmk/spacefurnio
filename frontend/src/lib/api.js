@@ -50,32 +50,38 @@ class ApiClient {
     }
   }
 
-  // --- AUTH ---
-  async login(email, password) {
-    const res = await fetch(WORKER_URL + '/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Login failed')
-    this.setToken(data.access_token)
-    return data
+// --- AUTH ---
+async login(email, password) {
+  const res = await fetch(WORKER_URL + '/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Login failed')
+  this.setToken(data.access_token)
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:login'))
   }
+  return data
+}
 
-  async register(userData) {
-    const res = await fetch(WORKER_URL + '/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Registration failed')
-    if (data.access_token) {
-      this.setToken(data.access_token)
+async register(userData) {
+  const res = await fetch(WORKER_URL + '/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Registration failed')
+  if (data.access_token) {
+    this.setToken(data.access_token)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('auth:login'))
     }
-    return data
   }
+  return data
+}
 
   async refresh() {
     const res = await fetch(WORKER_URL + '/auth/refresh', {

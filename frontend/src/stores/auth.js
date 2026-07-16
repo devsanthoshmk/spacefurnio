@@ -3,6 +3,7 @@
  * AUTH STORE
  * ===========================================
  * Manages user authentication state
+ * Handles localStorage cart/wishlist sync on login
  */
 
 import { defineStore } from 'pinia'
@@ -10,6 +11,7 @@ import { ref, computed } from 'vue'
 import { api } from '@/lib/api'
 import { useCartStore } from './cart'
 import { useWishlistStore } from './wishlist'
+import { hasLocalCart, hasLocalWishlist } from '@/lib/localCart'
 
 export const useAuthStore = defineStore('auth', () => {
   // ===========================================
@@ -34,40 +36,71 @@ export const useAuthStore = defineStore('auth', () => {
   // ACTIONS
   // ===========================================
 
-  /**
-   * Initialize auth state on app load
-   */
-  async function initialize() {
-    if (isInitialized.value) return
+/**
+ * Initialize auth state on app load
+ */
+async function initialize() {
+  if (isInitialized.value) return
 
-    const token = localStorage.getItem('spacefurnio_token')
+  const token = localStorage.getItem('spacefurnio_token')
 
-    if (!token) {
-      isInitialized.value = true
-      return
+  if (!token) {
+    const cartStore = useCartStore()
+    const wishlistStore = useWishlistStore()
+    cartStore.setMode(false)
+    wishlistStore.setMode(false)
+    await Promise.all([cartStore.fetchCart(), wishlistStore.fetchWishlist()])
+    isInitialized.value = true
+    return
+  }
+
+  try {
+    isLoading.value = true
+    const response = await api.getCurrentUser()
+    user.value = response.user
+
+    const cartStore = useCartStore()
+    const wishlistStore = useWishlistStore()
+    cartStore.setMode(true)
+    wishlistStore.setMode(true)
+
+    if (hasLocalCart() || hasLocalWishlist()) {
+      try {
+        await syncUserData()
+      } catch (syncErr) {
+        console.error('Auto-sync failed on init:', syncErr)
+      }
+    } else {
+      await Promise.all([cartStore.fetchCart(), wishlistStore.fetchWishlist()])
     }
-
-    // If we have a token, try to get current user
+  } catch (err) {
+    console.error('Auth init error:', err)
     try {
-      isLoading.value = true
+      await api.refresh()
       const response = await api.getCurrentUser()
       user.value = response.user
-    } catch (err) {
-      console.error('Auth init error:', err)
-      // Token might be expired, try to refresh (cookie will be sent automatically)
-      try {
-        await api.refresh()
-        const response = await api.getCurrentUser()
-        user.value = response.user
-      } catch (refreshErr) {
-        console.error('Token refresh failed:', refreshErr)
-        api.clearAuth()
+
+      const cartStore = useCartStore()
+      const wishlistStore = useWishlistStore()
+      cartStore.setMode(true)
+      wishlistStore.setMode(true)
+
+      if (hasLocalCart() || hasLocalWishlist()) {
+        await syncUserData()
       }
-    } finally {
-      isLoading.value = false
-      isInitialized.value = true
+    } catch (refreshErr) {
+      console.error('Token refresh failed:', refreshErr)
+      api.clearAuth()
+      const cartStore = useCartStore()
+      const wishlistStore = useWishlistStore()
+      cartStore.setMode(false)
+      wishlistStore.setMode(false)
     }
+  } finally {
+    isLoading.value = false
+    isInitialized.value = true
   }
+}
 
   // Stubs for magic link / oauth
   async function getGoogleAuthUrl() {
@@ -90,22 +123,25 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function revokeSession(sessionId) {}
 
-  /**
-   * Logout current session
-   */
-  async function logout() {
-    try {
-      await api.logout()
-    } catch (err) {
-      console.error('Logout error:', err)
-    } finally {
-      user.value = null
-      const cartStore = useCartStore()
-      const wishlistStore = useWishlistStore()
-      cartStore.$reset()
-      wishlistStore.$reset()
-    }
+/**
+ * Logout current session
+ * Note: Local cart/wishlist items are preserved (device-bound, not user-bound)
+ */
+async function logout() {
+  try {
+    await api.logout()
+  } catch (err) {
+    console.error('Logout error:', err)
+  } finally {
+    user.value = null
+    const cartStore = useCartStore()
+    const wishlistStore = useWishlistStore()
+    cartStore.setMode(false)
+    wishlistStore.setMode(false)
+    cartStore.$reset()
+    wishlistStore.$reset()
   }
+}
 
   /**
    * Logout all sessions
@@ -114,19 +150,22 @@ export const useAuthStore = defineStore('auth', () => {
     await logout()
   }
 
-  /**
-   * Sync user data after login (cart, wishlist)
-   */
-  async function syncUserData() {
-    try {
-      const cartStore = useCartStore()
-      const wishlistStore = useWishlistStore()
+/**
+ * Sync local cart/wishlist to database after login
+ */
+async function syncUserData() {
+  try {
+    const cartStore = useCartStore()
+    const wishlistStore = useWishlistStore()
 
-      await Promise.all([cartStore.fetchCart(), wishlistStore.fetchWishlist()])
-    } catch (err) {
-      console.error('Sync error:', err)
-    }
+    cartStore.setMode(true)
+    wishlistStore.setMode(true)
+
+    await Promise.all([cartStore.syncToDatabase(), wishlistStore.syncToDatabase()])
+  } catch (err) {
+    console.error('Sync error:', err)
   }
+}
 
   /**
    * Clear error
@@ -139,6 +178,14 @@ export const useAuthStore = defineStore('auth', () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('auth:logout', () => {
       user.value = null
+    })
+
+    window.addEventListener('auth:login', async () => {
+      const cartStore = useCartStore()
+      const wishlistStore = useWishlistStore()
+      cartStore.setMode(true)
+      wishlistStore.setMode(true)
+      await syncUserData()
     })
   }
 
