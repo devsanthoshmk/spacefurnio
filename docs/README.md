@@ -5,6 +5,7 @@
 | Document | Description |
 |----------|-------------|
 | [01-Neon-Data-API](01-NEON-DATA-API.md) | Neon Data API usage for carts, wishlists, orders |
+| [System-Wide Image Optimization](2026-09-30-system-wide-image-optimization.md) | Programmatic image pipeline, WebP generation, and dynamic CDN transforms |
 
 ## Architecture Overview
 
