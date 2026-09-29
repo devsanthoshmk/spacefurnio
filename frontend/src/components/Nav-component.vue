@@ -210,7 +210,7 @@
           </button>
 
           <!-- User Button / Avatar Dropdown -->
-          <div class="relative user-dropdown-container">
+          <div ref="userDropdownRef" class="relative user-dropdown-container">
             <!-- Guest: simple user icon button opening AuthModal -->
             <button
               v-if="!authStore.isAuthenticated"
@@ -222,14 +222,15 @@
               <i class="fas fa-user text-sm sm:text-base"></i>
             </button>
 
-            <!-- Authenticated: Initials avatar button toggling dropdown -->
+            <!-- Authenticated: Luxury initials avatar button toggling dropdown -->
             <button
               v-else
-              @click="toggleUserDropdown"
+              @click.stop="toggleUserDropdown"
               class="sf-avatar-btn"
+              :class="{ 'sf-avatar-active': userDropdownOpen }"
               :aria-expanded="userDropdownOpen"
-              aria-label="User Account Menu"
-              title="User Account"
+              :aria-label="`User Account Menu for ${authStore.userName}`"
+              :title="authStore.userName"
             >
               <img
                 v-if="authStore.userAvatar"
@@ -245,11 +246,18 @@
               <div
                 v-if="userDropdownOpen && authStore.isAuthenticated"
                 class="sf-user-menu"
+                @click.stop
               >
                 <!-- User Info Banner -->
                 <div class="sf-user-info-banner">
                   <div class="sf-user-menu-avatar">
-                    {{ userInitials }}
+                    <img
+                      v-if="authStore.userAvatar"
+                      :src="authStore.userAvatar"
+                      :alt="authStore.userName"
+                      class="w-full h-full object-cover rounded-full"
+                    />
+                    <span v-else>{{ userInitials }}</span>
                   </div>
                   <div class="min-w-0 flex-1">
                     <p class="sf-user-menu-name">{{ authStore.userName }}</p>
@@ -260,43 +268,57 @@
                 <div class="sf-user-menu-divider"></div>
 
                 <!-- Menu Items -->
-                <div class="py-1">
+                <div class="sf-user-menu-list">
                   <button
                     @click="handleMenuOrders"
                     class="sf-user-menu-item"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                    </svg>
-                    <span>My Orders</span>
+                    <div class="sf-menu-icon-wrap">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 text-left">
+                      <span class="sf-item-title">My Orders</span>
+                      <span class="sf-item-desc">Track & view history</span>
+                    </div>
+                    <i class="fas fa-chevron-right sf-chevron-icon"></i>
                   </button>
 
                   <button
                     @click="handleMenuWishlist"
                     class="sf-user-menu-item"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    <span>My Wishlist</span>
-                    <span v-if="wishlistCount > 0" class="ml-auto sf-pill-badge">{{ wishlistCount }}</span>
+                    <div class="sf-menu-icon-wrap">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 text-left">
+                      <span class="sf-item-title">My Wishlist</span>
+                      <span class="sf-item-desc">Saved items</span>
+                    </div>
+                    <span v-if="wishlistCount > 0" class="sf-pill-badge">{{ wishlistCount }}</span>
+                    <i v-else class="fas fa-chevron-right sf-chevron-icon"></i>
                   </button>
                 </div>
 
                 <div class="sf-user-menu-divider"></div>
 
-                <div class="py-1">
+                <div class="sf-user-menu-list">
                   <button
                     @click="handleMenuLogout"
-                    class="sf-user-menu-item text-rose-600 hover:bg-rose-50"
+                    class="sf-user-menu-item sf-logout-item"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    <span>Sign Out</span>
+                    <div class="sf-menu-icon-wrap sf-logout-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                    </div>
+                    <span class="sf-item-title flex-1 text-left">Sign Out</span>
                   </button>
                 </div>
               </div>
@@ -358,6 +380,34 @@
         class="mobile-menu absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-xl py-4 px-5 z-40"
       >
         <div class="md:hidden">
+          <!-- Mobile Logged-in User Card -->
+          <div
+            v-if="authStore.isAuthenticated"
+            class="sf-mobile-user-card mb-3 p-3 rounded-2xl bg-gradient-to-r from-stone-50 to-amber-50/40 border border-stone-100 flex items-center justify-between"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="sf-user-menu-avatar">
+                <img
+                  v-if="authStore.userAvatar"
+                  :src="authStore.userAvatar"
+                  :alt="authStore.userName"
+                  class="w-full h-full object-cover rounded-full"
+                />
+                <span v-else>{{ userInitials }}</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-stone-900 truncate">{{ authStore.userName }}</p>
+                <p class="text-xs text-stone-500 truncate">{{ authStore.userEmail }}</p>
+              </div>
+            </div>
+            <button
+              @click="handleMobileLogout"
+              class="text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+
           <ul class="space-y-1 text-sm font-medium">
             <li>
               <router-link
@@ -413,6 +463,23 @@
                 Contact Us
               </router-link>
             </li>
+
+            <!-- Mobile Logged-in Orders Option -->
+            <li v-if="authStore.isAuthenticated">
+              <button
+                @click="openOrders(); closeMobileMenu()"
+                class="w-full text-left flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+              >
+                <span class="flex items-center gap-2.5 font-medium">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-800">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                  </svg>
+                  <span>My Orders</span>
+                </span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-400"></i>
+              </button>
+            </li>
           </ul>
 
           <!-- Mobile Actions Footer -->
@@ -425,12 +492,28 @@
               <i class="fas fa-search text-sm"></i>
             </button>
 
+            <!-- Mobile Auth button -->
             <button
+              v-if="!authStore.isAuthenticated"
               @click="handleGuestAuthClick(); closeMobileMenu()"
               class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-stone-100"
-              aria-label="Account"
+              aria-label="Account Login"
             >
               <i class="fas fa-user text-sm"></i>
+            </button>
+            <button
+              v-else
+              @click="openOrders(); closeMobileMenu()"
+              class="sf-avatar-btn"
+              aria-label="My Account"
+            >
+              <img
+                v-if="authStore.userAvatar"
+                :src="authStore.userAvatar"
+                :alt="authStore.userName"
+                class="w-full h-full object-cover rounded-full"
+              />
+              <span v-else class="sf-avatar-text">{{ userInitials }}</span>
             </button>
 
             <button
@@ -494,6 +577,7 @@ const { openOrders } = inject('ordersUtils')
 
 // ─── User Avatar & Dropdown ───
 const userDropdownOpen = ref(false)
+const userDropdownRef = ref(null)
 
 const userInitials = computed(() => {
   const name = (authStore.userName || 'User').trim()
@@ -516,6 +600,7 @@ function handleGuestAuthClick() {
   if (authStore.isAuthenticated) {
     toggleUserDropdown()
   } else {
+    closeUserDropdown()
     openLogin()
   }
 }
@@ -531,6 +616,12 @@ function handleMenuWishlist() {
 }
 
 async function handleMenuLogout() {
+  closeUserDropdown()
+  await authStore.logout()
+}
+
+async function handleMobileLogout() {
+  closeMobileMenu()
   closeUserDropdown()
   await authStore.logout()
 }
@@ -631,6 +722,8 @@ function handleClickOutside(e) {
     closeMobileMenu()
     closeUserDropdown()
     showResults.value = false
+  } else if (userDropdownRef.value && !userDropdownRef.value.contains(e.target)) {
+    closeUserDropdown()
   }
 }
 
@@ -682,109 +775,209 @@ onBeforeUnmount(() => {
 
 /* User Avatar Button */
 .sf-avatar-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid #e7e5e4;
-  background: #2c2723;
-  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(184, 149, 108, 0.4);
+  background: linear-gradient(135deg, #2a2421 0%, #1c1917 50%, #3d2314 100%);
+  color: #fef3c7;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  box-shadow: 0 2px 6px rgba(44, 38, 32, 0.12);
+  padding: 0;
+  position: relative;
+  flex-shrink: 0;
 }
 .sf-avatar-btn:hover {
-  border-color: #b8956c;
-  transform: scale(1.05);
+  border-color: #d97706;
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.28), 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(1.04);
+}
+.sf-avatar-btn:active {
+  transform: scale(0.96);
+}
+.sf-avatar-active {
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2), 0 4px 12px rgba(44, 38, 32, 0.15);
 }
 .sf-avatar-text {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fde68a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* User Dropdown Menu */
 .sf-user-menu {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 10px);
   right: 0;
-  width: 220px;
-  background: white;
-  border: 1px solid #f0ebe4;
-  border-radius: 1rem;
-  box-shadow: 0 16px 36px rgba(44, 38, 32, 0.14);
+  width: 240px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid #ede8e1;
+  border-radius: 1.125rem;
+  box-shadow:
+    0 20px 40px -8px rgba(44, 38, 32, 0.16),
+    0 10px 16px -6px rgba(44, 38, 32, 0.08);
   padding: 0.5rem;
-  z-index: 100;
+  z-index: 10000;
+  transform-origin: top right;
 }
+
 .sf-user-info-banner {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 0.5rem;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: linear-gradient(135deg, #faf7f4 0%, #f5efe6 100%);
+  border: 1px solid #ede4d8;
+  border-radius: 0.875rem;
 }
+
 .sf-user-menu-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: #2c2723;
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 700;
+  background: linear-gradient(135deg, #2a2421 0%, #1c1917 50%, #3d2314 100%);
+  color: #fde68a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  overflow: hidden;
 }
+
 .sf-user-menu-name {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #2c2723;
+  color: #292524;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  line-height: 1.25;
 }
+
 .sf-user-menu-email {
   font-size: 0.6875rem;
-  color: #8c7d6e;
+  color: #78716c;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 1px;
 }
+
 .sf-user-menu-divider {
   height: 1px;
   background: #f0ebe4;
-  margin: 0.25rem 0;
+  margin: 0.375rem 0.25rem;
 }
+
+.sf-user-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .sf-user-menu-item {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #57534e;
+  border-radius: 0.625rem;
+  color: #44403c;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.15s;
-  text-align: left;
+  transition: all 0.15s ease;
+  text-decoration: none;
 }
+
 .sf-user-menu-item:hover {
-  background: #faf8f5;
-  color: #2c2723;
+  background: #f7f4ef;
+  color: #1c1917;
 }
+
+.sf-menu-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 0.5rem;
+  background: #f5f0e8;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.sf-user-menu-item:hover .sf-menu-icon-wrap {
+  background: #fde68a;
+  color: #78350f;
+}
+
+.sf-item-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  display: block;
+  line-height: 1.2;
+}
+
+.sf-item-desc {
+  font-size: 0.6875rem;
+  color: #a8a29e;
+  display: block;
+  line-height: 1.2;
+}
+
+.sf-chevron-icon {
+  font-size: 0.625rem;
+  color: #d6d3d1;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.sf-user-menu-item:hover .sf-chevron-icon {
+  color: #78716c;
+  transform: translateX(2px);
+}
+
+.sf-logout-item:hover {
+  background: #fef2f2;
+  color: #e11d48;
+}
+
+.sf-logout-icon {
+  background: #fee2e2;
+  color: #e11d48;
+}
+
+.sf-logout-item:hover .sf-logout-icon {
+  background: #fecdd3;
+  color: #be123c;
+}
+
 .sf-pill-badge {
   font-size: 0.6875rem;
   font-weight: 700;
   color: white;
-  background: #f43f5e;
-  padding: 0.125rem 0.375rem;
-  border-radius: 999px;
+  background: #e11d48;
+  padding: 0.125rem 0.4375rem;
+  border-radius: 9999px;
+  line-height: 1.2;
 }
 
 .dropdown-fade-enter-active,
