@@ -57,6 +57,10 @@ export default {
     text: "You'll find us",
     component: () => import('@/components/home/Product-section.vue'),
   },
+  product_section_button: {
+    text: 'Explore Collection',
+    component: () => import('@/components/home/Product-section.vue'),
+  },
   scroll_text_1: {
     text: 'Where lines meet light',
     component: () => import('@/components/home/Scroll-animation.vue'),

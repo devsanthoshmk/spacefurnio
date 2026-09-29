@@ -13,31 +13,11 @@
     <!-- <p class="section-subtitle">Discover our handcrafted collection of premium furniture</p> -->
 
     <div class="product-gallery-container">
-      <!-- Navigation Controls -->
-      <div class="scroll-controls">
-        <Button
-          @click="scrollLeft"
-          icon="pi pi-chevron-left"
-          class="scroll-btn scroll-btn-left"
-          severity="secondary"
-          outlined
-          :disabled="isAtStart"
-        />
-        <Button
-          @click="scrollRight"
-          icon="pi pi-chevron-right"
-          class="scroll-btn scroll-btn-right"
-          severity="secondary"
-          outlined
-          :disabled="isAtEnd"
-        />
-      </div>
-
       <!-- Products Grid Section -->
       <section class="products-section" v-animateonscroll="{ enterClass: 'animate__fadeInUp' }">
         <div ref="productsGrid" class="products-grid">
           <div
-            v-for="(product, index) in formattedProducts"
+            v-for="(product, index) in products"
             :key="product.id"
             class="product-card-wrapper group"
             v-animateonscroll="{
@@ -79,34 +59,35 @@
         </div>
       </section>
 
-      <!-- Page Indicator -->
-      <div class="page-indicator-container">
-        <div class="page-dots">
-          <span
-            v-for="(_, idx) in totalPages"
-            :key="idx"
-            class="page-dot"
-            :class="{ active: idx === currentPage }"
-            @click="goToPage(idx)"
-          ></span>
-        </div>
+      <!-- Shop Redirect CTA Button -->
+      <div class="cta-container">
+        <router-link to="/shop">
+          <Button class="shop-redirect-btn group">
+            <span class="relative z-10 flex items-center gap-2">
+              <span data-key="product_section_button">{{
+                homePageText.product_section_button?.text || 'Explore Shop'
+              }}</span>
+              <i
+                class="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
+              ></i>
+            </span>
+          </Button>
+        </router-link>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref } from 'vue'
 import Button from 'primevue/button'
 import ProductCard from '@/components/shop/ProductCard.vue'
 import homePageText from '@/assets/contents/homePage.js'
 
 // Reactive references
 const productsGrid = ref(null)
-const currentPage = ref(0)
-const itemsPerPage = ref(4) // Default for desktop
 
-// Products data (raw format)
+// Products data
 const products = ref([
   {
     id: 1,
@@ -148,101 +129,7 @@ const products = ref([
       'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop',
     ],
   },
-  {
-    id: 5,
-    name: 'Modern Bookshelf',
-    brand: 'Spacefurnio',
-    price: 329,
-    rating: 5,
-    images: [
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1000&auto=format&fit=crop',
-    ],
-  },
-  {
-    id: 6,
-    name: 'Elegant Side Table',
-    brand: 'Spacefurnio',
-    price: 179,
-    rating: 5,
-    images: [
-      'https://images.unsplash.com/photo-1549497538-303791108f95?q=80&w=1000&auto=format&fit=crop',
-    ],
-  },
-  {
-    id: 7,
-    name: 'Luxury Accent Chair',
-    brand: 'Spacefurnio',
-    price: 599,
-    rating: 5,
-    images: [
-      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop',
-    ],
-  },
-  {
-    id: 8,
-    name: 'Contemporary Ottoman',
-    brand: 'Spacefurnio',
-    price: 149,
-    rating: 5,
-    images: [
-      'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop',
-    ],
-  },
 ])
-
-// Computed properties
-const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage.value))
-
-const formattedProducts = computed(() => {
-  const start = currentPage.value * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return products.value.slice(start, end)
-})
-
-const isAtStart = computed(() => currentPage.value === 0)
-const isAtEnd = computed(() => currentPage.value >= totalPages.value - 1)
-
-// Scroll progress for indicator (now page-based) NOT NEEDED NOW
-// const scrollProgress = computed(() =>
-//   totalPages.value > 1 ? ((currentPage.value + 1) / totalPages.value) * 100 : 100
-// )
-
-// Methods
-const scrollLeft = () => {
-  if (currentPage.value > 0) {
-    currentPage.value--
-  }
-}
-
-const scrollRight = () => {
-  if (currentPage.value < totalPages.value - 1) {
-    currentPage.value++
-  }
-}
-
-const goToPage = (pageIndex) => {
-  currentPage.value = pageIndex
-}
-
-// Calculate items per page based on screen width
-const updateItemsPerPage = () => {
-  // Always show 4 products per page on all screens
-  itemsPerPage.value = 4
-  // Reset to first page if current page is out of bounds
-  if (currentPage.value >= totalPages.value) {
-    currentPage.value = Math.max(0, totalPages.value - 1)
-  }
-}
-
-// Lifecycle hooks
-onMounted(() => {
-  updateItemsPerPage()
-  window.addEventListener('resize', updateItemsPerPage)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateItemsPerPage)
-})
 </script>
 
 <style scoped>
@@ -346,46 +233,6 @@ onUnmounted(() => {
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-}
-
-/* ========================================
-   NAVIGATION CONTROLS
-======================================== */
-.scroll-controls {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  pointer-events: none;
-  z-index: 10;
-  padding: 0 0.25rem;
-}
-
-.scroll-btn {
-  pointer-events: auto;
-  width: clamp(36px, 5vw, 48px) !important;
-  height: clamp(36px, 5vw, 48px) !important;
-  min-width: 36px !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border-radius: 50% !important;
-}
-
-.scroll-btn:hover:not(:disabled) {
-  background: #fff !important;
-  transform: scale(1.1);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.scroll-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: scale(0.95);
 }
 
 /* ========================================
@@ -624,41 +471,35 @@ onUnmounted(() => {
 }
 
 /* ========================================
-   PAGE INDICATOR
+   CTA BUTTON CONTAINER
 ======================================== */
-.page-indicator-container {
+.cta-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: clamp(4px, 1vh, 8px);
-  padding: clamp(0.75rem, 2vh, 1.5rem) 1rem 0;
+  padding: clamp(0.5rem, 1.5vh, 1.25rem) 1rem 0;
+  z-index: 10;
 }
 
-.page-dots {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+.shop-redirect-btn {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: clamp(0.5rem, 1.2vh, 0.75rem) clamp(1.5rem, 3vw, 2.25rem) !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(0.75rem, 1.1vw, 0.9rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
 }
 
-.page-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.page-dot:hover {
-  background: rgba(230, 126, 34, 0.5);
-  transform: scale(1.2);
-}
-
-.page-dot.active {
-  width: 28px;
-  border-radius: 5px;
-  background: linear-gradient(90deg, #e67e22, #f39c12);
-  box-shadow: 0 2px 8px rgba(230, 126, 34, 0.4);
+.shop-redirect-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.45) !important;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
 }
 
 /* ========================================
@@ -767,35 +608,12 @@ onUnmounted(() => {
     font-weight: 700;
   }
 
-  .scroll-controls {
-    padding: 0 0.15rem;
-  }
-
-  .scroll-btn {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
-  }
-
   .header-decoration {
     display: none;
   }
 
-  .page-dot {
-    width: 6px;
-    height: 6px;
-  }
-
-  .page-dot.active {
-    width: 16px;
-  }
-
-  .page-indicator-container {
-    padding: 0.35rem 0.5rem 0;
-  }
-
-  .page-dots {
-    gap: 6px;
+  .cta-container {
+    padding-top: 0.25rem;
   }
 
   /* Hide some overlay elements on very small screens */
@@ -914,35 +732,12 @@ onUnmounted(() => {
     font-weight: 700;
   }
 
-  .scroll-controls {
-    padding: 0 0.25rem;
-  }
-
-  .scroll-btn {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-  }
-
   .header-decoration {
     max-width: 40px;
   }
 
-  .page-indicator-container {
-    padding: 0.4rem 0.5rem 0;
-  }
-
-  .page-dots {
-    gap: 8px;
-  }
-
-  .page-dot {
-    width: 7px;
-    height: 7px;
-  }
-
-  .page-dot.active {
-    width: 20px;
+  .cta-container {
+    padding-top: 0.35rem;
   }
 
   /* Adjust overlay for mobile */
@@ -993,15 +788,6 @@ onUnmounted(() => {
     height: clamp(280px, 48vh, 350px);
   }
 
-  .scroll-controls {
-    padding: 0 0.25rem;
-  }
-
-  .scroll-btn {
-    width: 36px !important;
-    height: 36px !important;
-  }
-
   .header-decoration {
     max-width: 80px;
   }
@@ -1024,15 +810,6 @@ onUnmounted(() => {
     flex: 1 1 0;
     max-width: 240px;
     height: clamp(300px, 50vh, 380px);
-  }
-
-  .scroll-controls {
-    padding: 0 0.35rem;
-  }
-
-  .scroll-btn {
-    width: 40px !important;
-    height: 40px !important;
   }
 }
 
@@ -1061,15 +838,6 @@ onUnmounted(() => {
     height: min(400px, 52vh);
   }
 
-  .scroll-controls {
-    padding: 0 0.5rem;
-  }
-
-  .scroll-btn {
-    width: 44px !important;
-    height: 44px !important;
-  }
-
   .header-decoration {
     max-width: 120px;
   }
@@ -1088,10 +856,6 @@ onUnmounted(() => {
   .product-card-wrapper {
     max-width: 320px;
     height: min(420px, 52vh);
-  }
-
-  .scroll-controls {
-    padding: 0 1rem;
   }
 }
 
@@ -1120,7 +884,7 @@ onUnmounted(() => {
     padding: 0.25rem 0;
   }
 
-  .page-indicator-container {
+  .cta-container {
     padding-top: 0.25rem;
   }
 }
