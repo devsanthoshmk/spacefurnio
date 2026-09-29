@@ -474,3 +474,59 @@ authRouter.put('/change-password', authenticate, async (request, env) => {
         return error(500, { message: 'Failed to change password' });
     }
 });
+
+// Delete account (permanently delete user and associated records)
+const handleDeleteAccount = async (request: AuthRequest, env: Env) => {
+    try {
+        const userId = request.user.sub;
+        const { sql } = getDb(env);
+
+        // Safely unlink or clean up dependent records to avoid constraint violations
+        await sql`UPDATE orders SET address_id = NULL WHERE user_id = ${userId}`;
+        await sql`DELETE FROM coupon_redemptions WHERE user_id = ${userId}`;
+        await sql`DELETE FROM return_requests WHERE user_id = ${userId}`;
+        await sql`DELETE FROM password_resets WHERE user_id = ${userId}`;
+        await sql`DELETE FROM user_sessions WHERE user_id = ${userId}`;
+        await sql`DELETE FROM user_roles WHERE user_id = ${userId}`;
+        await sql`DELETE FROM user_addresses WHERE user_id = ${userId}`;
+
+        // Carts & Wishlists
+        const userCarts = await sql`SELECT id FROM carts WHERE user_id = ${userId}`;
+        for (const c of userCarts) {
+            await sql`DELETE FROM cart_items WHERE cart_id = ${c.id}`;
+        }
+        await sql`DELETE FROM carts WHERE user_id = ${userId}`;
+
+        const userWishlists = await sql`SELECT id FROM wishlists WHERE user_id = ${userId}`;
+        for (const w of userWishlists) {
+            await sql`DELETE FROM wishlist_items WHERE wishlist_id = ${w.id}`;
+        }
+        await sql`DELETE FROM wishlists WHERE user_id = ${userId}`;
+
+        // Delete orders and their children
+        const userOrders = await sql`SELECT id FROM orders WHERE user_id = ${userId}`;
+        for (const o of userOrders) {
+            await sql`DELETE FROM order_items WHERE order_id = ${o.id}`;
+            await sql`DELETE FROM payments WHERE order_id = ${o.id}`;
+            await sql`DELETE FROM shipments WHERE order_id = ${o.id}`;
+            await sql`DELETE FROM order_status_history WHERE order_id = ${o.id}`;
+        }
+        await sql`DELETE FROM orders WHERE user_id = ${userId}`;
+
+        // Delete user row
+        await sql`DELETE FROM users WHERE id = ${userId}`;
+
+        return new Response(JSON.stringify({ success: true, message: 'Account deleted successfully' }), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Set-Cookie': 'refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'
+            }
+        });
+    } catch (e) {
+        console.error('Failed to delete account:', e);
+        return error(500, { message: 'Failed to delete account' });
+    }
+};
+
+authRouter.delete('/account', authenticate, handleDeleteAccount);
+authRouter.delete('/me', authenticate, handleDeleteAccount);

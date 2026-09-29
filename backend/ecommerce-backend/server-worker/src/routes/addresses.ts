@@ -107,7 +107,10 @@ addressRouter.post('/', authenticate, async (request, env) => {
     const addressId = crypto.randomUUID();
     const { sql } = getDb(env);
 
-    if (is_default) {
+    const countRes = await sql`SELECT COUNT(*)::int as count FROM user_addresses WHERE user_id = ${userId}`;
+    const shouldBeDefault = is_default || (countRes[0]?.count || 0) === 0;
+
+    if (shouldBeDefault) {
       await sql`
         UPDATE user_addresses SET is_default = false WHERE user_id = ${userId}
       `;
@@ -115,7 +118,7 @@ addressRouter.post('/', authenticate, async (request, env) => {
 
     await sql`
       INSERT INTO user_addresses (id, user_id, address_line_1, address_line_2, city, state, postal_code, country, is_default)
-      VALUES (${addressId}, ${userId}, ${address_line_1 || ''}, ${address_line_2 || ''}, ${city || ''}, ${state || ''}, ${postal_code || ''}, ${country || 'India'}, ${is_default || false})
+      VALUES (${addressId}, ${userId}, ${address_line_1 || ''}, ${address_line_2 || ''}, ${city || ''}, ${state || ''}, ${postal_code || ''}, ${country || 'India'}, ${shouldBeDefault})
     `;
 
     return { success: true, id: addressId };
@@ -170,14 +173,34 @@ addressRouter.delete('/:addressId', authenticate, async (request, env) => {
     const userId = request.user.sub;
     const { sql } = getDb(env);
 
+    // Safely unlink from orders before deletion to prevent foreign key errors
+    await sql`
+      UPDATE orders SET address_id = NULL WHERE address_id = ${addressId} AND user_id = ${userId}
+    `;
+
     const deleted = await sql`
       DELETE FROM user_addresses
       WHERE id = ${addressId} AND user_id = ${userId}
-      RETURNING id
+      RETURNING id, is_default
     `;
 
     if (deleted.length === 0) {
       return error(404, { message: 'Address not found' });
+    }
+
+    // If deleted address was default, promote the newest remaining address to default
+    if (deleted[0].is_default) {
+      const remaining = await sql`
+        SELECT id FROM user_addresses
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+        LIMIT 1
+      `;
+      if (remaining.length > 0) {
+        await sql`
+          UPDATE user_addresses SET is_default = true WHERE id = ${remaining[0].id}
+        `;
+      }
     }
 
     return { success: true };

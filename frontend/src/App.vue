@@ -28,6 +28,9 @@
   <!-- State-driven Checkout Modal (hidden on admin) -->
   <CheckoutModal v-if="!isAdminRoute" />
 
+  <!-- State-driven Settings Modal (hidden on admin) -->
+  <SettingsModal v-if="!isAdminRoute" />
+
   <!-- Highlight overlay for admin preview -->
   <div v-if="highlightKey" class="highlight-indicator">
     <span>Previewing: {{ highlightKey }}</span>
@@ -44,6 +47,7 @@ import WishlistOffCanvas from './components/WishlistOffCanvas.vue'
 import AuthModal from './components/AuthModal.vue'
 import OrdersModal from './components/OrdersModal.vue'
 import CheckoutModal from './components/CheckoutModal.vue'
+import SettingsModal from './components/SettingsModal.vue'
 import { useCartStore } from '@/stores/cart'
 import { useWishlistStore } from '@/stores/wishlist'
 import { useAuthStore } from '@/stores/auth'
@@ -84,6 +88,7 @@ const isWishlistOpen = ref(false)
 const isLoginOpen = ref(false)
 const isOrdersOpen = ref(false)
 const isCheckoutOpen = ref(false)
+const isSettingsOpen = ref(false)
 
 /**
  * Helper: close any open overlay before opening a new one
@@ -94,6 +99,7 @@ function closeAllModals() {
   isLoginOpen.value = false
   isOrdersOpen.value = false
   isCheckoutOpen.value = false
+  isSettingsOpen.value = false
 }
 
 function openCart() {
@@ -136,12 +142,21 @@ function closeCheckout() {
   isCheckoutOpen.value = false
 }
 
+function openSettings() {
+  closeAllModals()
+  isSettingsOpen.value = true
+}
+function closeSettings() {
+  isSettingsOpen.value = false
+}
+
 // Provide modal utilities to child components
 provide('cartUtils', { openCart, closeCart, isCartOpen, cartItemCount })
 provide('wishlistUtils', { openWishlist, closeWishlist, isWishlistOpen, wishlistItemCount })
 provide('authUtils', { openLogin, closeLogin, isLoginOpen, authStore })
 provide('ordersUtils', { openOrders, closeOrders, isOrdersOpen })
 provide('checkoutUtils', { openCheckout, closeCheckout, isCheckoutOpen })
+provide('settingsUtils', { openSettings, closeSettings, isSettingsOpen })
 
 /**
  * Highlight element with matching data-key attribute

@@ -1,10 +1,10 @@
 <template>
-  <nav id="navbar" class="fixed top-0 w-full z-50 py-4 sm:py-6 px-4" style="z-index: 100000">
+  <nav ref="navRef" id="navbar" class="fixed top-0 w-full z-50 py-3 sm:py-4 xl:py-5 px-3 sm:px-4 lg:px-6" style="z-index: 100000">
     <div
-      class="nav-pill bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg mx-auto max-w-5xl flex items-center justify-between px-5 sm:px-8 py-2.5 sm:py-3 h-16 transition-all duration-300"
+      class="nav-pill bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg mx-auto w-full max-w-5xl flex items-center justify-between px-3.5 sm:px-5 lg:px-6 xl:px-8 py-2 sm:py-2.5 h-14 sm:h-15 xl:h-16 transition-all duration-300"
     >
       <!-- Logo / Search Back Button -->
-      <div class="nav-left flex items-center me-2">
+      <div class="nav-left flex items-center me-1.5 sm:me-2 lg:me-3 shrink-0">
         <button
           v-if="searchMode"
           @click="closeSearch"
@@ -17,7 +17,7 @@
           <img
             src="/images/Spacefurnio-Logo.webp"
             alt="SpaceFurnio"
-            class="h-9 w-7 object-contain"
+            class="h-8 w-6 sm:h-9 sm:w-7 object-contain"
             decoding="async"
           />
         </router-link>
@@ -121,12 +121,12 @@
       <!-- ─── Desktop Nav Menu ─── -->
       <ul
         v-else
-        class="menu hidden md:flex items-center flex-1 justify-center space-x-1 text-sm font-medium tracking-wide"
+        class="menu hidden md:flex items-center flex-1 justify-center space-x-0.5 lg:space-x-1 xl:space-x-1.5 text-xs lg:text-[13px] xl:text-sm font-medium tracking-wide"
       >
         <li>
           <router-link
             to="/"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             Home
           </router-link>
@@ -134,7 +134,7 @@
         <li>
           <router-link
             to="/about"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             About Us
           </router-link>
@@ -142,7 +142,7 @@
         <li>
           <router-link
             to="/collabs"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             SF x Collabs
           </router-link>
@@ -150,7 +150,7 @@
         <li>
           <router-link
             to="/shop"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             Shop
           </router-link>
@@ -158,7 +158,7 @@
         <li>
           <router-link
             to="/portfolio"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             Portfolio
           </router-link>
@@ -166,39 +166,16 @@
         <li>
           <router-link
             to="/contact"
-            class="nav-link relative py-2 px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
+            class="nav-link relative py-1.5 px-2 md:px-2.5 lg:px-3 xl:px-3.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
           >
             Contact Us
           </router-link>
         </li>
       </ul>
 
-      <!-- Small Screen Navigation Links -->
-      <ul
-        v-if="!searchMode"
-        class="menu flex md:hidden items-center space-x-2 flex-1 justify-center text-xs font-medium"
-      >
-        <li>
-          <router-link
-            to="/"
-            class="nav-link py-1.5 px-2.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
-          >
-            Home
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/shop"
-            class="nav-link py-1.5 px-2.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700"
-          >
-            Shop
-          </router-link>
-        </li>
-      </ul>
-
       <!-- ─── Right Side Icons & User Avatar Dropdown ─── -->
-      <div v-if="!searchMode" class="nav-right flex items-center space-x-2 sm:space-x-3">
-        <div class="icons flex items-center space-x-2 sm:space-x-3 text-base">
+      <div v-if="!searchMode" class="nav-right flex items-center space-x-1 sm:space-x-1.5 lg:space-x-2 xl:space-x-3 shrink-0">
+        <div class="icons flex items-center space-x-0.5 sm:space-x-1 lg:space-x-1.5 xl:space-x-2 text-sm sm:text-base">
           <!-- Search Button -->
           <button
             @click="openSearch"
@@ -281,26 +258,26 @@
                     </div>
                     <div class="flex-1 text-left">
                       <span class="sf-item-title">My Orders</span>
-                      <span class="sf-item-desc">Track & view history</span>
+                      <span class="sf-item-desc">Track &amp; view history</span>
                     </div>
                     <i class="fas fa-chevron-right sf-chevron-icon"></i>
                   </button>
 
                   <button
-                    @click="handleMenuWishlist"
+                    @click="handleMenuSettings"
                     class="sf-user-menu-item"
                   >
                     <div class="sf-menu-icon-wrap">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                       </svg>
                     </div>
                     <div class="flex-1 text-left">
-                      <span class="sf-item-title">My Wishlist</span>
-                      <span class="sf-item-desc">Saved items</span>
+                      <span class="sf-item-title">Settings</span>
+                      <span class="sf-item-desc">Saved addresses &amp; account</span>
                     </div>
-                    <span v-if="wishlistCount > 0" class="sf-pill-badge">{{ wishlistCount }}</span>
-                    <i v-else class="fas fa-chevron-right sf-chevron-icon"></i>
+                    <i class="fas fa-chevron-right sf-chevron-icon"></i>
                   </button>
                 </div>
 
@@ -364,9 +341,9 @@
 
         <!-- Mobile Menu Toggle Button -->
         <button
-          class="md:hidden mobile-menu-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 text-stone-700"
+          class="md:hidden mobile-menu-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 text-stone-700 flex items-center justify-center cursor-pointer"
           aria-label="Toggle navigation menu"
-          @click="toggleMobileMenu"
+          @click.stop="toggleMobileMenu"
         >
           <i :class="mobileMenuOpen ? 'fas fa-times text-sm' : 'fas fa-bars text-sm'"></i>
         </button>
@@ -377,7 +354,7 @@
     <Transition name="mobile-menu-anim">
       <div
         v-if="mobileMenuOpen"
-        class="mobile-menu absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-md border border-gray-100 rounded-2xl shadow-xl py-4 px-5 z-40"
+        class="mobile-menu absolute top-full left-3 right-3 sm:left-4 sm:right-4 mt-2 bg-white/95 backdrop-blur-xl border border-stone-200/80 rounded-2xl shadow-2xl py-4 px-4 sm:px-5 z-50 max-h-[calc(100dvh-5rem)] overflow-y-auto"
       >
         <div class="md:hidden">
           <!-- Mobile Logged-in User Card -->
@@ -402,9 +379,31 @@
             </div>
             <button
               @click="handleMobileLogout"
-              class="text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors"
+              class="text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
             >
               Sign Out
+            </button>
+          </div>
+
+          <!-- Mobile Guest Login Prompt -->
+          <div
+            v-else
+            class="sf-mobile-guest-card mb-3 p-3 rounded-2xl bg-gradient-to-r from-amber-50/60 to-stone-50 border border-amber-100/80 flex items-center justify-between"
+          >
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-semibold">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-stone-900">Welcome to Spacefurnio</p>
+                <p class="text-[11px] text-stone-500">Sign in to track orders</p>
+              </div>
+            </div>
+            <button
+              @click="handleGuestAuthClick(); closeMobileMenu()"
+              class="text-xs font-semibold text-white bg-stone-900 hover:bg-stone-800 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            >
+              Sign In
             </button>
           </div>
 
@@ -412,55 +411,61 @@
             <li>
               <router-link
                 to="/"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                Home
+                <span>Home</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
             <li>
               <router-link
                 to="/about"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                About Us
+                <span>About Us</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
             <li>
               <router-link
                 to="/collabs"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                SF x Collabs
+                <span>SF x Collabs</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
             <li>
               <router-link
                 to="/shop"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                Shop Catalog
+                <span>Shop Catalog</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
             <li>
               <router-link
                 to="/portfolio"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                Portfolio
+                <span>Portfolio</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
             <li>
               <router-link
                 to="/contact"
-                class="block py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
                 @click="closeMobileMenu"
               >
-                Contact Us
+                <span>Contact Us</span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-300"></i>
               </router-link>
             </li>
 
@@ -468,7 +473,7 @@
             <li v-if="authStore.isAuthenticated">
               <button
                 @click="openOrders(); closeMobileMenu()"
-                class="w-full text-left flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800"
+                class="w-full text-left flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800 cursor-pointer"
               >
                 <span class="flex items-center gap-2.5 font-medium">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-800">
@@ -480,31 +485,48 @@
                 <i class="fas fa-chevron-right text-[10px] text-stone-400"></i>
               </button>
             </li>
+
+            <!-- Mobile Logged-in Settings Option -->
+            <li v-if="authStore.isAuthenticated">
+              <button
+                @click="openSettings(); closeMobileMenu()"
+                class="w-full text-left flex items-center justify-between py-2.5 px-4 rounded-xl transition-all duration-300 hover:bg-stone-50 active:bg-stone-100 text-stone-800 cursor-pointer"
+              >
+                <span class="flex items-center gap-2.5 font-medium">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-800">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                  </svg>
+                  <span>Settings</span>
+                </span>
+                <i class="fas fa-chevron-right text-[10px] text-stone-400"></i>
+              </button>
+            </li>
           </ul>
 
           <!-- Mobile Actions Footer -->
-          <div class="flex items-center justify-around mt-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center justify-around mt-4 pt-3.5 border-t border-gray-100">
             <button
               @click="openSearch(); closeMobileMenu()"
-              class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-stone-100"
+              class="icon-btn p-2.5 rounded-full transition-all duration-300 hover:bg-stone-100 cursor-pointer"
               aria-label="Search"
             >
-              <i class="fas fa-search text-sm"></i>
+              <i class="fas fa-search text-stone-700 text-sm"></i>
             </button>
 
             <!-- Mobile Auth button -->
             <button
               v-if="!authStore.isAuthenticated"
               @click="handleGuestAuthClick(); closeMobileMenu()"
-              class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-stone-100"
+              class="icon-btn p-2.5 rounded-full transition-all duration-300 hover:bg-stone-100 cursor-pointer"
               aria-label="Account Login"
             >
-              <i class="fas fa-user text-sm"></i>
+              <i class="fas fa-user text-stone-700 text-sm"></i>
             </button>
             <button
               v-else
               @click="openOrders(); closeMobileMenu()"
-              class="sf-avatar-btn"
+              class="sf-avatar-btn cursor-pointer"
               aria-label="My Account"
             >
               <img
@@ -518,13 +540,13 @@
 
             <button
               @click="handleWishlistClick(); closeMobileMenu()"
-              class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
+              class="icon-btn p-2.5 rounded-full transition-all duration-300 hover:bg-stone-100 relative cursor-pointer"
               aria-label="Wishlist"
             >
-              <i class="fas fa-heart text-sm"></i>
+              <i class="fas fa-heart text-stone-700 text-sm"></i>
               <span
                 v-if="wishlistCount > 0"
-                class="absolute top-1 right-1 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
+                class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
               >
                 {{ wishlistCount }}
               </span>
@@ -532,13 +554,13 @@
 
             <button
               @click="handleCartClick(); closeMobileMenu()"
-              class="icon-btn p-3 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
+              class="icon-btn p-2.5 rounded-full transition-all duration-300 hover:bg-stone-100 relative cursor-pointer"
               aria-label="Cart"
             >
-              <i class="fas fa-shopping-cart text-sm"></i>
+              <i class="fas fa-shopping-cart text-stone-700 text-sm"></i>
               <span
                 v-if="cartCount > 0"
-                class="absolute top-1 right-1 bg-amber-600 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
+                class="absolute -top-1 -right-1 bg-amber-600 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full"
               >
                 {{ cartCount }}
               </span>
@@ -574,6 +596,7 @@ const { openCart } = inject('cartUtils')
 const { openWishlist } = inject('wishlistUtils')
 const { openLogin } = inject('authUtils')
 const { openOrders } = inject('ordersUtils')
+const { openSettings } = inject('settingsUtils', { openSettings: () => {} })
 
 // ─── User Avatar & Dropdown ───
 const userDropdownOpen = ref(false)
@@ -610,9 +633,9 @@ function handleMenuOrders() {
   openOrders()
 }
 
-function handleMenuWishlist() {
+function handleMenuSettings() {
   closeUserDropdown()
-  openWishlist()
+  openSettings()
 }
 
 async function handleMenuLogout() {
@@ -702,6 +725,9 @@ watch(searchQuery, (newVal) => {
   }, 250)
 })
 
+// ─── DOM References ───
+const navRef = ref(null)
+
 // ─── Mobile Menu ───
 const mobileMenuOpen = ref(false)
 
@@ -717,8 +743,7 @@ function closeMobileMenu() {
 }
 
 function handleClickOutside(e) {
-  const navbar = document.getElementById('navbar')
-  if (navbar && !navbar.contains(e.target)) {
+  if (navRef.value && !navRef.value.contains(e.target)) {
     closeMobileMenu()
     closeUserDropdown()
     showResults.value = false
@@ -726,6 +751,15 @@ function handleClickOutside(e) {
     closeUserDropdown()
   }
 }
+
+watch(
+  () => router.currentRoute.value.fullPath,
+  () => {
+    closeMobileMenu()
+    closeUserDropdown()
+    closeSearch()
+  }
+)
 
 function formatPrice(val) {
   return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -762,11 +796,23 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
   cursor: pointer;
+}
+@media (min-width: 640px) {
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+@media (min-width: 1280px) {
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
 }
 .icon-btn:hover {
   color: #1c1917;
@@ -775,8 +821,8 @@ onBeforeUnmount(() => {
 
 /* User Avatar Button */
 .sf-avatar-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 9999px;
   border: 1.5px solid rgba(184, 149, 108, 0.4);
   background: linear-gradient(135deg, #2a2421 0%, #1c1917 50%, #3d2314 100%);
@@ -791,6 +837,18 @@ onBeforeUnmount(() => {
   padding: 0;
   position: relative;
   flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .sf-avatar-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+@media (min-width: 1280px) {
+  .sf-avatar-btn {
+    width: 36px;
+    height: 36px;
+  }
 }
 .sf-avatar-btn:hover {
   border-color: #d97706;

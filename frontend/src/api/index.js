@@ -206,6 +206,15 @@ export const auth = {
   async revokeSession(sessionId) {
     return apiRequest(`/auth/sessions/${sessionId}`, { method: 'DELETE' })
   },
+
+  /**
+   * Delete user account permanently
+   */
+  async deleteAccount() {
+    const result = await apiRequest('/auth/account', { method: 'DELETE' })
+    clearAuth()
+    return result
+  },
 }
 
 // ===========================================

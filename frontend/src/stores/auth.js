@@ -250,6 +250,32 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
+   * Delete user account permanently
+   */
+  async function deleteAccount() {
+    try {
+      isLoading.value = true
+      await api.deleteAccount()
+    } catch (err) {
+      console.error('Delete account API error:', err)
+      throw err
+    } finally {
+      setToken(null)
+      user.value = null
+      error.value = null
+      isLoading.value = false
+
+      const cartStore = useCartStore()
+      const wishlistStore = useWishlistStore()
+      cartStore.setMode(false)
+      wishlistStore.setMode(false)
+      cartStore.$reset()
+      wishlistStore.$reset()
+      await Promise.all([cartStore.fetchCart(), wishlistStore.fetchWishlist()])
+    }
+  }
+
+  /**
    * Update current user profile
    */
   async function updateProfile(data) {
@@ -364,6 +390,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    deleteAccount,
     updateProfile,
     changePassword,
     forgotPassword,

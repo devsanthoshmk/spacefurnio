@@ -273,6 +273,33 @@ orderRouter.post('/checkout', authenticate, async (request, env) => {
       shippingState = shippingAddress.state || '';
       shippingPincode = shippingAddress.pincode || shippingAddress.postal_code || '';
       shippingPhone = shippingAddress.phone || shippingAddress.phone_number || '';
+
+      // Auto-save address to user_addresses if not already linked so it is available for next orders
+      if (!dbAddressId && shippingAddressStr && shippingCity) {
+        try {
+          const existingAddr = await sql`
+            SELECT id FROM user_addresses 
+            WHERE user_id = ${userId} 
+              AND LOWER(TRIM(address_line_1)) = LOWER(TRIM(${shippingAddressStr}))
+              AND LOWER(TRIM(city)) = LOWER(TRIM(${shippingCity}))
+            LIMIT 1
+          `;
+          if (existingAddr.length > 0) {
+            dbAddressId = existingAddr[0].id;
+          } else {
+            const countRes = await sql`SELECT COUNT(*)::int as count FROM user_addresses WHERE user_id = ${userId}`;
+            const isFirst = (countRes[0]?.count || 0) === 0;
+            const newAddrId = crypto.randomUUID();
+            await sql`
+              INSERT INTO user_addresses (id, user_id, address_line_1, city, state, postal_code, country, is_default)
+              VALUES (${newAddrId}, ${userId}, ${shippingAddressStr}, ${shippingCity}, ${shippingState}, ${shippingPincode}, ${shippingAddress.country || 'India'}, ${isFirst})
+            `;
+            dbAddressId = newAddrId;
+          }
+        } catch (addrErr) {
+          console.error('Failed to auto-save address during checkout:', addrErr);
+        }
+      }
     } else if (addressId) {
       const addresses = await sql`
         SELECT address_line_1, address_line_2, city, state, postal_code

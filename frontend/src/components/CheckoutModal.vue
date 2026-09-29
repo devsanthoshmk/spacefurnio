@@ -723,26 +723,28 @@ async function handlePlaceOrder() {
       addressIdToPass = selectedAddressId.value
       const matched = savedAddresses.value.find((a) => a.id === selectedAddressId.value)
       if (matched) {
+        const nameParts = (authStore.userName || 'Customer').trim().split(/\s+/)
         resolvedShipping = {
-          firstName: authStore.user?.firstName || 'Customer',
-          lastName: authStore.user?.lastName || '',
+          firstName: authStore.user?.firstName || nameParts[0] || 'Customer',
+          lastName: authStore.user?.lastName || (nameParts.slice(1).join(' ')) || '',
           address: matched.address_line_2 ? `${matched.address_line_1}, ${matched.address_line_2}` : matched.address_line_1,
           city: matched.city,
           state: matched.state,
           pincode: matched.postal_code,
-          phone: authStore.user?.phone || '',
+          phone: authStore.user?.phoneNumber || authStore.user?.phone || '',
         }
       }
     } else {
       resolvedShipping = { ...shippingForm.value }
-      // If user opted to save address, save it in background
-      if (saveAddressToAccount.value) {
+      // If user is authenticated, ensure address is saved to account for future orders
+      if (authStore.isAuthenticated && (saveAddressToAccount.value || savedAddresses.value.length === 0)) {
         api.createAddress({
           address_line_1: shippingForm.value.address,
           city: shippingForm.value.city,
           state: shippingForm.value.state,
           postal_code: shippingForm.value.pincode,
           country: 'India',
+          is_default: savedAddresses.value.length === 0,
         }).catch((e) => console.warn('Background save address warning:', e))
       }
     }

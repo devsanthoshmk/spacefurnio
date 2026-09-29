@@ -337,6 +337,18 @@ class ApiClient {
     return { success: true }
   }
 
+  async deleteAccount() {
+    try {
+      const res = await this._request('/auth/account', { method: 'DELETE' }, true)
+      return res
+    } finally {
+      this.clearAuth()
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:logout'))
+      }
+    }
+  }
+
   async refresh() {
     const data = await this._request('/auth/refresh', {
       method: 'POST',
