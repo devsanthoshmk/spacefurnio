@@ -119,14 +119,14 @@
             Legal
           </h3>
           <div class="text-gray-400 text-sm sm:text-base leading-relaxed space-y-3">
-            <p class="flex flex-wrap items-baseline gap-1.5">
-              <span>© {{ currentYear }}</span>
+            <p class="flex flex-wrap items-center gap-2">
+              <span class="text-sm sm:text-base">© {{ currentYear }}</span>
               <span
-                class="phitagate-font bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent text-lg sm:text-xl font-bold tracking-wide"
+                class="phitagate-font bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent text-2xl sm:text-3xl tracking-wide inline-block leading-none"
               >
-                spacefurnio
+                Spacefurnio
               </span>
-              <span>– All rights reserved.</span>
+              <span class="text-sm sm:text-base">– All rights reserved.</span>
             </p>
             <p class="text-xs text-gray-500 leading-normal">
               Transforming spaces with bespoke craftsmanship and timeless architectural elegance.
