@@ -3,13 +3,13 @@
     <!-- Space-specific Section -->
     <section class="design-section">
       <header class="section-header">
-        <h2 class="section-title">Space-specific</h2>
-        <p class="section-subtitle">Shop furniture designed for specific rooms</p>
+        <h2 class="section-title">Space-Specific</h2>
+        <p class="section-subtitle">Curated furnishings designed for your unique spaces</p>
       </header>
 
       <!-- Loading State -->
       <div v-if="loading" class="spaces-grid">
-        <div v-for="n in 4" :key="n" class="space-card skeleton">
+        <div v-for="n in 6" :key="n" class="space-card skeleton-card">
           <div class="space-icon-wrapper shop-skeleton"></div>
           <div class="shop-skeleton skeleton-label"></div>
         </div>
@@ -18,20 +18,23 @@
       <!-- Error State -->
       <div v-else-if="error" class="error-state">
         <p class="error-text">{{ error }}</p>
+        <button class="shop-btn shop-btn-secondary mt-2" @click="$emit('retry')">
+          Retry
+        </button>
       </div>
 
       <!-- Spaces Grid -->
       <div v-else class="spaces-grid shop-stagger">
         <div
           v-for="item in spaceItems"
-          :key="item.id"
-          class="space-card"
+          :key="item.id || item.slug"
+          class="space-card group"
           @click="navigateToDesign(item.slug, 'space')"
         >
-          <div class="space-icon-wrapper">
+          <div class="space-icon-wrapper group-hover:scale-110 transition-transform duration-300">
             <component :is="getSpaceIcon(item.slug)" class="space-icon" />
           </div>
-          <span class="space-name">{{ item.name }}</span>
+          <span class="space-name group-hover:text-stone-900">{{ item.name }}</span>
         </div>
       </div>
     </section>
@@ -44,13 +47,13 @@
     <!-- Style-specific Section -->
     <section class="design-section">
       <header class="section-header">
-        <h2 class="section-title">Style-specific</h2>
-        <p class="section-subtitle">Browse collections curated by design aesthetic</p>
+        <h2 class="section-title">Style-Specific</h2>
+        <p class="section-subtitle">Browse collections curated by architectural aesthetic</p>
       </header>
 
       <!-- Loading State -->
       <div v-if="loading" class="styles-grid">
-        <div v-for="n in 4" :key="n" class="style-card skeleton">
+        <div v-for="n in 6" :key="n" class="style-card skeleton-card">
           <div class="style-image-wrapper shop-skeleton"></div>
           <div class="shop-skeleton skeleton-label"></div>
         </div>
@@ -60,17 +63,22 @@
       <div v-else class="styles-grid shop-stagger">
         <div
           v-for="item in styleItems"
-          :key="item.id"
-          class="style-card"
+          :key="item.id || item.slug"
+          class="style-card group"
           @click="navigateToDesign(item.slug, 'style')"
         >
           <div class="style-image-wrapper">
-            <img :src="item.image || getStyleFallback(item.slug)" :alt="item.name" loading="lazy" />
-            <div class="style-overlay">
-              <span class="style-explore">Explore</span>
+            <img
+              :src="item.image || getStyleFallback(item.slug)"
+              :alt="item.name"
+              loading="lazy"
+              class="group-hover:scale-110 transition-transform duration-700 ease-out"
+            />
+            <div class="style-overlay group-hover:opacity-100">
+              <span class="style-explore group-hover:translate-y-0">Explore</span>
             </div>
           </div>
-          <span class="style-name">{{ item.name }}</span>
+          <span class="style-name group-hover:text-stone-900">{{ item.name }}</span>
         </div>
       </div>
     </section>
@@ -96,13 +104,20 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['retry', 'select'])
+
 const router = useRouter()
 
 const spaceItems = computed(() => props.items?.spaceSpecific || [])
 const styleItems = computed(() => props.items?.styleSpecific || [])
 
 const navigateToDesign = (slug, type) => {
-  router.push(`/shop/design/${type}/${slug}`)
+  emit('select', { slug, type })
+  if (type === 'space') {
+    router.push(`/shop?spaces=${slug}`)
+  } else {
+    router.push(`/shop?styles=${slug}`)
+  }
 }
 
 // Space icons as functional components
@@ -114,7 +129,7 @@ const getSpaceIcon = (slug) => {
         { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
         [
           h('path', {
-            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2z',
+            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM6 7h12v3H6V7zm14 9H4v-4h2v2h12v-2h2v4z',
           }),
         ],
       ),
@@ -247,7 +262,7 @@ const getStyleFallback = (slug) => {
 
 .section-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 0.5rem 0;
@@ -264,11 +279,12 @@ const getStyleFallback = (slug) => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  margin: 2.5rem 0;
+  margin: 3rem auto;
+  max-width: 600px;
   color: var(--shop-tan, #c4b8a9);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
@@ -285,14 +301,21 @@ const getStyleFallback = (slug) => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
 @media (min-width: 640px) {
   .spaces-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spaces-grid {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 1100px;
   }
 }
 
@@ -301,29 +324,29 @@ const getStyleFallback = (slug) => {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  padding: 1.25rem 1rem;
+  padding: 1.5rem 1rem;
   background: white;
   border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .space-card:hover {
   border-color: var(--shop-tan, #c4b8a9);
-  box-shadow: 0 6px 16px rgba(61, 58, 54, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(61, 58, 54, 0.08);
+  transform: translateY(-3px);
 }
 
 .space-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--shop-cream-dark, #f5f2ed);
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .space-card:hover .space-icon-wrapper {
@@ -331,14 +354,14 @@ const getStyleFallback = (slug) => {
 }
 
 .space-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   color: var(--shop-charcoal, #3d3a36);
 }
 
 .space-name {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
 }
 
@@ -347,13 +370,19 @@ const getStyleFallback = (slug) => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .styles-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .styles-grid {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -378,57 +407,47 @@ const getStyleFallback = (slug) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.style-card:hover .style-image-wrapper img {
-  transform: scale(1.1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .style-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(61, 58, 54, 0);
+  background: rgba(61, 58, 54, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease;
-}
-
-.style-card:hover .style-overlay {
-  background: rgba(61, 58, 54, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .style-explore {
-  opacity: 0;
   transform: translateY(10px);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: white;
-  padding: 0.5rem 1rem;
-  border: 1px solid white;
+  padding: 0.4rem 0.875rem;
+  border: 1.5px solid white;
   border-radius: 9999px;
-  transition: all 0.3s ease;
-}
-
-.style-card:hover .style-explore {
-  opacity: 1;
-  transform: translateY(0);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .style-name {
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
+  text-align: center;
 }
 
-/* Skeleton */
-.skeleton {
+/* Skeletons */
+.skeleton-card {
   pointer-events: none;
 }
 
-.skeleton .space-icon-wrapper,
-.skeleton .style-image-wrapper {
+.skeleton-card .space-icon-wrapper,
+.skeleton-card .style-image-wrapper {
   background: var(--shop-beige, #e8e3dc);
 }
 

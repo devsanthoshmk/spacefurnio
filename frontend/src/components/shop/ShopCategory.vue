@@ -2,9 +2,10 @@
   <div class="shop-category">
     <!-- Loading State -->
     <div v-if="loading" class="categories-grid">
-      <div v-for="n in 4" :key="n" class="category-card skeleton">
+      <div v-for="n in 4" :key="n" class="category-card skeleton-category">
         <div class="category-icon-wrapper shop-skeleton"></div>
         <div class="shop-skeleton skeleton-label"></div>
+        <div class="shop-skeleton skeleton-sub"></div>
       </div>
     </div>
 
@@ -23,22 +24,29 @@
           <path d="M12 8v4M12 16h.01" />
         </svg>
       </div>
-      <h3 class="error-title">Something went wrong</h3>
+      <h3 class="error-title">Failed to load categories</h3>
       <p class="error-text">{{ error }}</p>
-      <button class="shop-btn shop-btn-secondary" @click="$emit('retry')">Try Again</button>
+      <button class="shop-btn shop-btn-primary" @click="$emit('retry')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5">
+          <path d="M1 4v6h6M23 20v-6h-6"/>
+          <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+        </svg>
+        Try Again
+      </button>
     </div>
 
     <!-- Categories Grid -->
     <div v-else class="categories-grid shop-stagger">
       <div
         v-for="item in items"
-        :key="item.id"
-        class="category-card"
+        :key="item.id || item.slug"
+        class="category-card group"
         @click="navigateToCategory(item.slug)"
       >
-        <div class="category-icon-wrapper">
-          <!-- Icon or Image -->
+        <div class="category-icon-wrapper group-hover:scale-110 transition-transform duration-300">
+          <!-- SVG Icon -->
           <div v-if="item.icon" class="category-icon" v-html="item.icon"></div>
+          <!-- Image -->
           <img
             v-else-if="item.image"
             :src="item.image"
@@ -46,6 +54,7 @@
             class="category-image"
             loading="lazy"
           />
+          <!-- Fallback icon -->
           <div v-else class="category-placeholder">
             <svg
               width="32"
@@ -63,17 +72,17 @@
         </div>
 
         <div class="category-info">
-          <span class="category-name">{{ item.name }}</span>
-          <span v-if="item.productCount" class="category-count">
-            {{ item.productCount }} items
+          <span class="category-name group-hover:text-stone-900">{{ item.name }}</span>
+          <span v-if="item.productCount !== undefined" class="category-count">
+            {{ item.productCount }} {{ item.productCount === 1 ? 'item' : 'items' }}
           </span>
         </div>
 
         <!-- Hover Arrow -->
-        <div class="category-arrow">
+        <div class="category-arrow group-hover:translate-x-0 group-hover:opacity-100">
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -105,12 +114,17 @@ defineProps({
   },
 })
 
-defineEmits(['retry'])
+const emit = defineEmits(['retry', 'select'])
 
 const router = useRouter()
 
 const navigateToCategory = (slug) => {
-  router.push(`/shop/category/${slug}`)
+  emit('select', slug)
+  if (slug) {
+    router.push(`/shop?categories=${slug}`)
+  } else {
+    router.push('/shop')
+  }
 }
 </script>
 
@@ -125,12 +139,18 @@ const navigateToCategory = (slug) => {
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  max-width: 800px;
+  gap: 1.25rem;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 @media (min-width: 640px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
   .categories-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
@@ -144,45 +164,40 @@ const navigateToCategory = (slug) => {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem 1rem;
+  padding: 2rem 1.25rem;
   background: white;
   border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .category-card:hover {
   border-color: var(--shop-tan, #c4b8a9);
-  box-shadow: 0 8px 24px rgba(61, 58, 54, 0.1);
+  box-shadow: 0 12px 28px rgba(61, 58, 54, 0.1);
   transform: translateY(-4px);
-}
-
-.category-card.skeleton {
-  pointer-events: none;
 }
 
 /* Icon Wrapper */
 .category-icon-wrapper {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--shop-cream-dark, #f5f2ed);
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .category-card:hover .category-icon-wrapper {
   background: var(--shop-beige, #e8e3dc);
-  transform: scale(1.05);
 }
 
 .category-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   color: var(--shop-charcoal, #3d3a36);
 }
 
@@ -212,19 +227,16 @@ const navigateToCategory = (slug) => {
 }
 
 .category-name {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
   transition: color 0.2s ease;
 }
 
-.category-card:hover .category-name {
-  color: var(--shop-accent, #b8956c);
-}
-
 .category-count {
   font-size: 0.75rem;
   color: var(--shop-brown, #a89b8c);
+  font-weight: 500;
 }
 
 /* Hover Arrow */
@@ -233,24 +245,29 @@ const navigateToCategory = (slug) => {
   bottom: 1rem;
   right: 1rem;
   opacity: 0;
-  transform: translateX(-8px);
-  color: var(--shop-accent, #b8956c);
-  transition: all 0.3s ease;
-}
-
-.category-card:hover .category-arrow {
-  opacity: 1;
-  transform: translateX(0);
+  transform: translateX(-6px);
+  color: var(--shop-charcoal, #3d3a36);
+  transition: all 0.25s ease;
 }
 
 /* Skeleton */
-.skeleton .category-icon-wrapper {
+.skeleton-category {
+  pointer-events: none;
+}
+
+.skeleton-category .category-icon-wrapper {
   background: var(--shop-beige, #e8e3dc);
 }
 
 .skeleton-label {
   width: 60%;
-  height: 1rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
+}
+
+.skeleton-sub {
+  width: 35%;
+  height: 0.75rem;
   border-radius: 0.25rem;
 }
 
@@ -264,7 +281,7 @@ const navigateToCategory = (slug) => {
 }
 
 .error-icon {
-  color: var(--shop-accent, #b8956c);
+  color: #ef4444;
   margin-bottom: 1rem;
 }
 

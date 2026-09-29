@@ -1,9 +1,9 @@
 <template>
   <div class="listing-page">
-    <!-- Fixed Header Background -->
+    <!-- Fixed Header Background Blur -->
     <div class="listing-header-bg"></div>
 
-    <!-- Mobile Filter Drawer -->
+    <!-- Mobile Filter Drawer (Teleported) -->
     <Teleport to="body">
       <Transition name="drawer">
         <div
@@ -13,8 +13,13 @@
         >
           <div class="mobile-drawer" @click.stop>
             <div class="drawer-header">
-              <h3 class="drawer-title">Filters</h3>
-              <button class="drawer-close" @click="showMobileFilters = false">
+              <div class="flex items-center gap-2">
+                <h3 class="drawer-title">Filters</h3>
+                <span v-if="activeFilterCount > 0" class="filter-count">
+                  {{ activeFilterCount }}
+                </span>
+              </div>
+              <button class="drawer-close" @click="showMobileFilters = false" aria-label="Close filters">
                 <svg
                   width="20"
                   height="20"
@@ -27,8 +32,8 @@
                 </svg>
               </button>
             </div>
+
             <div class="drawer-content shop-scrollbar">
-              <!-- Filter Content (same as sidebar) -->
               <FilterSidebar
                 :filters="filters"
                 :aggregations="aggregations"
@@ -37,12 +42,17 @@
                 @clear-all="clearAllFilters"
               />
             </div>
+
             <div class="drawer-footer">
-              <button class="shop-btn shop-btn-secondary" @click="clearAllFilters">
+              <button
+                class="shop-btn shop-btn-secondary"
+                :disabled="activeFilterCount === 0"
+                @click="clearAllFilters"
+              >
                 Clear All
               </button>
               <button class="shop-btn shop-btn-primary" @click="showMobileFilters = false">
-                Show {{ totalProducts }} Results
+                Show {{ totalProducts }} {{ totalProducts === 1 ? 'Product' : 'Products' }}
               </button>
             </div>
           </div>
@@ -64,8 +74,8 @@
               <svg
                 v-if="index < breadcrumbs.length - 1"
                 class="breadcrumb-separator"
-                width="16"
-                height="16"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -77,13 +87,54 @@
           </ol>
         </nav>
 
-        <!-- Title Row -->
+        <!-- Title & Search & Controls Row -->
         <div class="title-row">
           <div class="title-content">
             <h1 class="page-title">{{ pageTitle }}</h1>
             <p class="results-count">
-              <span class="count-number">{{ totalProducts }}</span> products
+              <span v-if="!loading">
+                Showing <span class="count-number">{{ itemRangeStart }}–{{ itemRangeEnd }}</span> of
+                <span class="count-number">{{ totalProducts }}</span> products
+              </span>
+              <span v-else>Loading products...</span>
             </p>
+          </div>
+
+          <!-- Live Debounced Search Bar -->
+          <div class="search-box-wrapper">
+            <div class="relative flex items-center">
+              <svg
+                class="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                v-model="filters.search"
+                @input="handleSearchInput"
+                placeholder="Search collection..."
+                class="shop-search-input"
+                aria-label="Search products"
+              />
+              <button
+                v-if="filters.search"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1 rounded-full transition-colors"
+                @click="clearSearch"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <!-- Desktop Controls -->
@@ -94,10 +145,10 @@
               <div class="select-wrapper">
                 <select v-model="sortBy" class="shop-select">
                   <option value="popularity-desc">Most Popular</option>
-                  <option value="rating-desc">Best Rating</option>
-                  <option value="newest-desc">Newest First</option>
                   <option value="price-asc">Price: Low to High</option>
                   <option value="price-desc">Price: High to Low</option>
+                  <option value="rating-desc">Highest Rated</option>
+                  <option value="newest-desc">Newest Arrivals</option>
                 </select>
               </div>
             </div>
@@ -108,10 +159,11 @@
                 :class="['view-btn', { active: viewMode === 'grid' }]"
                 @click="viewMode = 'grid'"
                 aria-label="Grid view"
+                title="Grid view"
               >
                 <svg
-                  width="18"
-                  height="18"
+                  width="17"
+                  height="17"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -127,10 +179,11 @@
                 :class="['view-btn', { active: viewMode === 'list' }]"
                 @click="viewMode = 'list'"
                 aria-label="List view"
+                title="List view"
               >
                 <svg
-                  width="18"
-                  height="18"
+                  width="17"
+                  height="17"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -142,15 +195,33 @@
             </div>
           </div>
         </div>
+
+        <!-- Quick Category / Taxonomy Filter Pills -->
+        <div class="category-pills-row shop-scrollbar">
+          <button
+            :class="['category-pill', { active: isAllActive }]"
+            @click="selectCategory('')"
+          >
+            All Products
+          </button>
+          <button
+            v-for="cat in availableCategories"
+            :key="cat.slug"
+            :class="['category-pill', { active: filters.categories.includes(cat.slug) }]"
+            @click="selectCategory(cat.slug)"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
       </div>
     </header>
 
-    <!-- Mobile Sticky Controls -->
+    <!-- Mobile Sticky Controls Bar -->
     <div class="mobile-controls">
       <button class="mobile-filter-btn" @click="showMobileFilters = true">
         <svg
-          width="18"
-          height="18"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -165,15 +236,40 @@
       <div class="mobile-sort">
         <select v-model="sortBy" class="mobile-sort-select">
           <option value="popularity-desc">Popular</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
           <option value="rating-desc">Rating</option>
           <option value="newest-desc">Newest</option>
-          <option value="price-asc">Price ↑</option>
-          <option value="price-desc">Price ↓</option>
         </select>
+      </div>
+
+      <!-- View Toggle Mobile -->
+      <div class="view-toggle">
+        <button
+          :class="['view-btn', { active: viewMode === 'grid' }]"
+          @click="viewMode = 'grid'"
+          aria-label="Grid view"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+        </button>
+        <button
+          :class="['view-btn', { active: viewMode === 'list' }]"
+          @click="viewMode = 'list'"
+          aria-label="List view"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+          </svg>
+        </button>
       </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content Layout -->
     <main class="listing-main">
       <div class="listing-container">
         <div class="listing-layout">
@@ -181,7 +277,11 @@
           <aside class="filter-sidebar">
             <div class="sidebar-header">
               <h2 class="sidebar-title">Filters</h2>
-              <button v-if="activeFilterCount > 0" class="clear-all-btn" @click="clearAllFilters">
+              <button
+                v-if="activeFilterCount > 0"
+                class="clear-all-btn"
+                @click="clearAllFilters"
+              >
                 Clear all
               </button>
             </div>
@@ -191,18 +291,20 @@
               <div class="filter-tags">
                 <button
                   v-for="tag in activeFilterTags"
-                  :key="tag.key"
-                  class="filter-tag"
+                  :key="tag.key + '-' + tag.value"
+                  class="filter-tag group"
                   @click="removeFilter(tag.key, tag.value)"
+                  :title="`Remove filter: ${tag.label}`"
                 >
-                  {{ tag.label }}
+                  <span>{{ tag.label }}</span>
                   <svg
-                    width="14"
-                    height="14"
+                    class="group-hover:scale-125 transition-transform"
+                    width="12"
+                    height="12"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.5"
                   >
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
@@ -219,33 +321,36 @@
             />
           </aside>
 
-          <!-- Products Grid -->
+          <!-- Products Section -->
           <section class="products-section">
             <!-- Active Filters Bar (Mobile) -->
             <div v-if="activeFilterCount > 0" class="active-filters-bar">
               <div class="filter-tags-scroll shop-scrollbar">
                 <button
                   v-for="tag in activeFilterTags"
-                  :key="tag.key"
-                  class="filter-tag-small"
+                  :key="'mobile-' + tag.key + '-' + tag.value"
+                  class="filter-tag-small group"
                   @click="removeFilter(tag.key, tag.value)"
                 >
-                  {{ tag.label }}
+                  <span>{{ tag.label }}</span>
                   <svg
-                    width="12"
-                    height="12"
+                    width="10"
+                    height="10"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.5"
                   >
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
+                <button class="clear-all-pill" @click="clearAllFilters">
+                  Clear All
+                </button>
               </div>
             </div>
 
-            <!-- Loading State -->
+            <!-- Loading State Skeletons -->
             <div v-if="loading" :class="['products-grid', `view-${viewMode}`]">
               <div v-for="n in 12" :key="n" class="product-skeleton">
                 <div class="skeleton-image shop-skeleton"></div>
@@ -257,28 +362,53 @@
               </div>
             </div>
 
-            <!-- Empty State -->
+            <!-- Error State with Retry -->
+            <div v-else-if="fetchError" class="error-container">
+              <div class="error-box">
+                <div class="error-icon-wrapper">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
+                  </svg>
+                </div>
+                <h3 class="error-heading">Failed to load catalog products</h3>
+                <p class="error-subtext">{{ fetchError }}</p>
+                <button class="shop-btn shop-btn-primary" @click="loadProducts()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5">
+                    <path d="M1 4v6h6M23 20v-6h-6"/>
+                    <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+                  </svg>
+                  Retry
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty State with Clear Filters -->
             <div v-else-if="products.length === 0" class="empty-state">
-              <div class="empty-icon">
+              <div class="empty-icon-wrapper">
                 <svg
-                  width="64"
-                  height="64"
+                  width="56"
+                  height="56"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="1"
+                  stroke-width="1.25"
                 >
-                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                  <path d="M8 11h6" />
                 </svg>
               </div>
               <h3 class="empty-title">No products found</h3>
-              <p class="empty-text">Try adjusting your filters or search criteria</p>
+              <p class="empty-text">
+                We couldn't find any products matching your active filters or search terms.
+              </p>
               <button class="shop-btn shop-btn-primary" @click="clearAllFilters">
                 Clear All Filters
               </button>
             </div>
 
-            <!-- Products Grid -->
+            <!-- Products Grid Content -->
             <div v-else :class="['products-grid', `view-${viewMode}`, 'shop-stagger']">
               <ProductCardNew
                 v-for="product in products"
@@ -291,12 +421,17 @@
               />
             </div>
 
-            <!-- Pagination -->
-            <div v-if="!loading && totalPages > 1" class="pagination">
+            <!-- Pagination Controls -->
+            <nav
+              v-if="!loading && !fetchError && totalPages > 1"
+              class="pagination"
+              aria-label="Product catalogue pagination"
+            >
               <button
                 class="page-btn prev"
                 :disabled="currentPage === 1"
                 @click="goToPage(currentPage - 1)"
+                aria-label="Previous page"
               >
                 <svg
                   width="16"
@@ -313,8 +448,8 @@
 
               <div class="page-numbers">
                 <button
-                  v-for="page in visiblePages"
-                  :key="page"
+                  v-for="(page, pIdx) in visiblePages"
+                  :key="pIdx"
                   :class="['page-num', { active: page === currentPage, ellipsis: page === '...' }]"
                   :disabled="page === '...'"
                   @click="page !== '...' && goToPage(page)"
@@ -327,6 +462,7 @@
                 class="page-btn next"
                 :disabled="currentPage === totalPages"
                 @click="goToPage(currentPage + 1)"
+                aria-label="Next page"
               >
                 Next
                 <svg
@@ -340,24 +476,7 @@
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>
-            </div>
-
-            <!-- Load More Button (Alternative to Pagination) -->
-            <div v-if="!loading && hasMoreProducts && !usePagination" class="load-more-container">
-              <button
-                class="shop-btn shop-btn-secondary load-more-btn"
-                :disabled="loadingMore"
-                @click="loadMoreProducts"
-              >
-                <span v-if="loadingMore" class="shop-loading-dots">
-                  <span></span><span></span><span></span>
-                </span>
-                <span v-else>Load More</span>
-              </button>
-              <p class="showing-count">
-                Showing {{ products.length }} of {{ totalProducts }} products
-              </p>
-            </div>
+            </nav>
           </section>
         </div>
       </div>
@@ -372,30 +491,34 @@ import shopApi from '@/api/shopApi.js'
 import FilterSidebar from '@/components/shop/FilterSidebar.vue'
 import ProductCardNew from '@/components/shop/ProductCardNew.vue'
 import { useWishlistStore } from '@/stores/wishlist'
+import { useCartStore } from '@/stores/cart'
 
 const route = useRoute()
 const router = useRouter()
 const wishlistStore = useWishlistStore()
-const { openWishlist } = inject('wishlistUtils', { openWishlist: () => {} })
+const cartStore = useCartStore()
+
+const { openWishlist } = inject('wishlistUtils', { openWishlist: () => wishlistStore.toggleDrawer(true) })
+const { openCart } = inject('cartUtils', { openCart: () => cartStore.toggleDrawer(true) })
 
 // State
 const loading = ref(true)
-const loadingMore = ref(false)
+const fetchError = ref(null)
 const products = ref([])
 const totalProducts = ref(0)
 const totalPages = ref(1)
 const currentPage = ref(1)
-const hasMoreProducts = ref(false)
 const showMobileFilters = ref(false)
 const viewMode = ref('grid')
 const sortBy = ref('popularity-desc')
-const usePagination = ref(true)
+const availableCategories = ref([])
 
 // Filter state - synced with URL query params
 const filters = ref({
   categories: [],
   spaces: [],
   styles: [],
+  room: '',
   brand: '',
   colors: [],
   material: '',
@@ -407,15 +530,27 @@ const filters = ref({
   search: '',
 })
 
+// Aggregations from API
+const aggregations = ref({
+  brands: [],
+  materials: [],
+  rooms: [],
+  colors: [],
+  priceRange: { min: 0, max: 5000 },
+})
+
+let searchDebounceTimer = null
+
 // Parse query params into filters
 const parseQueryParams = () => {
   const query = route.query
 
-  filters.value.categories = query.categories ? query.categories.split(',') : []
-  filters.value.spaces = query.spaces ? query.spaces.split(',') : []
-  filters.value.styles = query.styles ? query.styles.split(',') : []
+  filters.value.categories = query.categories ? query.categories.split(',').filter(Boolean) : []
+  filters.value.spaces = query.spaces ? query.spaces.split(',').filter(Boolean) : []
+  filters.value.styles = query.styles ? query.styles.split(',').filter(Boolean) : []
+  filters.value.room = query.room || ''
   filters.value.brand = query.brand || ''
-  filters.value.colors = query.colors ? query.colors.split(',') : []
+  filters.value.colors = query.colors ? query.colors.split(',').filter(Boolean) : []
   filters.value.material = query.material || ''
   filters.value.minPrice = query.minPrice ? parseFloat(query.minPrice) : null
   filters.value.maxPrice = query.maxPrice ? parseFloat(query.maxPrice) : null
@@ -441,11 +576,12 @@ const syncFiltersToUrl = () => {
   if (filters.value.styles.length > 0) {
     query.styles = filters.value.styles.join(',')
   }
+  if (filters.value.room) query.room = filters.value.room
   if (filters.value.brand) query.brand = filters.value.brand
   if (filters.value.colors.length > 0) query.colors = filters.value.colors.join(',')
   if (filters.value.material) query.material = filters.value.material
-  if (filters.value.minPrice !== null) query.minPrice = filters.value.minPrice
-  if (filters.value.maxPrice !== null) query.maxPrice = filters.value.maxPrice
+  if (filters.value.minPrice !== null && filters.value.minPrice !== undefined) query.minPrice = filters.value.minPrice
+  if (filters.value.maxPrice !== null && filters.value.maxPrice !== undefined) query.maxPrice = filters.value.maxPrice
   if (filters.value.inStock) query.inStock = 'true'
   if (filters.value.onSale) query.onSale = 'true'
   if (filters.value.isNew) query.isNew = 'true'
@@ -456,19 +592,16 @@ const syncFiltersToUrl = () => {
   router.replace({ path: '/shop', query })
 }
 
-// Aggregations from API
-const aggregations = ref({
-  brands: [],
-  materials: [],
-  colors: [],
-  priceRange: { min: 0, max: 5000 },
-})
-
-// Computed
+// Computed Title
 const pageTitle = computed(() => {
+  const search = filters.value.search
   const cats = filters.value.categories
   const spcs = filters.value.spaces
   const stys = filters.value.styles
+
+  if (search) {
+    return `Results for "${search}"`
+  }
 
   if (cats.length === 0 && spcs.length === 0 && stys.length === 0) {
     return 'All Products'
@@ -479,26 +612,30 @@ const pageTitle = computed(() => {
     parts.push(cats.map(c => c.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
   }
   if (spcs.length > 0) {
-    parts.push('Space: ' + spcs.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
+    parts.push(spcs.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
   }
   if (stys.length > 0) {
-    parts.push('Style: ' + stys.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
+    parts.push(stys.map(s => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', '))
   }
 
-  return parts.join(' | ')
+  return parts.join(' · ')
+})
+
+const isAllActive = computed(() => {
+  return (
+    filters.value.categories.length === 0 &&
+    filters.value.spaces.length === 0 &&
+    filters.value.styles.length === 0
+  )
 })
 
 const breadcrumbs = computed(() => {
   const crumbs = [
     { name: 'Home', route: '/' },
-    { name: 'Shop', route: '/shop' },
+    { name: 'Shop', route: isAllActive.value ? null : '/shop' },
   ]
 
-  const cats = filters.value.categories
-  const spcs = filters.value.spaces
-  const stys = filters.value.styles
-
-  if (cats.length > 0 || spcs.length > 0 || stys.length > 0) {
+  if (!isAllActive.value || filters.value.search) {
     crumbs.push({
       name: pageTitle.value,
       route: null,
@@ -513,6 +650,7 @@ const activeFilterCount = computed(() => {
   count += filters.value.categories.length
   count += filters.value.spaces.length
   count += filters.value.styles.length
+  if (filters.value.room) count++
   if (filters.value.brand) count++
   if (filters.value.colors.length > 0) count += filters.value.colors.length
   if (filters.value.material) count++
@@ -520,11 +658,16 @@ const activeFilterCount = computed(() => {
   if (filters.value.inStock) count++
   if (filters.value.onSale) count++
   if (filters.value.isNew) count++
+  if (filters.value.search) count++
   return count
 })
 
 const activeFilterTags = computed(() => {
   const tags = []
+
+  if (filters.value.search) {
+    tags.push({ key: 'search', value: filters.value.search, label: `Search: "${filters.value.search}"` })
+  }
 
   filters.value.categories.forEach((cat) => {
     tags.push({ key: 'categories', value: cat, label: cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })
@@ -538,22 +681,26 @@ const activeFilterTags = computed(() => {
     tags.push({ key: 'styles', value: style, label: 'Style: ' + style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })
   })
 
+  if (filters.value.room) {
+    tags.push({ key: 'room', value: filters.value.room, label: 'Room: ' + filters.value.room })
+  }
+
   if (filters.value.brand) {
-    tags.push({ key: 'brand', value: filters.value.brand, label: filters.value.brand })
+    tags.push({ key: 'brand', value: filters.value.brand, label: 'Brand: ' + filters.value.brand })
   }
 
   filters.value.colors.forEach((color) => {
-    tags.push({ key: 'colors', value: color, label: color })
+    tags.push({ key: 'colors', value: color, label: 'Color: ' + color })
   })
 
   if (filters.value.material) {
-    tags.push({ key: 'material', value: filters.value.material, label: filters.value.material })
+    tags.push({ key: 'material', value: filters.value.material, label: 'Material: ' + filters.value.material })
   }
 
   if (filters.value.minPrice !== null || filters.value.maxPrice !== null) {
-    const min = filters.value.minPrice || 0
-    const max = filters.value.maxPrice || '∞'
-    tags.push({ key: 'price', value: 'price', label: `$${min} - $${max}` })
+    const min = filters.value.minPrice !== null ? `$${filters.value.minPrice}` : '$0'
+    const max = filters.value.maxPrice !== null ? `$${filters.value.maxPrice}` : 'Max'
+    tags.push({ key: 'price', value: 'price', label: `${min} - ${max}` })
   }
 
   if (filters.value.inStock) {
@@ -571,6 +718,16 @@ const activeFilterTags = computed(() => {
   return tags
 })
 
+// Item count range
+const itemRangeStart = computed(() => {
+  if (totalProducts.value === 0) return 0
+  return (currentPage.value - 1) * 12 + 1
+})
+
+const itemRangeEnd = computed(() => {
+  return Math.min(currentPage.value * 12, totalProducts.value)
+})
+
 const visiblePages = computed(() => {
   const pages = []
   const total = totalPages.value
@@ -580,30 +737,20 @@ const visiblePages = computed(() => {
     for (let i = 1; i <= total; i++) pages.push(i)
   } else {
     pages.push(1)
-
     if (current > 3) pages.push('...')
-
     const start = Math.max(2, current - 1)
     const end = Math.min(total - 1, current + 1)
-
     for (let i = start; i <= end; i++) pages.push(i)
-
     if (current < total - 2) pages.push('...')
-
     pages.push(total)
   }
-
   return pages
 })
 
 // Methods
-const loadProducts = async (append = false) => {
-  if (!append) {
-    loading.value = true
-    products.value = []
-  } else {
-    loadingMore.value = true
-  }
+const loadProducts = async () => {
+  loading.value = true
+  fetchError.value = null
 
   try {
     const [sort, order] = sortBy.value.split('-')
@@ -612,6 +759,7 @@ const loadProducts = async (append = false) => {
       categories: filters.value.categories.length > 0 ? filters.value.categories : null,
       spaces: filters.value.spaces.length > 0 ? filters.value.spaces : null,
       styles: filters.value.styles.length > 0 ? filters.value.styles : null,
+      room: filters.value.room || null,
       brand: filters.value.brand || null,
       colors: filters.value.colors,
       material: filters.value.material || null,
@@ -629,38 +777,70 @@ const loadProducts = async (append = false) => {
 
     const response = await shopApi.getProducts(apiParams)
 
-    if (response.success) {
-      if (append) {
-        products.value = [...products.value, ...response.data]
-      } else {
-        products.value = response.data
-      }
-
-      totalProducts.value = response.meta.total
-      totalPages.value = response.meta.totalPages
-      hasMoreProducts.value = response.meta.hasNextPage
+    if (response && response.success) {
+      products.value = response.data || []
+      totalProducts.value = response.meta?.total || 0
+      totalPages.value = response.meta?.totalPages || 1
 
       if (response.aggregations) {
         aggregations.value = response.aggregations
       }
+    } else {
+      throw new Error(response?.error || 'Failed to fetch catalog products')
     }
   } catch (error) {
     console.error('Error loading products:', error)
+    fetchError.value = error.message || 'Unable to load products. Please check your network connection.'
+    products.value = []
   } finally {
     loading.value = false
-    loadingMore.value = false
   }
 }
 
 const loadFilterOptions = async () => {
   try {
-    const response = await shopApi.getFilterOptions(null)
-    if (response.success) {
-      aggregations.value = response.data
+    const [filterRes, catRes] = await Promise.all([
+      shopApi.getFilterOptions(null),
+      shopApi.getCategories(),
+    ])
+
+    if (filterRes.success && filterRes.data) {
+      aggregations.value = { ...aggregations.value, ...filterRes.data }
+    }
+
+    if (catRes.success && catRes.data) {
+      availableCategories.value = catRes.data
     }
   } catch (error) {
     console.error('Error loading filter options:', error)
   }
+}
+
+const handleSearchInput = () => {
+  clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    currentPage.value = 1
+    syncFiltersToUrl()
+    loadProducts()
+  }, 350)
+}
+
+const clearSearch = () => {
+  filters.value.search = ''
+  currentPage.value = 1
+  syncFiltersToUrl()
+  loadProducts()
+}
+
+const selectCategory = (slug) => {
+  if (!slug) {
+    filters.value.categories = []
+  } else {
+    filters.value.categories = [slug]
+  }
+  currentPage.value = 1
+  syncFiltersToUrl()
+  loadProducts()
 }
 
 const updateFilters = (newFilters) => {
@@ -682,6 +862,8 @@ const removeFilter = (key, value) => {
   } else if (key === 'price') {
     filters.value.minPrice = null
     filters.value.maxPrice = null
+  } else if (key === 'search') {
+    filters.value.search = ''
   } else if (typeof filters.value[key] === 'boolean') {
     filters.value[key] = false
   } else if (Array.isArray(filters.value[key])) {
@@ -699,6 +881,7 @@ const clearAllFilters = () => {
     categories: [],
     spaces: [],
     styles: [],
+    room: '',
     brand: '',
     colors: [],
     material: '',
@@ -715,38 +898,42 @@ const clearAllFilters = () => {
 }
 
 const goToPage = (page) => {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return
   currentPage.value = page
+  syncFiltersToUrl()
   loadProducts()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const loadMoreProducts = () => {
-  currentPage.value++
-  loadProducts(true)
+  window.scrollTo({ top: 180, behavior: 'smooth' })
 }
 
 const handleWishlist = async (product) => {
-  console.log('[ProductListing] Toggle wishlist:', product.id)
   try {
-    await wishlistStore.toggleItem(product.id, product)
+    await wishlistStore.toggleItem(product.id)
     if (wishlistStore.isInWishlist(product.id)) {
       openWishlist()
     }
   } catch (error) {
-    console.error('[ProductListing] Failed to toggle wishlist:', error)
+    console.error('Wishlist error:', error)
   }
 }
 
-const handleAddToCart = (product) => {
-  console.log('Add to cart:', product.id)
+const handleAddToCart = async (product) => {
+  try {
+    const price = product.price || (product.price_cents ? product.price_cents / 100 : 0)
+    await cartStore.addItem(product.id, 1, price)
+    openCart()
+  } catch (error) {
+    console.error('Add to cart error:', error)
+  }
 }
 
 const navigateToProduct = (product) => {
-  router.push(`/shop/product/${product.id}`)
+  const idOrSlug = product.slug || product.id
+  router.push(`/shop/product/${idOrSlug}`)
 }
 
 // Watchers
 watch(sortBy, () => {
+  currentPage.value = 1
   syncFiltersToUrl()
   loadProducts()
 })
@@ -775,10 +962,6 @@ onMounted(() => {
    PRODUCT LISTING PAGE STYLES
    ============================================ */
 
-/* ============================================
-   PRODUCT LISTING PAGE STYLES
-   ============================================ */
-
 .listing-page {
   min-height: 100vh;
   background: var(--shop-cream, #faf8f5);
@@ -791,8 +974,8 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 5rem;
-  background: rgba(250, 248, 245, 0.95);
-  backdrop-filter: blur(8px);
+  background: rgba(250, 248, 245, 0.96);
+  backdrop-filter: blur(12px);
   z-index: 40;
 }
 
@@ -808,9 +991,9 @@ onMounted(() => {
   top: 5rem;
   z-index: 30;
   background: rgba(250, 248, 245, 0.98);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
-  padding: 1.5rem 0;
+  padding: 1.25rem 0 0.75rem;
 }
 
 /* Breadcrumbs */
@@ -820,7 +1003,7 @@ onMounted(() => {
   gap: 0.5rem;
   list-style: none;
   padding: 0;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
 }
 
 .breadcrumb-item {
@@ -843,7 +1026,7 @@ onMounted(() => {
 .breadcrumb-current {
   font-size: 0.8125rem;
   color: var(--shop-charcoal, #3d3a36);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .breadcrumb-separator {
@@ -854,14 +1037,15 @@ onMounted(() => {
 .title-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .page-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.25rem);
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   letter-spacing: -0.02em;
@@ -869,21 +1053,46 @@ onMounted(() => {
 }
 
 .results-count {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--shop-brown, #a89b8c);
-  margin: 0.5rem 0 0 0;
+  margin: 0.25rem 0 0 0;
 }
 
 .count-number {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
+}
+
+/* Search Box */
+.search-box-wrapper {
+  flex: 1;
+  max-width: 380px;
+  min-width: 240px;
+}
+
+.shop-search-input {
+  width: 100%;
+  padding: 0.625rem 2.25rem 0.625rem 2.5rem;
+  font-size: 0.875rem;
+  background: white;
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
+  border-radius: 9999px;
+  color: var(--shop-charcoal, #3d3a36);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.shop-search-input:focus {
+  outline: none;
+  border-color: var(--shop-charcoal, #3d3a36);
+  box-shadow: 0 0 0 3px rgba(61, 58, 54, 0.08);
 }
 
 /* Header Controls */
 .header-controls {
   display: none;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 @media (min-width: 1024px) {
@@ -895,34 +1104,31 @@ onMounted(() => {
 .sort-dropdown {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.625rem;
 }
 
 .sort-label {
   font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--shop-brown, #a89b8c);
   white-space: nowrap;
-}
-
-.select-wrapper {
-  position: relative;
 }
 
 .view-toggle {
   display: flex;
   background: white;
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
-  padding: 0.25rem;
-  gap: 0.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 0.1875rem;
+  gap: 0.1875rem;
 }
 
 .view-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   border: none;
   background: transparent;
   border-radius: 0.375rem;
@@ -932,23 +1138,59 @@ onMounted(() => {
 }
 
 .view-btn:hover {
-  color: var(--shop-brown, #a89b8c);
-}
-
-.view-btn.active {
-  background: var(--shop-cream-dark, #f5f2ed);
   color: var(--shop-charcoal, #3d3a36);
 }
 
-/* Mobile Controls */
+.view-btn.active {
+  background: var(--shop-charcoal, #3d3a36);
+  color: white;
+}
+
+/* Quick Category Pills Row */
+.category-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-pill {
+  padding: 0.4rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--shop-brown-dark, #8b7d6d);
+  background: white;
+  border: 1px solid var(--shop-beige-dark, #d4cfc6);
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.category-pill:hover {
+  border-color: var(--shop-charcoal, #3d3a36);
+  color: var(--shop-charcoal, #3d3a36);
+}
+
+.category-pill.active {
+  background: var(--shop-charcoal, #3d3a36);
+  color: white;
+  border-color: var(--shop-charcoal, #3d3a36);
+}
+
+/* Mobile Controls Bar */
 .mobile-controls {
   display: flex;
+  align-items: center;
   position: sticky;
   top: 5rem;
   z-index: 25;
   background: rgba(250, 248, 245, 0.98);
   backdrop-filter: blur(8px);
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   gap: 0.75rem;
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
@@ -963,33 +1205,15 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1rem;
+  padding: 0.5rem 0.875rem;
   background: white;
   border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.mobile-filter-btn:hover {
-  border-color: var(--shop-tan, #c4b8a9);
-}
-
-.filter-count {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.375rem;
-  background: var(--shop-charcoal, #3d3a36);
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  border-radius: 9999px;
 }
 
 .mobile-sort {
@@ -998,22 +1222,36 @@ onMounted(() => {
 
 .mobile-sort-select {
   width: 100%;
-  padding: 0.625rem 2rem 0.625rem 1rem;
+  padding: 0.5rem 1.75rem 0.5rem 0.875rem;
   background: white
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B7D6D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238B7D6D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
     no-repeat right 0.75rem center;
   border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 9999px;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   appearance: none;
   cursor: pointer;
 }
 
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  background: var(--shop-charcoal, #3d3a36);
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+
 /* Main Layout */
 .listing-main {
-  padding: 2rem 0 4rem;
+  padding: 2rem 0 5rem;
 }
 
 .listing-layout {
@@ -1024,7 +1262,7 @@ onMounted(() => {
 /* Sidebar */
 .filter-sidebar {
   display: none;
-  width: 260px;
+  width: 270px;
   flex-shrink: 0;
 }
 
@@ -1038,14 +1276,14 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .sidebar-title {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
   margin: 0;
 }
@@ -1056,12 +1294,13 @@ onMounted(() => {
   background: none;
   border: none;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .clear-all-btn:hover {
   color: var(--shop-accent-dark, #8c6d4d);
+  text-decoration: underline;
 }
 
 /* Active Filters */
@@ -1072,14 +1311,14 @@ onMounted(() => {
 .filter-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .filter-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  padding: 0.3125rem 0.625rem;
   background: var(--shop-cream-dark, #f5f2ed);
   border: 1px solid var(--shop-beige, #e8e3dc);
   border-radius: 9999px;
@@ -1092,6 +1331,7 @@ onMounted(() => {
 
 .filter-tag:hover {
   background: var(--shop-beige, #e8e3dc);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 /* Products Section */
@@ -1103,7 +1343,7 @@ onMounted(() => {
 /* Active Filters Bar (Mobile) */
 .active-filters-bar {
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 @media (min-width: 1024px) {
@@ -1114,10 +1354,10 @@ onMounted(() => {
 
 .filter-tags-scroll {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.375rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.25rem;
 }
 
 .filter-tag-small {
@@ -1133,6 +1373,17 @@ onMounted(() => {
   color: var(--shop-charcoal, #3d3a36);
   white-space: nowrap;
   cursor: pointer;
+}
+
+.clear-all-pill {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--shop-accent, #b8956c);
+  background: none;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 /* Products Grid */
@@ -1160,25 +1411,28 @@ onMounted(() => {
 @media (min-width: 1280px) {
   .products-grid.view-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
   }
 }
 
 @media (min-width: 1600px) {
   .products-grid.view-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.75rem;
   }
 }
 
 .products-grid.view-list {
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-/* Skeleton */
+/* Skeleton State */
 .product-skeleton {
   background: white;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   overflow: hidden;
+  border: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .skeleton-image {
@@ -1191,7 +1445,7 @@ onMounted(() => {
 }
 
 .skeleton-brand {
-  width: 40%;
+  width: 35%;
   height: 0.75rem;
   margin-bottom: 0.5rem;
   border-radius: 0.25rem;
@@ -1210,24 +1464,58 @@ onMounted(() => {
   border-radius: 0.25rem;
 }
 
+/* Error State */
+.error-container {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 1rem;
+}
+
+.error-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  text-align: center;
+}
+
+.error-icon-wrapper {
+  color: #ef4444;
+  margin-bottom: 1.25rem;
+}
+
+.error-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--shop-charcoal, #3d3a36);
+  margin-bottom: 0.5rem;
+}
+
+.error-subtext {
+  font-size: 0.875rem;
+  color: var(--shop-brown, #a89b8c);
+  margin-bottom: 1.5rem;
+}
+
 /* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
   text-align: center;
 }
 
-.empty-icon {
+.empty-icon-wrapper {
   color: var(--shop-tan, #c4b8a9);
   margin-bottom: 1.5rem;
 }
 
 .empty-title {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   margin: 0 0 0.5rem 0;
 }
@@ -1235,7 +1523,9 @@ onMounted(() => {
 .empty-text {
   font-size: 0.9375rem;
   color: var(--shop-brown, #a89b8c);
-  margin: 0 0 1.5rem 0;
+  max-width: 420px;
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
 }
 
 /* Pagination */
@@ -1244,7 +1534,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 3rem;
+  margin-top: 3.5rem;
   flex-wrap: wrap;
 }
 
@@ -1257,19 +1547,19 @@ onMounted(() => {
   border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: var(--shop-tan, #c4b8a9);
+  border-color: var(--shop-charcoal, #3d3a36);
   background: var(--shop-cream-dark, #f5f2ed);
 }
 
 .page-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -1288,8 +1578,8 @@ onMounted(() => {
   border: none;
   border-radius: 0.375rem;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--shop-brown, #a89b8c);
+  font-weight: 600;
+  color: var(--shop-brown-dark, #8b7d6d);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1308,31 +1598,13 @@ onMounted(() => {
   cursor: default;
 }
 
-/* Load More */
-.load-more-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 3rem;
-}
-
-.load-more-btn {
-  min-width: 180px;
-}
-
-.showing-count {
-  font-size: 0.8125rem;
-  color: var(--shop-brown, #a89b8c);
-}
-
 /* Mobile Drawer */
 .mobile-drawer-overlay {
   position: fixed;
   inset: 0;
   z-index: 100001;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
 }
 
 .mobile-drawer {
@@ -1340,27 +1612,27 @@ onMounted(() => {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 85%;
-  max-width: 320px;
+  width: 88%;
+  max-width: 340px;
   background: var(--shop-cream, #faf8f5);
   display: flex;
   flex-direction: column;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  box-shadow: -6px 0 28px rgba(0, 0, 0, 0.15);
   z-index: 100002;
-  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
 }
 
 .drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
+  background: white;
 }
 
 .drawer-title {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
   margin: 0;
 }
@@ -1369,8 +1641,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   background: transparent;
   border: none;
   color: var(--shop-brown, #a89b8c);
@@ -1387,14 +1659,13 @@ onMounted(() => {
 .drawer-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 .drawer-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0.5rem));
+  padding: 1.25rem 1.5rem;
   border-top: 1px solid var(--shop-beige, #e8e3dc);
   background: white;
 }
@@ -1402,19 +1673,8 @@ onMounted(() => {
 .drawer-footer .shop-btn {
   flex: 1;
   padding: 0.875rem 1rem;
-  font-size: 0.9375rem;
-  min-height: 48px;
-}
-
-@media (max-width: 380px) {
-  .drawer-footer {
-    flex-direction: column;
-    gap: 0.625rem;
-  }
-
-  .drawer-footer .shop-btn {
-    width: 100%;
-  }
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 /* Drawer Transition */
@@ -1425,7 +1685,7 @@ onMounted(() => {
 
 .drawer-enter-active .mobile-drawer,
 .drawer-leave-active .mobile-drawer {
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .drawer-enter-from,

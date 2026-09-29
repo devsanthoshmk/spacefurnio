@@ -3,16 +3,28 @@
     <!-- Hero Section with Special Offers -->
     <section class="shop-hero">
       <div class="shop-hero-content">
+        <!-- Error State with Retry -->
+        <div v-if="fetchError" class="hero-error-box mb-6">
+          <p class="text-rose-600 font-medium text-sm mb-2">{{ fetchError }}</p>
+          <button class="shop-btn shop-btn-primary" @click="loadData">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1.5">
+              <path d="M1 4v6h6M23 20v-6h-6"/>
+              <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+            </svg>
+            Retry Loading
+          </button>
+        </div>
+
         <!-- Special Offers Banner -->
         <div class="special-offers" v-if="!loading">
           <div
             v-for="offer in specialOffers"
             :key="offer.id"
-            class="offer-card"
+            class="offer-card group"
             @click="navigateToOffer(offer.link)"
           >
             <div class="offer-image-wrapper">
-              <img :src="offer.image" :alt="offer.title" loading="lazy" />
+              <img :src="offer.image" :alt="offer.title" loading="lazy" class="group-hover:scale-105 transition-transform duration-700 ease-out" />
               <div class="offer-overlay">
                 <span class="offer-badge">{{ offer.badge }}</span>
               </div>
@@ -20,7 +32,7 @@
             <div class="offer-content">
               <h3 class="offer-title">{{ offer.title }}</h3>
               <p class="offer-subtitle">{{ offer.subtitle }}</p>
-              <span class="offer-link">
+              <span class="offer-link group-hover:gap-2.5 transition-all">
                 See All
                 <svg
                   width="16"
@@ -55,7 +67,7 @@
       <div class="shop-container">
         <!-- Section Header -->
         <header class="shop-header">
-          <h1 class="shop-title">Shop All Products</h1>
+          <h1 class="shop-title">Shop All Collections</h1>
 
           <!-- Toggle Pills -->
           <div class="shop-toggle">
@@ -86,13 +98,16 @@
               <div
                 v-for="category in categories"
                 :key="category.id"
-                class="category-card"
+                class="category-card group"
                 @click="navigateToCategory(category.slug)"
               >
-                <div class="category-icon-wrapper">
+                <div class="category-icon-wrapper group-hover:scale-110 group-hover:bg-stone-200 transition-all duration-300">
                   <div class="category-icon" v-html="category.icon"></div>
                 </div>
-                <span class="category-name">{{ category.name }}</span>
+                <span class="category-name group-hover:text-stone-900">{{ category.name }}</span>
+                <span v-if="category.productCount" class="category-count text-xs text-stone-400">
+                  {{ category.productCount }} {{ category.productCount === 1 ? 'product' : 'products' }}
+                </span>
               </div>
             </div>
 
@@ -108,26 +123,26 @@
           <div v-else key="design" class="tab-content">
             <!-- Space-specific Section -->
             <div class="design-section">
-              <h2 class="section-title">Space-specific</h2>
-              <p class="section-subtitle">Shop furniture designed for specific rooms</p>
+              <h2 class="section-title">Space-Specific</h2>
+              <p class="section-subtitle">Furnishings thoughtfully designed for specific rooms</p>
 
               <div class="spaces-grid shop-stagger" v-if="!loading">
                 <div
                   v-for="space in spaces"
                   :key="space.id"
-                  class="space-card"
+                  class="space-card group"
                   @click="navigateToSpace(space.slug)"
                 >
-                  <div class="space-icon-wrapper">
-                    <component :is="getSpaceIcon(space.icon)" class="space-icon" />
+                  <div class="space-icon-wrapper group-hover:scale-110 group-hover:bg-stone-200 transition-all duration-300">
+                    <component :is="getSpaceIcon(space.slug || space.icon)" class="space-icon" />
                   </div>
-                  <span class="space-name">{{ space.name }}</span>
+                  <span class="space-name group-hover:text-stone-900">{{ space.name }}</span>
                 </div>
               </div>
 
               <!-- Loading Skeleton -->
               <div v-else class="spaces-grid">
-                <div v-for="n in 4" :key="n" class="space-card skeleton-space">
+                <div v-for="n in 5" :key="n" class="space-card skeleton-space">
                   <div class="space-icon-wrapper shop-skeleton"></div>
                   <div class="shop-skeleton skeleton-label"></div>
                 </div>
@@ -138,29 +153,29 @@
 
             <!-- Style-specific Section -->
             <div class="design-section">
-              <h2 class="section-title">Style-specific</h2>
-              <p class="section-subtitle">Browse collections curated by design aesthetic</p>
+              <h2 class="section-title">Style-Specific</h2>
+              <p class="section-subtitle">Browse collections curated by distinct architectural aesthetics</p>
 
               <div class="styles-grid shop-stagger" v-if="!loading">
                 <div
                   v-for="style in styles"
                   :key="style.id"
-                  class="style-card"
+                  class="style-card group"
                   @click="navigateToStyle(style.slug)"
                 >
                   <div class="style-image-wrapper shop-arch">
-                    <img :src="style.image" :alt="style.name" loading="lazy" />
-                    <div class="style-overlay">
-                      <span class="style-explore">Explore</span>
+                    <img :src="style.image" :alt="style.name" loading="lazy" class="group-hover:scale-110 transition-transform duration-700 ease-out" />
+                    <div class="style-overlay group-hover:opacity-100 transition-opacity">
+                      <span class="style-explore group-hover:translate-y-0 transition-transform">Explore</span>
                     </div>
                   </div>
-                  <span class="style-name">{{ style.name }}</span>
+                  <span class="style-name group-hover:text-stone-900">{{ style.name }}</span>
                 </div>
               </div>
 
               <!-- Loading Skeleton -->
               <div v-else class="styles-grid">
-                <div v-for="n in 4" :key="n" class="style-card skeleton-style">
+                <div v-for="n in 6" :key="n" class="style-card skeleton-style">
                   <div class="style-image-wrapper shop-arch shop-skeleton"></div>
                   <div class="shop-skeleton skeleton-label"></div>
                 </div>
@@ -171,16 +186,16 @@
       </div>
     </section>
 
-    <!-- Featured Section -->
+    <!-- Featured Products Section -->
     <section class="shop-featured" v-if="!loading && featuredProducts.length > 0">
       <div class="shop-container">
         <header class="featured-header">
           <div>
-            <h2 class="featured-title">What's Popular</h2>
-            <p class="featured-subtitle">Curated picks loved by our community</p>
+            <h2 class="featured-title">Popular Creations</h2>
+            <p class="featured-subtitle">Curated picks loved by our discerning community</p>
           </div>
-          <router-link to="/shop/products?sort=popularity" class="see-all-link">
-            See All
+          <router-link to="/shop?sort=popularity-desc" class="see-all-link">
+            See All Products
             <svg
               width="16"
               height="16"
@@ -198,24 +213,37 @@
           <div
             v-for="product in featuredProducts.slice(0, 6)"
             :key="product.id"
-            class="featured-product"
+            class="featured-product group"
             @click="navigateToProduct(product)"
           >
-            <div class="featured-image shop-img-zoom">
-              <img :src="product.thumbnail" :alt="product.name" loading="lazy" />
+            <div class="featured-image shop-img-zoom relative">
+              <img :src="getProductThumbnail(product)" :alt="product.name" loading="lazy" class="group-hover:scale-105 transition-transform duration-700 ease-out" />
+              
+              <!-- Product Badges -->
               <div class="product-badges">
                 <span v-if="product.isNew" class="shop-badge shop-badge-new">New</span>
-                <span v-if="product.discount" class="shop-badge shop-badge-sale"
-                  >-{{ product.discount }}%</span
-                >
+                <span v-if="product.discount" class="shop-badge shop-badge-sale">
+                  -{{ product.discount }}%
+                </span>
+                <span v-if="product.isBestSeller" class="shop-badge bg-white text-stone-900 font-bold">
+                  Bestseller
+                </span>
               </div>
-              <button class="quick-action wishlist-btn" @click.stop="toggleWishlist(product)">
+
+              <!-- Quick Wishlist Button -->
+              <button
+                class="quick-action wishlist-btn"
+                :class="{ 'text-rose-500': wishlistStore.isInWishlist(product.id) }"
+                @click.stop="toggleWishlist(product)"
+                :title="wishlistStore.isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'"
+                aria-label="Wishlist"
+              >
                 <svg
-                  width="20"
-                  height="20"
+                  width="18"
+                  height="18"
                   viewBox="0 0 24 24"
-                  :fill="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'none'"
-                  :stroke="wishlistStore.isInWishlist(product.id) ? '#C47575' : 'currentColor'"
+                  :fill="wishlistStore.isInWishlist(product.id) ? '#e11d48' : 'none'"
+                  :stroke="wishlistStore.isInWishlist(product.id) ? '#e11d48' : 'currentColor'"
                   stroke-width="2"
                 >
                   <path
@@ -224,21 +252,22 @@
                 </svg>
               </button>
             </div>
+
             <div class="featured-info">
-              <span class="product-brand">{{ product.brand }}</span>
-              <h3 class="product-name">{{ product.name }}</h3>
+              <span class="product-brand">{{ product.brand || 'SpaceFurnio' }}</span>
+              <h3 class="product-name group-hover:text-stone-900 transition-colors">{{ product.name }}</h3>
               <div class="product-meta">
-                <span class="product-price">${{ product.price }}</span>
-                <span v-if="product.originalPrice" class="product-original-price"
-                  >${{ product.originalPrice }}</span
-                >
-                <div class="product-rating">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <span class="product-price">${{ formatPrice(product.price, product.price_cents) }}</span>
+                <span v-if="product.originalPrice" class="product-original-price">
+                  ${{ formatPrice(product.originalPrice) }}
+                </span>
+                <div v-if="product.rating" class="product-rating">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b">
                     <path
                       d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
                     />
                   </svg>
-                  <span>{{ product.rating }}</span>
+                  <span>{{ Number(product.rating).toFixed(1) }}</span>
                 </div>
               </div>
             </div>
@@ -247,13 +276,12 @@
       </div>
     </section>
 
-    <!-- Newsletter / Contact Section -->
+    <!-- Design Consultation CTA -->
     <section class="shop-contact">
       <div class="contact-content">
-        <h2 class="contact-title">Talk To Our Staff</h2>
+        <h2 class="contact-title">Need Personalized Design Consultation?</h2>
         <p class="contact-text">
-          Have questions about our collection? Our design consultants are here to help you find the
-          perfect pieces for your space.
+          Have questions about our collection or custom bespoke spatial arrangements? Our design consultants are here to help you craft your ideal sanctuary.
         </p>
         <router-link to="/contact" class="shop-btn shop-btn-primary">
           Let's Talk
@@ -283,16 +311,20 @@ const router = useRouter()
 const route = useRoute()
 const wishlistStore = useWishlistStore()
 const { openLogin } = inject('authUtils', { openLogin: () => {} })
-const { openWishlist } = inject('wishlistUtils', { openWishlist: () => {} })
+const { openWishlist } = inject('wishlistUtils', { openWishlist: () => wishlistStore.toggleDrawer(true) })
 
 // State
 const activeTab = ref('category')
 const loading = ref(true)
+const fetchError = ref(null)
 const categories = ref([])
 const spaces = ref([])
 const styles = ref([])
 const specialOffers = ref([])
 const featuredProducts = ref([])
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop&q=80'
 
 // Initialize tab from route
 const initializeTab = () => {
@@ -303,36 +335,58 @@ const initializeTab = () => {
 const switchTab = (tab) => {
   if (activeTab.value === tab) return
   activeTab.value = tab
-  router.push(`/shop/${tab}`)
 }
 
 // Navigation helpers
 const navigateToCategory = (slug) => {
-  router.push(`/shop/category/${slug}`)
+  if (slug) {
+    router.push(`/shop?categories=${slug}`)
+  } else {
+    router.push('/shop')
+  }
 }
 
 const navigateToSpace = (slug) => {
-  router.push(`/shop/design/space/${slug}`)
+  router.push(`/shop?spaces=${slug}`)
 }
 
 const navigateToStyle = (slug) => {
-  router.push(`/shop/design/style/${slug}`)
+  router.push(`/shop?styles=${slug}`)
 }
 
 const navigateToOffer = (link) => {
-  router.push(link)
+  if (link.startsWith('/shop/category?filter=new')) {
+    router.push('/shop?isNew=true')
+  } else if (link.startsWith('/shop/category?filter=bestseller')) {
+    router.push('/shop?sort=popularity-desc')
+  } else {
+    router.push(link)
+  }
 }
 
 const navigateToProduct = (product) => {
-  router.push(`/shop/category/${product.category}/${product.id}`)
+  const idOrSlug = product.slug || product.id
+  router.push(`/shop/product/${idOrSlug}`)
+}
+
+const getProductThumbnail = (product) => {
+  return product.thumbnail || product.primaryImage || product.images?.[0] || FALLBACK_IMAGE
+}
+
+const formatPrice = (price, priceCents) => {
+  if (priceCents !== undefined && priceCents !== null) {
+    return (Number(priceCents) / 100).toFixed(2)
+  }
+  if (price !== undefined && price !== null) {
+    return Number(price).toFixed(2)
+  }
+  return '0.00'
 }
 
 const toggleWishlist = async (product) => {
-  console.log('[ShopView] toggleWishlist called, product:', product.id, product.name)
   try {
-    const result = await wishlistStore.toggleItem(product.id, product)
-    console.log('[ShopView] toggleItem returned:', result, 'isInWishlist:', wishlistStore.isInWishlist(product.id))
-    if (wishlistStore.isInWishlist(product.id)) {
+    const isAdded = await wishlistStore.toggleItem(product.id)
+    if (isAdded) {
       openWishlist()
     }
   } catch (error) {
@@ -360,6 +414,16 @@ const getSpaceIcon = (iconName) => {
           }),
         ],
       ),
+    living: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM6 7h12v3H6V7zm14 9H4v-4h2v2h12v-2h2v4z',
+          }),
+        ],
+      ),
     bed: () =>
       h(
         'svg',
@@ -370,7 +434,27 @@ const getSpaceIcon = (iconName) => {
           }),
         ],
       ),
+    bedroom: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 12h18v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5zM3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M7 12V9M17 12V9M3 17v2M21 17v2',
+          }),
+        ],
+      ),
     utensils: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M3 2v7c0 1.1.9 2 2 2h3a2 2 0 002-2V2M8 2v20M18 2h1a3 3 0 013 3v1a3 3 0 01-3 3h-1v13',
+          }),
+        ],
+      ),
+    dining: () =>
       h(
         'svg',
         { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
@@ -399,7 +483,27 @@ const getSpaceIcon = (iconName) => {
           }),
         ],
       ),
+    'home-office': () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zM4 9v6M20 9v6M8 15h8M10 15v4M14 15v4',
+          }),
+        ],
+      ),
     bath: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [
+          h('path', {
+            d: 'M4 12h16a2 2 0 012 2v2a4 4 0 01-4 4H6a4 4 0 01-4-4v-2a2 2 0 012-2zM6 12V5a2 2 0 012-2h2a2 2 0 012 2v7M18 20v2M6 20v2',
+          }),
+        ],
+      ),
+    bathroom: () =>
       h(
         'svg',
         { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
@@ -415,15 +519,20 @@ const getSpaceIcon = (iconName) => {
         { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
         [h('path', { d: 'M12 22v-7M12 15l-4 4M12 15l4 4M12 2L5 12h4l-2 5h10l-2-5h4L12 2z' })],
       ),
-    blocks: () =>
+    balcony: () =>
+      h(
+        'svg',
+        { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
+        [h('path', { d: 'M12 22v-7M12 15l-4 4M12 15l4 4M12 2L5 12h4l-2 5h10l-2-5h4L12 2z' })],
+      ),
+    lounge: () =>
       h(
         'svg',
         { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' },
         [
-          h('rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }),
-          h('rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }),
-          h('rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }),
-          h('rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' }),
+          h('path', {
+            d: 'M20 10V7c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h1v2h2v-2h10v2h2v-2h1c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM6 7h12v3H6V7zm14 9H4v-4h2v2h12v-2h2v4z',
+          }),
         ],
       ),
   }
@@ -433,6 +542,7 @@ const getSpaceIcon = (iconName) => {
 // Load data
 const loadData = async () => {
   loading.value = true
+  fetchError.value = null
 
   try {
     const [categoriesRes, spacesRes, stylesRes, offersRes, featuredRes] = await Promise.all([
@@ -450,6 +560,7 @@ const loadData = async () => {
     if (featuredRes.success) featuredProducts.value = featuredRes.data.bestSellers || []
   } catch (error) {
     console.error('Error loading shop data:', error)
+    fetchError.value = 'Failed to load shop collections. Please retry.'
   } finally {
     loading.value = false
   }
@@ -476,14 +587,22 @@ onMounted(() => {
 .shop-root {
   min-height: 100vh;
   background: var(--shop-cream, #faf8f5);
-  padding-top: 7rem;
+  padding-top: 6rem;
 }
 
 /* Hero Section */
 .shop-hero {
-  padding: 2rem 2rem 3rem;
+  padding: 1.5rem 2rem 3rem;
   max-width: 1800px;
   margin: 0 auto;
+}
+
+.hero-error-box {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
 }
 
 .special-offers {
@@ -500,16 +619,18 @@ onMounted(() => {
 
 .offer-card {
   background: white;
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(61, 58, 54, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(61, 58, 54, 0.06);
+  border: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .offer-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(61, 58, 54, 0.12);
+  box-shadow: 0 16px 32px rgba(61, 58, 54, 0.12);
+  border-color: var(--shop-tan, #c4b8a9);
 }
 
 .offer-image-wrapper {
@@ -522,17 +643,13 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.offer-card:hover .offer-image-wrapper img {
-  transform: scale(1.05);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .offer-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, transparent 60%);
   display: flex;
   align-items: flex-end;
   padding: 1.5rem;
@@ -543,14 +660,15 @@ onMounted(() => {
   color: var(--shop-charcoal, #3d3a36);
   padding: 0.375rem 0.875rem;
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .offer-content {
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem 1.75rem;
 }
 
 .offer-title {
@@ -564,7 +682,7 @@ onMounted(() => {
 .offer-subtitle {
   font-size: 0.875rem;
   color: var(--shop-brown, #a89b8c);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
   line-height: 1.5;
 }
 
@@ -573,13 +691,9 @@ onMounted(() => {
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
   transition: gap 0.2s ease;
-}
-
-.offer-card:hover .offer-link {
-  gap: 0.625rem;
 }
 
 /* Skeleton styles */
@@ -622,10 +736,10 @@ onMounted(() => {
 
 .shop-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-size: clamp(2rem, 5vw, 2.75rem);
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
   letter-spacing: -0.02em;
 }
 
@@ -636,15 +750,16 @@ onMounted(() => {
   background: white;
   padding: 0.375rem;
   border-radius: 9999px;
-  box-shadow: 0 2px 8px rgba(61, 58, 54, 0.08);
+  box-shadow: 0 2px 10px rgba(61, 58, 54, 0.08);
+  border: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .toggle-btn {
   position: relative;
   z-index: 1;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.75rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-brown, #a89b8c);
   background: transparent;
   border: none;
@@ -678,30 +793,36 @@ onMounted(() => {
 /* Categories Grid */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 180px));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .category-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 1.5rem 1rem;
+  gap: 0.875rem;
+  padding: 1.75rem 1rem;
   background: white;
   border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .category-card:hover {
   border-color: var(--shop-tan, #c4b8a9);
-  box-shadow: 0 8px 24px rgba(61, 58, 54, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(61, 58, 54, 0.1);
+  transform: translateY(-3px);
 }
 
 .category-icon-wrapper {
@@ -710,11 +831,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--shop-cream-dark, #f5f2ed);
+  border-radius: 50%;
 }
 
 .category-icon {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   color: var(--shop-charcoal, #3d3a36);
 }
 
@@ -725,8 +848,9 @@ onMounted(() => {
 
 .category-name {
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
+  text-align: center;
 }
 
 .skeleton-category .category-icon-wrapper {
@@ -762,6 +886,27 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 
+.shop-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 3rem auto;
+  max-width: 500px;
+  color: var(--shop-tan, #c4b8a9);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.shop-divider::before,
+.shop-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--shop-beige, #e8e3dc);
+}
+
 /* Spaces Grid */
 .spaces-grid {
   display: grid;
@@ -769,13 +914,11 @@ onMounted(() => {
   gap: 1rem;
   max-width: 1000px;
   margin: 0 auto;
-  justify-content: center;
 }
 
 @media (min-width: 640px) {
   .spaces-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -793,14 +936,15 @@ onMounted(() => {
   padding: 1.25rem 1rem;
   background: white;
   border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .space-card:hover {
   border-color: var(--shop-tan, #c4b8a9);
-  box-shadow: 0 6px 16px rgba(61, 58, 54, 0.08);
+  box-shadow: 0 6px 18px rgba(61, 58, 54, 0.08);
+  transform: translateY(-2px);
 }
 
 .space-icon-wrapper {
@@ -809,18 +953,21 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--shop-cream-dark, #f5f2ed);
+  border-radius: 0.75rem;
 }
 
 .space-icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   color: var(--shop-charcoal, #3d3a36);
 }
 
 .space-name {
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
+  text-align: center;
 }
 
 .skeleton-space .space-icon-wrapper {
@@ -834,14 +981,13 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  justify-content: center;
 }
 
 @media (min-width: 768px) {
   .styles-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -872,47 +1018,36 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.style-card:hover .style-image-wrapper img {
-  transform: scale(1.1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .style-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(61, 58, 54, 0);
+  background: rgba(61, 58, 54, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease;
-}
-
-.style-card:hover .style-overlay {
-  background: rgba(61, 58, 54, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .style-explore {
-  opacity: 0;
   transform: translateY(10px);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: white;
-  padding: 0.5rem 1rem;
-  border: 1px solid white;
+  padding: 0.4rem 0.875rem;
+  border: 1.5px solid white;
   border-radius: 9999px;
   transition: all 0.3s ease;
 }
 
-.style-card:hover .style-explore {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .style-name {
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
 }
 
@@ -923,22 +1058,23 @@ onMounted(() => {
 /* Featured Section */
 .shop-featured {
   background: white;
-  padding: 4rem 2rem;
+  padding: 4.5rem 2rem;
   margin-top: 2rem;
+  border-top: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .featured-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
 .featured-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.25rem;
@@ -954,7 +1090,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.375rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
   text-decoration: none;
   transition: gap 0.2s ease;
@@ -976,16 +1112,9 @@ onMounted(() => {
   }
 }
 
-@media (min-width: 1024px) {
-  .featured-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 @media (min-width: 1280px) {
   .featured-grid {
     grid-template-columns: repeat(6, 1fr);
-    gap: 1.5rem;
   }
 }
 
@@ -994,12 +1123,12 @@ onMounted(() => {
 }
 
 .featured-image {
-  position: relative;
   aspect-ratio: 1;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   overflow: hidden;
   background: var(--shop-cream, #faf8f5);
   margin-bottom: 0.75rem;
+  border: 1px solid var(--shop-beige, #e8e3dc);
 }
 
 .featured-image img {
@@ -1010,30 +1139,53 @@ onMounted(() => {
 
 .product-badges {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
+  top: 0.625rem;
+  left: 0.625rem;
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.3125rem;
+  z-index: 2;
+}
+
+.shop-badge {
+  padding: 0.1875rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shop-badge-new {
+  background: var(--shop-charcoal, #3d3a36);
+  color: white;
+}
+
+.shop-badge-sale {
+  background: #e11d48;
+  color: white;
 }
 
 .quick-action {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0.625rem;
+  right: 0.625rem;
   width: 2rem;
   height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
   border: none;
   border-radius: 50%;
   cursor: pointer;
   opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(0.85);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  color: var(--shop-brown-dark, #8b7d6d);
 }
 
 .featured-product:hover .quick-action {
@@ -1042,7 +1194,8 @@ onMounted(() => {
 }
 
 .quick-action:hover {
-  color: #ef4444;
+  transform: scale(1.1);
+  background: white;
 }
 
 .featured-info {
@@ -1051,7 +1204,7 @@ onMounted(() => {
 
 .product-brand {
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--shop-brown, #a89b8c);
@@ -1059,7 +1212,7 @@ onMounted(() => {
 
 .product-name {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--shop-charcoal, #3d3a36);
   margin: 0.25rem 0;
   display: -webkit-box;
@@ -1077,7 +1230,7 @@ onMounted(() => {
 
 .product-price {
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--shop-charcoal, #3d3a36);
 }
 
@@ -1092,29 +1245,26 @@ onMounted(() => {
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
+  font-weight: 600;
   color: var(--shop-brown, #a89b8c);
-}
-
-.product-rating svg {
-  color: #f59e0b;
 }
 
 /* Contact Section */
 .shop-contact {
   background: var(--shop-beige, #e8e3dc);
-  padding: 4rem 1.5rem;
+  padding: 4.5rem 1.5rem;
   margin-top: 2rem;
 }
 
 .contact-content {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   text-align: center;
 }
 
 .contact-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 500;
   color: var(--shop-charcoal, #3d3a36);
   margin-bottom: 0.75rem;
@@ -1124,7 +1274,7 @@ onMounted(() => {
   font-size: 0.9375rem;
   color: var(--shop-brown-dark, #8b7d6d);
   line-height: 1.6;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 /* Transitions */

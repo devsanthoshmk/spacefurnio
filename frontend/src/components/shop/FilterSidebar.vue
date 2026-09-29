@@ -1,143 +1,236 @@
 <template>
-<div class="filter-sidebar-content">
-<!-- Design by Space Dropdown -->
-<div class="filter-group design-dropdown-group">
-<button
-class="filter-header design-dropdown-header"
-@click="toggleDesignSpace()"
-:aria-expanded="openDesignSpace"
->
-<span class="design-dropdown-label">
-<span class="design-dropdown-icon">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-<polyline points="9,22 9,12 15,12 15,22"/>
-</svg>
-</span>
-Design by Space
-</span>
-<svg
-class="chevron"
-:class="{ rotated: openDesignSpace }"
-width="16"
-height="16"
-viewBox="0 0 24 24"
-fill="none"
-stroke="currentColor"
-stroke-width="2"
->
-<path d="M6 9l6 6 6-6" />
-</svg>
-</button>
+  <div class="filter-sidebar-content">
+    <!-- Category Filter -->
+    <div class="filter-group">
+      <button
+        class="filter-header"
+        @click="toggleSection('category')"
+        :aria-expanded="openSections.category"
+      >
+        <span class="filter-title">Category</span>
+        <span v-if="localFilters.categories?.length > 0" class="filter-count">
+          {{ localFilters.categories.length }}
+        </span>
+        <svg
+          class="chevron"
+          :class="{ rotated: openSections.category }"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
-<Transition name="accordion">
-<div v-if="openDesignSpace" class="filter-content design-dropdown-content">
-<div class="design-dropdown-list shop-scrollbar">
-<label v-for="space in spaces" :key="space.id" class="checkbox-label">
-<input
-type="checkbox"
-name="design-space"
-:value="space.slug"
-:checked="localFilters.spaces.includes(space.slug)"
-@change="toggleSpace(space.slug)"
-class="shop-checkbox"
-/>
-<span class="checkbox-text">{{ space.name }}</span>
-</label>
-</div>
-</div>
-</Transition>
-</div>
+      <Transition name="accordion">
+        <div v-if="openSections.category" class="filter-content">
+          <div class="checkbox-list shop-scrollbar">
+            <label
+              v-for="cat in categories"
+              :key="cat.id"
+              class="checkbox-label group"
+            >
+              <input
+                type="checkbox"
+                name="category"
+                :value="cat.slug"
+                :checked="localFilters.categories.includes(cat.slug)"
+                @change="toggleCategory(cat.slug)"
+                class="shop-checkbox"
+              />
+              <span class="checkbox-text group-hover:text-stone-900">{{ cat.name }}</span>
+              <span v-if="cat.count" class="checkbox-count">{{ cat.count }}</span>
+            </label>
+          </div>
+          <button
+            v-if="localFilters.categories?.length > 0"
+            class="clear-filter-btn"
+            @click="clearCategories"
+          >
+            Clear categories
+          </button>
+        </div>
+      </Transition>
+    </div>
 
-<!-- Design by Style Dropdown -->
-<div class="filter-group design-dropdown-group">
-<button
-class="filter-header design-dropdown-header"
-@click="toggleDesignStyle()"
-:aria-expanded="openDesignStyle"
->
-<span class="design-dropdown-label">
-<span class="design-dropdown-icon">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-<circle cx="12" cy="12" r="10"/>
-<path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-<path d="M2 12h20"/>
-</svg>
-</span>
-Design by Style
-</span>
-<svg
-class="chevron"
-:class="{ rotated: openDesignStyle }"
-width="16"
-height="16"
-viewBox="0 0 24 24"
-fill="none"
-stroke="currentColor"
-stroke-width="2"
->
-<path d="M6 9l6 6 6-6" />
-</svg>
-</button>
+    <!-- Design by Space Dropdown / Section -->
+    <div class="filter-group">
+      <button
+        class="filter-header"
+        @click="toggleSection('space')"
+        :aria-expanded="openSections.space"
+      >
+        <span class="filter-title-with-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-stone-500">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+          Space / Room
+        </span>
+        <span v-if="localFilters.spaces?.length > 0" class="filter-count">
+          {{ localFilters.spaces.length }}
+        </span>
+        <svg
+          class="chevron"
+          :class="{ rotated: openSections.space }"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
-<Transition name="accordion">
-<div v-if="openDesignStyle" class="filter-content design-dropdown-content">
-<div class="design-dropdown-list shop-scrollbar">
-<label v-for="style in styles" :key="style.id" class="checkbox-label">
-<input
-type="checkbox"
-name="design-style"
-:value="style.slug"
-:checked="localFilters.styles.includes(style.slug)"
-@change="toggleStyle(style.slug)"
-class="shop-checkbox"
-/>
-<span class="checkbox-text">{{ style.name }}</span>
-</label>
-</div>
-</div>
-</Transition>
-</div>
+      <Transition name="accordion">
+        <div v-if="openSections.space" class="filter-content">
+          <div class="checkbox-list shop-scrollbar">
+            <label
+              v-for="space in spaces"
+              :key="space.id"
+              class="checkbox-label group"
+            >
+              <input
+                type="checkbox"
+                name="design-space"
+                :value="space.slug"
+                :checked="localFilters.spaces.includes(space.slug)"
+                @change="toggleSpace(space.slug)"
+                class="shop-checkbox"
+              />
+              <span class="checkbox-text group-hover:text-stone-900">{{ space.name }}</span>
+            </label>
+          </div>
+          <button
+            v-if="localFilters.spaces?.length > 0"
+            class="clear-filter-btn"
+            @click="clearSpaces"
+          >
+            Clear spaces
+          </button>
+        </div>
+      </Transition>
+    </div>
 
-<!-- Category Filter -->
-<div class="filter-group">
-<button
-class="filter-header"
-@click="toggleSection('category')"
-:aria-expanded="openSections.category"
->
-<span class="filter-title">Category</span>
-<svg
-class="chevron"
-:class="{ rotated: openSections.category }"
-width="16"
-height="16"
-viewBox="0 0 24 24"
-fill="none"
-stroke="currentColor"
-stroke-width="2"
->
-<path d="M6 9l6 6 6-6" />
-</svg>
-</button>
+    <!-- Design by Style Dropdown / Section -->
+    <div class="filter-group">
+      <button
+        class="filter-header"
+        @click="toggleSection('style')"
+        :aria-expanded="openSections.style"
+      >
+        <span class="filter-title-with-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-stone-500">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+            <path d="M2 12h20"/>
+          </svg>
+          Style Aesthetic
+        </span>
+        <span v-if="localFilters.styles?.length > 0" class="filter-count">
+          {{ localFilters.styles.length }}
+        </span>
+        <svg
+          class="chevron"
+          :class="{ rotated: openSections.style }"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
-<Transition name="accordion">
-<div v-if="openSections.category" class="filter-content">
-<label v-for="cat in categories" :key="cat.id" class="checkbox-label">
-<input
-type="checkbox"
-name="category"
-:value="cat.slug"
-:checked="localFilters.categories.includes(cat.slug)"
-@change="toggleCategory(cat.slug)"
-class="shop-checkbox"
-/>
-<span class="checkbox-text">{{ cat.name }}</span>
-<span v-if="cat.count" class="checkbox-count">{{ cat.count }}</span>
-</label>
-</div>
-</Transition>
-</div>
+      <Transition name="accordion">
+        <div v-if="openSections.style" class="filter-content">
+          <div class="checkbox-list shop-scrollbar">
+            <label
+              v-for="style in styles"
+              :key="style.id"
+              class="checkbox-label group"
+            >
+              <input
+                type="checkbox"
+                name="design-style"
+                :value="style.slug"
+                :checked="localFilters.styles.includes(style.slug)"
+                @change="toggleStyle(style.slug)"
+                class="shop-checkbox"
+              />
+              <span class="checkbox-text group-hover:text-stone-900">{{ style.name }}</span>
+            </label>
+          </div>
+          <button
+            v-if="localFilters.styles?.length > 0"
+            class="clear-filter-btn"
+            @click="clearStyles"
+          >
+            Clear styles
+          </button>
+        </div>
+      </Transition>
+    </div>
+
+    <!-- Rooms / Room Types Filter (if available) -->
+    <div v-if="availableRooms.length > 0" class="filter-group">
+      <button
+        class="filter-header"
+        @click="toggleSection('room')"
+        :aria-expanded="openSections.room"
+      >
+        <span class="filter-title">Rooms</span>
+        <span v-if="localFilters.room" class="filter-count">1</span>
+        <svg
+          class="chevron"
+          :class="{ rotated: openSections.room }"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+
+      <Transition name="accordion">
+        <div v-if="openSections.room" class="filter-content">
+          <div class="checkbox-list shop-scrollbar">
+            <label
+              v-for="room in availableRooms"
+              :key="room"
+              class="checkbox-label group"
+            >
+              <input
+                type="radio"
+                name="room"
+                :value="room"
+                :checked="localFilters.room === room"
+                @change="updateFilter('room', room)"
+                class="shop-checkbox"
+              />
+              <span class="checkbox-text group-hover:text-stone-900">{{ room }}</span>
+            </label>
+          </div>
+          <button
+            v-if="localFilters.room"
+            class="clear-filter-btn"
+            @click="updateFilter('room', '')"
+          >
+            Clear room
+          </button>
+        </div>
+      </Transition>
+    </div>
 
     <!-- Price Range Filter -->
     <div class="filter-group">
@@ -146,7 +239,8 @@ class="shop-checkbox"
         @click="toggleSection('price')"
         :aria-expanded="openSections.price"
       >
-        <span class="filter-title">Price</span>
+        <span class="filter-title">Price Range</span>
+        <span v-if="isPriceActive" class="filter-count">1</span>
         <svg
           class="chevron"
           :class="{ rotated: openSections.price }"
@@ -163,13 +257,14 @@ class="shop-checkbox"
 
       <Transition name="accordion">
         <div v-if="openSections.price" class="filter-content">
+          <!-- Price Inputs -->
           <div class="price-inputs">
             <div class="price-input-group">
               <span class="currency-symbol">$</span>
               <input
                 type="number"
                 v-model.number="localFilters.minPrice"
-                :placeholder="aggregations.priceRange?.min || 0"
+                :placeholder="priceRangeMin.toString()"
                 min="0"
                 class="price-input"
                 @change="applyPriceFilter"
@@ -181,7 +276,7 @@ class="shop-checkbox"
               <input
                 type="number"
                 v-model.number="localFilters.maxPrice"
-                :placeholder="aggregations.priceRange?.max || 5000"
+                :placeholder="priceRangeMax.toString()"
                 min="0"
                 class="price-input"
                 @change="applyPriceFilter"
@@ -189,41 +284,56 @@ class="shop-checkbox"
             </div>
           </div>
 
-          <!-- Price Range Slider -->
+          <!-- Price Slider -->
           <div class="price-slider">
+            <div class="flex justify-between text-[11px] text-stone-400 font-medium mb-1.5">
+              <span>${{ priceRangeMin }}</span>
+              <span class="font-semibold text-stone-700">${{ localFilters.maxPrice || priceRangeMax }}</span>
+              <span>${{ priceRangeMax }}</span>
+            </div>
             <input
               type="range"
-              :min="aggregations.priceRange?.min || 0"
-              :max="aggregations.priceRange?.max || 5000"
-              :value="localFilters.maxPrice || aggregations.priceRange?.max || 5000"
+              :min="priceRangeMin"
+              :max="priceRangeMax"
+              :value="localFilters.maxPrice || priceRangeMax"
               @input="handleSliderChange"
-              class="shop-range-slider"
+              class="shop-range-slider w-full cursor-pointer accent-stone-800"
             />
           </div>
 
-          <!-- Quick Price Options -->
+          <!-- Quick Price Option Pills -->
           <div class="price-quick-options">
             <button
               v-for="option in priceOptions"
               :key="option.label"
+              type="button"
               :class="['price-option', { active: isPriceOptionActive(option) }]"
               @click="selectPriceOption(option)"
             >
               {{ option.label }}
             </button>
           </div>
+
+          <button
+            v-if="isPriceActive"
+            class="clear-filter-btn"
+            @click="clearPrice"
+          >
+            Reset price
+          </button>
         </div>
       </Transition>
     </div>
 
-    <!-- Brand Filter -->
-    <div v-if="aggregations.brands?.length > 0" class="filter-group">
+    <!-- Brands Filter -->
+    <div v-if="availableBrands.length > 0" class="filter-group">
       <button
         class="filter-header"
         @click="toggleSection('brand')"
         :aria-expanded="openSections.brand"
       >
         <span class="filter-title">Brand</span>
+        <span v-if="localFilters.brand" class="filter-count">1</span>
         <svg
           class="chevron"
           :class="{ rotated: openSections.brand }"
@@ -241,11 +351,11 @@ class="shop-checkbox"
       <Transition name="accordion">
         <div v-if="openSections.brand" class="filter-content">
           <!-- Search Brands -->
-          <div class="filter-search">
+          <div class="filter-search" v-if="availableBrands.length > 5">
             <svg
               class="search-icon"
-              width="16"
-              height="16"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -257,13 +367,17 @@ class="shop-checkbox"
             <input
               type="text"
               v-model="brandSearch"
-              placeholder="Search brands..."
+              placeholder="Filter brands..."
               class="search-input"
             />
           </div>
 
           <div class="checkbox-list shop-scrollbar">
-            <label v-for="brand in filteredBrands" :key="brand" class="checkbox-label">
+            <label
+              v-for="brand in filteredBrands"
+              :key="brand"
+              class="checkbox-label group"
+            >
               <input
                 type="radio"
                 name="brand"
@@ -272,7 +386,7 @@ class="shop-checkbox"
                 @change="updateFilter('brand', brand)"
                 class="shop-checkbox"
               />
-              <span class="checkbox-text">{{ brand }}</span>
+              <span class="checkbox-text group-hover:text-stone-900">{{ brand }}</span>
             </label>
           </div>
 
@@ -287,14 +401,15 @@ class="shop-checkbox"
       </Transition>
     </div>
 
-    <!-- Material Filter -->
-    <div v-if="aggregations.materials?.length > 0" class="filter-group">
+    <!-- Materials Filter -->
+    <div v-if="availableMaterials.length > 0" class="filter-group">
       <button
         class="filter-header"
         @click="toggleSection('material')"
         :aria-expanded="openSections.material"
       >
         <span class="filter-title">Material</span>
+        <span v-if="localFilters.material" class="filter-count">1</span>
         <svg
           class="chevron"
           :class="{ rotated: openSections.material }"
@@ -311,11 +426,11 @@ class="shop-checkbox"
 
       <Transition name="accordion">
         <div v-if="openSections.material" class="filter-content">
-          <div class="checkbox-list">
+          <div class="checkbox-list shop-scrollbar">
             <label
-              v-for="material in aggregations.materials"
+              v-for="material in availableMaterials"
               :key="material"
-              class="checkbox-label"
+              class="checkbox-label group"
             >
               <input
                 type="radio"
@@ -325,7 +440,7 @@ class="shop-checkbox"
                 @change="updateFilter('material', material)"
                 class="shop-checkbox"
               />
-              <span class="checkbox-text">{{ material }}</span>
+              <span class="checkbox-text group-hover:text-stone-900">{{ material }}</span>
             </label>
           </div>
 
@@ -341,7 +456,7 @@ class="shop-checkbox"
     </div>
 
     <!-- Color Filter -->
-    <div v-if="aggregations.colors?.length > 0" class="filter-group">
+    <div v-if="availableColors.length > 0" class="filter-group">
       <button
         class="filter-header"
         @click="toggleSection('color')"
@@ -369,8 +484,9 @@ class="shop-checkbox"
         <div v-if="openSections.color" class="filter-content">
           <div class="color-grid">
             <button
-              v-for="color in aggregations.colors"
+              v-for="color in availableColors"
               :key="color.name"
+              type="button"
               :class="['color-swatch', { selected: localFilters.colors?.includes(color.name) }]"
               :style="{ '--swatch-color': color.hex }"
               :title="color.name"
@@ -402,14 +518,14 @@ class="shop-checkbox"
       </Transition>
     </div>
 
-    <!-- Availability Filter -->
+    <!-- Availability / Quick Flags Filter -->
     <div class="filter-group">
       <button
         class="filter-header"
         @click="toggleSection('availability')"
         :aria-expanded="openSections.availability"
       >
-        <span class="filter-title">Availability</span>
+        <span class="filter-title">Availability & Flags</span>
         <svg
           class="chevron"
           :class="{ rotated: openSections.availability }"
@@ -429,6 +545,7 @@ class="shop-checkbox"
           <label class="toggle-label">
             <span class="toggle-text">In Stock Only</span>
             <button
+              type="button"
               :class="['toggle-switch', { active: localFilters.inStock }]"
               @click="updateFilter('inStock', !localFilters.inStock)"
               role="switch"
@@ -441,6 +558,7 @@ class="shop-checkbox"
           <label class="toggle-label">
             <span class="toggle-text">On Sale</span>
             <button
+              type="button"
               :class="['toggle-switch', { active: localFilters.onSale }]"
               @click="updateFilter('onSale', !localFilters.onSale)"
               role="switch"
@@ -453,6 +571,7 @@ class="shop-checkbox"
           <label class="toggle-label">
             <span class="toggle-text">New Arrivals</span>
             <button
+              type="button"
               :class="['toggle-switch', { active: localFilters.isNew }]"
               @click="updateFilter('isNew', !localFilters.isNew)"
               role="switch"
@@ -481,6 +600,7 @@ const props = defineProps({
     default: () => ({
       brands: [],
       materials: [],
+      rooms: [],
       colors: [],
       priceRange: { min: 0, max: 5000 },
     }),
@@ -493,17 +613,30 @@ const props = defineProps({
 
 const emit = defineEmits(['update:filters', 'clear-all'])
 
-// Local state
+// Local copy of filters
 const localFilters = ref({
+  categories: [],
+  spaces: [],
+  styles: [],
+  room: '',
+  brand: '',
+  material: '',
+  colors: [],
+  minPrice: null,
+  maxPrice: null,
+  inStock: false,
+  onSale: false,
+  isNew: false,
   ...props.filters,
-  designSpace: '',
-  designStyle: '',
 })
+
 const brandSearch = ref('')
 
 const openSections = ref({
-  design: true,
   category: true,
+  space: true,
+  style: true,
+  room: false,
   price: true,
   brand: true,
   material: false,
@@ -513,134 +646,161 @@ const openSections = ref({
 
 const spaces = ref([])
 const styles = ref([])
-const openDesignSpace = ref(false)
-const openDesignStyle = ref(false)
+const categories = ref([])
 
-const toggleDesignSpace = () => {
-  openDesignSpace.value = !openDesignSpace.value
-}
+// Dynamic price options
+const priceOptions = [
+  { label: 'Under $100', min: 0, max: 100 },
+  { label: '$100 - $500', min: 100, max: 500 },
+  { label: '$500 - $1,000', min: 500, max: 1000 },
+  { label: 'Over $1,000', min: 1000, max: null },
+]
 
-const toggleDesignStyle = () => {
-  openDesignStyle.value = !openDesignStyle.value
-}
+// Computed aggregations
+const priceRangeMin = computed(() => props.aggregations.priceRange?.min ?? 0)
+const priceRangeMax = computed(() => props.aggregations.priceRange?.max ?? 5000)
 
-const loadSpaces = async () => {
+const availableBrands = computed(() => props.aggregations.brands || [])
+const availableMaterials = computed(() => props.aggregations.materials || [])
+const availableRooms = computed(() => props.aggregations.rooms || [])
+const availableColors = computed(() => props.aggregations.colors || [])
+
+const filteredBrands = computed(() => {
+  if (!availableBrands.value.length) return []
+  const search = brandSearch.value.trim().toLowerCase()
+  if (!search) return availableBrands.value
+  return availableBrands.value.filter((b) => b.toLowerCase().includes(search))
+})
+
+const isPriceActive = computed(() => {
+  return localFilters.value.minPrice !== null || localFilters.value.maxPrice !== null
+})
+
+// Load Taxonomy lists
+const loadData = async () => {
   try {
-    const response = await shopApi.getSpaces()
-    if (response.success && response.data) {
-      spaces.value = response.data
-    }
-  } catch (err) {
-    console.error('Error loading spaces:', err)
-  }
-}
+    const [catRes, spaceRes, styleRes] = await Promise.all([
+      shopApi.getCategories(),
+      shopApi.getSpaces(),
+      shopApi.getStyles(),
+    ])
 
-const loadStyles = async () => {
-  try {
-    const response = await shopApi.getStyles()
-    if (response.success && response.data) {
-      styles.value = response.data
-    }
-  } catch (err) {
-    console.error('Error loading styles:', err)
-  }
-}
-
-const toggleSpace = (slug) => {
-  const spaces = [...localFilters.value.spaces]
-  const index = spaces.indexOf(slug)
-  if (index > -1) {
-    spaces.splice(index, 1)
-  } else {
-    spaces.push(slug)
-  }
-  emit('update:filters', { spaces })
-}
-
-const toggleStyle = (slug) => {
-  const styles = [...localFilters.value.styles]
-  const index = styles.indexOf(slug)
-  if (index > -1) {
-    styles.splice(index, 1)
-  } else {
-    styles.push(slug)
-  }
-  emit('update:filters', { styles })
-}
-
-const toggleCategory = (slug) => {
-  const categories = [...localFilters.value.categories]
-  const index = categories.indexOf(slug)
-  if (index > -1) {
-    categories.splice(index, 1)
-  } else {
-    categories.push(slug)
-  }
-  emit('update:filters', { categories })
-}
-
-// Categories (loaded from API)
-const categories = ref([{ id: 'all', name: 'All Products', slug: '', count: 0 }])
-
-const loadCategories = async () => {
-  try {
-    const response = await shopApi.getCategories()
-    if (response.success && response.data) {
-      categories.value = response.data.map((c) => ({
-        id: c.slug,
+    if (catRes.success && catRes.data) {
+      categories.value = catRes.data.map((c) => ({
+        id: c.slug || c.id,
         name: c.name,
         slug: c.slug,
         count: c.productCount || 0,
       }))
     }
+    if (spaceRes.success && spaceRes.data) {
+      spaces.value = spaceRes.data
+    }
+    if (styleRes.success && styleRes.data) {
+      styles.value = styleRes.data
+    }
   } catch (err) {
-    console.error('Error loading categories for filter sidebar:', err)
+    console.error('FilterSidebar loadData error:', err)
   }
 }
 
 onMounted(() => {
-  loadCategories()
-  loadSpaces()
-  loadStyles()
+  loadData()
 })
 
-// Price options
-const priceOptions = [
-  { label: 'Under $100', min: 0, max: 100 },
-  { label: '$100 - $500', min: 100, max: 500 },
-  { label: '$500 - $1000', min: 500, max: 1000 },
-  { label: 'Over $1000', min: 1000, max: null },
-]
-
-// Computed
-const filteredBrands = computed(() => {
-  if (!props.aggregations.brands) return []
-
-  const search = brandSearch.value.toLowerCase()
-  if (!search) return props.aggregations.brands
-
-  return props.aggregations.brands.filter((brand) => brand.toLowerCase().includes(search))
-})
-
-// Methods
+// Accordion
 const toggleSection = (section) => {
   openSections.value[section] = !openSections.value[section]
 }
 
+// Filter updater
 const updateFilter = (key, value) => {
   localFilters.value[key] = value
   emit('update:filters', { [key]: value })
 }
 
+// Category toggles
+const toggleCategory = (slug) => {
+  const cats = [...(localFilters.value.categories || [])]
+  const idx = cats.indexOf(slug)
+  if (idx > -1) {
+    cats.splice(idx, 1)
+  } else {
+    cats.push(slug)
+  }
+  localFilters.value.categories = cats
+  emit('update:filters', { categories: cats })
+}
+
+const clearCategories = () => {
+  localFilters.value.categories = []
+  emit('update:filters', { categories: [] })
+}
+
+// Space toggles
+const toggleSpace = (slug) => {
+  const sps = [...(localFilters.value.spaces || [])]
+  const idx = sps.indexOf(slug)
+  if (idx > -1) {
+    sps.splice(idx, 1)
+  } else {
+    sps.push(slug)
+  }
+  localFilters.value.spaces = sps
+  emit('update:filters', { spaces: sps })
+}
+
+const clearSpaces = () => {
+  localFilters.value.spaces = []
+  emit('update:filters', { spaces: [] })
+}
+
+// Style toggles
+const toggleStyle = (slug) => {
+  const stys = [...(localFilters.value.styles || [])]
+  const idx = stys.indexOf(slug)
+  if (idx > -1) {
+    stys.splice(idx, 1)
+  } else {
+    stys.push(slug)
+  }
+  localFilters.value.styles = stys
+  emit('update:filters', { styles: stys })
+}
+
+const clearStyles = () => {
+  localFilters.value.styles = []
+  emit('update:filters', { styles: [] })
+}
+
+// Color toggles
+const toggleColor = (colorName) => {
+  const cols = [...(localFilters.value.colors || [])]
+  const idx = cols.indexOf(colorName)
+  if (idx > -1) {
+    cols.splice(idx, 1)
+  } else {
+    cols.push(colorName)
+  }
+  localFilters.value.colors = cols
+  emit('update:filters', { colors: cols })
+}
+
+const clearColors = () => {
+  localFilters.value.colors = []
+  emit('update:filters', { colors: [] })
+}
+
+// Price filters
 const applyPriceFilter = () => {
   emit('update:filters', {
-    minPrice: localFilters.value.minPrice || null,
-    maxPrice: localFilters.value.maxPrice || null,
+    minPrice: localFilters.value.minPrice !== null && localFilters.value.minPrice !== '' ? Number(localFilters.value.minPrice) : null,
+    maxPrice: localFilters.value.maxPrice !== null && localFilters.value.maxPrice !== '' ? Number(localFilters.value.maxPrice) : null,
   })
 }
 
 const handleSliderChange = (event) => {
-  localFilters.value.maxPrice = parseInt(event.target.value)
+  localFilters.value.maxPrice = parseInt(event.target.value, 10)
   applyPriceFilter()
 }
 
@@ -649,35 +809,40 @@ const isPriceOptionActive = (option) => {
 }
 
 const selectPriceOption = (option) => {
+  if (isPriceOptionActive(option)) {
+    clearPrice()
+    return
+  }
   localFilters.value.minPrice = option.min
   localFilters.value.maxPrice = option.max
   applyPriceFilter()
 }
 
-const toggleColor = (colorName) => {
-  const colors = localFilters.value.colors || []
-  const index = colors.indexOf(colorName)
-
-  if (index > -1) {
-    colors.splice(index, 1)
-  } else {
-    colors.push(colorName)
-  }
-
-  localFilters.value.colors = [...colors]
-  emit('update:filters', { colors: localFilters.value.colors })
+const clearPrice = () => {
+  localFilters.value.minPrice = null
+  localFilters.value.maxPrice = null
+  emit('update:filters', { minPrice: null, maxPrice: null })
 }
 
-const clearColors = () => {
-  localFilters.value.colors = []
-  emit('update:filters', { colors: [] })
-}
-
-// Watchers
+// Sync external prop changes into local state
 watch(
   () => props.filters,
   (newFilters) => {
-    localFilters.value = { ...newFilters }
+    localFilters.value = {
+      categories: [],
+      spaces: [],
+      styles: [],
+      room: '',
+      brand: '',
+      material: '',
+      colors: [],
+      minPrice: null,
+      maxPrice: null,
+      inStock: false,
+      onSale: false,
+      isNew: false,
+      ...newFilters,
+    }
   },
   { deep: true },
 )
@@ -721,6 +886,15 @@ watch(
   color: var(--shop-charcoal, #3d3a36);
 }
 
+.filter-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--shop-charcoal, #3d3a36);
+}
+
 .filter-count {
   display: inline-flex;
   align-items: center;
@@ -731,7 +905,7 @@ watch(
   background: var(--shop-charcoal, #3d3a36);
   color: white;
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 9999px;
   margin-left: auto;
   margin-right: 0.5rem;
@@ -753,20 +927,17 @@ watch(
 
 /* Checkbox Styles */
 .checkbox-list {
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0;
+  padding: 0.4rem 0;
   cursor: pointer;
-}
-
-.checkbox-label:hover .checkbox-text {
-  color: var(--shop-charcoal, #3d3a36);
 }
 
 .checkbox-text {
@@ -779,6 +950,7 @@ watch(
 .checkbox-count {
   font-size: 0.75rem;
   color: var(--shop-tan, #c4b8a9);
+  font-weight: 500;
 }
 
 /* Search Input */
@@ -797,7 +969,7 @@ watch(
 
 .search-input {
   width: 100%;
-  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
   font-size: 0.8125rem;
   border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
@@ -820,7 +992,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .price-input-group {
@@ -830,7 +1002,7 @@ watch(
 
 .currency-symbol {
   position: absolute;
-  left: 0.75rem;
+  left: 0.625rem;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.8125rem;
@@ -839,7 +1011,7 @@ watch(
 
 .price-input {
   width: 100%;
-  padding: 0.625rem 0.75rem 0.625rem 1.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.35rem;
   font-size: 0.8125rem;
   border: 1px solid var(--shop-beige-dark, #d4cfc6);
   border-radius: 0.5rem;
@@ -857,20 +1029,18 @@ watch(
   font-size: 0.875rem;
 }
 
-/* Price Slider */
 .price-slider {
   margin-bottom: 1rem;
 }
 
-/* Price Quick Options */
 .price-quick-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .price-option {
-  padding: 0.375rem 0.75rem;
+  padding: 0.3125rem 0.625rem;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--shop-brown-dark, #8b7d6d);
@@ -911,10 +1081,11 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .color-swatch:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .color-swatch.selected {
@@ -924,11 +1095,7 @@ watch(
 
 .check-icon {
   color: var(--shop-charcoal, #3d3a36);
-}
-
-/* Light colors need dark check icon */
-.color-swatch:has(.check-icon) {
-  filter: contrast(0.9);
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.8));
 }
 
 /* Toggle Switch */
@@ -936,18 +1103,19 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 0;
+  padding: 0.5rem 0;
 }
 
 .toggle-text {
   font-size: 0.875rem;
   color: var(--shop-brown-dark, #8b7d6d);
+  font-weight: 500;
 }
 
 .toggle-switch {
   position: relative;
-  width: 2.5rem;
-  height: 1.5rem;
+  width: 2.25rem;
+  height: 1.35rem;
   background: var(--shop-beige-dark, #d4cfc6);
   border: none;
   border-radius: 9999px;
@@ -963,16 +1131,16 @@ watch(
   position: absolute;
   top: 2px;
   left: 2px;
-  width: calc(1.5rem - 4px);
-  height: calc(1.5rem - 4px);
+  width: calc(1.35rem - 4px);
+  height: calc(1.35rem - 4px);
   background: white;
   border-radius: 50%;
   transition: transform 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .toggle-switch.active .toggle-thumb {
-  transform: translateX(1rem);
+  transform: translateX(0.9rem);
 }
 
 /* Clear Filter Button */
@@ -984,18 +1152,19 @@ watch(
   background: none;
   border: none;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .clear-filter-btn:hover {
   color: var(--shop-accent-dark, #8c6d4d);
+  text-decoration: underline;
 }
 
 /* Accordion Transition */
 .accordion-enter-active,
 .accordion-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease-out;
   overflow: hidden;
 }
 
@@ -1008,119 +1177,6 @@ watch(
 .accordion-enter-to,
 .accordion-leave-from {
   opacity: 1;
-  max-height: 500px;
-}
-
-/* Design Filter Options */
-.design-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.design-option-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.75rem;
-  background: var(--shop-cream-dark, #f5f2ed);
-  border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.design-option-btn:hover {
-  border-color: var(--shop-tan, #c4b8a9);
-  background: white;
-}
-
-.design-option-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background: white;
-  border-radius: 0.375rem;
-  color: var(--shop-brown, #a89b8c);
-}
-
-.design-option-text {
-  flex: 1;
-  text-align: left;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--shop-charcoal, #3d3a36);
-}
-
-/* Design Dropdown Styles */
-.design-dropdown-group {
-  padding-bottom: 0.5rem;
-}
-
-.design-dropdown-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.625rem 0.5rem;
-  background: var(--shop-cream-dark, #f5f2ed);
-  border: 1px solid var(--shop-beige, #e8e3dc);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.design-dropdown-header:hover {
-  border-color: var(--shop-tan, #c4b8a9);
-}
-
-.design-dropdown-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--shop-charcoal, #3d3a36);
-}
-
-.design-dropdown-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  background: white;
-  border-radius: 0.375rem;
-  color: var(--shop-brown, #a89b8c);
-}
-
-.design-dropdown-header .chevron {
-  color: var(--shop-tan, #c4b8a9);
-  transition: transform 0.3s ease;
-}
-
-.design-dropdown-content {
-  padding-top: 0.5rem;
-}
-
-.design-dropdown-list {
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 0.25rem;
-}
-
-.design-option-arrow {
-  color: var(--shop-tan, #c4b8a9);
-}
-
-.design-sub-options {
-  padding-left: 0.5rem;
-  margin-top: 0.75rem;
-  border-top: 1px solid var(--shop-beige, #e8e3dc);
-  padding-top: 0.75rem;
+  max-height: 400px;
 }
 </style>
