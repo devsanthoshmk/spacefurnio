@@ -3,11 +3,11 @@
     ref="containerRef"
     class="relative w-full h-[100dvh] pt-20 bg-stone-100 overflow-hidden outline-none flex flex-col"
     tabindex="0"
-    @keydown.stop="handleKeydown"
-    @wheel.prevent.stop="handleWheel"
-    @touchstart.stop="handleTouchStart"
-    @touchmove.prevent.stop="handleTouchMove"
-    @touchend.stop="handleTouchEnd"
+    @keydown="handleKeydown"
+    @wheel="handleWheel"
+    @touchstart="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
   >
     <!-- Background -->
     <div class="absolute inset-0 pointer-events-none">
@@ -113,12 +113,7 @@
  * - Wrapper: CSS transition morphs aspect ratio simultaneously
  */
 
-import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
-
-const props = defineProps({
-  simulateKey: Function,
-  innerCustomScollEl: HTMLElement,
-})
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // ============================================
 // SECTION DATA
@@ -181,33 +176,37 @@ const currentSection = computed(() => sections.value[currentIndex.value])
 // ============================================
 function handleKeydown(event) {
   if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(event.code)) {
-    event.preventDefault()
-  }
+    if (isTransitioning.value) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
 
-  if (isTransitioning.value) return
-
-  if (event.code === 'ArrowDown' || event.code === 'PageDown') {
-    navigateNext()
-  } else if (event.code === 'ArrowUp' || event.code === 'PageUp') {
-    navigatePrev()
+    if (event.code === 'ArrowDown' || event.code === 'PageDown' || event.code === 'Space') {
+      if (currentIndex.value < sections.value.length - 1) {
+        event.preventDefault()
+        event.stopPropagation()
+        navigateNext()
+      }
+    } else if (event.code === 'ArrowUp' || event.code === 'PageUp') {
+      if (currentIndex.value > 0) {
+        event.preventDefault()
+        event.stopPropagation()
+        navigatePrev()
+      }
+    }
   }
 }
 
 function navigateNext() {
   if (currentIndex.value < sections.value.length - 1) {
     triggerTransition(currentIndex.value + 1)
-  } else {
-    scroll100(1)
-    containerRef.value.style.pointerEvents = 'none'
   }
 }
 
 function navigatePrev() {
   if (currentIndex.value > 0) {
     triggerTransition(currentIndex.value - 1)
-  } else {
-    scroll100(-1)
-    containerRef.value.style.pointerEvents = 'none'
   }
 }
 
@@ -241,85 +240,67 @@ function getAspectRatioClass(orientation) {
   }
 }
 
-function scroll100(up) {
-  /** up is -1 or +1 whih desides to go up or down */
-  if (up > 0) {
-    props.simulateKey('ArrowDown')
-  } else {
-    props.simulateKey('ArrowUp')
-  }
-}
-
 // ============================================
 // SCROLL HANDLING (Container-level only)
 // ============================================
-// const isInsideContainer = ref(false)
 
 function handleWheel(event) {
-  // Prevent default scroll and use for navigation
-  event.preventDefault()
-
-  if (isTransitioning.value) return
+  if (isTransitioning.value) {
+    event.preventDefault()
+    event.stopPropagation()
+    return
+  }
 
   if (event.deltaY > 0) {
-    navigateNext()
-  } else if (event.deltaY < 0) {
-    navigatePrev()
-  }
-}
-
-function handleTouchStart(event) {
-  // Store initial touch position for swipe detection
-  containerRef.value._touchStartY = event.touches[0].clientY
-}
-
-function handleTouchMove(event) {
-  event.preventDefault()
-}
-
-function handleTouchEnd(event) {
-  if (isTransitioning.value) return
-
-  const touchEndY = event.changedTouches[0].clientY
-  const touchStartY = containerRef.value._touchStartY || touchEndY
-  const diff = touchStartY - touchEndY
-
-  // Swipe threshold of 50px
-  if (Math.abs(diff) > 50) {
-    if (diff > 0) {
+    if (currentIndex.value < sections.value.length - 1) {
+      event.preventDefault()
+      event.stopPropagation()
       navigateNext()
-    } else {
+    }
+  } else if (event.deltaY < 0) {
+    if (currentIndex.value > 0) {
+      event.preventDefault()
+      event.stopPropagation()
       navigatePrev()
     }
   }
 }
 
-// enabling auto focus for custom scroll to work properly
-// using custom scroll event to handle scroll
-function handlecustomScroll(e) {
-  console.warn(
-    'called',
-    e.detail.currentSection,
-    props.innerCustomScollEl,
-    e.detail.currentSection === props.innerCustomScollEl,
-  )
-  if (e.detail.currentSection === props.innerCustomScollEl) {
-    containerRef.value.style.pointerEvents = 'auto'
-    containerRef.value?.focus({ preventScroll: true })
-    containerRef.value?.children[0].click() //aditinal ensurance for click verification
+function handleTouchStart(event) {
+  containerRef.value._touchStartY = event.touches[0].clientY
+}
+
+function handleTouchMove(event) {
+  const touchY = event.touches[0].clientY
+  const touchStartY = containerRef.value._touchStartY || touchY
+  const deltaY = touchStartY - touchY
+  
+  if (Math.abs(deltaY) > 30) { // Same threshold used for swipe
+    if (deltaY > 0 && currentIndex.value < sections.value.length - 1) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!isTransitioning.value) navigateNext()
+      containerRef.value._touchStartY = touchY // reset to prevent multiple triggers
+    } else if (deltaY < 0 && currentIndex.value > 0) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!isTransitioning.value) navigatePrev()
+      containerRef.value._touchStartY = touchY
+    }
   }
+}
+
+function handleTouchEnd() {
+  // Logic shifted to touchMove for instantaneous reaction matching customScroll.js
 }
 
 // ============================================
 // LIFECYCLE
 // ============================================
 onMounted(() => {
-  window.addEventListener('sectionChange', handlecustomScroll)
 })
 
 onUnmounted(() => {
-  // Cleanup if needed
-  window.removeEventListener('sectionChange', handlecustomScroll)
 })
 </script>
 

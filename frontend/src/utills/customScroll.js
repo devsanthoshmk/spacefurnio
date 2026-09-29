@@ -51,7 +51,7 @@ const toElement = (candidate) => candidate?.value ?? candidate ?? null
  * @returns {HTMLElement[]}
  */
 const queryChildSections = (wrapperEl, childClass) =>
-  Array.from(wrapperEl.querySelectorAll(`.${childClass}`))
+  Array.from(wrapperEl.children).filter((child) => child.classList.contains(childClass))
 
 /**
  * Determines the current viewport height, accounting for SSR-compatible fallbacks.

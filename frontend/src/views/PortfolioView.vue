@@ -1,16 +1,17 @@
 <template>
   <div id="scroll-container" class="overflow-hidden">
-    <div id="scroll-wrapper" ref="wrapper">
+    <div>
       <div
+        id="scroll-wrapper" ref="wrapper"
         class="bg-space-bg-light dark:bg-space-bg-dark text-space-text-light dark:text-space-text-dark font-space-display transition-colors duration-300 min-h-screen"
       >
         <!-- Hero Section -->
         <div class="scroll-section">
-          <HeroSection :simulateKey="simulateKey" />
+          <HeroSection />
         </div>
 
-        <div class="scroll-section" ref="innerCustomScollEl">
-          <MainSection :simulateKey="simulateKey" :innerCustomScollEl="innerCustomScollEl" />
+        <div class="scroll-section">
+          <MainSection />
         </div>
 
         <div class="scroll-section w-full px-6 md:px-12 py-12 mb-8 md:mb-16">
@@ -58,7 +59,6 @@ import { ref, onMounted, onBeforeUnmount, inject } from 'vue'
 
 const { showNav, showFoo } = inject('navShowUtils')
 const wrapper = ref(null)
-const innerCustomScollEl = ref(null)
 
 onMounted(() => {
   showFoo.value = false
@@ -74,24 +74,7 @@ onMounted(() => {
   })
 })
 
-function simulateKey(key) {
-  const down = new KeyboardEvent('keydown', {
-    key,
-    code: key,
-    bubbles: true,
-    cancelable: true,
-  })
 
-  const up = new KeyboardEvent('keyup', {
-    key,
-    code: key,
-    bubbles: true,
-    cancelable: true,
-  })
-
-  document.dispatchEvent(down)
-  document.dispatchEvent(up)
-}
 // const toggleDarkMode = () => {
 //   document.documentElement.classList.toggle('dark');
 // };

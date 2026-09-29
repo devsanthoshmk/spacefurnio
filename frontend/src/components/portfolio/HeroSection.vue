@@ -86,9 +86,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
 
-const props = defineProps({
-  simulateKey: Object,
-})
+const props = defineProps({})
 
 // ========================================
 // Configuration Constants (No Props)
