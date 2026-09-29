@@ -482,29 +482,53 @@
 
       <Transition name="accordion">
         <div v-if="openSections.color" class="filter-content">
-          <div class="color-grid">
-            <button
-              v-for="color in availableColors"
-              :key="color.name"
-              type="button"
-              :class="['color-swatch', { selected: localFilters.colors?.includes(color.name) }]"
-              :style="{ '--swatch-color': color.hex }"
-              :title="color.name"
-              @click="toggleColor(color.name)"
+          <!-- Search Colors -->
+          <div class="filter-search" v-if="availableColors.length > 5">
+            <svg
+              class="search-icon"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
             >
-              <svg
-                v-if="localFilters.colors?.includes(color.name)"
-                class="check-icon"
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="3"
-              >
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </button>
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              v-model="colorSearch"
+              placeholder="Filter colors..."
+              class="search-input"
+            />
+          </div>
+
+          <div class="checkbox-list shop-scrollbar">
+            <label
+              v-for="color in filteredColors"
+              :key="color.name"
+              class="checkbox-label group"
+            >
+              <input
+                type="checkbox"
+                name="color"
+                :value="color.name"
+                :checked="localFilters.colors?.includes(color.name)"
+                @change="toggleColor(color.name)"
+                class="shop-checkbox"
+              />
+              <span
+                class="color-indicator-swatch"
+                :style="{ backgroundColor: color.hex }"
+                :title="color.name"
+              ></span>
+              <span class="checkbox-text group-hover:text-stone-900">{{ color.name }}</span>
+              <span v-if="color.count" class="checkbox-count">{{ color.count }}</span>
+            </label>
+            <p v-if="filteredColors.length === 0" class="no-results-text">
+              No matching colors found
+            </p>
           </div>
 
           <button
@@ -589,6 +613,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import shopApi from '@/api/shopApi.js'
+import { getColorHexHelper } from '@/composables/productsUtills.js'
 
 const props = defineProps({
   filters: {
@@ -631,6 +656,7 @@ const localFilters = ref({
 })
 
 const brandSearch = ref('')
+const colorSearch = ref('')
 
 const openSections = ref({
   category: true,
@@ -663,13 +689,32 @@ const priceRangeMax = computed(() => props.aggregations.priceRange?.max ?? 5000)
 const availableBrands = computed(() => props.aggregations.brands || [])
 const availableMaterials = computed(() => props.aggregations.materials || [])
 const availableRooms = computed(() => props.aggregations.rooms || [])
-const availableColors = computed(() => props.aggregations.colors || [])
+const availableColors = computed(() => {
+  const raw = props.aggregations.colors || []
+  return raw.map((c) => {
+    if (typeof c === 'string') {
+      return { name: c, hex: getColorHexHelper(c) }
+    }
+    return {
+      name: c.name,
+      hex: c.hex || getColorHexHelper(c.name),
+      count: c.count,
+    }
+  })
+})
 
 const filteredBrands = computed(() => {
   if (!availableBrands.value.length) return []
   const search = brandSearch.value.trim().toLowerCase()
   if (!search) return availableBrands.value
   return availableBrands.value.filter((b) => b.toLowerCase().includes(search))
+})
+
+const filteredColors = computed(() => {
+  if (!availableColors.value.length) return []
+  const search = colorSearch.value.trim().toLowerCase()
+  if (!search) return availableColors.value
+  return availableColors.value.filter((c) => c.name.toLowerCase().includes(search))
 })
 
 const isPriceActive = computed(() => {
@@ -1061,41 +1106,27 @@ watch(
   border-color: var(--shop-charcoal, #3d3a36);
 }
 
-/* Color Grid */
-.color-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.color-swatch {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  background: var(--swatch-color);
-  border: 2px solid transparent;
+/* Color Indicator Swatch */
+.color-indicator-swatch {
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  display: inline-block;
+  transition: transform 0.15s ease;
 }
 
-.color-swatch:hover {
-  transform: scale(1.15);
+.checkbox-label:hover .color-indicator-swatch {
+  transform: scale(1.1);
 }
 
-.color-swatch.selected {
-  border-color: var(--shop-charcoal, #3d3a36);
-  box-shadow: 0 0 0 2px var(--shop-cream, #faf8f5);
-}
-
-.check-icon {
-  color: var(--shop-charcoal, #3d3a36);
-  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.8));
+.no-results-text {
+  font-size: 0.75rem;
+  color: var(--shop-tan, #c4b8a9);
+  padding: 0.5rem 0;
+  font-style: italic;
 }
 
 /* Toggle Switch */
