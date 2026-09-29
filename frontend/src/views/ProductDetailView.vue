@@ -709,6 +709,123 @@
         </div>
 
         <!-- ==========================================
+             RELATED PRODUCTS CAROUSEL / GRID
+             ========================================== -->
+        <section v-if="relatedProductsList.length > 0" class="related-section mt-16 pt-12 border-t border-stone-200">
+          <div class="flex items-end justify-between mb-8">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Curated Pairing</span>
+              <h2 class="text-2xl sm:text-3xl font-serif text-stone-900 mt-1">More Like This</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                v-if="relatedProductsList.length > 3"
+                @click="scrollRelated('left')"
+                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
+                aria-label="Previous products"
+                title="Previous products"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                v-if="relatedProductsList.length > 3"
+                @click="scrollRelated('right')"
+                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
+                aria-label="Next products"
+                title="Next products"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <router-link
+                :to="`/shop?categories=${product?.category || ''}`"
+                class="hidden sm:inline-flex items-center ml-2 text-xs font-semibold text-stone-700 hover:text-stone-900 underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 transition-colors"
+              >
+                Explore Collection →
+              </router-link>
+            </div>
+          </div>
+
+          <div
+            ref="relatedScrollContainer"
+            class="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 shop-scrollbar scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
+          >
+            <div
+              v-for="item in relatedProductsList"
+              :key="item.id"
+              class="related-card flex-none w-[220px] sm:w-[250px] md:w-[270px] snap-start group flex flex-col bg-white rounded-2xl p-3 border border-stone-200/80 hover:border-stone-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              @click="navigateToProduct(item)"
+            >
+              <!-- Product Image with Quick Add Button -->
+              <div class="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-100 mb-3">
+                <img
+                  :src="optimizeImageUrl(item.thumbnail || item.images?.[0], { width: 480, quality: 80 })"
+                  :alt="item.name"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+
+                <!-- Quick Add to Cart Button -->
+                <button
+                  @click.stop="quickAddToCart(item)"
+                  :disabled="quickAddingId === item.id"
+                  class="absolute bottom-2.5 right-2.5 p-2 rounded-full bg-white/95 backdrop-blur-sm text-stone-800 shadow-md hover:bg-stone-900 hover:text-white hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none"
+                  :title="`Quick add ${item.name} to cart`"
+                  aria-label="Quick Add to Cart"
+                >
+                  <svg
+                    v-if="quickAddingId === item.id"
+                    class="w-4 h-4 animate-spin text-stone-900"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  </svg>
+                  <svg
+                    v-else-if="quickAddedId === item.id"
+                    class="w-4 h-4 text-emerald-600 animate-bounce"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Product Info -->
+              <div class="flex-1 flex flex-col justify-between">
+                <div>
+                  <span class="block text-[11px] font-bold tracking-wider uppercase text-amber-800 mb-0.5">
+                    {{ item.brand || 'Nordic Studio' }}
+                  </span>
+                  <h3 class="text-xs sm:text-sm font-medium text-stone-900 line-clamp-1 group-hover:text-amber-900 transition-colors">
+                    {{ item.name }}
+                  </h3>
+                </div>
+                <div class="flex items-center justify-between mt-2 pt-2 border-t border-stone-100">
+                  <span class="text-xs sm:text-sm font-bold text-stone-900">${{ formatPriceNumber(item.price) }}</span>
+                  <div v-if="item.rating" class="flex items-center gap-1 text-xs text-stone-500">
+                    <svg class="w-3 h-3 fill-amber-400 text-amber-400" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    <span>{{ Number(item.rating).toFixed(1) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
              CUSTOMER REVIEWS & WRITE A REVIEW SECTION
              ========================================== -->
         <section id="reviews-section" class="reviews-section mt-16 pt-12 border-t border-stone-200">
@@ -865,123 +982,6 @@
             >
               Write First Review
             </button>
-          </div>
-        </section>
-
-        <!-- ==========================================
-             RELATED PRODUCTS CAROUSEL / GRID
-             ========================================== -->
-        <section v-if="relatedProductsList.length > 0" class="related-section mt-16 pt-12 border-t border-stone-200">
-          <div class="flex items-end justify-between mb-8">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Curated Pairing</span>
-              <h2 class="text-2xl sm:text-3xl font-serif text-stone-900 mt-1">You May Also Like</h2>
-            </div>
-            <div class="flex items-center gap-3">
-              <button
-                v-if="relatedProductsList.length > 3"
-                @click="scrollRelated('left')"
-                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
-                aria-label="Previous products"
-                title="Previous products"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                v-if="relatedProductsList.length > 3"
-                @click="scrollRelated('right')"
-                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
-                aria-label="Next products"
-                title="Next products"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              <router-link
-                :to="`/shop?categories=${product?.category || ''}`"
-                class="hidden sm:inline-flex items-center ml-2 text-xs font-semibold text-stone-700 hover:text-stone-900 underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 transition-colors"
-              >
-                Explore Collection →
-              </router-link>
-            </div>
-          </div>
-
-          <div
-            ref="relatedScrollContainer"
-            class="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 shop-scrollbar scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
-          >
-            <div
-              v-for="item in relatedProductsList"
-              :key="item.id"
-              class="related-card flex-none w-[220px] sm:w-[250px] md:w-[270px] snap-start group flex flex-col bg-white rounded-2xl p-3 border border-stone-200/80 hover:border-stone-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
-              @click="navigateToProduct(item)"
-            >
-              <!-- Product Image with Quick Add Button -->
-              <div class="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-100 mb-3">
-                <img
-                  :src="optimizeImageUrl(item.thumbnail || item.images?.[0], { width: 480, quality: 80 })"
-                  :alt="item.name"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-
-                <!-- Quick Add to Cart Button -->
-                <button
-                  @click.stop="quickAddToCart(item)"
-                  :disabled="quickAddingId === item.id"
-                  class="absolute bottom-2.5 right-2.5 p-2 rounded-full bg-white/95 backdrop-blur-sm text-stone-800 shadow-md hover:bg-stone-900 hover:text-white hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none"
-                  :title="`Quick add ${item.name} to cart`"
-                  aria-label="Quick Add to Cart"
-                >
-                  <svg
-                    v-if="quickAddingId === item.id"
-                    class="w-4 h-4 animate-spin text-stone-900"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                  <svg
-                    v-else-if="quickAddedId === item.id"
-                    class="w-4 h-4 text-emerald-600 animate-bounce"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Product Info -->
-              <div class="flex-1 flex flex-col justify-between">
-                <div>
-                  <span class="block text-[11px] font-bold tracking-wider uppercase text-amber-800 mb-0.5">
-                    {{ item.brand || 'Nordic Studio' }}
-                  </span>
-                  <h3 class="text-xs sm:text-sm font-medium text-stone-900 line-clamp-1 group-hover:text-amber-900 transition-colors">
-                    {{ item.name }}
-                  </h3>
-                </div>
-                <div class="flex items-center justify-between mt-2 pt-2 border-t border-stone-100">
-                  <span class="text-xs sm:text-sm font-bold text-stone-900">${{ formatPriceNumber(item.price) }}</span>
-                  <div v-if="item.rating" class="flex items-center gap-1 text-xs text-stone-500">
-                    <svg class="w-3 h-3 fill-amber-400 text-amber-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                    <span>{{ Number(item.rating).toFixed(1) }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
       </div>
