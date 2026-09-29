@@ -378,6 +378,37 @@ export async function getCategories() {
 }
 
 /**
+ * Get single category by slug or ID
+ */
+export async function getCategory(slugOrId) {
+  try {
+    const isNumericId = /^\d+$/.test(String(slugOrId))
+    const where = isNumericId ? 'WHERE id = $1' : 'WHERE slug = $1'
+    const param = isNumericId ? parseInt(slugOrId, 10) : slugOrId
+    const rows = await sql.query(`SELECT id, name, slug FROM categories ${where} LIMIT 1`, [param])
+
+    if (rows.length === 0) {
+      return { success: false, error: 'Category not found' }
+    }
+
+    const cat = rows[0]
+    return {
+      success: true,
+      data: {
+        id: cat.slug,
+        name: cat.name,
+        slug: cat.slug,
+        description: `Browse our ${cat.name.toLowerCase()} collection.`,
+        icon: CATEGORY_ICONS[cat.slug] || CATEGORY_ICONS.furniture,
+      },
+    }
+  } catch (error) {
+    console.error('Error fetching category:', error)
+    return { success: false, error: 'Failed to fetch category' }
+  }
+}
+
+/**
  * Get all spaces (rooms)
  */
 export async function getSpaces() {
@@ -580,6 +611,9 @@ SELECT
   (SELECT json_agg(DISTINCT m2.name ORDER BY m2.name)
   FROM products p2 JOIN materials m2 ON m2.id = p2.material_id
   ) AS materials,
+  (SELECT json_agg(DISTINCT r2.name ORDER BY r2.name)
+  FROM products p2 JOIN rooms r2 ON r2.id = p2.room_id
+  ) AS rooms,
   (SELECT json_agg(json_build_object('name', cl.name, 'hex', cl.hex_code))
   FROM (SELECT DISTINCT cl.name, cl.hex_code
   FROM product_colors pc JOIN colors cl ON cl.id = pc.color_id
@@ -610,6 +644,7 @@ const [countResult, productRows, aggResult] = await Promise.all([
     const aggregations = {
       brands: agg.brands || [],
       materials: agg.materials || [],
+      rooms: agg.rooms || [],
       colors: (agg.colors || []).map((c) => ({
         name: c.name,
         hex: c.hex || getColorHex(c.name),
@@ -739,7 +774,7 @@ export async function getFilterOptions(category = null) {
     const catFilter = category ? `JOIN categories c ON c.id = p.category_id WHERE c.slug = $1` : ''
     const params = category ? [category] : []
 
-    const [brandsRes, materialsRes, colorsRes, priceRes] = await Promise.all([
+    const [brandsRes, materialsRes, colorsRes, roomsRes, priceRes] = await Promise.all([
       sql.query(
         `SELECT DISTINCT b.name FROM products p JOIN brands b ON b.id = p.brand_id ${catFilter} ORDER BY b.name`,
         params,
@@ -753,6 +788,10 @@ export async function getFilterOptions(category = null) {
         params,
       ),
       sql.query(
+        `SELECT DISTINCT r.name FROM products p JOIN rooms r ON r.id = p.room_id ${catFilter} ORDER BY r.name`,
+        params,
+      ).catch(() => []),
+      sql.query(
         `SELECT COALESCE(MIN(p.price_cents)/100, 0) AS min, COALESCE(MAX(p.price_cents)/100, 5000) AS max FROM products p ${catFilter}`,
         params,
       ),
@@ -761,15 +800,16 @@ export async function getFilterOptions(category = null) {
     return {
       success: true,
       data: {
-        brands: brandsRes.map((r) => r.name),
-        materials: materialsRes.map((r) => r.name),
+        brands: brandsRes.map((r) => r.name).filter(Boolean),
+        materials: materialsRes.map((r) => r.name).filter(Boolean),
+        rooms: (roomsRes || []).map((r) => r.name).filter(Boolean),
         colors: colorsRes.map((r) => ({
           name: r.name,
           hex: r.hex_code || getColorHex(r.name),
         })),
         priceRange: {
-          min: priceRes[0]?.min || 0,
-          max: priceRes[0]?.max || 5000,
+          min: Math.floor(Number(priceRes[0]?.min) || 0),
+          max: Math.ceil(Number(priceRes[0]?.max) || 5000),
         },
       },
     }
@@ -777,7 +817,7 @@ export async function getFilterOptions(category = null) {
     console.error('Error fetching filter options:', error)
     return {
       success: true,
-      data: { brands: [], materials: [], colors: [], priceRange: { min: 0, max: 5000 } },
+      data: { brands: [], materials: [], rooms: [], colors: [], priceRange: { min: 0, max: 5000 } },
     }
   }
 }
@@ -904,6 +944,7 @@ export async function enrichOrderItems(orderItems) {
 
 export default {
   getCategories,
+  getCategory,
   getSpaces,
   getStyles,
   getProducts,

@@ -3,12 +3,13 @@
  * CART STORE
  * ===========================================
  * Manages shopping cart state
- * Supports both localStorage (unauthenticated) and database (authenticated) modes
+ * Pinia setup store using ref() and computed()
+ * Supports local guest mode and Worker API for authenticated users
  */
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { api as cartApi } from '@/lib/api'
+import { api } from '@/lib/api'
 import { getProduct } from '@/api/shopApi'
 import {
   getLocalCart,
@@ -16,115 +17,80 @@ import {
   updateLocalCartItem,
   removeFromLocalCart as removeFromLocalCartFn,
   clearLocalCart,
-  hasLocalCart
 } from '@/lib/localCart'
 
 export const useCartStore = defineStore('cart', () => {
-// ===========================================
-// STATE
-// ===========================================
+  // ===========================================
+  // STATE
+  // ===========================================
 
-const cartId = ref(null)
-const items = ref([])
-const enrichedItems = ref([])
-const subtotal = ref(0)
-const discountCode = ref(null)
-const discountAmount = ref(0)
-const isLoading = ref(false)
-const error = ref(null)
-const isLocalMode = ref(false)
-const isSyncing = ref(false)
-const syncError = ref(null)
+  const items = ref([])
+  const enrichedItems = ref([])
+  const subtotal = ref(0)
+  const discountCode = ref(null)
+  const discountAmount = ref(0)
+  const coupon = ref(null)
+  const isLoading = ref(false)
+  const isUpdating = ref(false)
+  const error = ref(null)
+  const isDrawerOpen = ref(false)
+
+  const cartId = ref(null)
+  const isLocalMode = ref(false)
+  const isSyncing = ref(false)
+  const syncError = ref(null)
 
   // ===========================================
-  // GETTERS
+  // GETTERS (COMPUTED)
   // ===========================================
 
   const itemCount = computed(() => {
-    return items.value?.reduce((sum, item) => sum + item.quantity, 0) || 0
+    return items.value?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || 0
   })
 
   const total = computed(() => {
-    return subtotal.value - discountAmount.value
+    return Math.max(0, Math.round((subtotal.value - discountAmount.value) * 100) / 100)
   })
 
   const isEmpty = computed(() => items.value.length === 0)
 
-  const hasDiscount = computed(() => !!discountCode.value)
+  const hasDiscount = computed(() => !!discountCode.value && discountAmount.value > 0)
 
   const displayItems = computed(() => {
     return enrichedItems.value.length > 0 ? enrichedItems.value : items.value
   })
 
-// ===========================================
-// ACTIONS
-// ===========================================
-
-/**
- * Set the cart mode (local or authenticated)
- */
-function setMode(authenticated) {
-  isLocalMode.value = !authenticated
-}
-
-/**
- * Fetch cart from server or localStorage and auto-enrich with product details.
- */
-async function fetchCart() {
-  try {
-    isLoading.value = true
-    error.value = null
-
-    if (isLocalMode.value) {
-      const localItems = getLocalCart()
-      items.value = localItems.map(item => ({
-        id: `local_${item.productId}`,
-        productId: item.productId,
-        name: null,
-        image: null,
-        unitPrice: parseFloat(item.priceSnapshot || 0),
-        quantity: item.quantity,
-      }))
-      subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-      await enrichItems()
-      items.value = enrichedItems.value
-      return
-    }
-
-    const cartData = await cartApi.getCart()
-
-    if (cartData) {
-      cartId.value = cartData.id
-      const newItems = (cartData.cart_items || []).map((ci) => ({
-        id: ci.id,
-        productId: ci.product_id,
-        name: null,
-        image: null,
-        unitPrice: parseFloat(ci.price_snapshot || 0),
-        quantity: ci.quantity,
-      }))
-      items.value = newItems
-      subtotal.value = newItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-    } else {
-      cartId.value = null
-      items.value = []
-      subtotal.value = 0
-    }
-
-    await enrichItems()
-    items.value = enrichedItems.value
-  } catch (err) {
-    error.value = err.message
-    console.error('Fetch cart error:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
+  // ===========================================
+  // ACTIONS
+  // ===========================================
 
   /**
-   * Enrich cart items with product details from catalog DB.
-   * Since cart_items only stores product_id (products in separate Neon DB),
-   * we fetch full product data to display name, image, etc.
+   * Set cart operating mode (local vs authenticated)
+   */
+  function setMode(authenticated) {
+    isLocalMode.value = !authenticated
+  }
+
+  /**
+   * Toggle or set cart drawer visibility
+   */
+  function toggleDrawer(open) {
+    if (typeof open === 'boolean') {
+      isDrawerOpen.value = open
+    } else {
+      isDrawerOpen.value = !isDrawerOpen.value
+    }
+  }
+
+  /**
+   * Clear active error state
+   */
+  function clearError() {
+    error.value = null
+  }
+
+  /**
+   * Enrich cart items with product details from catalog DB
    */
   async function enrichItems() {
     if (items.value.length === 0) {
@@ -138,423 +104,454 @@ async function fetchCart() {
 
       enrichedItems.value = items.value.map((item, index) => {
         const productResult = results[index]
-        if (productResult.success && productResult.data) {
+        if (productResult && productResult.success && productResult.data) {
           const product = productResult.data
           return {
             ...item,
             name: product.name,
             image: product.thumbnail || product.images?.[0] || null,
-            primaryImage: product.thumbnail,
+            primaryImage: product.thumbnail || product.images?.[0] || null,
             slug: product.slug,
             originalPrice: product.originalPrice,
             discount: product.discount,
             colors: product.colors,
+            product,
           }
         }
         return {
           ...item,
-          name: item.name || 'Loading...',
-          image: null,
-          primaryImage: null,
-          slug: null,
+          name: item.name || item.product?.name || 'Product',
+          image: item.image || item.product?.image?.src || null,
+          primaryImage: item.primaryImage || item.product?.image?.src || null,
+          slug: item.slug || item.product?.slug || null,
         }
       })
     } catch (err) {
-      console.error('Enrich cart items error:', err)
+      console.warn('Enrich cart items warning:', err)
       enrichedItems.value = items.value.map((item) => ({
         ...item,
-        name: item.name || 'Product',
-        image: null,
+        name: item.name || item.product?.name || 'Product',
+        image: item.image || item.product?.image?.src || null,
       }))
     }
   }
 
-/**
- * Add item to cart (supports both local and authenticated modes)
- */
-async function addItem(productId, quantity = 1, variantId = null) {
-  if (isLocalMode.value) {
-    try {
-      const productResult = await getProduct(productId)
-      const price = productResult.success ? productResult.data.price : 0
-      addToLocalCartFn(productId, quantity, price)
-      await fetchCart()
-      return true
-    } catch (err) {
-      error.value = err.message
-      throw err
-    }
+  /**
+   * Recalculate subtotal from items list
+   */
+  function calculateSubtotal() {
+    const sum = items.value.reduce((acc, item) => {
+      const unit = parseFloat(item.unitPrice || item.price_snapshot || 0)
+      const qty = Number(item.quantity) || 0
+      return acc + unit * qty
+    }, 0)
+    subtotal.value = Math.round(sum * 100) / 100
   }
 
-  if (!cartId.value) {
-    await fetchCart()
-    if (!cartId.value) {
-      try {
-        await cartApi.createCart()
-        await fetchCart()
-      } catch {
-        error.value = 'Failed to create cart. Please login again.'
+  /**
+   * Fetch cart from Worker API or localStorage
+   */
+  async function fetchCart() {
+    try {
+      isLoading.value = true
+      error.value = null
+
+      const token = api.getToken()
+      if (isLocalMode.value || !token) {
+        const localItems = getLocalCart()
+        items.value = localItems.map((item) => ({
+          id: `local_${item.productId}`,
+          productId: item.productId,
+          name: null,
+          image: null,
+          unitPrice: parseFloat(item.priceSnapshot || 0),
+          quantity: item.quantity,
+          createdAt: item.addedAt,
+        }))
+        calculateSubtotal()
+        await enrichItems()
+        items.value = enrichedItems.value
         return
       }
+
+      const cartData = await api.getCart()
+
+      if (cartData) {
+        cartId.value = cartData.cart?.id || cartData.id || null
+        const rawItems = cartData.items || cartData.cart_items || []
+
+        items.value = rawItems.map((ci) => {
+          const unitPrice = parseFloat(ci.unitPrice || ci.price_snapshot || 0)
+          const prodObj = ci.product || null
+          return {
+            id: ci.id,
+            productId: ci.productId || ci.product_id,
+            name: prodObj?.name || null,
+            image: prodObj?.image?.src || null,
+            primaryImage: prodObj?.image?.src || null,
+            slug: prodObj?.slug || null,
+            unitPrice,
+            quantity: ci.quantity,
+            totalPrice: ci.totalPrice || unitPrice * ci.quantity,
+            product: prodObj,
+            createdAt: ci.createdAt || ci.created_at,
+          }
+        })
+
+        if (cartData.subtotal !== undefined) {
+          subtotal.value = parseFloat(cartData.subtotal) || 0
+        } else {
+          calculateSubtotal()
+        }
+      } else {
+        cartId.value = null
+        items.value = []
+        subtotal.value = 0
+      }
+
+      await enrichItems()
+      items.value = enrichedItems.value
+
+      // Revalidate active coupon if present
+      if (discountCode.value) {
+        await applyCoupon(discountCode.value).catch(() => {
+          removeCoupon()
+        })
+      }
+    } catch (err) {
+      error.value = err.message || 'Failed to fetch cart'
+      console.warn('Fetch cart warning:', err)
+    } finally {
+      isLoading.value = false
     }
   }
 
-  try {
-    isLoading.value = true
-    error.value = null
+  /**
+   * Add item to cart
+   */
+  async function addItem(productId, quantity = 1, priceSnapshot = null) {
+    try {
+      isUpdating.value = true
+      error.value = null
 
-    const existingItem = items.value.find((i) => i.productId === productId)
-    if (existingItem) {
-      existingItem.quantity += quantity
-      await cartApi.updateCartItem(existingItem.id, existingItem.quantity)
-    } else {
-      const productResult = await getProduct(productId)
-      const price = productResult.success ? productResult.data.price : 0
-      await cartApi.addCartItem({
-        cart_id: cartId.value,
+      const token = api.getToken()
+      if (isLocalMode.value || !token) {
+        let price = priceSnapshot
+        if (price === null || price === undefined) {
+          const productResult = await getProduct(productId)
+          price = productResult.success ? productResult.data.price : 0
+        }
+        addToLocalCartFn(productId, quantity, price)
+        await fetchCart()
+        return true
+      }
+
+      // Authenticated via Worker API
+      let resolvedPrice = priceSnapshot
+      if (resolvedPrice === null || resolvedPrice === undefined) {
+        const productResult = await getProduct(productId)
+        resolvedPrice = productResult.success ? productResult.data.price : 0
+      }
+
+      await api.addToCart({
         product_id: productId,
-        quantity: quantity,
-        price_snapshot: price,
+        quantity,
+        price_snapshot: resolvedPrice,
       })
-    }
 
-    await fetchCart()
-    return true
-  } catch (err) {
-    if (err.message && err.message.includes('Item already exists.')) {
       await fetchCart()
-    } else {
-      error.value = err.message
-      throw err
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
-
-/**
- * Update item quantity (supports both local and authenticated modes)
- */
-async function updateItemQuantity(itemId, quantity) {
-  const itemIndex = items.value.findIndex((i) => i.id === itemId)
-  const previousQuantity = itemIndex >= 0 ? items.value[itemIndex].quantity : 0
-  const productId = itemIndex >= 0 ? items.value[itemIndex].productId : null
-
-  if (itemIndex >= 0) {
-    items.value[itemIndex].quantity = quantity
-    subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-  }
-
-  if (isLocalMode.value && productId) {
-    try {
-      updateLocalCartItem(productId, quantity)
       return true
     } catch (err) {
-      if (itemIndex >= 0) {
-        items.value[itemIndex].quantity = previousQuantity
-        subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-      }
-      error.value = err.message
+      error.value = err.message || 'Failed to add item to cart'
       throw err
+    } finally {
+      isUpdating.value = false
     }
   }
 
-  try {
-    isLoading.value = true
-    error.value = null
-    await cartApi.updateCartItem(itemId, quantity)
-    return true
-  } catch (err) {
+  /**
+   * Update item quantity in cart
+   */
+  async function updateQuantity(itemId, quantity) {
+    const itemIndex = items.value.findIndex((i) => i.id === itemId)
+    const prevQuantity = itemIndex >= 0 ? items.value[itemIndex].quantity : 0
+    const productId = itemIndex >= 0 ? items.value[itemIndex].productId : null
+
     if (itemIndex >= 0) {
-      items.value[itemIndex].quantity = previousQuantity
-      subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+      if (quantity <= 0) {
+        items.value.splice(itemIndex, 1)
+        enrichedItems.value = enrichedItems.value.filter((i) => i.id !== itemId)
+      } else {
+        items.value[itemIndex].quantity = quantity
+        if (enrichedItems.value[itemIndex]) {
+          enrichedItems.value[itemIndex].quantity = quantity
+        }
+      }
+      calculateSubtotal()
     }
-    error.value = err.message
-    throw err
-  } finally {
-    isLoading.value = false
-  }
-}
 
-/**
- * Remove item from cart (supports both local and authenticated modes)
- */
-async function removeItem(itemId) {
-  const removedItem = items.value.find((i) => i.id === itemId)
-  const removedEnrichedItem = enrichedItems.value.find((i) => i.id === itemId)
-  const productId = removedItem?.productId
-
-  items.value = items.value.filter((i) => i.id !== itemId)
-  enrichedItems.value = enrichedItems.value.filter((i) => i.id !== itemId)
-  subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-
-  if (isLocalMode.value && productId) {
     try {
-      removeFromLocalCartFn(productId)
+      isUpdating.value = true
+      error.value = null
+
+      const token = api.getToken()
+      if (isLocalMode.value || !token) {
+        if (productId) {
+          updateLocalCartItem(productId, quantity)
+        }
+        return true
+      }
+
+      if (quantity <= 0) {
+        await api.removeCartItem(itemId)
+      } else {
+        await api.updateCartItem(itemId, quantity)
+      }
+
+      await fetchCart()
       return true
     } catch (err) {
-      if (removedItem) {
-        items.value.push(removedItem)
+      // Revert on error
+      if (itemIndex >= 0 && prevQuantity > 0) {
+        items.value[itemIndex].quantity = prevQuantity
+        calculateSubtotal()
       }
-      if (removedEnrichedItem) {
-        enrichedItems.value.push(removedEnrichedItem)
-      }
-      subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-      error.value = err.message
+      error.value = err.message || 'Failed to update quantity'
       throw err
+    } finally {
+      isUpdating.value = false
     }
   }
 
-  try {
-    isLoading.value = true
-    error.value = null
-    await cartApi.removeCartItem(itemId)
-  } catch (err) {
-    if (removedItem) {
-      items.value.push(removedItem)
-    }
-    if (removedEnrichedItem) {
-      enrichedItems.value.push(removedEnrichedItem)
-    }
-    subtotal.value = items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-    error.value = err.message
-    throw err
-  } finally {
-    isLoading.value = false
+  /**
+   * Alias for updateQuantity
+   */
+  async function updateItemQuantity(itemId, quantity) {
+    return updateQuantity(itemId, quantity)
   }
-}
 
-/**
- * Clear entire cart (supports both local and authenticated modes)
- */
-async function clearCart() {
-  if (isLocalMode.value) {
+  /**
+   * Remove item from cart
+   */
+  async function removeItem(itemId) {
+    const removedItem = items.value.find((i) => i.id === itemId)
+    const removedEnrichedItem = enrichedItems.value.find((i) => i.id === itemId)
+    const productId = removedItem?.productId
+
+    items.value = items.value.filter((i) => i.id !== itemId)
+    enrichedItems.value = enrichedItems.value.filter((i) => i.id !== itemId)
+    calculateSubtotal()
+
     try {
-      clearLocalCart()
+      isUpdating.value = true
+      error.value = null
+
+      const token = api.getToken()
+      if (isLocalMode.value || !token) {
+        if (productId) {
+          removeFromLocalCartFn(productId)
+        }
+        return true
+      }
+
+      await api.removeCartItem(itemId)
+      await fetchCart()
+      return true
+    } catch (err) {
+      if (removedItem) items.value.push(removedItem)
+      if (removedEnrichedItem) enrichedItems.value.push(removedEnrichedItem)
+      calculateSubtotal()
+      error.value = err.message || 'Failed to remove item'
+      throw err
+    } finally {
+      isUpdating.value = false
+    }
+  }
+
+  /**
+   * Clear entire cart
+   */
+  async function clearCart() {
+    try {
+      isLoading.value = true
+      error.value = null
+
+      const token = api.getToken()
+      if (isLocalMode.value || !token) {
+        clearLocalCart()
+        items.value = []
+        enrichedItems.value = []
+        subtotal.value = 0
+        removeCoupon()
+        return true
+      }
+
+      await api.clearCart()
       items.value = []
       enrichedItems.value = []
       subtotal.value = 0
+      removeCoupon()
       return true
     } catch (err) {
-      error.value = err.message
+      error.value = err.message || 'Failed to clear cart'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Apply discount coupon code
+   */
+  async function applyCoupon(code) {
+    if (!code || typeof code !== 'string') {
+      removeCoupon()
+      return null
+    }
+
+    try {
+      error.value = null
+      const res = await api.validateCoupon(code.trim(), subtotal.value)
+
+      if (res && res.valid) {
+        coupon.value = res.coupon
+        discountCode.value = res.coupon?.code || code.trim().toUpperCase()
+        discountAmount.value = parseFloat(res.discount_amount || 0)
+        return res
+      } else {
+        removeCoupon()
+        throw new Error(res?.message || 'Invalid coupon code')
+      }
+    } catch (err) {
+      removeCoupon()
+      error.value = err.message || 'Failed to apply coupon'
       throw err
     }
   }
 
-  if (!cartId.value) return
-  try {
-    isLoading.value = true
-    error.value = null
-    await cartApi.clearCart(cartId.value)
-    items.value = []
-    enrichedItems.value = []
-    subtotal.value = 0
-  } catch (err) {
-    error.value = err.message
-    throw err
-  } finally {
-    isLoading.value = false
-  }
-}
-
   /**
-   * Remove coupon (stub)
+   * Remove active coupon
    */
-  async function removeCoupon() {
+  function removeCoupon() {
+    coupon.value = null
     discountCode.value = null
     discountAmount.value = 0
   }
 
   /**
-   * Apply coupon code (stub)
+   * Check if a product is in cart
    */
-  async function applyCoupon(code) {
-    discountCode.value = code
-    discountAmount.value = 0
+  function isInCart(productId) {
+    return items.value.some((item) => String(item.productId) === String(productId))
   }
 
   /**
-   * Get cart count only
+   * Get product quantity currently in cart
    */
-  async function fetchCount() {
-    await fetchCart()
-    return itemCount.value
+  function getItemQuantity(productId) {
+    const item = items.value.find((i) => String(i.productId) === String(productId))
+    return item ? item.quantity : 0
   }
 
-/**
- * Check if product is in cart (checks both local and DB items)
- */
-function isInCart(productId, variantId = null) {
-  if (isLocalMode.value) {
+  /**
+   * Sync local guest cart items to backend Worker
+   */
+  async function syncToDatabase() {
+    if (isSyncing.value) return false
     const localItems = getLocalCart()
-    return localItems.some(item => item.productId === productId)
-  }
-  return items.value.some((item) => item.productId === productId)
-}
+    if (localItems.length === 0) return true
 
-/**
- * Get item quantity in cart (checks both local and DB items)
- */
-function getItemQuantity(productId, variantId = null) {
-  if (isLocalMode.value) {
-    const localItems = getLocalCart()
-    const item = localItems.find(i => i.productId === productId)
-    return item?.quantity || 0
-  }
-  const item = items.value.find((i) => i.productId === productId)
-  return item?.quantity || 0
-}
+    try {
+      isSyncing.value = true
+      syncError.value = null
 
-/**
- * Clear error
- */
-function clearError() {
-  error.value = null
-}
+      for (const localItem of localItems) {
+        try {
+          const productResult = await getProduct(localItem.productId)
+          const price = productResult.success ? productResult.data.price : localItem.priceSnapshot || 0
 
-/**
- * Sync local cart items to database
- * Called when user logs in or registers
- */
-async function syncToDatabase() {
-  if (!isLocalMode.value) return false
-  if (isSyncing.value) return false
-
-  const localItems = getLocalCart()
-  if (localItems.length === 0) return true
-
-  try {
-    isSyncing.value = true
-    syncError.value = null
-
-    let cartData = await cartApi.getCart()
-    if (!cartData) {
-      await cartApi.createCart()
-      cartData = await cartApi.getCart()
-    }
-
-    if (!cartData || !cartData.id) {
-      throw new Error('Failed to get or create cart')
-    }
-
-    cartId.value = cartData.id
-    const existingItems = cartData.cart_items || []
-    const failedItems = []
-
-    for (const localItem of localItems) {
-      try {
-        const productResult = await getProduct(localItem.productId)
-        if (!productResult.success) {
-          failedItems.push({ productId: localItem.productId, reason: 'Product not found' })
-          continue
-        }
-
-        const currentPrice = productResult.data.price
-        const existingItem = existingItems.find(
-          ei => ei.product_id === localItem.productId
-        )
-
-        if (existingItem) {
-          const newQuantity = existingItem.quantity + localItem.quantity
-          await cartApi.updateCartItem(existingItem.id, newQuantity)
-        } else {
-          await cartApi.addCartItem({
-            cart_id: cartId.value,
+          await api.addToCart({
             product_id: localItem.productId,
             quantity: localItem.quantity,
-            price_snapshot: currentPrice,
+            price_snapshot: price,
           })
+        } catch (itemErr) {
+          console.warn('Failed to sync item to cart:', localItem.productId, itemErr)
         }
-      } catch (itemErr) {
-        console.error('Failed to sync item:', localItem.productId, itemErr)
-        failedItems.push({ productId: localItem.productId, reason: itemErr.message })
       }
-    }
 
-    clearLocalCart()
+      clearLocalCart()
+      isLocalMode.value = false
+      await fetchCart()
+      return true
+    } catch (err) {
+      console.error('Cart sync error:', err)
+      syncError.value = err.message || 'Failed to sync cart'
+      throw err
+    } finally {
+      isSyncing.value = false
+    }
+  }
+
+  /**
+   * Reset store state on logout
+   */
+  function $reset() {
+    items.value = []
+    enrichedItems.value = []
+    subtotal.value = 0
+    discountCode.value = null
+    discountAmount.value = 0
+    coupon.value = null
+    isLoading.value = false
+    isUpdating.value = false
+    error.value = null
+    cartId.value = null
     isLocalMode.value = false
-    await fetchCart()
-
-    if (failedItems.length > 0) {
-      console.warn('Some items failed to sync:', failedItems)
-      syncError.value = `${failedItems.length} item(s) could not be synced`
-    }
-
-    return true
-  } catch (err) {
-    console.error('Cart sync failed:', err)
-    syncError.value = err.message
-    throw err
-  } finally {
     isSyncing.value = false
+    syncError.value = null
   }
-}
 
-/**
- * Set mode and optionally sync
- */
-async function setAuthenticatedMode(doSync = true) {
-  const wasLocal = isLocalMode.value
-  isLocalMode.value = false
+  return {
+    // State
+    items,
+    enrichedItems,
+    subtotal,
+    discountCode,
+    discountAmount,
+    coupon,
+    isLoading,
+    isUpdating,
+    error,
+    isDrawerOpen,
+    cartId,
+    isLocalMode,
+    isSyncing,
+    syncError,
 
-  if (wasLocal && doSync && hasLocalCart()) {
-    await syncToDatabase()
-  } else if (!wasLocal) {
-    await fetchCart()
+    // Getters
+    itemCount,
+    total,
+    isEmpty,
+    hasDiscount,
+    displayItems,
+
+    // Actions
+    fetchCart,
+    enrichItems,
+    addItem,
+    updateQuantity,
+    updateItemQuantity,
+    removeItem,
+    clearCart,
+    applyCoupon,
+    removeCoupon,
+    toggleDrawer,
+    isInCart,
+    getItemQuantity,
+    clearError,
+    setMode,
+    syncToDatabase,
+    $reset,
   }
-}
-
-/**
- * Reset store (on logout)
- */
-function $reset() {
-  cartId.value = null
-  items.value = []
-  enrichedItems.value = []
-  subtotal.value = 0
-  discountCode.value = null
-  discountAmount.value = 0
-  isLoading.value = false
-  error.value = null
-  isLocalMode.value = false
-  isSyncing.value = false
-  syncError.value = null
-}
-
-return {
-  items,
-  enrichedItems,
-  displayItems,
-  subtotal,
-  discountCode,
-  discountAmount,
-  isLoading,
-  error,
-  cartId,
-  isLocalMode,
-  isSyncing,
-  syncError,
-
-  itemCount,
-  total,
-  isEmpty,
-  hasDiscount,
-
-  fetchCart,
-  enrichItems,
-  addItem,
-  updateItemQuantity,
-  removeItem,
-  clearCart,
-  applyCoupon,
-  removeCoupon,
-  fetchCount,
-  isInCart,
-  getItemQuantity,
-  clearError,
-  setMode,
-  syncToDatabase,
-  setAuthenticatedMode,
-  $reset,
-}
 })

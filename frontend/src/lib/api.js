@@ -1,13 +1,25 @@
 // frontend/src/lib/api.js
 
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || 'https://backend.spacefurnio.workers.dev'
+function resolveWorkerUrl() {
+  const envUrl = import.meta.env.VITE_WORKER_URL || import.meta.env.VITE_API_URL
+  if (import.meta.env.PROD) {
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl.replace(/\/$/, '')
+    }
+    return 'https://backend.thepreview.workers.dev'
+  }
+  return (envUrl || 'http://localhost:8787').replace(/\/$/, '')
+}
+
+const WORKER_URL = resolveWorkerUrl()
+const TOKEN_KEY = 'spacefurnio_token'
+
 const NEON_URL =
   import.meta.env.VITE_NEON_URL ||
   'https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1'
 const CATALOG_URL =
   import.meta.env.VITE_CATALOG_URL ||
   'https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1'
-
 const NEON_CONN =
   import.meta.env.VITE_NEON_CONN ||
   'postgresql://authenticator@ep-ancient-frog-aimehta7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require'
@@ -18,17 +30,29 @@ const CATALOG_CONN =
 class ApiClient {
   constructor() {
     this.token = null
+    this._refreshPromise = null
     if (typeof window !== 'undefined') {
-      this.token = localStorage.getItem('spacefurnio_token')
+      this.token = localStorage.getItem(TOKEN_KEY)
     }
   }
 
+  // --- TOKEN MANAGEMENT ---
+
+  getToken() {
+    if (!this.token && typeof window !== 'undefined') {
+      this.token = localStorage.getItem(TOKEN_KEY)
+    }
+    return this.token
+  }
+
   setToken(token) {
-    this.token = token
-    if (token) {
-      localStorage.setItem('spacefurnio_token', token)
-    } else {
-      localStorage.removeItem('spacefurnio_token')
+    this.token = token || null
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token)
+      } else {
+        localStorage.removeItem(TOKEN_KEY)
+      }
     }
   }
 
@@ -36,114 +60,124 @@ class ApiClient {
     this.setToken(null)
   }
 
+  _isTokenExpiringSoon(thresholdSeconds = 60) {
+    if (!this.token) return true
+    try {
+      const parts = this.token.split('.')
+      if (parts.length < 2) return true
+      const payload = JSON.parse(atob(parts[1]))
+      if (!payload.exp) return false
+      const expMs = payload.exp * 1000
+      return expMs - Date.now() < thresholdSeconds * 1000
+    } catch {
+      return true
+    }
+  }
+
   async _ensureValidToken() {
-    if (!this.token) throw new Error('Not authenticated')
-    try {
-      const payload = JSON.parse(atob(this.token.split('.')[1]))
-      const exp = payload.exp * 1000
-      const now = Date.now()
-      if (exp - now < 60000) {
-        await this.refresh()
+    if (!this.token) {
+      this.token = this.getToken()
+    }
+    if (!this.token) {
+      throw new Error('Not authenticated')
+    }
+
+    if (this._isTokenExpiringSoon(60)) {
+      if (!this._refreshPromise) {
+        this._refreshPromise = this.refresh()
+          .catch((err) => {
+            this.clearAuth()
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('auth:logout'))
+            }
+            throw err
+          })
+          .finally(() => {
+            this._refreshPromise = null
+          })
       }
-    } catch {
-      await this.refresh()
+      await this._refreshPromise
     }
   }
 
-// --- AUTH ---
-async login(email, password) {
-  const res = await fetch(WORKER_URL + '/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.message || 'Login failed')
-  this.setToken(data.access_token)
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('auth:login'))
-  }
-  return data
-}
+  // --- CORE WORKER HTTP REQUEST HELPER ---
 
-async register(userData) {
-  const res = await fetch(WORKER_URL + '/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  })
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.message || 'Registration failed')
-  if (data.access_token) {
-    this.setToken(data.access_token)
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('auth:login'))
+  async _request(endpoint, options = {}, requiresAuth = false, retryCount = 0) {
+    if (requiresAuth) {
+      await this._ensureValidToken()
     }
-  }
-  return data
-}
 
-  async refresh() {
-    const res = await fetch(WORKER_URL + '/auth/refresh', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    }
+
+    const currentToken = this.getToken()
+    if (currentToken) {
+      headers.Authorization = `Bearer ${currentToken}`
+    }
+
+    const url = endpoint.startsWith('http') ? endpoint : `${WORKER_URL}${endpoint}`
+
+    const res = await fetch(url, {
+      ...options,
+      headers,
     })
-    if (!res.ok) throw new Error('Token refresh failed')
-    const data = await res.json()
-    this.setToken(data.access_token)
-    return data
-  }
 
-  async forgotPassword(email) {
-    const res = await fetch(WORKER_URL + '/auth/forgot-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Forgot password failed')
-    return data
-  }
-
-  async resetPassword(email, tokenOrCode, newPassword) {
-    const res = await fetch(WORKER_URL + '/auth/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, tokenOrCode, newPassword }),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Reset password failed')
-    return data
-  }
-
-  async getCurrentUser() {
-    if (!this.token) throw new Error('Not authenticated')
-    try {
-      const payload = JSON.parse(atob(this.token.split('.')[1]))
-      return {
-        user: {
-          id: payload.sub,
-          role: payload.role,
-          email: payload.email || 'user@example.com',
-        },
+    if (res.status === 401 && retryCount < 1 && (requiresAuth || currentToken)) {
+      try {
+        if (!this._refreshPromise) {
+          this._refreshPromise = this.refresh().finally(() => {
+            this._refreshPromise = null
+          })
+        }
+        await this._refreshPromise
+        return this._request(endpoint, options, requiresAuth, retryCount + 1)
+      } catch {
+        this.clearAuth()
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:logout'))
+        }
+        throw new Error('Session expired. Please log in again.')
       }
-    } catch {
-      throw new Error('Invalid token')
     }
+
+    if (!res.ok) {
+      let errorMessage = `Request failed with status ${res.status}`
+      let errorData = null
+      try {
+        errorData = await res.json()
+        errorMessage = errorData.message || errorData.error || errorMessage
+      } catch {
+        // use default status message
+      }
+
+      const err = new Error(errorMessage)
+      err.status = res.status
+      err.data = errorData
+      if (errorData?.allowed_methods) {
+        err.allowedMethods = errorData.allowed_methods
+      }
+      throw err
+    }
+
+    if (res.status === 204) {
+      return { success: true }
+    }
+
+    return res.json()
   }
 
-  logout() {
-    fetch(WORKER_URL + '/auth/logout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    }).catch(() => { })
-    this.clearAuth()
-    return Promise.resolve()
-  }
+  // --- NEON DATA API HELPER (fallback / direct read compatibility) ---
 
-  // --- NEON DATA API HELPER (with auto-refresh) ---
   async _neonFetch(path, options = {}, isCatalog = false, retryCount = 0) {
-    await this._ensureValidToken()
+    if (this.token && this._isTokenExpiringSoon(60)) {
+      try {
+        await this._ensureValidToken()
+      } catch {
+        // continue without refresh if failed
+      }
+    }
 
     const url = isCatalog ? CATALOG_URL : NEON_URL
     let headers = {
@@ -151,8 +185,9 @@ async register(userData) {
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     }
-    if (this.token) {
-      headers.Authorization = 'Bearer ' + this.token
+    const token = this.getToken()
+    if (token) {
+      headers.Authorization = 'Bearer ' + token
     }
     if (options.headers) {
       headers = { ...headers, ...options.headers }
@@ -160,13 +195,15 @@ async register(userData) {
 
     const res = await fetch(url + path, { ...options, headers })
 
-    if (res.status === 401 && retryCount < 1) {
+    if (res.status === 401 && retryCount < 1 && token) {
       try {
         await this.refresh()
         return this._neonFetch(path, options, isCatalog, retryCount + 1)
       } catch {
         this.clearAuth()
-        window.dispatchEvent(new CustomEvent('auth:logout'))
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:logout'))
+        }
         throw new Error('Session expired. Please log in again.')
       }
     }
@@ -176,189 +213,481 @@ async register(userData) {
       try {
         const errorData = await res.json()
         errorMessage = errorData.message || errorData.error || errorMessage
-      } catch (parseError) {
-        console.error('Failed to parse Data API error response:', parseError)
+      } catch {
+        // keep fallback
       }
       if (res.status === 409) throw new Error('Item already exists.')
       if (res.status === 401) throw new Error('Unauthorized')
       throw new Error(errorMessage)
     }
+
     return res.status === 204 ? null : res.json()
   }
 
-  // --- WORKER API HELPER (with auto-refresh) ---
-  async _workerFetch(endpoint, options = {}, retryCount = 0) {
-    await this._ensureValidToken()
+  // ===========================================
+  // 1. AUTH METHODS
+  // ===========================================
 
-    const headers = {
-      Authorization: 'Bearer ' + this.token,
-      'Content-Type': 'application/json',
+  async login(email, password) {
+    const data = await this._request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+    if (data?.access_token) {
+      this.setToken(data.access_token)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:login'))
+      }
     }
-    if (options.headers) {
-      Object.assign(headers, options.headers)
+    return data
+  }
+
+  async register(userData) {
+    const data = await this._request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    })
+    if (data?.access_token) {
+      this.setToken(data.access_token)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:login'))
+      }
     }
+    return data
+  }
 
-    const res = await fetch(WORKER_URL + endpoint, { ...options, headers })
+  async getMe() {
+    return this._request('/auth/me', { method: 'GET' }, true)
+  }
 
-    if (res.status === 401 && retryCount < 1) {
+  async getCurrentUser() {
+    try {
+      const me = await this.getMe()
+      return { user: me }
+    } catch {
+      const token = this.getToken()
+      if (!token) throw new Error('Not authenticated')
       try {
-        await this.refresh()
-        return this._workerFetch(endpoint, options, retryCount + 1)
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        return {
+          user: {
+            id: payload.sub,
+            role: payload.role || 'authenticated',
+            email: payload.email || 'user@example.com',
+          },
+        }
       } catch {
-        this.clearAuth()
+        throw new Error('Invalid token')
+      }
+    }
+  }
+
+  async updateProfile(data) {
+    return this._request(
+      '/auth/profile',
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      },
+      true,
+    )
+  }
+
+  async changePassword(currentPasswordOrData, newPassword = null) {
+    const payload =
+      typeof currentPasswordOrData === 'object' && currentPasswordOrData !== null
+        ? currentPasswordOrData
+        : { current_password: currentPasswordOrData, new_password: newPassword }
+
+    return this._request(
+      '/auth/change-password',
+      {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      },
+      true,
+    )
+  }
+
+  async forgotPassword(email) {
+    return this._request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+  }
+
+  async resetPassword(email, tokenOrCode, newPassword) {
+    return this._request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, tokenOrCode, newPassword }),
+    })
+  }
+
+  async logout() {
+    try {
+      await this._request('/auth/logout', { method: 'POST' })
+    } catch (e) {
+      console.warn('Logout request warning:', e)
+    } finally {
+      this.clearAuth()
+      if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('auth:logout'))
-        throw new Error('Session expired. Please log in again.')
+      }
+    }
+    return { success: true }
+  }
+
+  async refresh() {
+    const data = await this._request('/auth/refresh', {
+      method: 'POST',
+    })
+    if (data?.access_token) {
+      this.setToken(data.access_token)
+    }
+    return data
+  }
+
+  // ===========================================
+  // 2. PRODUCTS METHODS
+  // ===========================================
+
+  async getProducts(params = {}) {
+    const query = new URLSearchParams()
+    for (const [key, val] of Object.entries(params)) {
+      if (val !== undefined && val !== null && val !== '') {
+        if (Array.isArray(val)) {
+          val.forEach((item) => query.append(key, item))
+        } else {
+          query.append(key, String(val))
+        }
+      }
+    }
+    const qs = query.toString()
+    return this._request(`/api/products${qs ? `?${qs}` : ''}`, { method: 'GET' })
+  }
+
+  async getProduct(idOrSlug) {
+    return this._request(`/api/products/${encodeURIComponent(idOrSlug)}`, { method: 'GET' })
+  }
+
+  async getFilters() {
+    return this._request('/api/products/filters', { method: 'GET' })
+  }
+
+  async getFeaturedProducts(limit = 8) {
+    return this._request(`/api/products/featured?limit=${limit}`, { method: 'GET' })
+  }
+
+  async getCategories() {
+    return this._request('/api/categories', { method: 'GET' })
+  }
+
+  async getCategory(slugOrId) {
+    return this._request(`/api/categories/${encodeURIComponent(slugOrId)}`, { method: 'GET' })
+  }
+
+  // ===========================================
+  // 3. CART METHODS
+  // ===========================================
+
+  async getCart() {
+    return this._request('/api/cart', { method: 'GET' }, true)
+  }
+
+  async addToCart(productIdOrData, quantity = 1, priceSnapshot = null) {
+    let payload
+    if (typeof productIdOrData === 'object' && productIdOrData !== null) {
+      payload = {
+        product_id: productIdOrData.product_id || productIdOrData.productId,
+        quantity: productIdOrData.quantity || quantity || 1,
+        price_snapshot:
+          productIdOrData.price_snapshot !== undefined
+            ? productIdOrData.price_snapshot
+            : productIdOrData.priceSnapshot !== undefined
+              ? productIdOrData.priceSnapshot
+              : priceSnapshot,
+      }
+    } else {
+      payload = {
+        product_id: productIdOrData,
+        quantity,
+        price_snapshot: priceSnapshot,
       }
     }
 
-    return res
-  }
-
-  // --- CARTS & WISHLISTS (via Neon Data API) ---
-  async getCart() {
-    if (!this.token) return null
-    const carts = await this._neonFetch('/carts?select=id,user_id,created_at,updated_at')
-    if (!carts || !carts.length) return null
-    const cartId = carts[0].id
-    const items = await this._neonFetch(
-      '/cart_items?cart_id=eq.' +
-      cartId +
-      '&select=id,cart_id,product_id,quantity,price_snapshot,created_at',
+    return this._request(
+      '/api/cart/items',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      true,
     )
-    return { ...carts[0], cart_items: items || [] }
-  }
-
-  async getCartId() {
-    if (!this.token) return null
-    const carts = await this._neonFetch('/carts?select=id')
-    return carts && carts.length ? carts[0].id : null
-  }
-
-  async createCart() {
-    const user = await this.getCurrentUser()
-    if (!user.user.id) throw new Error('Not authenticated')
-    return this._neonFetch('/carts', {
-      method: 'POST',
-      body: JSON.stringify({ user_id: user.user.id }),
-    })
-  }
-
-  async createWishlist() {
-    const user = await this.getCurrentUser()
-    if (!user.user.id) throw new Error('Not authenticated')
-    return this._neonFetch('/wishlists', {
-      method: 'POST',
-      body: JSON.stringify({ user_id: user.user.id }),
-    })
   }
 
   addCartItem(data) {
-    return this._neonFetch('/cart_items', { method: 'POST', body: JSON.stringify(data) })
+    return this.addToCart(data)
   }
 
-  updateCartItem(id, qty) {
-    return this._neonFetch('/cart_items?id=eq.' + id, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity: qty }),
-    })
+  async updateCartItem(itemId, quantity) {
+    return this._request(
+      `/api/cart/items/${itemId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ quantity }),
+      },
+      true,
+    )
   }
 
-  removeCartItem(id) {
-    return this._neonFetch('/cart_items?id=eq.' + id, { method: 'DELETE' })
+  async removeCartItem(itemId) {
+    return this._request(`/api/cart/items/${itemId}`, { method: 'DELETE' }, true)
   }
 
-  async clearCart(cartId) {
-    if (cartId) {
-      return this._neonFetch('/cart_items?cart_id=eq.' + cartId, { method: 'DELETE' })
-    }
+  async clearCart() {
+    return this._request('/api/cart/clear', { method: 'DELETE' }, true)
   }
+
+  async createCart() {
+    return this.getCart()
+  }
+
+  // ===========================================
+  // 4. WISHLIST METHODS
+  // ===========================================
 
   async getWishlist() {
-    if (!this.token) return []
-    const wishlists = await this._neonFetch('/wishlists?select=id')
-    if (!wishlists || !wishlists.length) return []
-    const wishlistId = wishlists[0].id
-    return this._neonFetch(
-      '/wishlist_items?wishlist_id=eq.' +
-      wishlistId +
-      '&select=id,wishlist_id,product_id,created_at',
-    )
+    return this._request('/api/wishlist', { method: 'GET' }, true)
   }
 
   async getWishlistId() {
-    if (!this.token) return null
-    const wishlists = await this._neonFetch('/wishlists?select=id')
-    return wishlists && wishlists.length ? wishlists[0].id : null
+    const data = await this.getWishlist()
+    return data?.items?.[0]?.wishlist_id || 'user_wishlist'
+  }
+
+  async addToWishlist(productIdOrData) {
+    const productId =
+      typeof productIdOrData === 'object' && productIdOrData !== null
+        ? productIdOrData.product_id || productIdOrData.productId
+        : productIdOrData
+
+    return this._request(
+      '/api/wishlist/items',
+      {
+        method: 'POST',
+        body: JSON.stringify({ product_id: productId }),
+      },
+      true,
+    )
   }
 
   addWishlistItem(data) {
-    return this._neonFetch('/wishlist_items', { method: 'POST', body: JSON.stringify(data) })
+    return this.addToWishlist(data)
   }
 
-  removeWishlistItem(id) {
-    return this._neonFetch('/wishlist_items?id=eq.' + id, { method: 'DELETE' })
+  async removeFromWishlist(itemId) {
+    return this._request(`/api/wishlist/items/${itemId}`, { method: 'DELETE' }, true)
   }
 
-  removeWishlistItemByProductId(pid) {
-    return this._neonFetch('/wishlist_items?product_id=eq.' + pid, { method: 'DELETE' })
+  removeWishlistItem(itemId) {
+    return this.removeFromWishlist(itemId)
   }
 
-  // --- ORDERS (read via Neon Data API, write via Worker API) ---
-  async getOrders() {
-    return this._neonFetch(
-      '/orders?select=id,status,total_amount,created_at,address_id,shipping_first_name,shipping_last_name,shipping_address,shipping_city,shipping_state,shipping_pincode,shipping_phone,order_items(*),user_addresses(id,address_line_1,address_line_2,city,state,postal_code,country),payments(method,status)&order=created_at.desc',
+  async removeWishlistItemByProductId(productId) {
+    return this._request(
+      `/api/wishlist/items/by-product/${encodeURIComponent(productId)}`,
+      { method: 'DELETE' },
+      true,
     )
+  }
+
+  async clearWishlist() {
+    return this._request('/api/wishlist/clear', { method: 'DELETE' }, true)
+  }
+
+  async createWishlist() {
+    return this.getWishlist()
+  }
+
+  // ===========================================
+  // 5. ADDRESSES METHODS
+  // ===========================================
+
+  async getAddresses() {
+    return this._request('/api/addresses', { method: 'GET' }, true)
+  }
+
+  async getDefaultAddress() {
+    return this._request('/api/addresses/default', { method: 'GET' }, true)
+  }
+
+  async getAddress(addressId) {
+    return this._request(`/api/addresses/${addressId}`, { method: 'GET' }, true)
+  }
+
+  async createAddress(addressData) {
+    return this._request(
+      '/api/addresses',
+      {
+        method: 'POST',
+        body: JSON.stringify(addressData),
+      },
+      true,
+    )
+  }
+
+  async updateAddress(addressId, addressData) {
+    return this._request(
+      `/api/addresses/${addressId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(addressData),
+      },
+      true,
+    )
+  }
+
+  async setDefaultAddress(addressId) {
+    return this.updateAddress(addressId, { is_default: true })
+  }
+
+  async deleteAddress(addressId) {
+    return this._request(`/api/addresses/${addressId}`, { method: 'DELETE' }, true)
+  }
+
+  // ===========================================
+  // 6. COUPONS METHODS
+  // ===========================================
+
+  async getActiveCoupons() {
+    return this._request('/api/coupons/active', { method: 'GET' })
+  }
+
+  async validateCoupon(code, subtotal = 0) {
+    return this._request('/api/coupons/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code, subtotal }),
+    })
+  }
+
+  // ===========================================
+  // 7. ORDERS METHODS
+  // ===========================================
+
+  async checkout(orderData) {
+    return this._request(
+      '/api/orders/checkout',
+      {
+        method: 'POST',
+        body: JSON.stringify(orderData),
+      },
+      true,
+    )
+  }
+
+  async getOrders() {
+    return this._request('/api/orders', { method: 'GET' }, true)
+  }
+
+  async getOrder(orderId) {
+    return this._request(`/api/orders/${orderId}`, { method: 'GET' }, true)
   }
 
   async getOrderById(orderId) {
-    return this._neonFetch(
-      '/orders?id=eq.' +
-      orderId +
-      '&select=id,status,total_amount,created_at,address_id,shipping_first_name,shipping_last_name,shipping_address,shipping_city,shipping_state,shipping_pincode,shipping_phone,order_items(*),user_addresses(id,address_line_1,address_line_2,city,state,postal_code,country),payments(method,status)',
-    )
+    return this.getOrder(orderId)
   }
 
   async updateOrderShipping(orderId, shippingData) {
-    const res = await this._workerFetch('/api/orders/' + orderId + '/shipping', {
-      method: 'PATCH',
-      body: JSON.stringify(shippingData),
-    })
-    if (!res.ok) throw new Error('Failed to update shipping')
-    return res.json()
+    return this._request(
+      `/api/orders/${orderId}/shipping`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(shippingData),
+      },
+      true,
+    )
   }
 
-  async checkout(orderData) {
-    const res = await this._workerFetch('/api/orders/checkout', {
+  async cancelOrder(orderId, reason = 'Cancelled by customer') {
+    return this._request(
+      `/api/orders/${orderId}/cancel`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      },
+      true,
+    )
+  }
+
+  // ===========================================
+  // 8. REVIEWS METHODS
+  // ===========================================
+
+  async getProductReviews(productId, params = {}) {
+    const query = new URLSearchParams()
+    if (params.page) query.set('page', String(params.page))
+    if (params.limit) query.set('limit', String(params.limit))
+    const qs = query.toString()
+    return this._request(`/api/reviews/product/${productId}${qs ? `?${qs}` : ''}`, {
+      method: 'GET',
+    })
+  }
+
+  async submitReview(reviewData) {
+    return this._request(
+      '/api/reviews',
+      {
+        method: 'POST',
+        body: JSON.stringify(reviewData),
+      },
+      true,
+    )
+  }
+
+  // ===========================================
+  // 9. PAYMENTS METHODS
+  // ===========================================
+
+  async createPaymentOrder(orderId, amount, currency = 'INR') {
+    return this._request(
+      '/api/payments/create-order',
+      {
+        method: 'POST',
+        body: JSON.stringify({ order_id: orderId, amount, currency }),
+      },
+      true,
+    )
+  }
+
+  async verifyPayment(paymentData) {
+    return this._request(
+      '/api/payments/verify',
+      {
+        method: 'POST',
+        body: JSON.stringify(paymentData),
+      },
+      true,
+    )
+  }
+
+  // ===========================================
+  // 10. ENGAGEMENT METHODS
+  // ===========================================
+
+  async subscribeNewsletter(email) {
+    return this._request('/api/newsletter/subscribe', {
       method: 'POST',
-      body: JSON.stringify(orderData),
+      body: JSON.stringify({ email }),
     })
-    if (!res.ok) {
-      let message = 'Checkout failed'
-      let allowedMethods = null
-
-      try {
-        const data = await res.json()
-        message = data?.message || message
-        if (Array.isArray(data?.allowed_methods)) {
-          allowedMethods = data.allowed_methods
-        }
-      } catch {
-        // keep default message
-      }
-
-      const err = new Error(message)
-      if (allowedMethods) {
-        err.allowedMethods = allowedMethods
-      }
-      throw err
-    }
-    return res.json()
   }
 
-  // --- CATALOG ---
-  getProducts() {
-    return this._neonFetch('/products?is_active=eq.true', {}, true)
+  async submitContact(contactData) {
+    return this._request('/api/contact', {
+      method: 'POST',
+      body: JSON.stringify(contactData),
+    })
   }
 }
 
 export const api = new ApiClient()
+export default api
