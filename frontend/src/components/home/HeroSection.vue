@@ -21,7 +21,7 @@ const newArrivalImages = [
     altKey: 'new_arrival_alt_2',
   },
   {
-    src: 'https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
+    src: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
     alt: homePageText.new_arrival_alt_3.text,
     altKey: 'new_arrival_alt_3',
   },

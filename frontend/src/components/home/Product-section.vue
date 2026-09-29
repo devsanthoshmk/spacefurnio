@@ -139,10 +139,11 @@ const products = ref([
 @font-face {
   font-family: 'Phitagate';
   src: url('/fonts/Phitagate.otf') format('opentype');
+  font-display: swap;
 }
 
 .phitagate-font {
-  font-family: 'Phitagate', serif !important;
+  font-family: 'Phitagate', 'Playfair Display', serif !important;
 }
 
 /* ========================================
@@ -204,12 +205,13 @@ const products = ref([
   font-size: clamp(2rem, 6vw, 4.5rem);
   font-weight: 400;
   text-align: center;
-  color: transparent;
-  -webkit-text-stroke: 1.5px #1a1a1a;
-  text-stroke: 1.5px #1a1a1a;
+  color: #1a1a1a;
   letter-spacing: 0.02em;
   line-height: 1.1;
   white-space: nowrap;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .section-subtitle {
@@ -533,7 +535,6 @@ const products = ref([
   }
 
   .section-title {
-    -webkit-text-stroke: 1.2px #1a1a1a;
     font-size: 2rem;
   }
 
@@ -658,7 +659,6 @@ const products = ref([
 
   .section-title {
     font-size: 2.4rem;
-    -webkit-text-stroke: 1.3px #1a1a1a;
   }
 
   .section-subtitle {
@@ -819,10 +819,6 @@ const products = ref([
 @media (min-width: 1400px) {
   .product-section {
     padding-top: 7rem;
-  }
-
-  .section-title {
-    -webkit-text-stroke: 2px #1a1a1a;
   }
 
   .products-grid {

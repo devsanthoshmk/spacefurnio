@@ -176,7 +176,7 @@ const submitForm = () => {
     </div>
 
     <!-- Bottom Section: Team Arc -->
-    <div>
+    <div class="pt-[50px]">
       <CTA />
     </div>
   </div>
