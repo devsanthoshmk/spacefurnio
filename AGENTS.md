@@ -6,7 +6,7 @@
 - Do not make architectural changes without prior approval.
 - Always update `docs/` when completing features, schema changes, or bug fixes.
 - Consult documentation in `backend/ecommerce-backend/docs/` before making backend or database changes.
-- Do not touch or modify the custom frontend scrolling logic under any circumstances.
+- Do not touch or modify the custom frontend scrolling logic (`customScroll.js`) or wrap `.scroll-section` elements inside intermediate container divs under any circumstances without explicit user permission. All `.scroll-section` elements in views using `customScroll` MUST be direct children of `#scroll-wrapper`.
 - Keep agent instructions up to date in `AGENTS.md` whenever workflows or standards evolve.
 
 ---

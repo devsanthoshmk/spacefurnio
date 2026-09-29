@@ -1,68 +1,71 @@
+<!-- ⚠️ AI AGENT WARNING:
+  Hands off! Every section here is a direct root child of #scroll-wrapper with .scroll-section.
+  Do NOT wrap these in extra container tags or alter the hierarchy. Custom scroller calculations
+  depend strictly on direct child structure. Any changes require explicit user authorization!
+-->
 <template>
-  <section id="founder-section" class="antialiased" aria-label="Meet the Team">
-    <div
-      v-for="(person, index) in team"
-      :key="person.id"
-      class="scroll-section team-member-section !min-h-[100dvh]"
-      :class="index % 2 !== 0 ? 'bg-[#fff4ec]' : 'bg-[#f4f2ed]'"
-    >
-      <div class="h-[9vh] block"></div>
-      <div class="team-member-container">
-        <!-- Main Content Wrapper with Flexbox -->
-        <!-- Added 'reversed' class logic for alternating desktop layout -->
-        <div class="team-content-wrapper" :class="{ reversed: index % 2 !== 0 }">
-          <!-- Photo Frame Column with Diagonal Cut -->
-          <div class="photo-frame-wrapper">
-            <div class="photo-frame">
-              <!-- Hello Text positioned above the clipped container -->
-              <h2 class="hello-text cinzel-font" aria-hidden="true">HELLO,</h2>
+  <div
+    v-for="(person, index) in team"
+    :key="person.id"
+    class="scroll-section team-member-section !min-h-[100dvh]"
+    :class="index % 2 !== 0 ? 'bg-[#fff4ec]' : 'bg-[#f4f2ed]'"
+  >
+    <div class="h-[9vh] block"></div>
+    <div class="team-member-container">
+      <!-- Main Content Wrapper with Flexbox -->
+      <!-- Added 'reversed' class logic for alternating desktop layout -->
+      <div class="team-content-wrapper" :class="{ reversed: index % 2 !== 0 }">
+        <!-- Photo Frame Column with Diagonal Cut -->
+        <div class="photo-frame-wrapper">
+          <div class="photo-frame">
+            <!-- Hello Text positioned above the clipped container -->
+            <h2 class="hello-text cinzel-font" aria-hidden="true">HELLO,</h2>
 
-              <!-- Photo container with diagonal clip -->
-              <div class="photo-container">
-                <img
-                  :src="person.image || defaultImage(person.id)"
-                  :alt="person.name"
-                  class="team-photo"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
+            <!-- Photo container with diagonal clip -->
+            <div class="photo-container">
+              <img
+                :src="person.image || defaultImage(person.id)"
+                :alt="person.name"
+                class="team-photo"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
 
-              <!-- Name block at bottom right -->
-              <div class="name-block">
-                <h1 class="name-title cinzel-font">
-                  <span class="text-black">I'M</span>
-                  <span class="name-highlight">{{
-                    person.nickname.toUpperCase() || firstName(person.name)
-                  }}</span>
-                </h1>
-                <div class="role-text">
-                  <span>{{ person.name }}</span>
-                  <span v-for="(rolePart, i) in splitRole(person.role)" :key="i">
-                    {{ rolePart }}
-                  </span>
-                </div>
+            <!-- Name block at bottom right -->
+            <div class="name-block">
+              <h1 class="name-title cinzel-font">
+                <span class="text-black">I'M</span>
+                <span class="name-highlight">{{
+                  person.nickname.toUpperCase() || firstName(person.name)
+                }}</span>
+              </h1>
+              <div class="role-text">
+                <span>{{ person.name }}</span>
+                <span v-for="(rolePart, i) in splitRole(person.role)" :key="i">
+                  {{ rolePart }}
+                </span>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Content Column -->
-          <div class="content-column">
-            <div class="content-inner">
-              <div class="bio-text">
-                <p>{{ person.detailedBio }}</p>
-              </div>
+        <!-- Content Column -->
+        <div class="content-column">
+          <div class="content-inner">
+            <div class="bio-text">
+              <p>{{ person.detailedBio }}</p>
+            </div>
 
-              <div v-if="person.Architectural_Perspective" class="perspective-section">
-                <h4 class="perspective-title">Architectural Perspective:</h4>
-                <p class="perspective-quote">"{{ person.Architectural_Perspective }}"</p>
-              </div>
+            <div v-if="person.Architectural_Perspective" class="perspective-section">
+              <h4 class="perspective-title">Architectural Perspective:</h4>
+              <p class="perspective-quote">"{{ person.Architectural_Perspective }}"</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup>

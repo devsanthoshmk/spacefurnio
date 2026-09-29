@@ -1,4 +1,14 @@
 /**
+ * ⚠️⚡ AI AGENT WARNING ZONE ⚡⚠️
+ * =========================================================================================
+ * Stop right there! Do NOT touch, alter, refactor, or "optimize" this custom scrolling logic
+ * without explicit, written permission from the project owner.
+ *
+ * All views using customScroll rely on direct child elements matching .scroll-section
+ * directly under the #scroll-wrapper element.
+ * Modifying this file without human consent has broken production before. Proceed at your own peril!
+ * =========================================================================================
+ *
  * Section-based scrolling utility that synchronizes wheel, touch, and keyboard navigation
  * while managing optional navigation dots. Designed for full-height layouts where each
  * child section occupies the viewport and should snap into view.

@@ -1,3 +1,8 @@
+<!-- ⚠️ AI AGENT WARNING:
+  Halt! You are entering the Sacred Custom Scroll Zone.
+  Every scroll section in this template MUST remain a direct child of #scroll-wrapper with .scroll-section.
+  Do NOT add wrapper divs around components like <TeamMembers /> or modify section hierarchy without explicit human orders!
+-->
 <template>
   <div id="scroll-container" class="overflow-hidden">
     <div id="scroll-wrapper" ref="wrapper">
@@ -351,10 +356,8 @@
         </div>
       </section>
 
-      <!-- founder's section -->
-      <div class="team-section" style="position: relative; z-index: 2">
-        <TeamMembers />
-      </div>
+      <!-- founder's section (Direct fragment children inside #scroll-wrapper) -->
+      <TeamMembers />
 
       <section
         id="our-team"
