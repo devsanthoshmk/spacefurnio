@@ -694,27 +694,86 @@ export async function getProduct(idOrSlug) {
 
     const product = transformProduct(rows[0])
 
-    // Get related products (same listing type + category/space/style)
-    let relatedWhere = 'WHERE p.id != $1'
-    const relatedParams = [rows[0].id]
+    // Get related products with robust tiered fallback (targeting 8 items for horizontal scrolling)
+    const TARGET_RELATED_COUNT = 8
+    const currentProdId = rows[0].id
+    const seenIds = new Set([currentProdId])
+    const relatedProducts = []
 
+    // Tier 1: Same category
     if (rows[0].category_slug) {
-      relatedWhere += ' AND c.slug = $2'
-      relatedParams.push(rows[0].category_slug)
-    } else if (rows[0].space_slug) {
-      relatedWhere += ' AND s.slug = $2'
-      relatedParams.push(rows[0].space_slug)
-    } else if (rows[0].style_slug) {
-      relatedWhere += ' AND st.slug = $2'
-      relatedParams.push(rows[0].style_slug)
+      try {
+        const catRows = await sql.query(
+          `${PRODUCT_BASE_QUERY} WHERE p.id != $1 AND c.slug = $2 ORDER BY p.popularity DESC LIMIT $3`,
+          [currentProdId, rows[0].category_slug, TARGET_RELATED_COUNT],
+        )
+        for (const r of catRows) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id)
+            relatedProducts.push(transformProduct(r))
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching category related products:', e)
+      }
     }
 
-    const relatedRows = await sql.query(
-      `${PRODUCT_BASE_QUERY} ${relatedWhere} ORDER BY p.popularity DESC LIMIT 4`,
-      relatedParams,
-    )
+    // Tier 2: Same space if we need more
+    if (relatedProducts.length < TARGET_RELATED_COUNT && rows[0].space_slug) {
+      try {
+        const spaceRows = await sql.query(
+          `${PRODUCT_BASE_QUERY} WHERE p.id != $1 AND s.slug = $2 ORDER BY p.popularity DESC LIMIT $3`,
+          [currentProdId, rows[0].space_slug, TARGET_RELATED_COUNT],
+        )
+        for (const r of spaceRows) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id)
+            relatedProducts.push(transformProduct(r))
+            if (relatedProducts.length >= TARGET_RELATED_COUNT) break
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching space related products:', e)
+      }
+    }
 
-    const relatedProducts = relatedRows.map(transformProduct)
+    // Tier 3: Same style if we need more
+    if (relatedProducts.length < TARGET_RELATED_COUNT && rows[0].style_slug) {
+      try {
+        const styleRows = await sql.query(
+          `${PRODUCT_BASE_QUERY} WHERE p.id != $1 AND st.slug = $2 ORDER BY p.popularity DESC LIMIT $3`,
+          [currentProdId, rows[0].style_slug, TARGET_RELATED_COUNT],
+        )
+        for (const r of styleRows) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id)
+            relatedProducts.push(transformProduct(r))
+            if (relatedProducts.length >= TARGET_RELATED_COUNT) break
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching style related products:', e)
+      }
+    }
+
+    // Tier 4: General top popular items fallback to guarantee a rich list
+    if (relatedProducts.length < TARGET_RELATED_COUNT) {
+      try {
+        const popRows = await sql.query(
+          `${PRODUCT_BASE_QUERY} WHERE p.id != $1 ORDER BY p.popularity DESC, p.id ASC LIMIT $2`,
+          [currentProdId, TARGET_RELATED_COUNT + seenIds.size],
+        )
+        for (const r of popRows) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id)
+            relatedProducts.push(transformProduct(r))
+            if (relatedProducts.length >= TARGET_RELATED_COUNT) break
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching fallback related products:', e)
+      }
+    }
 
     return {
       success: true,

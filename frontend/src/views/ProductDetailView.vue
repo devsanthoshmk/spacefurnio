@@ -870,19 +870,46 @@
               <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Curated Pairing</span>
               <h2 class="text-2xl sm:text-3xl font-serif text-stone-900 mt-1">You May Also Like</h2>
             </div>
-            <router-link
-              :to="`/shop?categories=${product?.category || ''}`"
-              class="text-xs font-semibold text-stone-700 hover:text-stone-900 underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 transition-colors"
-            >
-              Explore Collection →
-            </router-link>
+            <div class="flex items-center gap-3">
+              <button
+                v-if="relatedProductsList.length > 3"
+                @click="scrollRelated('left')"
+                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
+                aria-label="Previous products"
+                title="Previous products"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                v-if="relatedProductsList.length > 3"
+                @click="scrollRelated('right')"
+                class="w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-700 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-200 active:scale-95 cursor-pointer"
+                aria-label="Next products"
+                title="Next products"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <router-link
+                :to="`/shop?categories=${product?.category || ''}`"
+                class="hidden sm:inline-flex items-center ml-2 text-xs font-semibold text-stone-700 hover:text-stone-900 underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 transition-colors"
+              >
+                Explore Collection →
+              </router-link>
+            </div>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div
+            ref="relatedScrollContainer"
+            class="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 shop-scrollbar scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
+          >
             <div
               v-for="item in relatedProductsList"
               :key="item.id"
-              class="related-card group flex flex-col bg-white rounded-2xl p-3 border border-stone-200/80 hover:border-stone-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              class="related-card flex-none w-[220px] sm:w-[250px] md:w-[270px] snap-start group flex flex-col bg-white rounded-2xl p-3 border border-stone-200/80 hover:border-stone-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
               @click="navigateToProduct(item)"
             >
               <!-- Product Image with Quick Add Button -->
@@ -1215,6 +1242,7 @@ const newReview = ref({
 // Main Product Data
 const product = ref(null)
 const relatedProductsList = ref([])
+const relatedScrollContainer = ref(null)
 const reviewsList = ref([])
 
 // Preset fallback furniture product
@@ -1684,6 +1712,15 @@ function navigateToProduct(item) {
   router.push(`/shop/product/${item.id}`)
 }
 
+function scrollRelated(direction) {
+  if (!relatedScrollContainer.value) return
+  const scrollAmount = Math.max(300, relatedScrollContainer.value.clientWidth * 0.75)
+  relatedScrollContainer.value.scrollBy({
+    left: direction === 'left' ? -scrollAmount : scrollAmount,
+    behavior: 'smooth',
+  })
+}
+
 // Review helpers
 function getStarPercentage(star) {
   const total = reviewsList.value.length
@@ -1805,11 +1842,11 @@ async function loadProduct() {
       // Fetch reviews
       await loadReviews(response.data.id)
 
-      // Related products
-      if (response.data.relatedProducts && response.data.relatedProducts.length > 0) {
+      // Related products (ensure at least 6-8 items for smooth carousel scrolling)
+      if (response.data.relatedProducts && response.data.relatedProducts.length >= 6) {
         relatedProductsList.value = response.data.relatedProducts
       } else {
-        await loadRelatedProducts(response.data)
+        await loadRelatedProducts(response.data, response.data.relatedProducts || [])
       }
     } else {
       fetchError.value = response.error || 'Product not found'
@@ -1847,16 +1884,34 @@ async function loadReviews(productId) {
   }
 }
 
-async function loadRelatedProducts(prod) {
+async function loadRelatedProducts(prod, initialList = []) {
   try {
+    const list = [...initialList]
+    const currentId = String(prod?.id || '')
+    const existingIds = new Set([currentId, ...list.map((p) => String(p.id))])
+
     const featuredRes = await getFeaturedProducts()
-    if (featuredRes.success && Array.isArray(featuredRes.data)) {
-      relatedProductsList.value = featuredRes.data
-        .filter((p) => String(p.id) !== String(prod.id))
-        .slice(0, 4)
+    if (featuredRes && featuredRes.success && featuredRes.data) {
+      const candidates = [
+        ...(Array.isArray(featuredRes.data) ? featuredRes.data : []),
+        ...(featuredRes.data.featured || []),
+        ...(featuredRes.data.bestSellers || []),
+        ...(featuredRes.data.newArrivals || []),
+      ]
+
+      for (const item of candidates) {
+        if (item && item.id && !existingIds.has(String(item.id))) {
+          existingIds.add(String(item.id))
+          list.push(item)
+          if (list.length >= 8) break
+        }
+      }
     }
+
+    relatedProductsList.value = list
   } catch (e) {
     console.warn('Failed to load related products:', e)
+    relatedProductsList.value = initialList
   }
 }
 
