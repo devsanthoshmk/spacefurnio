@@ -173,9 +173,41 @@
         </li>
       </ul>
 
+      <!-- ─── Small Screen Navigation Links (Home, Shop, Portfolio) ─── -->
+      <ul
+        v-if="!searchMode"
+        class="menu flex md:hidden items-center space-x-1 sm:space-x-2 flex-1 justify-center text-xs font-medium"
+      >
+        <li>
+          <router-link
+            to="/"
+            class="nav-link py-1.5 px-2.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
+          >
+            Home
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/shop"
+            class="nav-link py-1.5 px-2.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
+          >
+            Shop
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/portfolio"
+            class="nav-link py-1.5 px-2.5 rounded-full transition-all duration-300 hover:bg-stone-50 text-stone-700 whitespace-nowrap"
+          >
+            Portfolio
+          </router-link>
+        </li>
+      </ul>
+
       <!-- ─── Right Side Icons & User Avatar Dropdown ─── -->
       <div v-if="!searchMode" class="nav-right flex items-center space-x-1 sm:space-x-1.5 lg:space-x-2 xl:space-x-3 shrink-0">
-        <div class="icons flex items-center space-x-0.5 sm:space-x-1 lg:space-x-1.5 xl:space-x-2 text-sm sm:text-base">
+        <!-- Desktop Action Icons (Hidden on mobile < md, visible on md and up) -->
+        <div class="icons hidden md:flex items-center space-x-0.5 sm:space-x-1 lg:space-x-1.5 xl:space-x-2 text-sm sm:text-base">
           <!-- Search Button -->
           <button
             @click="openSearch"
