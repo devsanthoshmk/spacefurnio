@@ -5,4 +5,5 @@ export type Env = {
     RSA_PUBLIC_KEY_PEM: string;
     RESEND_API_KEY: string;
     JWT_SECRET: string;
+    ASSETS?: Fetcher;
 };

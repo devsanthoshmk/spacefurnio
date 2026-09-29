@@ -37,4 +37,11 @@ router.all('/api/*', engagementRouter.fetch);
 
 router.get('/health', () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
+router.all('*', (request: Request, env: Env) => {
+  if (env.ASSETS) {
+    return env.ASSETS.fetch(request);
+  }
+  return new Response('Not Found', { status: 404 });
+});
+
 export default router;
