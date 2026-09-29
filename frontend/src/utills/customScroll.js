@@ -32,10 +32,10 @@ const SCROLL_DIRECTION = {
  * }>}
  */
 const DEFAULT_OPTIONS = Object.freeze({
-  scrollDelay: 400,
+  scrollDelay: 300,
   bounceDistance: 100,
-  bounceDuration: 250,
-  touchThreshold: 30,
+  bounceDuration: 200,
+  touchThreshold: 15,
   transitionTiming: 'cubic-bezier(0.5, 0, 0.2, 1)',
   emmitSectionChangeEvent: true,
   enableResizeListener: true,

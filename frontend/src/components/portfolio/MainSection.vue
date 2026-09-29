@@ -275,7 +275,7 @@ function handleTouchMove(event) {
   const touchStartY = containerRef.value._touchStartY || touchY
   const deltaY = touchStartY - touchY
   
-  if (Math.abs(deltaY) > 30) { // Same threshold used for swipe
+  if (Math.abs(deltaY) > 15) { // Same threshold used for swipe
     if (deltaY > 0 && currentIndex.value < sections.value.length - 1) {
       event.preventDefault()
       event.stopPropagation()
