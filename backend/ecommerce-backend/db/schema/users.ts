@@ -47,6 +47,14 @@ export const userSessions = pgTable('user_sessions', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const passwordResets = pgTable('password_resets', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    token: text('token').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
     addresses: many(userAddresses),

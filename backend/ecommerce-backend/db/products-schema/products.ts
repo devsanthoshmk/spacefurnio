@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, integer, smallint, numeric, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, integer, smallint, numeric, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core';
 
 // Enum for listing type
 export const listingTypeEnum = pgEnum('listing_type', ['category', 'space', 'style']);
@@ -8,41 +8,49 @@ export const listingTypeEnum = pgEnum('listing_type', ['category', 'space', 'sty
 export const brands = pgTable('brands', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
+    slug: varchar('slug', { length: 120 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const categories = pgTable('categories', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
     slug: varchar('slug', { length: 120 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const colors = pgTable('colors', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 50 }).notNull().unique(),
-    hex: varchar('hex', { length: 7 }).notNull(),
+    hexCode: varchar('hex_code', { length: 7 }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const materials = pgTable('materials', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const spaces = pgTable('spaces', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
     slug: varchar('slug', { length: 120 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const styles = pgTable('styles', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
     slug: varchar('slug', { length: 120 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const rooms = pgTable('rooms', {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 100 }).notNull().unique(),
     slug: varchar('slug', { length: 120 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ============= PRODUCTS TABLE =============
@@ -73,12 +81,15 @@ export const products = pgTable('products', {
 export const productColors = pgTable('product_colors', {
     productId: integer('product_id').notNull().references(() => products.id),
     colorId: integer('color_id').notNull().references(() => colors.id),
+    sortOrder: smallint('sort_order').notNull().default(0),
 });
 
 export const productImages = pgTable('product_images', {
     id: serial('id').primaryKey(),
     productId: integer('product_id').notNull().references(() => products.id),
-    url: varchar('url', { length: 500 }).notNull(),
+    src: text('src').notNull(),
     alt: varchar('alt', { length: 200 }),
     sortOrder: smallint('sort_order').notNull().default(0),
+    isPrimary: boolean('is_primary').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
