@@ -3,15 +3,13 @@
  * AdminView.vue - Main admin wrapper with passcode protection
  * Shows passcode input initially, then renders AdminLayout
  */
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
 import AdminLayout from '@/components/admin/AdminLayout.vue'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 
-const router = useRouter()
 const toast = useToast()
 
 // State

@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const wrapper = ref(null)
 const navDotsContainer = ref(null)
@@ -137,7 +137,6 @@ onMounted(() => {
     if (now - lastScrollTime < scrollDelay) return
 
     if (currentIndex === 0 && offset >= maxOffset) {
-      const h = child_elms[currentIndex].offsetHeight
       wrapperEl.style.transform = `translateY(${offset + 100}px)`
       lastScrollTime = now
       setTimeout(() => {

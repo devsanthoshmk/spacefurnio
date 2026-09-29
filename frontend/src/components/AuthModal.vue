@@ -1,34 +1,23 @@
 <template>
-  <!--
-    ================================================================
-    LOGIN / SIGNUP MODAL — Reimagined
-    ================================================================
-    Premium auth modal with:
-    - Smooth tab switch between Login & Register
-    - Google OAuth button
-    - Magic link option
-    - Form validation with inline errors
-    - Route-driven open/close (/login suffix)
-    - Uses actual Worker API: POST /auth/login, POST /auth/register
-    ================================================================
-  -->
   <Teleport to="body">
+    <!-- Backdrop -->
     <Transition name="auth-backdrop">
       <div v-if="isOpen" class="sf-auth-backdrop" @click.self="closeModal"></div>
     </Transition>
 
+    <!-- Modal Window -->
     <Transition name="auth-content">
       <div
         v-if="isOpen"
         class="sf-auth-modal"
         role="dialog"
-        :aria-label="isLogin ? 'Sign In' : 'Create Account'"
+        :aria-label="modalTitle"
         @keydown.esc="closeModal"
         tabindex="-1"
         ref="modalRef"
       >
-        <!-- Close -->
-        <button @click="closeModal" class="sf-auth-close" aria-label="Close">
+        <!-- Close Button -->
+        <button @click="closeModal" class="sf-auth-close" aria-label="Close authentication dialog">
           <svg
             width="20"
             height="20"
@@ -44,75 +33,73 @@
           </svg>
         </button>
 
-        <!-- Brand -->
+        <!-- Brand Logo Header -->
         <div class="sf-auth-brand">
-          <img src="/images/Spacefurnio-Logo.png" alt="Spacefurnio" class="sf-auth-logo" />
+          <img src="/images/Spacefurnio-Logo.png" alt="SpaceFurnio" class="sf-auth-logo" />
         </div>
 
-        <!-- Tab Switcher -->
-        <div class="sf-auth-tabs" v-if="authView === 'login' || authView === 'register'">
-          <button :class="['sf-auth-tab', { active: authView === 'login' }]" @click="switchTab('login')">
+        <!-- Tab Switcher (Login / Register) -->
+        <div v-if="authView === 'login' || authView === 'register'" class="sf-auth-tabs">
+          <button
+            type="button"
+            :class="['sf-auth-tab', { active: authView === 'login' }]"
+            @click="switchTab('login')"
+          >
             Sign In
           </button>
-          <button :class="['sf-auth-tab', { active: authView === 'register' }]" @click="switchTab('register')">
+          <button
+            type="button"
+            :class="['sf-auth-tab', { active: authView === 'register' }]"
+            @click="switchTab('register')"
+          >
             Create Account
           </button>
-          <div class="sf-auth-tab-indicator" :style="{ left: authView === 'login' ? '0' : '50%' }"></div>
+          <div
+            class="sf-auth-tab-indicator"
+            :style="{ left: authView === 'login' ? '3px' : 'calc(50% + 1px)' }"
+          ></div>
         </div>
 
+        <!-- Alt Headers for Forgot / Reset -->
         <div v-else-if="authView === 'forgot'" class="sf-auth-header-alt">
-          <h3>Reset Password</h3>
-          <p>Enter your email to receive a reset link.</p>
+          <h3 class="sf-auth-alt-title">Forgot Password</h3>
+          <p class="sf-auth-alt-desc">Enter your email address and we'll send you a password reset code.</p>
         </div>
 
         <div v-else-if="authView === 'reset'" class="sf-auth-header-alt">
-          <h3>Set New Password</h3>
-          <p>Enter the code sent to your email or link token.</p>
+          <h3 class="sf-auth-alt-title">Set New Password</h3>
+          <p class="sf-auth-alt-desc">Enter the verification code sent to your email and your new password.</p>
         </div>
 
-        <!-- Form Container -->
+        <!-- Form Area -->
         <div class="sf-auth-form-wrap">
-          <!-- Error Banner -->
+          <!-- Error Alert -->
           <Transition name="error-slide">
-            <div v-if="errorMessage" class="sf-auth-error">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
+            <div v-if="errorMessage" class="sf-auth-alert error">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="15" y1="9" x2="9" y2="15" />
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
-              <span>{{ errorMessage }}</span>
-              <button type="button" @click="errorMessage = ''" class="sf-auth-error-dismiss">×</button>
+              <span class="flex-1">{{ errorMessage }}</span>
+              <button type="button" @click="errorMessage = ''" class="sf-alert-dismiss" aria-label="Dismiss error">×</button>
             </div>
           </Transition>
 
-          <!-- Success Banner -->
+          <!-- Success Alert -->
           <Transition name="error-slide">
-            <div v-if="successMessage" class="sf-auth-success">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
+            <div v-if="successMessage" class="sf-auth-alert success">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="flex-shrink-0">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
-              <span>{{ successMessage }}</span>
+              <span class="flex-1">{{ successMessage }}</span>
             </div>
           </Transition>
 
-          <!-- LOGIN FORM -->
+          <!-- 1. LOGIN VIEW -->
           <form v-if="authView === 'login'" @submit.prevent="handleLogin" class="sf-auth-form">
             <div class="sf-auth-field">
-              <label for="login-email" class="sf-auth-label">Email</label>
+              <label for="login-email" class="sf-auth-label">Email Address</label>
               <input
                 id="login-email"
                 v-model="loginForm.email"
@@ -127,15 +114,17 @@
             <div class="sf-auth-field">
               <div class="sf-auth-field-header">
                 <label for="login-password" class="sf-auth-label">Password</label>
-                <button type="button" class="sf-auth-forgot" @click="switchTab('forgot')">Forgot your password?</button>
+                <button type="button" class="sf-auth-forgot" @click="switchTab('forgot')">
+                  Forgot password?
+                </button>
               </div>
               <div class="sf-auth-input-wrap">
                 <input
                   id="login-password"
                   v-model="loginForm.password"
                   :type="showPassword ? 'text' : 'password'"
-                  class="sf-auth-input"
-                  placeholder="Enter your password"
+                  class="sf-auth-input pr-10"
+                  placeholder="••••••••"
                   required
                   autocomplete="current-password"
                 />
@@ -143,32 +132,14 @@
                   type="button"
                   @click="showPassword = !showPassword"
                   class="sf-auth-eye"
-                  aria-label="Toggle password visibility"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
                 >
-                  <svg
-                    v-if="!showPassword"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
+                  <svg v-if="!showPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
-                  <svg
-                    v-else
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <path
-                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
-                    />
+                  <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                     <line x1="1" y1="1" x2="23" y2="23" />
                   </svg>
                 </button>
@@ -181,9 +152,9 @@
             </button>
           </form>
 
-          <!-- REGISTER FORM -->
+          <!-- 2. REGISTER VIEW -->
           <form v-else-if="authView === 'register'" @submit.prevent="handleRegister" class="sf-auth-form">
-            <div class="sf-auth-row">
+            <div class="grid grid-cols-2 gap-3">
               <div class="sf-auth-field">
                 <label for="reg-fname" class="sf-auth-label">First Name</label>
                 <input
@@ -211,7 +182,7 @@
             </div>
 
             <div class="sf-auth-field">
-              <label for="reg-email" class="sf-auth-label">Email</label>
+              <label for="reg-email" class="sf-auth-label">Email Address</label>
               <input
                 id="reg-email"
                 v-model="registerForm.email"
@@ -230,8 +201,8 @@
                   id="reg-password"
                   v-model="registerForm.password"
                   :type="showPassword ? 'text' : 'password'"
-                  class="sf-auth-input"
-                  placeholder="Min 6 characters"
+                  class="sf-auth-input pr-10"
+                  placeholder="At least 6 characters"
                   required
                   minlength="6"
                   autocomplete="new-password"
@@ -240,36 +211,19 @@
                   type="button"
                   @click="showPassword = !showPassword"
                   class="sf-auth-eye"
-                  aria-label="Toggle password visibility"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
                 >
-                  <svg
-                    v-if="!showPassword"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
+                  <svg v-if="!showPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
-                  <svg
-                    v-else
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <path
-                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
-                    />
+                  <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                     <line x1="1" y1="1" x2="23" y2="23" />
                   </svg>
                 </button>
               </div>
+              <p class="text-[11px] text-stone-400 mt-0.5">Password must be at least 6 characters</p>
             </div>
 
             <button type="submit" :disabled="isSubmitting" class="sf-auth-submit">
@@ -278,10 +232,10 @@
             </button>
           </form>
 
-          <!-- FORGOT FORM -->
+          <!-- 3. FORGOT PASSWORD VIEW -->
           <form v-else-if="authView === 'forgot'" @submit.prevent="handleForgot" class="sf-auth-form">
             <div class="sf-auth-field">
-              <label for="forgot-email" class="sf-auth-label">Email</label>
+              <label for="forgot-email" class="sf-auth-label">Registered Email</label>
               <input
                 id="forgot-email"
                 v-model="forgotForm.email"
@@ -292,38 +246,39 @@
                 autocomplete="email"
               />
             </div>
+
             <button type="submit" :disabled="isSubmitting" class="sf-auth-submit">
               <span v-if="isSubmitting" class="sf-auth-spinner"></span>
-              <span v-else>Send Reset Link</span>
+              <span v-else>Send Reset Code</span>
             </button>
-            <button type="button" @click="switchTab('login')" class="sf-auth-back">
-              Back to log in
+
+            <button type="button" @click="switchTab('login')" class="sf-auth-back-link">
+              ← Back to Sign In
             </button>
           </form>
 
-          <!-- RESET FORM -->
+          <!-- 4. RESET PASSWORD VIEW -->
           <form v-else-if="authView === 'reset'" @submit.prevent="handleReset" class="sf-auth-form">
             <div class="sf-auth-field">
-              <label for="reset-email" class="sf-auth-label">Email</label>
+              <label for="reset-email" class="sf-auth-label">Email Address</label>
               <input
                 id="reset-email"
                 v-model="resetForm.email"
                 type="email"
-                class="sf-auth-input readonly-input"
+                class="sf-auth-input bg-stone-100"
                 placeholder="you@example.com"
                 required
-                readonly
               />
             </div>
-            
-            <div class="sf-auth-field" v-if="!$route?.query?.token">
-              <label for="reset-token" class="sf-auth-label">6-Digit Code</label>
+
+            <div class="sf-auth-field">
+              <label for="reset-token" class="sf-auth-label">6-Digit Code / Reset Token</label>
               <input
                 id="reset-token"
                 v-model="resetForm.token"
                 type="text"
-                class="sf-auth-input"
-                placeholder="000000"
+                class="sf-auth-input tracking-widest uppercase font-mono"
+                placeholder="123456"
                 required
               />
             </div>
@@ -335,8 +290,8 @@
                   id="reset-password"
                   v-model="resetForm.password"
                   :type="showPassword ? 'text' : 'password'"
-                  class="sf-auth-input"
-                  placeholder="Min 6 characters"
+                  class="sf-auth-input pr-10"
+                  placeholder="New password (min 6 chars)"
                   required
                   minlength="6"
                   autocomplete="new-password"
@@ -345,32 +300,14 @@
                   type="button"
                   @click="showPassword = !showPassword"
                   class="sf-auth-eye"
-                  aria-label="Toggle password visibility"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
                 >
-                  <svg
-                    v-if="!showPassword"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
+                  <svg v-if="!showPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
-                  <svg
-                    v-else
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                  >
-                    <path
-                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
-                    />
+                  <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                     <line x1="1" y1="1" x2="23" y2="23" />
                   </svg>
                 </button>
@@ -379,46 +316,20 @@
 
             <button type="submit" :disabled="isSubmitting" class="sf-auth-submit">
               <span v-if="isSubmitting" class="sf-auth-spinner"></span>
-              <span v-else>Reset Password</span>
+              <span v-else>Update Password</span>
+            </button>
+
+            <button type="button" @click="switchTab('login')" class="sf-auth-back-link">
+              ← Back to Sign In
             </button>
           </form>
-
-          <!-- Divider -->
-          <div class="sf-auth-divider" v-if="authView === 'login' || authView === 'register'">
-            <span>or</span>
-          </div>
-
-          <!-- Google OAuth (Disabled for now) -->
-          <!--
-          <button @click="handleGoogleLogin" class="sf-auth-google">
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            Continue with Google
-          </button>
-          -->
         </div>
 
-        <!-- Footer */-->
+        <!-- Footer terms info -->
         <p class="sf-auth-footer">
-          By continuing, you agree to our
-          <a href="/terms" class="sf-auth-link">Terms</a> &
-          <a href="/privacy" class="sf-auth-link">Privacy Policy</a>
+          By continuing, you agree to SpaceFurnio's
+          <router-link to="/about" @click="closeModal" class="sf-auth-link">Terms</router-link> &amp;
+          <router-link to="/about" @click="closeModal" class="sf-auth-link">Privacy Policy</router-link>.
         </p>
       </div>
     </Transition>
@@ -426,23 +337,13 @@
 </template>
 
 <script setup>
-/**
- * ===========================================
- * LOGIN / SIGNUP MODAL — Reimagined
- * ===========================================
- */
-
-import { ref, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { api } from '@/lib/api'
 
-// ─── Inject modal state from App.vue ───
 const { isLoginOpen: isOpen, closeLogin } = inject('authUtils')
-
 const authStore = useAuthStore()
-const modalRef = ref(null)
 
-// ─── State ───
+const modalRef = ref(null)
 const authView = ref('login') // 'login' | 'register' | 'forgot' | 'reset'
 const showPassword = ref(false)
 const isSubmitting = ref(false)
@@ -454,190 +355,176 @@ const registerForm = ref({ firstName: '', lastName: '', email: '', password: '' 
 const forgotForm = ref({ email: '' })
 const resetForm = ref({ email: '', token: '', password: '' })
 
-// Add a way to trigger open from within if needed, or read query on mount
-onMounted(() => {
-  document.addEventListener('keydown', handleEscKey)
-  
-  // Check URL specifically for reset
-  if (typeof window !== 'undefined') {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('reset') === 'true') {
-      authView.value = 'reset'
-      resetForm.value.email = params.get('email') || ''
-      resetForm.value.token = params.get('token') || ''
-      
-      // We assume App.vue might auto-open if login=true, which we added in link
-    }
-  }
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscKey)
-  document.body.style.overflow = ''
+const modalTitle = computed(() => {
+  if (authView.value === 'login') return 'Sign In'
+  if (authView.value === 'register') return 'Create Account'
+  if (authView.value === 'forgot') return 'Forgot Password'
+  return 'Reset Password'
 })
 
 watch(isOpen, async (open) => {
   if (open) {
     document.body.style.overflow = 'hidden'
-    await nextTick()
-    modalRef.value?.focus()
-    // Reset forms error/success
     errorMessage.value = ''
     successMessage.value = ''
-    
-    // Auto-detect reset again just in case
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('reset') === 'true') {
-      authView.value = 'reset'
-    } else if (authView.value === 'reset') {
-      authView.value = 'login'
+    showPassword.value = false
+
+    // Check query params if reset requested
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('reset') === 'true') {
+        authView.value = 'reset'
+        resetForm.value.email = params.get('email') || ''
+        resetForm.value.token = params.get('token') || ''
+      }
     }
+
+    await nextTick()
+    modalRef.value?.focus()
   } else {
     document.body.style.overflow = ''
   }
 })
 
-// ─── Tab Switch ───
 function switchTab(view) {
   authView.value = view
   errorMessage.value = ''
   successMessage.value = ''
+  showPassword.value = false
 }
 
-// ─── Login ───
 async function handleLogin() {
   if (isSubmitting.value) return
   errorMessage.value = ''
+  successMessage.value = ''
 
-  try {
-    isSubmitting.value = true
-    const data = await api.login(loginForm.value.email, loginForm.value.password)
-    authStore.user = data.user
-    successMessage.value = 'Welcome back!'
-    setTimeout(() => closeModal(), 800)
-  } catch (err) {
-    errorMessage.value = err.message || 'Something went wrong. Please try again.'
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// ─── Register ───
-async function handleRegister() {
-  if (isSubmitting.value) return
-  errorMessage.value = ''
-
-  if (registerForm.value.password.length < 6) {
-    errorMessage.value = 'Password must be at least 6 characters.'
+  if (!loginForm.value.email.trim() || !loginForm.value.password) {
+    errorMessage.value = 'Please enter both your email and password.'
     return
   }
 
   try {
     isSubmitting.value = true
-    const data = await api.register({
-      email: registerForm.value.email,
-      password: registerForm.value.password,
-      firstName: registerForm.value.firstName,
-      lastName: registerForm.value.lastName,
-    })
-    if (data.access_token) {
-      authStore.user = data.user
-    }
-    successMessage.value = data.message || 'Account created successfully!'
-    setTimeout(() => closeModal(), 800)
+    await authStore.login(loginForm.value.email.trim(), loginForm.value.password)
+    successMessage.value = 'Welcome back! Signing you in...'
+    setTimeout(() => {
+      closeModal()
+    }, 600)
   } catch (err) {
-    errorMessage.value = err.message || 'Something went wrong. Please try again.'
+    console.error('Login failed:', err)
+    errorMessage.value = err.message || 'Invalid email or password. Please try again.'
   } finally {
     isSubmitting.value = false
   }
 }
 
-// ─── Forgot Password ───
+async function handleRegister() {
+  if (isSubmitting.value) return
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  if (registerForm.value.password.length < 6) {
+    errorMessage.value = 'Password must be at least 6 characters long.'
+    return
+  }
+
+  try {
+    isSubmitting.value = true
+    const res = await authStore.register({
+      email: registerForm.value.email.trim(),
+      password: registerForm.value.password,
+      firstName: registerForm.value.firstName.trim(),
+      lastName: registerForm.value.lastName.trim(),
+    })
+    successMessage.value = res?.message || 'Account created successfully! Welcome to SpaceFurnio.'
+    setTimeout(() => {
+      closeModal()
+    }, 800)
+  } catch (err) {
+    console.error('Registration failed:', err)
+    errorMessage.value = err.message || 'Could not complete registration. Please try again.'
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
 async function handleForgot() {
   if (isSubmitting.value) return
   errorMessage.value = ''
-  
+  successMessage.value = ''
+
+  if (!forgotForm.value.email.trim()) {
+    errorMessage.value = 'Please enter a valid email address.'
+    return
+  }
+
   try {
     isSubmitting.value = true
-    const data = await api.forgotPassword(forgotForm.value.email)
-    successMessage.value = data.message || 'Reset link sent!'
-    // Switch to reset mode so they can enter code if they want
+    const res = await authStore.forgotPassword(forgotForm.value.email.trim())
+    successMessage.value = res?.message || 'Verification code sent to your email.'
+    resetForm.value.email = forgotForm.value.email.trim()
     setTimeout(() => {
-      resetForm.value.email = forgotForm.value.email
       switchTab('reset')
-    }, 1500)
+    }, 1200)
   } catch (err) {
-    errorMessage.value = err.message || 'Failed to send reset link.'
+    console.error('Forgot password error:', err)
+    errorMessage.value = err.message || 'Failed to send reset code. Please check your email.'
   } finally {
     isSubmitting.value = false
   }
 }
 
-// ─── Reset Password ───
 async function handleReset() {
   if (isSubmitting.value) return
   errorMessage.value = ''
-  
+  successMessage.value = ''
+
   if (resetForm.value.password.length < 6) {
     errorMessage.value = 'New password must be at least 6 characters.'
     return
   }
-  
+
   try {
     isSubmitting.value = true
-    const data = await api.resetPassword(resetForm.value.email, resetForm.value.token, resetForm.value.password)
-    successMessage.value = data.message || 'Password reset successfully!'
-    
-    // Clean URL if we had tokens
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href)
-      url.searchParams.delete('reset')
-      url.searchParams.delete('token')
-      url.searchParams.delete('email')
-      window.history.replaceState({}, '', url)
-    }
-    
+    const res = await authStore.resetPassword(
+      resetForm.value.email.trim(),
+      resetForm.value.token.trim(),
+      resetForm.value.password,
+    )
+    successMessage.value = res?.message || 'Password reset successfully! Please sign in with your new password.'
     setTimeout(() => {
-      switchTab('login')
       loginForm.value.email = resetForm.value.email
-    }, 1500)
+      switchTab('login')
+    }, 1200)
   } catch (err) {
-    errorMessage.value = err.message || 'Failed to reset password.'
+    console.error('Reset password error:', err)
+    errorMessage.value = err.message || 'Failed to reset password. Please verify the code.'
   } finally {
     isSubmitting.value = false
   }
 }
 
-// ─── Google OAuth ───
-async function handleGoogleLogin() {
-  try {
-    const url = await authStore.getGoogleAuthUrl()
-    if (url) window.location.href = url
-  } catch {
-    errorMessage.value = 'Google sign-in is currently unavailable.'
-  }
-}
-
-// ─── Navigation ───
 function closeModal() {
   closeLogin()
 }
 
-// ─── Keyboard ───
 function handleEscKey(e) {
   if (e.key === 'Escape' && isOpen.value) closeModal()
 }
+
+onMounted(() => document.addEventListener('keydown', handleEscKey))
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscKey)
+  document.body.style.overflow = ''
+})
 </script>
 
-<style>
-/* ═══════════════════════════════════════════
-   AUTH MODAL — Reimagined Styles
-   ═══════════════════════════════════════════ */
-
+<style scoped>
+/* Backdrop */
 .sf-auth-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(26, 24, 22, 0.55);
+  background: rgba(26, 24, 22, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 100001;
@@ -651,6 +538,7 @@ function handleEscKey(e) {
   opacity: 0;
 }
 
+/* Modal Window */
 .sf-auth-modal {
   position: fixed;
   top: 50%;
@@ -658,17 +546,17 @@ function handleEscKey(e) {
   transform: translate(-50%, -50%);
   width: calc(100% - 2rem);
   max-width: 420px;
-  max-height: calc(100vh - 3rem);
+  max-height: calc(100vh - 3.5rem);
   overflow-y: auto;
-  background: var(--shop-cream, #faf8f5);
-  border-radius: var(--shop-radius-xl, 1.5rem);
+  background: #faf8f5;
+  border-radius: 1.5rem;
   z-index: 100002;
-  padding: 2rem;
-  box-shadow: 0 24px 60px rgba(61, 58, 54, 0.2);
+  padding: 2rem 2rem 1.75rem;
+  box-shadow: 0 24px 60px rgba(44, 38, 32, 0.25);
   outline: none;
 }
 .auth-content-enter-active {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .auth-content-leave-active {
   transition: all 0.25s ease;
@@ -684,8 +572,8 @@ function handleEscKey(e) {
 
 .sf-auth-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 1.125rem;
+  right: 1.125rem;
   width: 34px;
   height: 34px;
   display: flex;
@@ -693,15 +581,15 @@ function handleEscKey(e) {
   justify-content: center;
   border-radius: 50%;
   border: none;
-  background: var(--shop-beige, #e8e3dc);
-  color: var(--shop-brown-dark, #8b7d6d);
+  background: #e8e3dc;
+  color: #5c4f42;
   cursor: pointer;
   transition: all 0.2s;
-  z-index: 1;
+  z-index: 10;
 }
 .sf-auth-close:hover {
-  background: var(--shop-beige-dark, #d4cfc6);
-  color: var(--shop-charcoal, #3d3a36);
+  background: #dcd5ca;
+  color: #2c2723;
 }
 
 /* Brand */
@@ -720,17 +608,17 @@ function handleEscKey(e) {
 .sf-auth-tabs {
   position: relative;
   display: flex;
-  background: var(--shop-beige, #e8e3dc);
+  background: #e8e3dc;
   border-radius: 999px;
   padding: 3px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 .sf-auth-tab {
   flex: 1;
-  padding: 0.625rem 0;
+  padding: 0.5625rem 0;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--shop-brown, #a89b8c);
+  color: #8c7d6e;
   background: transparent;
   border: none;
   border-radius: 999px;
@@ -738,19 +626,36 @@ function handleEscKey(e) {
   transition: color 0.25s;
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 .sf-auth-tab.active {
-  color: var(--shop-charcoal, #3d3a36);
+  color: #2c2723;
 }
 .sf-auth-tab-indicator {
   position: absolute;
   top: 3px;
   bottom: 3px;
-  width: 50%;
+  width: calc(50% - 4px);
   background: white;
   border-radius: 999px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sf-auth-header-alt {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+.sf-auth-alt-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c2723;
+  margin-bottom: 0.25rem;
+}
+.sf-auth-alt-desc {
+  font-size: 0.75rem;
+  color: #8c7d6e;
 }
 
 /* Form */
@@ -762,15 +667,10 @@ function handleEscKey(e) {
   flex-direction: column;
   gap: 0.875rem;
 }
-.sf-auth-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
 .sf-auth-field {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.25rem;
 }
 .sf-auth-field-header {
   display: flex;
@@ -782,107 +682,68 @@ function handleEscKey(e) {
   border: none;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--shop-brown, #a89b8c);
+  color: #8c7d6e;
   cursor: pointer;
   padding: 0;
   transition: color 0.2s;
 }
 .sf-auth-forgot:hover {
-  color: var(--shop-charcoal, #3d3a36);
+  color: #2c2723;
   text-decoration: underline;
 }
-.sf-auth-header-alt {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-.sf-auth-header-alt h3 {
-  font-size: 1.25rem;
-  color: var(--shop-charcoal, #3d3a36);
-  margin-bottom: 0.5rem;
-}
-.sf-auth-header-alt p {
-  font-size: 0.875rem;
-  color: var(--shop-brown, #a89b8c);
-}
-.sf-auth-back {
-  background: none;
-  border: none;
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--shop-brown, #a89b8c);
-  cursor: pointer;
-  transition: color 0.2s;
-  margin-top: 0.5rem;
-}
-.sf-auth-back:hover {
-  color: var(--shop-charcoal, #3d3a36);
-}
-.readonly-input {
-  background: var(--shop-cream-dark, #f5f2ed);
-  color: var(--shop-brown-dark, #8b7d6d);
-  cursor: not-allowed;
-}
+
 .sf-auth-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--shop-brown-dark, #8b7d6d);
-  letter-spacing: 0.02em;
+  color: #5c4f42;
+  letter-spacing: 0.01em;
 }
 .sf-auth-input {
   width: 100%;
-  padding: 0.75rem 0.875rem;
-  font-size: 0.875rem;
-  border: 1px solid var(--shop-beige-dark, #d4cfc6);
-  border-radius: var(--shop-radius-md, 0.75rem);
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.8125rem;
+  border: 1px solid #dcd5ca;
+  border-radius: 0.75rem;
   background: white;
-  color: var(--shop-charcoal, #3d3a36);
-  transition: all 0.2s;
+  color: #2c2723;
   outline: none;
+  transition: all 0.2s;
 }
 .sf-auth-input:focus {
-  border-color: var(--shop-accent, #b8956c);
-  box-shadow: 0 0 0 3px rgba(184, 149, 108, 0.12);
-}
-.sf-auth-input::placeholder {
-  color: var(--shop-tan, #c4b8a9);
+  border-color: #b8956c;
+  box-shadow: 0 0 0 3px rgba(184, 149, 108, 0.15);
 }
 .sf-auth-input-wrap {
   position: relative;
-}
-.sf-auth-input-wrap .sf-auth-input {
-  padding-right: 2.75rem;
 }
 .sf-auth-eye {
   position: absolute;
   right: 0.625rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--shop-brown, #a89b8c);
+  color: #8c7d6e;
   cursor: pointer;
-  border-radius: 6px;
   transition: color 0.15s;
 }
 .sf-auth-eye:hover {
-  color: var(--shop-charcoal, #3d3a36);
+  color: #2c2723;
 }
 
-/* Submit */
+/* Submit Button */
 .sf-auth-submit {
   width: 100%;
   padding: 0.875rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: white;
-  background: var(--shop-charcoal, #3d3a36);
+  background: #2c2723;
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -890,91 +751,55 @@ function handleEscKey(e) {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.25rem;
+  margin-top: 0.375rem;
 }
 .sf-auth-submit:hover:not(:disabled) {
-  background: var(--shop-black, #1a1816);
+  background: #110e0c;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(61, 58, 54, 0.2);
+  box-shadow: 0 6px 20px rgba(44, 38, 32, 0.2);
 }
 .sf-auth-submit:disabled {
   opacity: 0.6;
   cursor: wait;
 }
-.sf-auth-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: authSpin 0.6s linear infinite;
-}
-@keyframes authSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-/* Divider */
-.sf-auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1.25rem 0;
-}
-.sf-auth-divider::before,
-.sf-auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--shop-beige-dark, #d4cfc6);
-}
-.sf-auth-divider span {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--shop-brown, #a89b8c);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-/* Google */
-.sf-auth-google {
+.sf-auth-back-link {
+  background: none;
+  border: none;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  padding: 0.75rem;
-  font-size: 0.8125rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--shop-charcoal, #3d3a36);
-  background: white;
-  border: 1px solid var(--shop-beige-dark, #d4cfc6);
-  border-radius: 999px;
+  color: #8c7d6e;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.2s;
+  text-align: center;
 }
-.sf-auth-google:hover {
-  background: var(--shop-cream-dark, #f5f2ed);
-  border-color: var(--shop-tan, #c4b8a9);
-  transform: translateY(-1px);
+.sf-auth-back-link:hover {
+  color: #2c2723;
 }
 
-/* Error / Success */
-.sf-auth-error {
+/* Alerts */
+.sf-auth-alert {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 0.875rem;
-  background: rgba(196, 117, 117, 0.08);
-  border: 1px solid rgba(196, 117, 117, 0.2);
-  border-radius: var(--shop-radius-md, 0.75rem);
-  font-size: 0.8125rem;
-  color: var(--shop-error, #c47575);
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
   margin-bottom: 0.75rem;
 }
-.sf-auth-error-dismiss {
-  margin-left: auto;
+.sf-auth-alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+.sf-auth-alert.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+.sf-alert-dismiss {
   border: none;
   background: none;
   color: inherit;
@@ -983,18 +808,7 @@ function handleEscKey(e) {
   padding: 0 4px;
   line-height: 1;
 }
-.sf-auth-success {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 0.875rem;
-  background: rgba(125, 155, 118, 0.1);
-  border: 1px solid rgba(125, 155, 118, 0.25);
-  border-radius: var(--shop-radius-md, 0.75rem);
-  font-size: 0.8125rem;
-  color: var(--shop-success, #5a7d51);
-  margin-bottom: 0.75rem;
-}
+
 .error-slide-enter-active,
 .error-slide-leave-active {
   transition: all 0.25s ease;
@@ -1005,34 +819,37 @@ function handleEscKey(e) {
   transform: translateY(-6px);
 }
 
+.sf-auth-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Footer */
 .sf-auth-footer {
   text-align: center;
   font-size: 0.6875rem;
-  color: var(--shop-brown, #a89b8c);
+  color: #8c7d6e;
   margin-top: 1.25rem;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 .sf-auth-link {
-  color: var(--shop-accent-dark, #8c6d4d);
+  color: #b8956c;
   text-decoration: underline;
-  text-underline-offset: 2px;
 }
 .sf-auth-link:hover {
-  color: var(--shop-charcoal, #3d3a36);
+  color: #2c2723;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .sf-auth-modal {
-    width: calc(100% - 1rem);
-    max-height: calc(100vh - 2rem);
-    padding: 1.5rem;
-    border-radius: var(--shop-radius-lg, 1rem);
-  }
-  .sf-auth-row {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    padding: 1.5rem 1.25rem;
   }
 }
 </style>

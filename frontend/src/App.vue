@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { RouterView, useRouter, useRoute } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { ref, computed, provide, watch, onMounted, nextTick } from 'vue'
 import NavComponent from './components/Nav-component.vue'
 import FooterComponent from './components/Footer-component.vue'
@@ -55,8 +55,7 @@ provide('navShowUtils', { showNav })
 const showFoo = ref(true)
 provide('navShowUtils', { showFoo, showNav })
 
-// Cart store and router for cart opening
-const router = useRouter()
+// Cart store
 const route = useRoute()
 const cart = useCartStore()
 const wishlist = useWishlistStore()

@@ -106,8 +106,6 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount } from 'vue'
-
 // Image data as requested
 const images = [
   { src: 'https://picsum.photos/seed/curly-woman-teal/400/520', alt: 'Team member 1' },

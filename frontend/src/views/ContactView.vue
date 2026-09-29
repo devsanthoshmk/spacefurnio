@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref } from 'vue'
 import CTA from '@/components/contactUs/CTA.vue'
 
 const form = ref({
@@ -36,12 +36,6 @@ const contactMethods = [
     link: null,
   },
 ]
-
-const teamImages = Array.from({ length: 7 }, (_, i) => ({
-  id: i,
-  src: `https://placehold.co/300x400/png?text=User+${i + 1}`,
-  rot: (i - 3) * 12, // Distributed angles centered at 0
-}))
 
 const submitForm = () => {
   console.log('Submitting', form.value)
