@@ -1,8 +1,5 @@
 <template>
   <div class="listing-page">
-    <!-- Fixed Header Background Blur -->
-    <div class="listing-header-bg"></div>
-
     <!-- Mobile Filter Drawer (Teleported) -->
     <Teleport to="body">
       <Transition name="drawer">
@@ -968,17 +965,6 @@ onMounted(() => {
   padding-top: 5rem;
 }
 
-.listing-header-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5rem;
-  background: rgba(250, 248, 245, 0.96);
-  backdrop-filter: blur(12px);
-  z-index: 40;
-}
-
 .listing-container {
   max-width: 1800px;
   margin: 0 auto;
@@ -987,11 +973,8 @@ onMounted(() => {
 
 /* Header */
 .listing-header {
-  position: sticky;
-  top: 5rem;
-  z-index: 30;
+  position: relative;
   background: rgba(250, 248, 245, 0.98);
-  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   padding: 1.25rem 0 0.75rem;
 }
@@ -1185,11 +1168,8 @@ onMounted(() => {
 .mobile-controls {
   display: flex;
   align-items: center;
-  position: sticky;
-  top: 5rem;
-  z-index: 25;
+  position: relative;
   background: rgba(250, 248, 245, 0.98);
-  backdrop-filter: blur(8px);
   padding: 0.625rem 1.25rem;
   gap: 0.75rem;
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);

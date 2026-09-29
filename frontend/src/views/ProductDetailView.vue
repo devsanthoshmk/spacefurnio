@@ -1984,11 +1984,8 @@ onUnmounted(() => {
 
 /* Navigation */
 .detail-nav {
-  position: sticky;
-  top: 5rem;
-  z-index: 30;
+  position: relative;
   background: rgba(250, 248, 245, 0.96);
-  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--shop-beige, #e8e3dc);
   padding: 0.875rem 0;
 }
@@ -2089,16 +2086,8 @@ onUnmounted(() => {
 
 /* Gallery Section */
 .gallery-section {
-  position: sticky;
-  top: 9.5rem;
+  position: relative;
   align-self: start;
-}
-
-@media (max-width: 1023px) {
-  .gallery-section {
-    position: relative;
-    top: 0;
-  }
 }
 
 .main-image-wrapper {
