@@ -1,327 +1,429 @@
-# 🚀 Spacefurnio API Documentation
+# 🚀 Spacefurnio E-Commerce API Documentation
 
-> **Complete API Reference for Frontend Implementation**
-> This document consolidates both the **Worker API** (sensitive operations) and the **Neon Data API** (direct DB access) into a single, usable frontend implementation guide.
+> **Complete Storefront Backend API Reference**
+> This document details all available RESTful endpoints for the Spacefurnio E-Commerce backend Worker and Database.
 
 ---
 
 ## 🌍 Base URLs
 
-| Environment | Worker (Auth & Orders) | Neon Data API (Carts, Orders, etc.) | Catalog API (Products) |
-|---|---|---|---|
-| **Production** | `https://backend.spacefurnio.workers.dev` | `https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1` | `https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1` |
-| **Local/Dev** | `http://localhost:8787` | `https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1` | `https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1` |
+| Environment | Base URL | Description |
+|---|---|---|
+| **Local / Dev** | `http://localhost:8787` | Cloudflare Worker local runtime (`wrangler dev`) |
+| **Production** | `https://backend.spacefurnio.workers.dev` | Cloudflare Workers Edge API |
 
 > [!TIP]
-> **Currency Handling:** To avoid floating-point math errors, all prices (e.g., `price_cents`) are stored as **integers in cents**.
-> *   **Display:** Divide by 100 (e.g., `1499` becomes `$14.99`).
-> *   **Storage:** Multiply by 100 (e.g., `$29.50` becomes `2950`).
+> **Currency Handling:** To avoid floating-point math errors, product catalog prices are stored as **integers in cents** (`price_cents`).
+> * **Display:** Divide by 100 (e.g., `89900` cents = `$899.00`).
+> * Cart/Order responses provide calculated subtotals, discounts, and totals in standard currency units.
 
 ---
 
-## 🔐 1. Authentication (Worker API)
-
-### Login
-
-Exchanges email/password for an RS256 JWT token. Passwords are securely verified using PBKDF2 with SHA-256.
-
-* **Endpoint:** `POST {WORKER_URL}/auth/login`
-* **Body:**
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "yourpassword"
-  }
-  ```
-* **Response (200 OK):**
-  ```json
-  {
-    "token": "eyJhbGciOiJSUzI1NiIsImtpZCI...",
-    "user": {
-      "id": "49364355-5bcb-4645-aa99-619bd373878c",
-      "email": "user@example.com",
-      "role": "authenticated"
-    }
-  }
-  ```
+## 🔐 1. Authentication (`/auth`)
 
 ### Register
-
-Creates a new user account. Passwords are automatically hashed using PBKDF2 before storage.
-
-* **Endpoint:** `POST {WORKER_URL}/auth/register`
+* **Endpoint:** `POST /auth/register`
 * **Body:**
   ```json
   {
     "email": "user@example.com",
-    "password": "yourpassword",
-    "firstName": "John",
-    "lastName": "Doe"
+    "password": "Password123!"
   }
   ```
 * **Response (200 OK):**
   ```json
   {
     "message": "Registration successful",
-    "token": "eyJhbGciOiJSUzI1NiIsImtpZCI...",
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
     "user": {
-      "id": "11111111-...",
+      "id": "uuid",
       "email": "user@example.com",
-      "role": "customer"
+      "role": "authenticated"
     }
   }
   ```
 
-> **Frontend Implementation:** Store the `token` in `sessionStorage` or an in-memory store (zustand/redux).
-
----
-
-## 🛒 2. Non-Sensitive Operations (Neon Data API)
-
-All user-scoped CRUD operations interact directly with Neon Postgres using PostgREST. 
-
-### Required Headers
-Every request to the Neon Data API **MUST** include:
-```javascript
-{
-  "Authorization": "Bearer <YOUR_JWT_TOKEN>",
-  "neon-connection-string": "postgresql://authenticator@ep-ancient-frog-aimehta7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require",
-  "Content-Type": "application/json",
-  "Prefer": "return=representation" // Returns the affected row on POST/PATCH
-}
-```
-
-### 🛍️ Cart API
-
-**Get User's Cart (with items & products)**
-* **Endpoint:** `GET {NEON_URL}/carts?select=*,cart_items(*)`
-> ⚠️ **Note:** `products(*)` joins are NOT available here because the `products` table was moved to a separate Neon project (`icy-union-81751721`). Product enrichment (name, image, price) must be done client-side using the Catalog API.
-
-**Add Item to Cart**
-* **Endpoint:** `POST {NEON_URL}/cart_items`
+### Login
+* **Endpoint:** `POST /auth/login`
 * **Body:**
   ```json
   {
-    "cart_id": "<USER_CART_ID>",
-    "product_id": "<PRODUCT_ID>",
-    "quantity": 1,
-    "price_snapshot": 149.50
+    "email": "user@example.com",
+    "password": "Password123!"
   }
   ```
-  *(Note: If adding an existing item, this currently returns 409 Conflict based on unique constraints. Ensure the frontend PATCHes instead or handles the error).*
+* **Response (200 OK):**
+  ```json
+  {
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "role": "authenticated"
+    }
+  }
+  ```
 
-**Update Cart Item Quantity**
-* **Endpoint:** `PATCH {NEON_URL}/cart_items?id=eq.<CART_ITEM_ID>`
-* **Body:** `{"quantity": 2}`
+### Get Current User Profile
+* **Endpoint:** `GET /auth/me`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Response (200 OK):**
+  ```json
+  {
+    "id": "uuid",
+    "email": "user@example.com",
+    "phone_number": "+919876543210",
+    "is_active": true,
+    "role": "authenticated",
+    "created_at": "2026-09-29T17:00:00.000Z"
+  }
+  ```
 
-**Remove from Cart**
-* **Endpoint:** `DELETE {NEON_URL}/cart_items?id=eq.<CART_ITEM_ID>`
-
----
-
-### ❤️ Wishlist API
-
-**Get User's Wishlist**
-* **Endpoint:** `GET {NEON_URL}/wishlist_items?select=id,created_at,product_id`
-> ⚠️ **Note:** `products(*)` joins are NOT available here — see Cart note above.
-
-**Add to Wishlist**
-* **Endpoint:** `POST {NEON_URL}/wishlist_items`
+### Update Profile
+* **Endpoint:** `PUT /auth/profile`
+* **Headers:** `Authorization: Bearer <access_token>`
 * **Body:**
   ```json
   {
-    "wishlist_id": "<USER_WISHLIST_ID>",
-    "product_id": "<PRODUCT_ID>"
+    "phone_number": "+919876543210"
   }
   ```
 
-**Remove from Wishlist**
-* **Endpoint:** `DELETE {NEON_URL}/wishlist_items?id=eq.<WISHLIST_ITEM_ID>`
-
----
-
-### 📦 Orders (Read-Only)
-
-**Get User's Order History**
-* **Endpoint:** `GET {NEON_URL}/orders?select=*,order_items(*)&order=created_at.desc`
-* *(RLS automatically returns only orders belonging to the logged-in user).*
-
----
-
-### 📖 Catalog API (Products)
-
-The Catalog relies on the separate `icy-union-81751721` Neon project (endpoint: `ep-flat-brook-a1h1dgii`, region: `ap-southeast-1`).
-
-**Get All Products**
-* **Endpoint:** `GET {CATALOG_URL}/products`
-* **Headers:** 
-  ```javascript
+### Change Password
+* **Endpoint:** `PUT /auth/change-password`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:**
+  ```json
   {
-    "neon-connection-string": "postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require",
-    "Authorization": "Bearer <TOKEN>"  // JWT from /auth/login — role maps to admin/customer in products DB
+    "current_password": "OldPassword123!",
+    "new_password": "NewPassword456!"
   }
   ```
 
-**Get Single Product**
-* **Endpoint:** `GET {CATALOG_URL}/products?id=eq.<PRODUCT_ID>`
+### Forgot Password
+* **Endpoint:** `POST /auth/forgot-password`
+* **Body:**
+  ```json
+  {
+    "email": "user@example.com"
+  }
+  ```
 
-**Get Products with Brands (Join)**
-* **Endpoint:** `GET {CATALOG_URL}/products?select=*,brands(*),categories(*)`
+### Reset Password
+* **Endpoint:** `POST /auth/reset-password`
+* **Body:**
+  ```json
+  {
+    "email": "user@example.com",
+    "tokenOrCode": "reset_token_or_code",
+    "newPassword": "NewPassword789!"
+  }
+  ```
+
+### Refresh Token
+* **Endpoint:** `POST /auth/refresh`
+* **Body (Optional):** `{ "refresh_token": "..." }` or sent automatically via `httpOnly` cookie.
+
+### Logout
+* **Endpoint:** `POST /auth/logout`
 
 ---
 
-## 💳 3. Sensitive Operations (Worker API)
+## 🪑 2. Catalog & Products (`/api/products` & `/api/categories`)
 
-These operations execute backend business logic (payment verification, multi-table transactions).
+### Get Filter Metadata
+* **Endpoint:** `GET /api/products/filters`
+* **Response (200 OK):**
+  ```json
+  {
+    "categories": [{ "id": 1, "name": "Living Room", "slug": "living-room" }],
+    "spaces": [{ "id": 1, "name": "Indoor", "slug": "indoor" }],
+    "styles": [{ "id": 1, "name": "Modern", "slug": "modern" }],
+    "rooms": [{ "id": 1, "name": "Dining Room", "slug": "dining-room" }],
+    "materials": [{ "id": 1, "name": "Solid Oak" }],
+    "brands": [{ "id": 1, "name": "SpaceFurnio Originals", "slug": "spacefurnio" }],
+    "colors": [{ "id": 1, "name": "Natural Wood", "hex_code": "#C19A6B" }],
+    "price_range": { "min": 4900, "max": 229900 },
+    "total_products": 49
+  }
+  ```
+
+### List / Search Products
+* **Endpoint:** `GET /api/products`
+* **Query Parameters:**
+  - `search`: Case-insensitive text search (e.g. `?search=table`)
+  - `category`: Category slug or id (e.g. `?category=living-room`)
+  - `space`: Space slug (e.g. `?space=outdoor`)
+  - `style`: Style slug (e.g. `?style=modern`)
+  - `room`: Room slug (e.g. `?room=bedroom`)
+  - `material`: Material name or id
+  - `brand`: Brand slug
+  - `min_price` / `max_price`: Filter by `price_cents`
+  - `sort`: `popularity`, `rating`, `newest`, `price_asc`, `price_desc`
+  - `page`: Page number (default: 1)
+  - `limit`: Items per page (default: 20, max: 100)
+* **Response (200 OK):**
+  ```json
+  {
+    "products": [
+      {
+        "id": 3,
+        "name": "Modern Oak Dining Table",
+        "slug": "modern-oak-dining-table",
+        "description": "Solid oak dining table...",
+        "price_cents": 89900,
+        "listing_type": "category",
+        "rating": 4.8,
+        "review_count": 12,
+        "popularity": 85,
+        "brand": { "id": 1, "name": "SpaceFurnio", "slug": "spacefurnio" },
+        "category": { "id": 2, "name": "Dining", "slug": "dining" },
+        "primary_image": { "src": "https://images.unsplash.com/...", "alt": "Modern oak dining table" }
+      }
+    ],
+    "pagination": {
+      "total": 49,
+      "page": 1,
+      "limit": 20,
+      "total_pages": 3,
+      "has_next_page": true,
+      "has_prev_page": false
+    }
+  }
+  ```
+
+### Get Single Product by ID or Slug
+* **Endpoint:** `GET /api/products/:idOrSlug`
+* **Response (200 OK):** Full product model including `images` array and `colors` array.
+
+### Get Featured Products
+* **Endpoint:** `GET /api/products/featured?limit=8`
+
+### List Categories
+* **Endpoint:** `GET /api/categories`
+* **Response (200 OK):** List of categories with `product_count`.
+
+### Get Category Details
+* **Endpoint:** `GET /api/categories/:slugOrId`
+
+---
+
+## 🛒 3. Cart (`/api/cart`)
+
+### Get User Cart (Enriched)
+* **Endpoint:** `GET /api/cart`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Response (200 OK):**
+  ```json
+  {
+    "cart": { "id": "uuid", "user_id": "uuid" },
+    "items": [
+      {
+        "id": "uuid",
+        "productId": 3,
+        "quantity": 2,
+        "unitPrice": 899.00,
+        "totalPrice": 1798.00,
+        "product": {
+          "id": 3,
+          "name": "Modern Oak Dining Table",
+          "slug": "modern-oak-dining-table",
+          "brandName": "SpaceFurnio",
+          "image": { "src": "...", "alt": "..." }
+        }
+      }
+    ],
+    "item_count": 2,
+    "subtotal": 1798.00
+  }
+  ```
+
+### Add Item to Cart
+* **Endpoint:** `POST /api/cart/items`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:**
+  ```json
+  {
+    "product_id": 3,
+    "quantity": 1
+  }
+  ```
+*(Automatically increments quantity if item is already in cart).*
+
+### Update Cart Item Quantity
+* **Endpoint:** `PATCH /api/cart/items/:id`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:** `{ "quantity": 3 }`
+
+### Remove Item from Cart
+* **Endpoint:** `DELETE /api/cart/items/:id`
+
+### Clear Cart
+* **Endpoint:** `DELETE /api/cart/clear`
+
+---
+
+## ❤️ 4. Wishlist (`/api/wishlist`)
+
+### Get User Wishlist (Enriched)
+* **Endpoint:** `GET /api/wishlist`
+* **Headers:** `Authorization: Bearer <access_token>`
+
+### Add Item to Wishlist
+* **Endpoint:** `POST /api/wishlist/items`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:** `{ "product_id": 3 }`
+*(Idempotent: will not duplicate if already present).*
+
+### Remove Item from Wishlist
+* **Endpoint:** `DELETE /api/wishlist/items/:id` or `DELETE /api/wishlist/items/by-product/:productId`
+
+### Clear Wishlist
+* **Endpoint:** `DELETE /api/wishlist/clear`
+
+---
+
+## 📍 5. Addresses (`/api/addresses`)
+
+* `GET /api/addresses`: List all user addresses.
+* `GET /api/addresses/default`: Get user's default shipping address.
+* `GET /api/addresses/:addressId`: Get single address.
+* `POST /api/addresses`: Create new address.
+  ```json
+  {
+    "address_line_1": "123 MG Road",
+    "address_line_2": "Apt 4B",
+    "city": "Bangalore",
+    "state": "Karnataka",
+    "postal_code": "560001",
+    "country": "India",
+    "is_default": true
+  }
+  ```
+* `PATCH /api/addresses/:addressId`: Update address.
+* `POST /api/addresses/:addressId/default`: Set as default address.
+* `DELETE /api/addresses/:addressId`: Delete address.
+
+---
+
+## 🎟️ 6. Coupons & Discounts (`/api/coupons`)
+
+### List Active Coupons
+* **Endpoint:** `GET /api/coupons/active`
+
+### Validate Coupon Code
+* **Endpoint:** `POST /api/coupons/validate`
+* **Body:**
+  ```json
+  {
+    "code": "WELCOME10",
+    "subtotal": 1499.00
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "valid": true,
+    "coupon": {
+      "id": "uuid",
+      "code": "WELCOME10",
+      "description": "10% off on your first order",
+      "discount_type": "percentage",
+      "discount_value": 10
+    },
+    "subtotal": 1499.00,
+    "discount_amount": 149.90,
+    "final_amount": 1349.10
+  }
+  ```
+
+---
+
+## 📦 7. Orders & Checkout (`/api/orders`)
 
 ### Place Order (Checkout)
-Replaces the cart contents with an actionable order.
-
-* **Endpoint:** `POST {WORKER_URL}/api/orders/checkout`
-* **Headers:** `Authorization: Bearer <TOKEN>`
+* **Endpoint:** `POST /api/orders/checkout`
+* **Headers:** `Authorization: Bearer <access_token>`
 * **Body:**
   ```json
   {
-    "cartItems": [
-      { "productId": "...", "quantity": 1, "price": 99.99 }
-    ],
-    "shippingAddressId": "...",
-    "paymentMethod": "card"
+    "addressId": "uuid-of-address",
+    "paymentMethod": "card",
+    "couponCode": "WELCOME10"
   }
   ```
+*(Pulls items from user's active cart if `cartItems` not explicitly passed, applies coupon discount, creates order, creates payment record, and automatically clears the user's cart).*
 
-### Update Order Status (Admin Only)
-* **Endpoint:** `PATCH {WORKER_URL}/api/orders/<ORDER_ID>/status`
-* **Headers:** `Authorization: Bearer <ADMIN_TOKEN>`
-* **Body:**
-  ```json
-  { "status": "shipped" }
-  ```
+### List User Orders
+* **Endpoint:** `GET /api/orders`
+* **Headers:** `Authorization: Bearer <access_token>`
 
-### Verify Payment (Razorpay)
-* **Endpoint:** `POST {WORKER_URL}/api/payments/verify`
-* **Headers:** `Authorization: Bearer <TOKEN>`
-* **Body:**
-  ```json
-  {
-    "razorpay_order_id": "order_xxx",
-    "razorpay_payment_id": "pay_xxx",
-    "razorpay_signature": "signature_xxx"
-  }
-  ```
+### Get Single Order Details
+* **Endpoint:** `GET /api/orders/:orderId`
+* **Headers:** `Authorization: Bearer <access_token>`
 
-### Manage Products (Admin Only)
-* **Endpoint:** `POST {WORKER_URL}/api/products` (Create)
-* **Endpoint:** `PUT {WORKER_URL}/api/products/<PRODUCT_ID>` (Update)
-* **Endpoint:** `DELETE {WORKER_URL}/api/products/<PRODUCT_ID>` (Delete)
-* **Headers:** `Authorization: Bearer <ADMIN_TOKEN>`
+### Update Shipping Address
+* **Endpoint:** `PATCH /api/orders/:orderId/shipping`
+* **Headers:** `Authorization: Bearer <access_token>`
 
-### System Health
-* **Endpoint:** `GET {WORKER_URL}/api/health`
-* **Response:** `{ "status": "ok", "timestamp": "..." }`
+### Cancel Order
+* **Endpoint:** `POST /api/orders/:orderId/cancel`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:** `{ "reason": "Customer request" }`
 
 ---
 
-## 🛠️ Complete Frontend Implementation (Copy & Paste)
+## ⭐ 8. Reviews (`/api/reviews`)
 
-You can use this unified `api.js` client to handle all backend communication gracefully:
+### Get Product Reviews & Rating Summary
+* **Endpoint:** `GET /api/reviews/product/:productId`
+* **Response (200 OK):**
+  ```json
+  {
+    "productId": 3,
+    "stats": {
+      "total_reviews": 12,
+      "average_rating": 4.8
+    },
+    "reviews": [
+      {
+        "id": "uuid",
+        "author_name": "Santhosh M.",
+        "rating": 5,
+        "title": "Exceptional quality!",
+        "comment": "Solid wood construction and arrived promptly.",
+        "is_verified_purchase": true,
+        "created_at": "2026-09-29T17:00:00.000Z"
+      }
+    ]
+  }
+  ```
 
-```javascript
-// frontend/src/lib/api.js
+### Submit Review
+* **Endpoint:** `POST /api/reviews`
+* **Headers:** `Authorization: Bearer <access_token>`
+* **Body:**
+  ```json
+  {
+    "product_id": 3,
+    "rating": 5,
+    "title": "Exceptional quality!",
+    "comment": "Solid wood construction and arrived promptly.",
+    "author_name": "Santhosh M."
+  }
+  ```
+*(Automatically checks order history for `is_verified_purchase` badge and updates product aggregate rating).*
 
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || 'https://backend.spacefurnio.workers.dev';
-const NEON_URL = import.meta.env.VITE_NEON_URL || 'https://ep-ancient-frog-aimehta7.apirest.c-4.us-east-1.aws.neon.tech/neondb/rest/v1';
-const CATALOG_URL = import.meta.env.VITE_CATALOG_URL || 'https://ep-flat-brook-a1h1dgii.apirest.ap-southeast-1.aws.neon.tech/neondb/rest/v1';
+---
 
-const NEON_CONN = import.meta.env.VITE_NEON_CONN || 'postgresql://authenticator@ep-ancient-frog-aimehta7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require';
-const CATALOG_CONN = import.meta.env.VITE_CATALOG_CONN || 'postgresql://authenticator@ep-flat-brook-a1h1dgii-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+## 💳 9. Payments (`/api/payments`)
 
-class ApiClient {
-    constructor() {
-        this.token = null;
-        if (typeof window !== 'undefined') {
-            this.token = localStorage.getItem('spacefurnio_token');
-        }
-    }
+* `POST /api/payments/create-order`: Create payment order with amount and currency.
+* `POST /api/payments/verify`: Verify payment transaction and update order to `paid`.
 
-    setToken(token) {
-        this.token = token;
-        if (token) {
-            localStorage.setItem('spacefurnio_token', token);
-        } else {
-            localStorage.removeItem('spacefurnio_token');
-        }
-    }
+---
 
-    // --- AUTH ---
-    async login(email, password) {
-        const res = await fetch(`${WORKER_URL}/auth/login`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        if (!res.ok) throw new Error('Login failed');
-        const data = await res.json();
-        this.setToken(data.token);
-        return data;
-    }
+## ✉️ 10. Engagement (`/api`)
 
-    async register(userData) {
-        const res = await fetch(`${WORKER_URL}/auth/register`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
-        });
-        if (!res.ok) throw new Error('Registration failed');
-        const data = await res.json();
-        if (data.token) this.setToken(data.token);
-        return data;
-    }
-
-    // --- NEON HTTP HELPER ---
-    async _neonFetch(path, options = {}, isCatalog = false) {
-        const url = isCatalog ? CATALOG_URL : NEON_URL;
-        const res = await fetch(`${url}${path}`, {
-            ...options,
-            headers: {
-                'neon-connection-string': isCatalog ? CATALOG_CONN : NEON_CONN,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation',
-                ...(this.token ? { 'Authorization': `Bearer ${this.token}` } : {}),
-                ...options.headers
-            }
-        });
-        if (!res.ok) {
-            if (res.status === 409) throw new Error('Item already exists.');
-            throw new Error(`Data API error: ${res.status}`);
-        }
-        return res.status === 204 ? null : res.json();
-    }
-
-    // --- CARTS & WISHLISTS ---
-    getCart() { return this._neonFetch('/carts?select=*,cart_items(*)'); }
-    addCartItem(data) { return this._neonFetch('/cart_items', { method: 'POST', body: JSON.stringify(data) }); }
-    updateCartItem(id, qty) { return this._neonFetch(`/cart_items?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ quantity: qty }) }); }
-    removeCartItem(id) { return this._neonFetch(`/cart_items?id=eq.${id}`, { method: 'DELETE' }); }
-    
-    getWishlist() { return this._neonFetch('/wishlist_items?select=id,product_id'); }
-    addWishlistItem(data) { return this._neonFetch('/wishlist_items', { method: 'POST', body: JSON.stringify(data) }); }
-    removeWishlistItem(id) { return this._neonFetch(`/wishlist_items?id=eq.${id}`, { method: 'DELETE' }); }
-
-    // --- ORDERS (Read via Neon, Write via Worker) ---
-    getOrders() { return this._neonFetch('/orders?select=*,order_items(*)&order=created_at.desc'); }
-    
-    async checkout(orderData) {
-        const res = await fetch(`${WORKER_URL}/api/orders/checkout`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-        });
-        if (!res.ok) throw new Error('Checkout failed');
-        return res.json();
-    }
-
-    // --- CATALOG ---
-    getProducts() { return this._neonFetch(`/products?is_active=eq.true`, {}, true); }
-}
-
-export const api = new ApiClient();
-```
+* `POST /api/newsletter/subscribe`: `{ "email": "customer@example.com" }`
+* `POST /api/contact`: `{ "name": "John Doe", "email": "john@example.com", "subject": "Inquiry", "message": "..." }`

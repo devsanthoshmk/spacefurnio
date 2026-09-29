@@ -3,8 +3,9 @@ import { getJwks, generateToken, generateRefreshToken, verifyRefreshToken } from
 import { getDb } from '../utils/db';
 import { Env } from '../types';
 import { hashPassword, verifyPassword } from '../utils/crypto';
+import { authenticate, AuthRequest } from '../middleware/auth';
 
-export const authRouter = AutoRouter<any, [env: Env, ctx: ExecutionContext]>({ base: '/auth' });
+export const authRouter = AutoRouter<AuthRequest, [env: Env, ctx: ExecutionContext]>({ base: '/auth' });
 
 import { Resend } from 'resend';
 
@@ -150,8 +151,8 @@ authRouter.post('/refresh', async (request, env) => {
 
         // Also accept in body for programmatic refresh
         if (!refreshToken) {
-            const body = await request.json() as any;
-            refreshToken = body.refresh_token;
+            const body = await request.json().catch(() => ({})) as any;
+            refreshToken = body?.refresh_token;
         }
 
         if (!refreshToken) {
@@ -375,5 +376,101 @@ authRouter.post('/reset-password', async (request, env) => {
     } catch (e) {
         console.error(e);
         return error(500, { message: 'Failed to reset password' });
+    }
+});
+
+authRouter.get('/me', authenticate, async (request, env) => {
+    try {
+        const userId = request.user.sub;
+        const { sql } = getDb(env);
+
+        const result = await sql`
+            SELECT u.id, u.email, u.phone_number, u.is_active, u.created_at,
+                   COALESCE(ur.role_id, 'authenticated') as role
+            FROM users u
+            LEFT JOIN user_roles ur ON u.id = ur.user_id
+            WHERE u.id = ${userId}
+            LIMIT 1
+        `;
+
+        if (result.length === 0) {
+            return error(404, { message: 'User not found' });
+        }
+
+        const user = result[0];
+        return {
+            id: user.id,
+            email: user.email,
+            phone_number: user.phone_number,
+            is_active: user.is_active,
+            role: user.role,
+            created_at: user.created_at,
+        };
+    } catch (e) {
+        console.error(e);
+        return error(500, { message: 'Failed to fetch user profile' });
+    }
+});
+
+authRouter.put('/profile', authenticate, async (request, env) => {
+    try {
+        const userId = request.user.sub;
+        const body = await request.json().catch(() => ({})) as any;
+        const { phone_number } = body;
+
+        const { sql } = getDb(env);
+
+        const result = await sql`
+            UPDATE users 
+            SET phone_number = COALESCE(${phone_number ?? null}, phone_number),
+                updated_at = NOW()
+            WHERE id = ${userId}
+            RETURNING id, email, phone_number, is_active, created_at, updated_at
+        `;
+
+        if (result.length === 0) {
+            return error(404, { message: 'User not found' });
+        }
+
+        return { message: 'Profile updated successfully', user: result[0] };
+    } catch (e: any) {
+        console.error(e);
+        if (e?.code === '23505') {
+            return error(409, { message: 'Phone number is already associated with another account' });
+        }
+        return error(500, { message: 'Failed to update profile' });
+    }
+});
+
+authRouter.put('/change-password', authenticate, async (request, env) => {
+    try {
+        const userId = request.user.sub;
+        const body = await request.json() as any;
+        const { current_password, new_password } = body;
+
+        if (!current_password || !new_password) {
+            return error(400, { message: 'Current password and new password are required' });
+        }
+
+        const { sql } = getDb(env);
+
+        const result = await sql`SELECT id, password_hash FROM users WHERE id = ${userId} LIMIT 1`;
+        if (result.length === 0) {
+            return error(404, { message: 'User not found' });
+        }
+
+        const user = result[0];
+        const isValid = await verifyPassword(current_password, user.password_hash);
+        if (!isValid) {
+            return error(401, { message: 'Incorrect current password' });
+        }
+
+        const newHash = await hashPassword(new_password);
+        await sql`UPDATE users SET password_hash = ${newHash}, updated_at = NOW() WHERE id = ${userId}`;
+
+        return { message: 'Password changed successfully' };
+    } catch (e) {
+        console.error(e);
+        return error(500, { message: 'Failed to change password' });
     }
 });
