@@ -227,11 +227,13 @@
             >
               <!-- Primary Image -->
               <img
-                :src="currentImage"
+                :src="optimizeImageUrl(currentImage, { width: 1200, quality: 85 })"
                 :alt="product.name"
                 class="main-image transition-transform duration-200 ease-out"
                 :style="zoomStyle"
                 loading="eager"
+                fetchpriority="high"
+                decoding="async"
               />
 
               <!-- Floating Image Badges (Top-Left) -->
@@ -321,7 +323,12 @@
                   @click="currentImageIndex = index"
                   :aria-label="`Select image ${index + 1}`"
                 >
-                  <img :src="img" :alt="`${product.name} - Thumbnail ${index + 1}`" loading="lazy" />
+                  <img
+                    :src="optimizeImageUrl(img, { width: 240, quality: 80 })"
+                    :alt="`${product.name} - Thumbnail ${index + 1}`"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <span v-if="currentImageIndex === index" class="thumb-active-dot"></span>
                 </button>
               </div>
@@ -915,9 +922,10 @@
               <!-- Product Image with Quick Add Button -->
               <div class="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-100 mb-3">
                 <img
-                  :src="item.thumbnail || item.images?.[0]"
+                  :src="optimizeImageUrl(item.thumbnail || item.images?.[0], { width: 480, quality: 80 })"
                   :alt="item.name"
                   loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
@@ -1010,8 +1018,9 @@
         <!-- Modal Center High-Res Image Area -->
         <div class="relative flex-1 flex items-center justify-center p-4 sm:p-8 overflow-hidden">
           <img
-            :src="galleryImages[currentImageIndex]"
+            :src="optimizeImageUrl(galleryImages[currentImageIndex], { width: 1920, quality: 90 })"
             :alt="`${product?.name} High-Res View`"
+            decoding="async"
             class="max-h-[80vh] max-w-[90vw] object-contain rounded-lg shadow-2xl transition-all duration-300"
           />
 
@@ -1047,7 +1056,13 @@
             :class="currentImageIndex === idx ? 'border-amber-400 scale-105 opacity-100' : 'border-transparent opacity-50 hover:opacity-80'"
             @click="currentImageIndex = idx"
           >
-            <img :src="img" class="w-full h-full object-cover" alt="Thumb" />
+            <img
+              :src="optimizeImageUrl(img, { width: 160, quality: 80 })"
+              class="w-full h-full object-cover"
+              alt="Thumb"
+              loading="lazy"
+              decoding="async"
+            />
           </button>
         </div>
       </div>
@@ -1195,6 +1210,7 @@ import { useCartStore } from '@/stores/cart'
 import { useWishlistStore } from '@/stores/wishlist'
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/lib/api'
+import { optimizeImageUrl } from '@/utils/imageOptimizer.js'
 
 // Route & Stores
 const route = useRoute()

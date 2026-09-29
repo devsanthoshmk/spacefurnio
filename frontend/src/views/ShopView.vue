@@ -24,7 +24,13 @@
             @click="navigateToOffer(offer.link)"
           >
             <div class="offer-image-wrapper">
-              <img :src="offer.image" :alt="offer.title" loading="lazy" class="group-hover:scale-105 transition-transform duration-700 ease-out" />
+              <img
+                :src="optimizeImageUrl(offer.image, { width: 600, quality: 82 })"
+                :alt="offer.title"
+                loading="lazy"
+                decoding="async"
+                class="group-hover:scale-105 transition-transform duration-700 ease-out"
+              />
               <div class="offer-overlay">
                 <span class="offer-badge">{{ offer.badge }}</span>
               </div>
@@ -164,7 +170,13 @@
                   @click="navigateToStyle(style.slug)"
                 >
                   <div class="style-image-wrapper shop-arch">
-                    <img :src="style.image" :alt="style.name" loading="lazy" class="group-hover:scale-110 transition-transform duration-700 ease-out" />
+                    <img
+                      :src="optimizeImageUrl(style.image, { width: 400, quality: 82 })"
+                      :alt="style.name"
+                      loading="lazy"
+                      decoding="async"
+                      class="group-hover:scale-110 transition-transform duration-700 ease-out"
+                    />
                     <div class="style-overlay group-hover:opacity-100 transition-opacity">
                       <span class="style-explore group-hover:translate-y-0 transition-transform">Explore</span>
                     </div>
@@ -306,6 +318,7 @@ import { ref, onMounted, watch, h, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import shopApi from '@/api/shopApi.js'
 import { useWishlistStore } from '@/stores/wishlist'
+import { optimizeImageUrl } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -370,7 +383,8 @@ const navigateToProduct = (product) => {
 }
 
 const getProductThumbnail = (product) => {
-  return product.thumbnail || product.primaryImage || product.images?.[0] || FALLBACK_IMAGE
+  const raw = product.thumbnail || product.primaryImage || product.images?.[0] || FALLBACK_IMAGE
+  return optimizeImageUrl(raw, { width: 600, quality: 82 })
 }
 
 const formatPrice = (price, priceCents) => {

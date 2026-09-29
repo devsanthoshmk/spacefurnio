@@ -32,7 +32,8 @@ onMounted(() => {
             <img
               alt="Abstract architectural shadows"
               class="w-full h-full object-cover opacity-90 grayscale"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhgKO0hSTWG8ItXCNibW_OwnRd-hVLNDjVdtYABLzMFnJkmxfTo7lezGgAKHJ2oByOqbt0Bdw95Lrr3sTj3iHl_amf-PmUOcLb3AL6c1isxbGZQVied6Oj22vBxQCc2dMH2kfcZFz43VOGgJTNV_jmcUI7_I3OiG5d1AyLmsopkxfYQ0WQ6YNr_kdf9JmCknkr6oSYw0pJtsag5DTR7rgUjVR5VJALqahF4ingfIhsUOQVUp0IvC64M0l7IppyjdZ5bg5MUF28tf0"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhgKO0hSTWG8ItXCNibW_OwnRd-hVLNDjVdtYABLzMFnJkmxfTo7lezGgAKHJ2oByOqbt0Bdw95Lrr3sTj3iHl_amf-PmUOcLb3AL6c1isxbGZQVied6Oj22vBxQCc2dMH2kfcZFz43VOGgJTNV_jmcUI7_I3OiG5d1AyLmsopkxfYQ0WQ6YNr_kdf9JmCknkr6oSYw0pJtsag5DTR7rgUjVR5VJALqahF4ingfIhsUOQVUp0IvC64M0l7IppyjdZ5bg5MUF28tf0=w1600-rw"
+              decoding="async"
             />
             <div
               class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/30 to-background-light"
@@ -48,7 +49,8 @@ onMounted(() => {
               <img
                 alt="Spacefurnio Monogram"
                 class="w-full h-auto drop-shadow-2xl"
-                src="/images/Spacefurnio-Logo.png"
+                src="/images/Spacefurnio-Logo.webp"
+                decoding="async"
               />
             </div>
 

@@ -153,9 +153,10 @@
               <div class="sf-wl-item-img">
                 <img
                   v-if="item.product?.primaryImage || item.product?.thumbnail"
-                  :src="item.product.primaryImage || item.product.thumbnail"
+                  :src="getOptimizedThumbnail(item.product.primaryImage || item.product.thumbnail, 160)"
                   :alt="item.product?.name"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div v-else class="sf-wl-item-img-placeholder">
                   <svg
@@ -258,6 +259,7 @@
 import { watch, onMounted, onUnmounted, ref, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWishlistStore } from '@/stores/wishlist'
+import { getOptimizedThumbnail } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 const { isWishlistOpen, closeWishlist: closeWishlistFn } = inject('wishlistUtils')

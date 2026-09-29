@@ -38,10 +38,11 @@
           class="w-full h-full flex-shrink-0 relative overflow-hidden bg-stone-100"
         >
           <img
-            :src="img"
+            :src="optimizeImageUrl(img, { width: 600, quality: 82 })"
             :alt="`${product.name || 'Product'} image ${idx + 1}`"
             class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
+            decoding="async"
             @error="handleImageError"
           />
         </div>
@@ -275,6 +276,7 @@ import { useRouter } from 'vue-router'
 import { useWishlistStore } from '@/stores/wishlist'
 import { useCartStore } from '@/stores/cart'
 import { getColorHexHelper } from '@/composables/productsUtills.js'
+import { optimizeImageUrl } from '@/utils/imageOptimizer.js'
 
 const props = defineProps({
   product: {

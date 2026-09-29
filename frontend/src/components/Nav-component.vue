@@ -15,9 +15,10 @@
         </button>
         <router-link v-else to="/" class="flex items-center">
           <img
-            src="/images/Spacefurnio-Logo.png"
+            src="/images/Spacefurnio-Logo.webp"
             alt="SpaceFurnio"
             class="h-9 w-7 object-contain"
+            decoding="async"
           />
         </router-link>
       </div>
@@ -78,8 +79,10 @@
               class="search-result-item w-full flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-stone-50 transition-all duration-200 text-left"
             >
               <img
-                :src="product.images?.[0] || product.thumbnail || '/images/placeholder.png'"
+                :src="optimizeImageUrl(product.images?.[0] || product.thumbnail, { width: 120, quality: 80 })"
                 :alt="product.name"
+                loading="lazy"
+                decoding="async"
                 class="w-14 h-14 object-cover rounded-lg shadow-sm bg-stone-100 flex-shrink-0"
               />
               <div class="flex-1 min-w-0">
@@ -471,6 +474,7 @@ import { searchProducts } from '@/api/shopApi'
 import { useCartStore } from '@/stores/cart'
 import { useWishlistStore } from '@/stores/wishlist'
 import { useAuthStore } from '@/stores/auth'
+import { optimizeImageUrl } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 
@@ -811,7 +815,7 @@ onBeforeUnmount(() => {
   transform: translateX(-50%);
   width: 8px;
   height: 8px;
-  background: url('/images/nav-img.png') no-repeat center/contain;
+  background: url('/images/nav-img.webp') no-repeat center/contain;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;

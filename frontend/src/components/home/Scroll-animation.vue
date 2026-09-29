@@ -7,7 +7,7 @@ import homePageText from '@/assets/contents/homePage.js'
     <!-- Panel 1 -->
     <div class="h-[100dvh]">
       <div
-        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.png')] bg-cover bg-center rounded-xl relative"
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/linemeetslight.webp')] bg-cover bg-center rounded-xl relative"
       >
         <div
           id="text-1"
@@ -22,7 +22,7 @@ import homePageText from '@/assets/contents/homePage.js'
     <!-- Panel 2 -->
     <div class="scroll-section h-[100dvh]">
       <div
-        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.png')] bg-cover bg-center rounded-xl relative"
+        class="panel h-[100dvh] w-full flex items-center justify-center bg-[url('/images/functionmeetsoul.webp')] bg-cover bg-center rounded-xl relative"
       >
         <div
           id="text-2"

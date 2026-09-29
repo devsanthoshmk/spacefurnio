@@ -122,8 +122,10 @@
                   <div class="sf-order-thumbnails">
                     <img
                       v-if="order.order_items?.[0]?.product_image"
-                      :src="order.order_items[0].product_image"
+                      :src="getOptimizedThumbnail(order.order_items[0].product_image, 120)"
                       :alt="order.order_items[0].product_name"
+                      loading="lazy"
+                      decoding="async"
                       class="sf-order-thumb"
                     />
                     <div v-else class="sf-order-thumb-placeholder">
@@ -240,8 +242,10 @@
                       <div class="sf-order-item-info">
                         <img
                           v-if="item.product_image"
-                          :src="item.product_image"
+                          :src="getOptimizedThumbnail(item.product_image, 120)"
                           :alt="item.product_name"
+                          loading="lazy"
+                          decoding="async"
                           class="w-10 h-10 object-cover rounded-lg bg-stone-100 flex-shrink-0"
                         />
                         <div class="min-w-0 flex-1">
@@ -432,6 +436,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 import { enrichOrderItems } from '@/api/shopApi'
 import { api } from '@/lib/api'
+import { getOptimizedThumbnail } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 const { isOrdersOpen: isOpen, closeOrders } = inject('ordersUtils')

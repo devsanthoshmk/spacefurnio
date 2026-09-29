@@ -277,7 +277,13 @@
                 class="sf-review-item"
               >
                 <div class="sf-review-img">
-                  <img v-if="item.image || item.primaryImage" :src="item.image || item.primaryImage" :alt="item.name" />
+                  <img
+                    v-if="item.image || item.primaryImage"
+                    :src="getOptimizedThumbnail(item.image || item.primaryImage, 120)"
+                    :alt="item.name"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <div v-else class="sf-review-img-ph">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                       <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -531,6 +537,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/lib/api'
+import { getOptimizedThumbnail } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 

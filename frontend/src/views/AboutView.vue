@@ -11,8 +11,9 @@
           <!-- background image block -->
           <div class="h-[80%] w-full relative">
             <img
-              src="/images/aboutus/hero/window.png"
+              src="/images/aboutus/hero/window.webp"
               alt=""
+              decoding="async"
               style="
                 bottom: 0;
                 width: 100%;
@@ -22,8 +23,9 @@
               "
             />
             <img
-              src="/images/aboutus/hero/people.png"
+              src="/images/aboutus/hero/people.webp"
               alt=""
+              decoding="async"
               style="position: absolute; bottom: 0; inset-inline: 0; margin: auto"
             />
           </div>
@@ -55,7 +57,7 @@
 
       <section class="scroll-section relative w-full h-[100dvh] overflow-hidden">
         <div
-          class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.png')]"
+          class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/2.webp')]"
         ></div>
 
         <!-- Overlay text (permanently placed inside curve) -->
@@ -107,7 +109,7 @@
       <section class="scroll-section relative w-full h-[100dvh] overflow-hidden">
         <!-- Background -->
         <div
-          class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/3.png')]"
+          class="absolute inset-0 bg-no-repeat bg-center bg-cover bg-[url('/images/aboutus/3.webp')]"
         ></div>
 
         <div
@@ -412,8 +414,10 @@
           <div class="flex flex-col items-center text-center">
             <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
               <img
-                src="/images/aboutus/clients/zentrophy.png"
+                src="/images/aboutus/clients/zentrophy.webp"
                 alt="Zentropy Logo"
+                decoding="async"
+                loading="lazy"
                 class="max-h-28 object-contain"
               />
             </div>
@@ -425,8 +429,10 @@
           <div class="flex flex-col items-center text-center">
             <div class="w-72 h-40 flex items-center justify-center bg-white shadow-lg rounded-xl">
               <img
-                src="/images/aboutus/clients/gk.png"
+                src="/images/aboutus/clients/gk.webp"
                 alt="Genius Kidz Logo"
+                decoding="async"
+                loading="lazy"
                 class="max-h-28 object-contain"
               />
             </div>
@@ -833,7 +839,7 @@ const ourteam = [
     id: 3,
     name: 'Ms. Kaviya Arulthilagam',
     role: 'Product Designer',
-    image: '/images/aboutus/team-main/our-team/Kaviya.png',
+    image: '/images/aboutus/team-main/our-team/Kaviya.webp',
   },
   {
     id: 4,

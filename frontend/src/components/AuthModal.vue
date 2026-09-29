@@ -35,7 +35,7 @@
 
         <!-- Brand Logo Header -->
         <div class="sf-auth-brand">
-          <img src="/images/Spacefurnio-Logo.png" alt="SpaceFurnio" class="sf-auth-logo" />
+          <img src="/images/Spacefurnio-Logo.webp" alt="SpaceFurnio" class="sf-auth-logo" decoding="async" />
         </div>
 
         <!-- Tab Switcher (Login / Register) -->

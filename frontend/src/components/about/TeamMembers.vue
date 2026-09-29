@@ -24,6 +24,7 @@
                   :alt="person.name"
                   class="team-photo"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
 
@@ -76,7 +77,7 @@ const teamMembers = [
     description: 'Architect with 3 years of experience in this field',
     detailedBio: `I'm an architect with 3 years of experience in this field, and I genuinely enjoy the hands-on side of design, especially bringing ideas to life through thoughtful execution. I'm a naturally curious person, always exploring new tools, materials, and ways to improve what I do. I love turning creative concepts into practical, buildable solutions that are both smart and meaningful.`,
     Architectural_Perspective: `For me, architecture is all about creating smart, simple spaces that work well and feel good to live in. I'm drawn to designs that are minimalist, budget-friendly, and kind to the environment. I believe that with the right ideas and materials, we can build spaces that are both beautiful and practical, without overcomplicating things. Sometimes, the simplest designs speak the loudest—when they're made with care and purpose.`,
-    image: '/images/aboutus/team-main/jentra.png',
+    image: '/images/aboutus/team-main/jentra.webp',
   },
   {
     id: 2,
@@ -87,7 +88,7 @@ const teamMembers = [
       'CA Finalist with a passion for supporting growing businesses through strategic guidance',
     detailedBio: `I'm a CA Finalist with a passion for supporting growing businesses through strategic guidance by bringing a blend of analytical thinking and real-world experience. My journey blends people, purpose, and strategy. At Spacefurnio, I wear many hats — from keeping the team motivated and connected, to shaping how the world sees us. As the HR head, I'm all about creating a positive, driven work culture and helping bring our brand's voice to life.`,
     Architectural_Perspective: `As an outsider in the field of architecture, I see architecture as the art of creating meaningful spaces within real-world limits. It's not just about aesthetics — it's about smart, sustainable choices that balance beauty, function, and budget. Great architecture, to me, is where creativity meets constraint, and still manages to feel effortless.`,
-    image: '/images/aboutus/team-main/cintra.png',
+    image: '/images/aboutus/team-main/cintra.webp',
   },
   {
     id: 3,
@@ -98,7 +99,7 @@ const teamMembers = [
       'Architect and the Design Lead at Spacefurnio, shaping products with a balance of function and aesthetics',
     detailedBio: `I'm an architect and the Design Lead at Spacefurnio, where I shape every product with a balance of function and aesthetics. My journey began with sketches in the margins of my notebooks and has grown into creating purposeful spaces that fulfill both design intent and functional needs. From the first line I draw, my focus is clear — to capture every requirement with precision and embed it into our work, ensuring the foundation of every project is laid right from the very beginning.`,
     Architectural_Perspective: `To me, architecture is more than design — it is the art of translating dreams into spaces that tell stories and serve a purpose. It begins with listening — to people, to place, and to intent. I see it as a soulful practice where emotion, function, and aesthetics come together in harmony. True architecture is not just admired; it is felt, lived in, and cherished — evolving with the lives it touches.`,
-    image: '/images/aboutus/team-main/monisha.png',
+    image: '/images/aboutus/team-main/monisha.webp',
   },
   {
     id: 4,
@@ -109,7 +110,7 @@ const teamMembers = [
       'MBA graduate with a passion for driving business growth through strategic financial planning',
     detailedBio: `I'm an MBA graduate with a passion for driving business growth through strategic financial planning. As the Co-Founder of our startup, I oversee financial operations, manage investments, and ensure we're on a path to sustainable success. My journey combines academic excellence with hands-on experience, allowing me to turn numbers into actionable insights that shape our future.`,
     Architectural_Perspective: `I don't come from an architecture background, but I've always been fascinated by the way spaces make us feel. To me, architecture isn't just about buildings or blueprints—it's about stories. Every wall, every window, every curve has a purpose, even if you don't see it at first. I approach it with the eyes of an outsider, which I think is my strength. Technical rules do not bind me; I see the beauty, the emotion, and the human experience behind the structures. It's like listening to a song in a language you don't speak—you may not know every word, but you feel its meaning.`,
-    image: '/images/aboutus/team-main/jenita.png',
+    image: '/images/aboutus/team-main/jenita.webp',
   },
 ]
 

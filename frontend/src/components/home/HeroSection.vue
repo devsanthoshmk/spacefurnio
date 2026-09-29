@@ -11,22 +11,22 @@ const ctaRef = ref(null)
 
 const newArrivalImages = [
   {
-    src: 'https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: 'https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
     alt: homePageText.new_arrival_alt_1.text,
     altKey: 'new_arrival_alt_1',
   },
   {
-    src: 'https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: 'https://images.unsplash.com/photo-1604580040660-f0a7f9abaea6?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
     alt: homePageText.new_arrival_alt_2.text,
     altKey: 'new_arrival_alt_2',
   },
   {
-    src: 'https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=2012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: 'https://plus.unsplash.com/premium_photo-1664300702916-49bb4eeb5373?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
     alt: homePageText.new_arrival_alt_3.text,
     altKey: 'new_arrival_alt_3',
   },
   {
-    src: 'https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: 'https://plus.unsplash.com/premium_photo-1681400063959-81efdde1814c?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.1.0',
     alt: homePageText.new_arrival_alt_4.text,
     altKey: 'new_arrival_alt_4',
   },
@@ -41,7 +41,7 @@ const newArrivalImages = [
         ref="heroRef"
         class="hero-image-container"
         :style="{
-          backgroundImage: `url('/images/taglinebg.png')`,
+          backgroundImage: `url('/images/taglinebg.webp')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }"
@@ -113,6 +113,7 @@ const newArrivalImages = [
                 :data-key="image.altKey"
                 class="new-arrival-image grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
                 loading="lazy"
+                decoding="async"
               />
               <!-- Coming Soon Overlay -->
               <div class="coming-soon-overlay">

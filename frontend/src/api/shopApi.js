@@ -192,16 +192,16 @@ const SPACE_ICON_MAP = {
 // ============================================
 
 const STYLE_IMAGE_MAP = {
-  brutalist: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop',
-  minimalist: 'https://images.unsplash.com/photo-1598928506311-c55efa66a84d?w=600&h=600&fit=crop',
-  sustainable: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=600&fit=crop',
-  parametric: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=600&h=600&fit=crop',
-  'wabi-sabi': 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=600&fit=crop',
-  traditional: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop',
-  'vintage-retro': 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop',
-  victorian: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop',
-  japandi: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=600&h=600&fit=crop',
-  moroccan: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop',
+  brutalist: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop&auto=format&q=80',
+  minimalist: 'https://images.unsplash.com/photo-1598928506311-c55efa66a84d?w=600&h=600&fit=crop&auto=format&q=80',
+  sustainable: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=600&fit=crop&auto=format&q=80',
+  parametric: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=600&h=600&fit=crop&auto=format&q=80',
+  'wabi-sabi': 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=600&fit=crop&auto=format&q=80',
+  traditional: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop&auto=format&q=80',
+  'vintage-retro': 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop&auto=format&q=80',
+  victorian: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop&auto=format&q=80',
+  japandi: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=600&h=600&fit=crop&auto=format&q=80',
+  moroccan: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop&auto=format&q=80',
 }
 
 // ============================================
@@ -452,7 +452,7 @@ export async function getStyles() {
       slug: st.slug,
       image:
         STYLE_IMAGE_MAP[st.slug] ||
-        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop&auto=format&q=80',
       description: `Explore our ${st.name} collection.`,
     }))
 
@@ -913,7 +913,7 @@ export async function getSpecialOffers() {
         id: 'new-arrivals',
         title: 'New',
         subtitle: 'Latest collection of minimalist home essentials',
-        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop&auto=format&q=80',
         link: '/shop/category?filter=new',
         badge: 'New Arrivals',
       },
@@ -921,7 +921,7 @@ export async function getSpecialOffers() {
         id: 'best-sellers',
         title: 'Best',
         subtitle: 'Our most loved pieces by customers',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop',
+        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop&auto=format&q=80',
         link: '/shop/category?filter=bestseller',
         badge: 'Trending',
       },

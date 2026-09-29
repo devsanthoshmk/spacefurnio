@@ -166,9 +166,10 @@
               <div class="sf-cart-item-img">
                 <img
                   v-if="item.image || item.primaryImage"
-                  :src="item.image || item.primaryImage"
+                  :src="getOptimizedThumbnail(item.image || item.primaryImage, 160)"
                   :alt="item.name"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div v-else class="sf-cart-item-img-placeholder">
                   <svg
@@ -382,6 +383,7 @@
 import { computed, watch, onMounted, onUnmounted, ref, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
+import { getOptimizedThumbnail } from '@/utils/imageOptimizer.js'
 
 const router = useRouter()
 const { isCartOpen, closeCart: closeCartFn } = inject('cartUtils')
