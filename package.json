@@ -1,4 +1,13 @@
 {
+  "name": "spacefurnio",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter spacefurnio-vue build",
+    "build:frontend": "pnpm --filter spacefurnio-vue build",
+    "build:worker": "cd backend/ecommerce-backend/server-worker && pnpm install && pnpm build",
+    "build:all": "pnpm build:frontend && pnpm build:worker",
+    "test:worker": "cd backend/ecommerce-backend/server-worker && pnpm test"
+  },
   "devDependencies": {
     "pg": "^8.20.0"
   }
