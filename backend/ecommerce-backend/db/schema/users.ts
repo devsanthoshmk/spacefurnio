@@ -55,6 +55,19 @@ export const passwordResets = pgTable('password_resets', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const adminInvitations = pgTable('admin_invitations', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: text('email').notNull(),
+    name: text('name').notNull(),
+    role: text('role').notNull().default('store_manager'),
+    permissions: text('permissions').array().notNull().default([]),
+    tokenHash: text('token_hash').unique().notNull(),
+    invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
+    expiresAt: timestamp('expires_at').notNull(),
+    acceptedAt: timestamp('accepted_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
     addresses: many(userAddresses),
