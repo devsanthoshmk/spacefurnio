@@ -35,8 +35,8 @@ couponRouter.get('/active', async (request, env) => {
 // Validate coupon code against subtotal
 couponRouter.post('/validate', async (request, env) => {
     try {
-        const body = await request.json() as any;
-        const { code, subtotal = 0 } = body;
+        const body = (await request.json().catch(() => ({}))) as any;
+        const { code, subtotal = 0 } = body || {};
 
         if (!code || typeof code !== 'string') {
             return error(400, { message: 'Coupon code is required' });
