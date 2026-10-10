@@ -80,7 +80,7 @@ function createStaticServer(distDir) {
 
 /**
  * Discover non-storefront marketing & content routes to prerender.
- * Storefront pages (/shop, /shop/product/*) and Admin (/admin-spacefurnio/*) are kept dynamic CSR.
+ * Storefront pages (/shop, /shop/product/*) are kept dynamic CSR.
  */
 function discoverRoutes() {
   const contentRoutes = [
@@ -92,7 +92,7 @@ function discoverRoutes() {
     '/shopping',
   ]
 
-  console.log(`Prerendering ${contentRoutes.length} content/marketing pages (storefront & admin kept dynamic CSR).`)
+  console.log(`Prerendering ${contentRoutes.length} content/marketing pages (storefront kept dynamic CSR).`)
   return contentRoutes
 }
 
