@@ -4,6 +4,8 @@
 
 | Document | Description |
 |----------|-------------|
+| [Complete API Documentation](API_DOCUMENTATION.md) | Comprehensive REST API reference across Storefront & Admin domains |
+| [Admin Backend Suite](2026-09-30-admin-backend-suite.md) | Architecture, RBAC matrix, endpoints, and E2E verification test reports |
 | [01-Neon-Data-API](01-NEON-DATA-API.md) | Neon Data API usage for carts, wishlists, orders |
 | [System-Wide Image Optimization](2026-09-30-system-wide-image-optimization.md) | Programmatic image pipeline, WebP generation, and dynamic CDN transforms |
 
