@@ -1,5 +1,6 @@
 import { AutoRouter, cors } from 'itty-router';
 import { authRouter } from './routes/auth';
+import { adminRouter } from './routes/admin';
 import { orderRouter } from './routes/orders';
 import { paymentRouter } from './routes/payments';
 import { productRouter } from './routes/products';
@@ -24,6 +25,7 @@ const router = AutoRouter<any, [env: Env, ctx: ExecutionContext]>({
 });
 
 router.all('/auth/*', authRouter.fetch);
+router.all('/api/admin/*', adminRouter.fetch);
 router.all('/api/products/*', productRouter.fetch);
 router.all('/api/categories/*', categoryRouter.fetch);
 router.all('/api/cart/*', cartRouter.fetch);
