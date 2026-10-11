@@ -260,7 +260,7 @@ const handleDashboardRequest = async (request: AdminAuthRequest, env: Env) => {
     }
 
     // Trends Data (bucketed by day / interval)
-    const isSingleDay = period === 'today' || totalDurationMs <= 86400000;
+    const isSingleDay = period === 'today' || (period !== 'week' && period !== 'month' && period !== 'year' && period !== 'all' && totalDurationMs <= 86400000);
     const trendBucketsCount = isSingleDay ? 8 : 7;
     const trendBucketMs = Math.max(1, totalDurationMs / trendBucketsCount);
     const trends: { date: string; label: string; revenue: number; orders: number }[] = [];
