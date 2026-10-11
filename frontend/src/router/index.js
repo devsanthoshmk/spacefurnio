@@ -85,6 +85,7 @@ const router = createRouter({
         { path: 'coupons', name: 'AdminCoupons', component: () => import('@/admin/views/AdminCoupons.vue'), meta: { title: 'Coupons - SpaceFurnio Admin' } },
         { path: 'reviews', name: 'AdminReviews', component: () => import('@/admin/views/AdminReviews.vue'), meta: { title: 'Reviews - SpaceFurnio Admin' } },
         { path: 'images', alias: 'media', name: 'AdminImages', component: () => import('@/admin/views/AdminImages.vue'), meta: { title: 'Media - SpaceFurnio Admin' } },
+        { path: 'team', name: 'AdminTeam', component: () => import('@/admin/views/AdminTeam.vue'), meta: { title: 'Team - SpaceFurnio Admin' } },
       ],
     },
   ],
