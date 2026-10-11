@@ -824,7 +824,7 @@ onMounted(() => {
 })
 
 const getInitials = (name) => {
-  let cleanName = name.replace(/^(Ar\.|Mr\.|Ms\.|Mrs\.|Dr\.|Er\.)\s+/i, '')
+  const cleanName = name.replace(/^(Ar\.|Mr\.|Ms\.|Mrs\.|Dr\.|Er\.)\s+/i, '')
   const parts = cleanName.trim().split(' ')
   if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase()
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
