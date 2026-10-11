@@ -194,7 +194,9 @@ const performAutoScroll = () => {
   // })
 
   // for custom scroll
-  props.simulateKey('ArrowDown')
+  if (typeof props.simulateKey === 'function') {
+    props.simulateKey('ArrowDown')
+  }
 }
 
 // ========================================
