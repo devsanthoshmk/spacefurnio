@@ -1,20 +1,19 @@
 <template>
   <div id="scroll-container" class="overflow-hidden">
-    <div>
-      <div
-        id="scroll-wrapper" ref="wrapper"
-        class="bg-space-bg-light dark:bg-space-bg-dark text-space-text-light dark:text-space-text-dark font-space-display transition-colors duration-300 min-h-screen"
-      >
-        <!-- Hero Section -->
-        <div class="scroll-section">
-          <HeroSection />
-        </div>
+    <div
+      id="scroll-wrapper" ref="wrapper"
+      class="bg-space-bg-light dark:bg-space-bg-dark text-space-text-light dark:text-space-text-dark font-space-display transition-colors duration-300 min-h-screen"
+    >
+      <!-- Hero Section -->
+      <div class="scroll-section">
+        <HeroSection />
+      </div>
 
-        <div class="scroll-section">
-          <MainSection />
-        </div>
+      <div class="scroll-section">
+        <MainSection />
+      </div>
 
-        <div class="scroll-section w-full px-6 md:px-12 py-12 mb-8 md:mb-16">
+      <div class="scroll-section w-full px-6 md:px-12 pt-12 pb-20 md:pt-12 md:pb-28">
           <div
             class="max-w-[1600px] mx-auto border-t border-b border-gray-300 dark:border-gray-700 py-12 md:py-20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
           >
@@ -45,7 +44,6 @@
         <div class="scroll-section">
           <FooterComponent />
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -68,10 +66,6 @@ onMounted(() => {
     showNav.value = true
     showFoo.value = true
   })
-  wrapper.value.addEventListener('sectionChange', (e) => {
-    console.error(e.detail.currentIndex)
-    console.error(e.detail.currentSection)
-  })
 })
 
 
@@ -81,6 +75,20 @@ onMounted(() => {
 </script>
 
 <style scoped>
+#scroll-container {
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+  touch-action: pan-x pinch-zoom;
+  overscroll-behavior: none;
+}
+
+#scroll-wrapper {
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
