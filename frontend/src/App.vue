@@ -1,6 +1,6 @@
 <template>
   <header>
-    <NavComponent v-show="showNav" />
+    <NavComponent v-show="showNav && !isAdminRoute" />
   </header>
 
   <main>
@@ -8,30 +8,30 @@
   </main>
 
   <footer>
-    <FooterComponent v-show="showFoo" />
+    <FooterComponent v-show="showFoo && !isAdminRoute" />
   </footer>
 
   <!-- State-driven Cart Off-Canvas Overlay -->
-  <CartOffCanvas />
+  <CartOffCanvas v-if="!isAdminRoute" />
 
   <!-- State-driven Wishlist Off-Canvas Overlay -->
-  <WishlistOffCanvas />
+  <WishlistOffCanvas v-if="!isAdminRoute" />
 
   <!-- State-driven Auth Modal -->
-  <AuthModal />
+  <AuthModal v-if="!isAdminRoute" />
 
   <!-- State-driven Orders Modal -->
-  <OrdersModal />
+  <OrdersModal v-if="!isAdminRoute" />
 
   <!-- State-driven Checkout Modal -->
-  <CheckoutModal />
+  <CheckoutModal v-if="!isAdminRoute" />
 
   <!-- State-driven Settings Modal -->
-  <SettingsModal />
+  <SettingsModal v-if="!isAdminRoute" />
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { ref, computed, provide, onMounted } from 'vue'
 import NavComponent from './components/Nav-component.vue'
 import FooterComponent from './components/Footer-component.vue'
@@ -46,6 +46,8 @@ import { useWishlistStore } from '@/stores/wishlist'
 import { useAuthStore } from '@/stores/auth'
 
 // Nav visibility
+const route = useRoute()
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const showNav = ref(true)
 provide('navShowUtils', { showNav })
 // footer visibility

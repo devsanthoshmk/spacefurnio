@@ -55,6 +55,28 @@ const router = createRouter({
     { path: '/shop/products', redirect: '/shop' },
     { path: '/shopping', name: 'shopping', component: comingSoon },
     { path: '/contact', name: 'contact', component: () => import('@/views/ContactView.vue'), meta: { title: 'Contact Us - Spacefurnio' } },
+
+    // Admin routes
+    {
+      path: '/admin/login',
+      name: 'AdminLogin',
+      component: () => import('@/admin/views/AdminLogin.vue'),
+      meta: { title: 'Admin Login - SpaceFurnio', isAdmin: true, requiresAuth: false },
+    },
+    {
+      path: '/admin/setup',
+      name: 'AdminSetup',
+      component: () => import('@/admin/views/AdminSetup.vue'),
+      meta: { title: 'Admin Setup - SpaceFurnio', isAdmin: true, requiresAuth: false },
+    },
+    {
+      path: '/admin',
+      component: () => import('@/admin/components/layout/AdminLayout.vue'),
+      meta: { isAdmin: true, requiresAuth: true },
+      children: [
+        { path: '', name: 'AdminDashboard', component: () => import('@/admin/views/AdminDashboard.vue'), meta: { title: 'Dashboard - SpaceFurnio Admin' } },
+      ],
+    },
   ],
 })
 
@@ -63,6 +85,23 @@ router.beforeEach((to, from, next) => {
   if (title) {
     document.title = typeof title === 'function' ? title(to) : title
   }
+
+  if (to.meta.isAdmin && to.meta.requiresAuth !== false) {
+    const token = localStorage.getItem('spacefurnio_token')
+    if (!token) {
+      next({ name: 'AdminLogin', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
+  if (to.name === 'AdminLogin') {
+    const token = localStorage.getItem('spacefurnio_token')
+    if (token) {
+      next({ name: 'AdminDashboard' })
+      return
+    }
+  }
+
   next()
 })
 

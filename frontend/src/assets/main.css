@@ -10,9 +10,33 @@
   --color-accent-light: #e5e5e5;
   --color-accent-dark: #262626;
 
+  /* Admin Theme Colors */
+  --color-admin-bg: #f8fafc;
+  --color-admin-surface: #ffffff;
+  --color-admin-sidebar: #0f172a;
+  --color-admin-sidebar-hover: #1e293b;
+  --color-admin-sidebar-active: #2563eb;
+  --color-admin-primary: #2563eb;
+  --color-admin-primary-hover: #1d4ed8;
+  --color-admin-primary-light: #dbeafe;
+  --color-admin-success: #10b981;
+  --color-admin-success-light: #d1fae5;
+  --color-admin-warning: #f59e0b;
+  --color-admin-warning-light: #fef3c7;
+  --color-admin-danger: #ef4444;
+  --color-admin-danger-light: #fee2e2;
+  --color-admin-info: #06b6d4;
+  --color-admin-info-light: #cffafe;
+  --color-admin-text: #0f172a;
+  --color-admin-text-secondary: #64748b;
+  --color-admin-text-muted: #94a3b8;
+  --color-admin-border: #e2e8f0;
+  --color-admin-border-strong: #cbd5e1;
+
   /* Fonts */
   --font-display: 'Playfair Display', serif;
   --font-body: 'Lato', sans-serif;
+  --font-admin: 'Inter', system-ui, sans-serif;
 
   /* Border Radius */
   --radius: 2px;
