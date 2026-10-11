@@ -75,6 +75,9 @@ const router = createRouter({
       meta: { isAdmin: true, requiresAuth: true },
       children: [
         { path: '', name: 'AdminDashboard', component: () => import('@/admin/views/AdminDashboard.vue'), meta: { title: 'Dashboard - SpaceFurnio Admin' } },
+        { path: 'products', name: 'AdminProducts', component: () => import('@/admin/views/AdminProducts.vue'), meta: { title: 'Products - SpaceFurnio Admin' } },
+        { path: 'products/new', name: 'AdminProductCreate', component: () => import('@/admin/views/AdminProductForm.vue'), meta: { title: 'New Product - SpaceFurnio Admin' } },
+        { path: 'products/:id/edit', name: 'AdminProductEdit', component: () => import('@/admin/views/AdminProductForm.vue'), meta: { title: 'Edit Product - SpaceFurnio Admin' } },
       ],
     },
   ],
