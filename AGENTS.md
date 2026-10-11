@@ -72,6 +72,55 @@ pnpm db:studio   # Open Drizzle Studio UI
 
 ---
 
+## Admin Frontend
+
+All admin frontend code lives in `frontend/src/admin/`. Do not create admin files outside this directory.
+
+### Structure
+```
+frontend/src/admin/
+├── api/adminApi.ts            # Admin API client
+├── components/
+│   ├── layout/                # AdminLayout, AdminSidebar, AdminTopbar
+│   ├── shared/                # Reusable components (see below)
+│   └── [domain]/              # Domain-specific sub-components
+├── composables/               # useAdminAuth, usePagination, useFilters, useConfirm
+├── stores/                    # adminAuth, adminSidebar
+├── types/admin.ts             # All TypeScript interfaces
+├── utils/                     # permissions, formatters, constants
+└── views/                     # Admin*.vue view components
+```
+
+### Shared Components (use before building custom)
+`AdminPageHeader`, `AdminDataTable`, `AdminStatsCard`, `AdminStatusBadge`, `AdminEmptyState`, `AdminPagination`, `AdminSearchBar`, `AdminFilterBar`, `AdminSparkline`, `AdminConfirmDialog`
+
+### Admin Rules
+- Every view must use `AdminLayout` as parent.
+- Every view must check permissions before rendering protected actions.
+- Use `adminApi` from `@/admin/api/adminApi` for all admin API calls.
+- Use PrimeVue DataTable for tables, Dialog for modals, Toast for notifications.
+- Follow the admin color palette defined in `src/assets/main.css` (admin-* custom properties).
+- Do NOT modify files outside `frontend/src/admin/` except `router/index.js` (for route registration) and `assets/main.css` (for theme tokens).
+- Do NOT modify backend code or add new API endpoints without explicit approval.
+- Do NOT install new npm packages without explicit approval.
+
+### Admin Coordination Files
+Reference specs during admin development:
+- `/tmp/opencode/spacefurnio-admin-build/API-SPEC.md` — Complete API endpoint reference
+- `/tmp/opencode/spacefurnio-admin-build/DESIGN-SPEC.md` — Color palette, spacing, component patterns
+- `/tmp/opencode/spacefurnio-admin-build/AGENT-BRIEF.md` — Standard instructions for every agent
+
+### Feedback Loop Protocol
+When building admin pages with subagents:
+1. Build the page/feature.
+2. EVALUATE in a new session: score /100, list issues. Never evaluate in the same session that built it.
+3. FIX in a new session if score < 100.
+4. REPEAT until fresh evaluator scores 100/100.
+5. If stuck (same issue 3+ times): pause, analyze root cause, hand off to fresh subagent with: original requirements, current file state, root cause, what NOT to try again.
+6. For UI verification: use OpenChamber browser tools (browser.open, browser.snapshot, browser.click, browser.type) to test like a real user. No sloppy programmatic test stubs.
+
+---
+
 ## Pre-Commit Verification
 
 Before committing changes, ensure:
