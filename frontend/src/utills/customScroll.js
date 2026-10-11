@@ -482,12 +482,14 @@ const createWheelHandler = (state) => (event) => {
  * }}
  */
 const createTouchHandlers = (state) => {
+  let touchStartY = 0
+  let touchStartX = 0
   let isSwiping = false
 
   const touchStart = (event) => {
     if (event.touches.length !== 1) return
-    state.touchStartY = event.touches[0].clientY
-    state.touchStartX = event.touches[0].clientX
+    touchStartY = event.touches[0].clientY
+    touchStartX = event.touches[0].clientX
     isSwiping = false
   }
 
@@ -496,8 +498,8 @@ const createTouchHandlers = (state) => {
 
     const touchY = event.touches[0].clientY
     const touchX = event.touches[0].clientX
-    const deltaY = state.touchStartY - touchY
-    const deltaX = (state.touchStartX || touchX) - touchX
+    const deltaY = touchStartY - touchY
+    const deltaX = touchStartX - touchX
 
     // If swipe is primarily horizontal, allow native/horizontal interaction
     if (Math.abs(deltaX) > Math.abs(deltaY)) return
@@ -606,7 +608,6 @@ const setupEventHandlers = (state) => {
  *   maxOffset: number,
  *   currentIndex: number,
  *   lastScrollTime: number,
- *   touchStartY: number,
  *   options: typeof DEFAULT_OPTIONS
  * }}
  */
@@ -625,7 +626,6 @@ const createScrollState = (wrapperEl, childClass, navDotsEl, options) => {
     maxOffset: 0,
     currentIndex: 0,
     lastScrollTime: 0,
-    touchStartY: 0,
     options,
   }
 }
