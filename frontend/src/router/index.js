@@ -80,6 +80,8 @@ const router = createRouter({
         { path: 'products/:id/edit', name: 'AdminProductEdit', component: () => import('@/admin/views/AdminProductForm.vue'), meta: { title: 'Edit Product - SpaceFurnio Admin' } },
         { path: 'orders', name: 'AdminOrders', component: () => import('@/admin/views/AdminOrders.vue'), meta: { title: 'Orders - SpaceFurnio Admin' } },
         { path: 'orders/:id', name: 'AdminOrderDetail', component: () => import('@/admin/views/AdminOrderDetail.vue'), meta: { title: 'Order Detail - SpaceFurnio Admin' } },
+        { path: 'customers', name: 'AdminCustomers', component: () => import('@/admin/views/AdminCustomers.vue'), meta: { title: 'Customers - SpaceFurnio Admin' } },
+        { path: 'customers/:id', name: 'AdminCustomerDetail', component: () => import('@/admin/views/AdminCustomerDetail.vue'), meta: { title: 'Customer Detail - SpaceFurnio Admin' } },
       ],
     },
   ],
