@@ -471,31 +471,50 @@ const createWheelHandler = (state) => (event) => {
 }
 
 /**
- * Creates touch event listeners (start/move) to support swipe-based navigation on mobile
- * devices.
+ * Creates touch event listeners (start/move/end/cancel) to support swipe-based navigation
+ * on touch devices with single-gesture locking.
  *
  * @param {ReturnType<typeof createScrollState>} state
- * @returns {{ touchStart: (event: TouchEvent) => void, touchMove: (event: TouchEvent) => void }}
+ * @returns {{
+ *   touchStart: (event: TouchEvent) => void,
+ *   touchMove: (event: TouchEvent) => void,
+ *   touchEnd: () => void
+ * }}
  */
 const createTouchHandlers = (state) => {
+  let isSwiping = false
+
   const touchStart = (event) => {
+    if (event.touches.length !== 1) return
     state.touchStartY = event.touches[0].clientY
+    state.touchStartX = event.touches[0].clientX
+    isSwiping = false
   }
 
   const touchMove = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
+    if (isSwiping || event.touches.length !== 1) return
 
     const touchY = event.touches[0].clientY
+    const touchX = event.touches[0].clientX
     const deltaY = state.touchStartY - touchY
+    const deltaX = (state.touchStartX || touchX) - touchX
+
+    // If swipe is primarily horizontal, allow native/horizontal interaction
+    if (Math.abs(deltaX) > Math.abs(deltaY)) return
 
     if (Math.abs(deltaY) > state.options.touchThreshold) {
+      event.preventDefault()
+      event.stopPropagation()
+      isSwiping = true
       performDirectionalScroll(state, deltaY > 0 ? SCROLL_DIRECTION.DOWN : SCROLL_DIRECTION.UP)
-      state.touchStartY = touchY
     }
   }
 
-  return { touchStart, touchMove }
+  const touchEnd = () => {
+    isSwiping = false
+  }
+
+  return { touchStart, touchMove, touchEnd }
 }
 
 /**
@@ -538,13 +557,15 @@ const createKeyHandler = (state) => (event) => {
  */
 const setupEventHandlers = (state) => {
   const wheelHandler = createWheelHandler(state)
-  const { touchStart, touchMove } = createTouchHandlers(state)
+  const { touchStart, touchMove, touchEnd } = createTouchHandlers(state)
   const keyHandler = createKeyHandler(state)
   const resizeHandler = () => updateDimensions(state)
 
   state.wrapperEl.addEventListener('wheel', wheelHandler, { passive: false })
   state.wrapperEl.addEventListener('touchstart', touchStart, { passive: true })
   state.wrapperEl.addEventListener('touchmove', touchMove, { passive: false })
+  state.wrapperEl.addEventListener('touchend', touchEnd, { passive: true })
+  state.wrapperEl.addEventListener('touchcancel', touchEnd, { passive: true })
   document.addEventListener('keydown', keyHandler)
 
   if (state.options.enableResizeListener) {
@@ -555,6 +576,8 @@ const setupEventHandlers = (state) => {
     state.wrapperEl.removeEventListener('wheel', wheelHandler)
     state.wrapperEl.removeEventListener('touchstart', touchStart)
     state.wrapperEl.removeEventListener('touchmove', touchMove)
+    state.wrapperEl.removeEventListener('touchend', touchEnd)
+    state.wrapperEl.removeEventListener('touchcancel', touchEnd)
     document.removeEventListener('keydown', keyHandler)
 
     if (state.options.enableResizeListener) {
