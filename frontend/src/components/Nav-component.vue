@@ -218,6 +218,42 @@
             <i class="fas fa-search text-sm sm:text-base"></i>
           </button>
 
+          <!-- Wishlist Button with Badge -->
+          <button
+            @click="handleWishlistClick"
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
+            aria-label="Wishlist"
+            title="Wishlist"
+          >
+            <i class="fas fa-heart text-sm sm:text-base"></i>
+            <Transition name="badge-pop">
+              <span
+                v-if="wishlistCount > 0"
+                class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full shadow-sm"
+              >
+                {{ wishlistCount > 99 ? '99+' : wishlistCount }}
+              </span>
+            </Transition>
+          </button>
+
+          <!-- Cart Button with Badge -->
+          <button
+            @click="handleCartClick"
+            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
+            aria-label="Shopping Cart"
+            title="Cart"
+          >
+            <i class="fas fa-shopping-cart text-sm sm:text-base"></i>
+            <Transition name="badge-pop">
+              <span
+                v-if="cartCount > 0"
+                class="absolute -top-1 -right-1 bg-amber-600 text-white text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full shadow-sm"
+              >
+                {{ cartCount > 99 ? '99+' : cartCount }}
+              </span>
+            </Transition>
+          </button>
+
           <!-- User Button / Avatar Dropdown -->
           <div ref="userDropdownRef" class="relative user-dropdown-container">
             <!-- Guest: simple user icon button opening AuthModal -->
@@ -333,42 +369,6 @@
               </div>
             </Transition>
           </div>
-
-          <!-- Wishlist Button with Badge -->
-          <button
-            @click="handleWishlistClick"
-            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
-            aria-label="Wishlist"
-            title="Wishlist"
-          >
-            <i class="fas fa-heart text-sm sm:text-base"></i>
-            <Transition name="badge-pop">
-              <span
-                v-if="wishlistCount > 0"
-                class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full shadow-sm"
-              >
-                {{ wishlistCount > 99 ? '99+' : wishlistCount }}
-              </span>
-            </Transition>
-          </button>
-
-          <!-- Cart Button with Badge -->
-          <button
-            @click="handleCartClick"
-            class="icon-btn p-2 rounded-full transition-all duration-300 hover:bg-stone-100 relative"
-            aria-label="Shopping Cart"
-            title="Cart"
-          >
-            <i class="fas fa-shopping-cart text-sm sm:text-base"></i>
-            <Transition name="badge-pop">
-              <span
-                v-if="cartCount > 0"
-                class="absolute -top-1 -right-1 bg-amber-600 text-white text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full shadow-sm"
-              >
-                {{ cartCount > 99 ? '99+' : cartCount }}
-              </span>
-            </Transition>
-          </button>
         </div>
 
         <!-- Mobile Menu Toggle Button -->
