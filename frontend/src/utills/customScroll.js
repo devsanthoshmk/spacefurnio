@@ -373,8 +373,8 @@ const moveToAdjacentSection = (state, direction) => {
 }
 
 /**
- * Checks whether an element is currently in 100dvh mode and fully visible
- * in the viewport (aligned within tolerance).
+ * Checks whether an element is currently in 100dvh mode and visible
+ * in the viewport (allowing for mobile address bar shifts and subpixel rounding).
  *
  * @param {HTMLElement} element
  * @param {number} viewportHeight
@@ -383,14 +383,13 @@ const moveToAdjacentSection = (state, direction) => {
 const isElementIn100dvhMode = (element, viewportHeight) => {
   if (!element) return false
   const rect = element.getBoundingClientRect()
-  const tolerance = Math.max(ALIGN_EPSILON, 3)
 
-  const is100dvhHeight = Math.abs(rect.height - viewportHeight) <= tolerance
-  const isFullyAligned =
-    Math.abs(rect.top) <= tolerance &&
-    Math.abs(rect.bottom - viewportHeight) <= tolerance
+  // 100dvh elements occupy roughly full viewport height (accounting for mobile toolbars/address bar)
+  const isRoughlyFullHeight = rect.height >= viewportHeight * 0.75
+  // Must be currently aligned in view (top within a reasonable threshold of viewport top)
+  const isAlignedInView = Math.abs(rect.top) <= viewportHeight * 0.25
 
-  return is100dvhHeight && isFullyAligned
+  return isRoughlyFullHeight && isAlignedInView
 }
 
 /**
