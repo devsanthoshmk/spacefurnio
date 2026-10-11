@@ -200,3 +200,7 @@ dist
 !.env.example
 .wrangler/
 
+# OpenChamber test run artifacts
+.openchamber/
+
+
