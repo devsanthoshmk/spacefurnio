@@ -371,30 +371,57 @@ const moveToAdjacentSection = (state, direction) => {
   updateActiveState(state)
   return true
 }
-/** * Traverses the DOM to find the next element sibling, climbing up the hierarchy as needed.
+
+/**
+ * Checks whether an element is currently in 100dvh mode and fully visible
+ * in the viewport (aligned within tolerance).
  *
- * @param {Element} node
- * @returns {Element}
+ * @param {HTMLElement} element
+ * @param {number} viewportHeight
+ * @returns {boolean}
  */
+const isElementIn100dvhMode = (element, viewportHeight) => {
+  if (!element) return false
+  const rect = element.getBoundingClientRect()
+  const tolerance = Math.max(ALIGN_EPSILON, 3)
 
-// eslint-disable-next-line no-unused-vars
-function getNextElement(node) {
-  if (!(node instanceof Element)) {
-    throw new TypeError('getNextElement: argument must be a DOM Element')
+  const is100dvhHeight = Math.abs(rect.height - viewportHeight) <= tolerance
+  const isFullyAligned =
+    Math.abs(rect.top) <= tolerance &&
+    Math.abs(rect.bottom - viewportHeight) <= tolerance
+
+  return is100dvhHeight && isFullyAligned
+}
+
+/**
+ * Checks if the current section contains a nested scroll element in 100dvh mode,
+ * and if so, delegates directional scrolling via a cancelable 'nestedScroll' event.
+ *
+ * @param {ReturnType<typeof createScrollState>} state
+ * @param {number} direction
+ * @returns {boolean} True when the nested component consumed the scroll event.
+ */
+const scrollNestedSection = (state, direction) => {
+  const currentSection = state.childElements[state.currentIndex]
+  if (!currentSection) return false
+
+  const nestedEl = currentSection.matches('[data-nested-scroll]')
+    ? currentSection
+    : currentSection.querySelector('[data-nested-scroll]')
+
+  if (!nestedEl) return false
+
+  if (!isElementIn100dvhMode(nestedEl, state.viewportHeight)) {
+    return false
   }
 
-  let next = node.nextElementSibling
+  const event = new CustomEvent('nestedScroll', {
+    detail: { direction },
+    cancelable: true,
+  })
 
-  while (!next && node.parentElement) {
-    node = node.parentElement
-    next = node.nextElementSibling
-  }
-
-  if (!next) {
-    throw new Error('No next element found in the DOM hierarchy.')
-  }
-
-  return next
+  nestedEl.dispatchEvent(event)
+  return event.defaultPrevented
 }
 
 /**
@@ -411,6 +438,11 @@ const performDirectionalScroll = (state, direction) => {
 
   if (isAtBoundary(state, direction)) {
     bounce(state, direction)
+    state.lastScrollTime = now
+    return
+  }
+
+  if (scrollNestedSection(state, direction)) {
     state.lastScrollTime = now
     return
   }

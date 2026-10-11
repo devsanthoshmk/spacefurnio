@@ -1,13 +1,8 @@
 <template>
   <div
     ref="containerRef"
+    data-nested-scroll
     class="relative w-full h-[100dvh] pt-20 bg-stone-100 overflow-hidden outline-none flex flex-col"
-    tabindex="0"
-    @keydown="handleKeydown"
-    @wheel="handleWheel"
-    @touchstart="handleTouchStart"
-    @touchmove="handleTouchMove"
-    @touchend="handleTouchEnd"
   >
     <!-- Background -->
     <div class="absolute inset-0 pointer-events-none">
@@ -174,30 +169,6 @@ const currentSection = computed(() => sections.value[currentIndex.value])
 // ============================================
 // NAVIGATION
 // ============================================
-function handleKeydown(event) {
-  if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(event.code)) {
-    if (isTransitioning.value) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
-    }
-
-    if (event.code === 'ArrowDown' || event.code === 'PageDown' || event.code === 'Space') {
-      if (currentIndex.value < sections.value.length - 1) {
-        event.preventDefault()
-        event.stopPropagation()
-        navigateNext()
-      }
-    } else if (event.code === 'ArrowUp' || event.code === 'PageUp') {
-      if (currentIndex.value > 0) {
-        event.preventDefault()
-        event.stopPropagation()
-        navigatePrev()
-      }
-    }
-  }
-}
-
 function navigateNext() {
   if (currentIndex.value < sections.value.length - 1) {
     triggerTransition(currentIndex.value + 1)
@@ -241,66 +212,42 @@ function getAspectRatioClass(orientation) {
 }
 
 // ============================================
-// SCROLL HANDLING (Container-level only)
+// NESTED SCROLL HANDLING
 // ============================================
+function handleNestedScroll(event) {
+  const { direction } = event.detail
 
-function handleWheel(event) {
   if (isTransitioning.value) {
     event.preventDefault()
-    event.stopPropagation()
     return
   }
 
-  if (event.deltaY > 0) {
+  if (direction > 0) {
     if (currentIndex.value < sections.value.length - 1) {
       event.preventDefault()
-      event.stopPropagation()
       navigateNext()
     }
-  } else if (event.deltaY < 0) {
+  } else if (direction < 0) {
     if (currentIndex.value > 0) {
       event.preventDefault()
-      event.stopPropagation()
       navigatePrev()
     }
   }
-}
-
-function handleTouchStart(event) {
-  containerRef.value._touchStartY = event.touches[0].clientY
-}
-
-function handleTouchMove(event) {
-  const touchY = event.touches[0].clientY
-  const touchStartY = containerRef.value._touchStartY || touchY
-  const deltaY = touchStartY - touchY
-  
-  if (Math.abs(deltaY) > 15) { // Same threshold used for swipe
-    if (deltaY > 0 && currentIndex.value < sections.value.length - 1) {
-      event.preventDefault()
-      event.stopPropagation()
-      if (!isTransitioning.value) navigateNext()
-      containerRef.value._touchStartY = touchY // reset to prevent multiple triggers
-    } else if (deltaY < 0 && currentIndex.value > 0) {
-      event.preventDefault()
-      event.stopPropagation()
-      if (!isTransitioning.value) navigatePrev()
-      containerRef.value._touchStartY = touchY
-    }
-  }
-}
-
-function handleTouchEnd() {
-  // Logic shifted to touchMove for instantaneous reaction matching customScroll.js
 }
 
 // ============================================
 // LIFECYCLE
 // ============================================
 onMounted(() => {
+  if (containerRef.value) {
+    containerRef.value.addEventListener('nestedScroll', handleNestedScroll)
+  }
 })
 
 onUnmounted(() => {
+  if (containerRef.value) {
+    containerRef.value.removeEventListener('nestedScroll', handleNestedScroll)
+  }
 })
 </script>
 
