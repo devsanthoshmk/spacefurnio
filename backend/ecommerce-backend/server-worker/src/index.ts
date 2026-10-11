@@ -40,6 +40,7 @@ router.all('/api/payments/*', paymentRouter.fetch);
 router.all('/api/*', engagementRouter.fetch);
 
 router.get('/health', () => ({ status: 'ok', timestamp: new Date().toISOString() }));
+router.get('/', () => new Response('Spacefurnio API is running', { status: 200 }));
 
 router.all('*', (request: Request, env: Env) => {
   if (env.ASSETS) {

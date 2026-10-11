@@ -33,14 +33,14 @@
 	// "vars": {  "MY_VARIABLE": "production_value" }
 	/**
 	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
+	 * Note: Frontend is deployed separately on Cloudflare Pages (spacefurnio.pages.dev / spacefurnio.in)
 	 */
-	"assets": {
-		"directory": "../../../frontend/dist",
-		"binding": "ASSETS",
-		"html_handling": "auto-trailing-slash",
-		"not_found_handling": "single-page-application"
-	}
+	// "assets": {
+	// 	"directory": "../../../frontend/dist",
+	// 	"binding": "ASSETS",
+	// 	"html_handling": "auto-trailing-slash",
+	// 	"not_found_handling": "single-page-application"
+	// }
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
