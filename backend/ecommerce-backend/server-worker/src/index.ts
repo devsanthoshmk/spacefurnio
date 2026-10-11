@@ -14,9 +14,11 @@ import { engagementRouter } from './routes/engagement';
 import { Env } from './types';
 
 const { preflight, corsify } = cors({
-  origin: '*',
+  origin: (origin) => origin || '*',
+  credentials: true,
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'x-session-id', 'Cookie']
+  allowHeaders: ['Content-Type', 'Authorization', 'x-session-id', 'X-Session-ID', 'Cookie', 'Accept'],
+  maxAge: 86400,
 });
 
 const router = AutoRouter<any, [env: Env, ctx: ExecutionContext]>({
