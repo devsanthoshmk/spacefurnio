@@ -3,6 +3,9 @@ import { ref } from 'vue'
 import NavComponent from '@/components/Nav-component.vue'
 import Button from 'primevue/button'
 import homePageText from '@/assets/contents/homePage.js'
+import { useCmsStore } from '@/stores/cms'
+
+const cms = useCmsStore()
 
 const heroRef = ref(null)
 const newArrivalsRef = ref(null)
@@ -68,13 +71,13 @@ const newArrivalImages = [
               class="phitagate-font text-[clamp(2.5rem,12vw,6rem)] text-white drop-shadow-2xl tracking-wide font-extrabold"
               data-key="hero_brand_name"
             >
-              {{ homePageText.hero_brand_name.text }}
+              {{ cms.heroBrandName }}
             </h1>
             <p
               class="phitagate-font text-[clamp(1.5rem,2.3vw,4.05rem)] mt-[0.3dvh] text-white italic drop-shadow-xl tracking-widest leading-10 font-medium"
               data-key="hero_tagline"
             >
-              {{ homePageText.hero_tagline.text }}
+              {{ cms.heroTagline }}
             </p>
             <div
               class="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 mx-auto mt-6 rounded-full"
@@ -95,7 +98,7 @@ const newArrivalImages = [
             class="text-gray-800 font-bold text-base xl:text-lg text-center font-['Montserrat']"
             data-key="new_arrivals_heading"
           >
-            {{ homePageText.new_arrivals_heading.text }}
+            {{ cms.newArrivalsHeading }}
           </h2>
         </div>
 
@@ -126,7 +129,7 @@ const newArrivalImages = [
                   <div class="glass-card">
                     <i class="pi pi-clock text-lg text-orange-400 mb-1 animate-pulse"></i>
                     <span class="coming-soon-text" data-key="coming_soon">{{
-                      homePageText.coming_soon.text
+                      cms.comingSoonBadge
                     }}</span>
                     <div class="sparkle-line"></div>
                   </div>
@@ -153,10 +156,10 @@ const newArrivalImages = [
           <p
             class="text-xs xl:text-sm font-semibold text-gray-800 mb-2 font-['Montserrat'] leading-tight text-center"
           >
-            <span data-key="cta_line_1">{{ homePageText.cta_line_1.text }}</span
+            <span data-key="cta_line_1">{{ cms.ctaLine1 }}</span
             ><br />
             <span class="text-orange-500" data-key="cta_line_2">{{
-              homePageText.cta_line_2.text
+              cms.ctaLine2
             }}</span>
           </p>
 
@@ -168,7 +171,7 @@ const newArrivalImages = [
               >
                 <span class="relative z-10 flex items-center gap-2">
                   <i class="pi pi-bolt text-xs"></i>
-                  <span data-key="grab_now_button">{{ homePageText.grab_now_button.text }}</span>
+                  <span data-key="grab_now_button">{{ cms.grabNowButton }}</span>
                   <i
                     class="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
                   ></i>

@@ -70,24 +70,25 @@
             Contact
           </h3>
           <div class="space-y-3 sm:space-y-4 text-sm sm:text-base">
-            <address class="not-italic text-gray-400 leading-relaxed">
-              90/1, North Beach Road Tuticorin,<br />
-              Chennai – 628001.
+            <address class="not-italic text-gray-400 leading-relaxed whitespace-pre-line" data-key="footer_address">
+              {{ cms.footerAddress }}
             </address>
             <div>
               <a
-                href="tel:+919751112025"
+                :href="`tel:${cms.footerPhone.replace(/\s+/g, '')}`"
                 class="text-gray-400 hover:text-white transition-colors duration-200 inline-flex items-center gap-2"
+                data-key="footer_phone"
               >
-                +91 9751112025
+                {{ cms.footerPhone }}
               </a>
             </div>
             <div>
               <a
-                href="mailto:info.spacefurnio@gmail.com"
+                :href="`mailto:${cms.footerEmail}`"
                 class="text-gray-400 hover:text-white transition-colors duration-200 inline-flex items-center gap-2 break-all sm:break-normal"
+                data-key="footer_email"
               >
-                info.spacefurnio@gmail.com
+                {{ cms.footerEmail }}
               </a>
             </div>
           </div>
@@ -119,17 +120,11 @@
             Legal
           </h3>
           <div class="text-gray-400 text-sm sm:text-base leading-relaxed space-y-3">
-            <p class="flex flex-wrap items-center gap-2">
-              <span class="text-sm sm:text-base">© {{ currentYear }}</span>
-              <span
-                class="phitagate-font bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent text-2xl sm:text-3xl tracking-wide inline-block leading-none"
-              >
-                Spacefurnio
-              </span>
-              <span class="text-sm sm:text-base">– All rights reserved.</span>
+            <p class="flex flex-wrap items-center gap-2" data-key="footer_copyright">
+              {{ cms.footerCopyright }}
             </p>
-            <p class="text-xs text-gray-500 leading-normal">
-              Transforming spaces with bespoke craftsmanship and timeless architectural elegance.
+            <p class="text-xs text-gray-500 leading-normal" data-key="footer_brand_statement">
+              {{ cms.footerBrandStatement }}
             </p>
           </div>
         </div>
@@ -140,7 +135,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useCmsStore } from '@/stores/cms'
 
+const cms = useCmsStore()
 const currentYear = computed(() => new Date().getFullYear())
 
 const socialLinks = [

@@ -1,5 +1,7 @@
 <script setup>
-import homePageText from '@/assets/contents/homePage.js'
+import { useCmsStore } from '@/stores/cms'
+
+const cms = useCmsStore()
 </script>
 
 <template>
@@ -14,7 +16,7 @@ import homePageText from '@/assets/contents/homePage.js'
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700"
           data-key="scroll_text_1"
         >
-          {{ homePageText.scroll_text_1.text }}
+          {{ cms.scrollText1 }}
         </div>
       </div>
     </div>
@@ -29,7 +31,7 @@ import homePageText from '@/assets/contents/homePage.js'
           class="floating-text italic absolute inset-0 flex items-center justify-center text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4 opacity-0 transition-opacity duration-700 z-1"
           data-key="scroll_text_2"
         >
-          {{ homePageText.scroll_text_2.text }}
+          {{ cms.scrollText2 }}
         </div>
       </div>
     </div>

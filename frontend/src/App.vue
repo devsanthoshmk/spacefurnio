@@ -44,6 +44,7 @@ import SettingsModal from './components/SettingsModal.vue'
 import { useCartStore } from '@/stores/cart'
 import { useWishlistStore } from '@/stores/wishlist'
 import { useAuthStore } from '@/stores/auth'
+import { useCmsStore } from '@/stores/cms'
 
 // Nav visibility
 const route = useRoute()
@@ -58,6 +59,7 @@ provide('navShowUtils', { showFoo, showNav })
 const cart = useCartStore()
 const wishlist = useWishlistStore()
 const authStore = useAuthStore()
+const cmsStore = useCmsStore()
 
 // Cart item count for nav badge
 const cartItemCount = computed(() => cart.itemCount)
@@ -149,5 +151,7 @@ provide('settingsUtils', { openSettings, closeSettings, isSettingsOpen })
 onMounted(() => {
   // Initialize auth state from localStorage
   authStore.initialize()
+  // Load CMS bundle on boot
+  cmsStore.init()
 })
 </script>

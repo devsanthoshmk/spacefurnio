@@ -97,6 +97,61 @@ function discoverRoutes() {
 }
 
 /**
+ * Resolve backend Worker URL for CMS bundle fetching
+ */
+function resolveWorkerUrl() {
+  const envUrl = (process.env.VITE_WORKER_URL || process.env.VITE_API_URL || '').replace(/\/$/, '')
+  if (envUrl) {
+    return envUrl
+  }
+  return process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8788'
+    : 'https://backend.spacefurnio.workers.dev'
+}
+
+/**
+ * Pre-fetch CMS bundle and inject into dist/index.html for SSG prerendering
+ */
+async function prefetchAndInjectCmsBundle(distDir) {
+  const workerUrl = resolveWorkerUrl()
+  const endpoint = `${workerUrl}/api/cms/bundle`
+
+  try {
+    const res = await fetch(endpoint, {
+      signal: AbortSignal.timeout(5000),
+    })
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    }
+
+    const bundle = await res.json()
+
+    // Save bundle to dist/cms-bundle.json
+    const bundlePath = path.join(distDir, 'cms-bundle.json')
+    fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2), 'utf-8')
+
+    // Inject script tag before </head> in dist/index.html
+    const indexPath = path.join(distDir, 'index.html')
+    if (fs.existsSync(indexPath)) {
+      let indexHtml = fs.readFileSync(indexPath, 'utf-8')
+      const scriptTag = `<script>window.__INITIAL_CMS_BUNDLE__ = ${JSON.stringify(bundle)};</script>`
+      if (indexHtml.includes('</head>')) {
+        indexHtml = indexHtml.replace('</head>', `${scriptTag}\n</head>`)
+      } else {
+        indexHtml = scriptTag + indexHtml
+      }
+      fs.writeFileSync(indexPath, indexHtml, 'utf-8')
+      console.log('[prerender] Successfully injected published CMS bundle into dist/index.html')
+    } else {
+      console.warn('[prerender] Warning: dist/index.html not found, skipped injection')
+    }
+  } catch (err) {
+    console.warn(`[prerender] Warning: Failed to fetch CMS bundle from ${endpoint} (${err.message}). Proceeding with default fallback content.`)
+  }
+}
+
+/**
  * Safely launch Chromium with auto-install fallback
  */
 async function launchBrowser() {
@@ -206,6 +261,10 @@ async function main() {
   }
 
   console.log('--- Starting SpaceFurnio SSG Prerender Pipeline ---')
+
+  // Pre-fetch and inject published CMS bundle before starting static server
+  await prefetchAndInjectCmsBundle(DIST_DIR)
+
   const routes = discoverRoutes()
   const server = await createStaticServer(DIST_DIR)
   const baseUrl = `http://127.0.0.1:${server.port}`
