@@ -14,6 +14,14 @@ jobs:
   build-test-deploy:
     name: Build, Test & Deploy Worker
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      PRODUCTS_DATABASE_URL: ${{ secrets.PRODUCTS_DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      RSA_PRIVATE_KEY_PEM: ${{ secrets.RSA_PRIVATE_KEY_PEM }}
+      RSA_PUBLIC_KEY_PEM: ${{ secrets.RSA_PUBLIC_KEY_PEM }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,12 +47,6 @@ jobs:
 
       - name: Setup test environment variables
         working-directory: backend/ecommerce-backend/server-worker
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRODUCTS_DATABASE_URL: ${{ secrets.PRODUCTS_DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          RSA_PRIVATE_KEY_PEM: ${{ secrets.RSA_PRIVATE_KEY_PEM }}
-          RSA_PUBLIC_KEY_PEM: ${{ secrets.RSA_PUBLIC_KEY_PEM }}
         run: |
           if [ -n "$DATABASE_URL" ]; then
             cat << EOF > .dev.vars
@@ -57,12 +59,12 @@ jobs:
           fi
 
       - name: Run Vitest Suite
+        if: env.DATABASE_URL != ''
         working-directory: backend/ecommerce-backend/server-worker
-        if: ${{ secrets.DATABASE_URL != '' }}
         run: pnpm test --run
 
       - name: Deploy to Cloudflare Workers
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        if: env.CLOUDFLARE_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
