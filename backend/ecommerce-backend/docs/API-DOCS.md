@@ -1632,7 +1632,583 @@ All endpoints require an Admin/Staff token with corresponding RBAC permissions.
   }
   ```
 
+---
 
+## 19. Content Management System (CMS) Endpoints
 
+The CMS provides a Static Site Generation (SSG) staging workflow where content changes are authored in draft mode and atomically published to trigger storefront rebuilds.
 
+### Public CMS Endpoints (`/api/cms`)
+
+Public endpoints require no authentication and return only published content.
+
+#### 19.1 Health Check
+* **Endpoint:** `GET /api/cms/health`
+* **Response (200 OK):**
+  ```json
+  {
+    "status": "ok",
+    "module": "cms"
+  }
+  ```
+
+#### 19.2 SSG Content Bundle
+* **Endpoint:** `GET /api/cms/bundle`
+* **Headers:** `Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=86400`
+* **Description:** Returns the aggregated published snapshot of all pages, active sections, and active policies for SSG prerendering and client-side hydration.
+* **Response (200 OK):**
+  ```json
+  {
+    "generatedAt": "2026-11-06T14:30:00.000Z",
+    "pages": [
+      {
+        "id": "e8e60408-724f-4a0b-a320-c75c8be0343a",
+        "slug": "home",
+        "title": "Home Page",
+        "seoMetadata": {
+          "title": "Spacefurnio | Artisanal Modern Furniture",
+          "description": "Architectural furniture made with sustainable timber."
+        },
+        "status": "published",
+        "publishedAt": "2026-11-06T14:00:00.000Z",
+        "updatedAt": "2026-11-06T14:00:00.000Z",
+        "sections": [
+          {
+            "id": "home-hero",
+            "sectionKey": "hero",
+            "sortOrder": 0,
+            "data": {
+              "headline": "Crafted For Modern Sanctuaries",
+              "cta": "Explore Catalog"
+            },
+            "publishedData": {
+              "headline": "Crafted For Modern Sanctuaries",
+              "cta": "Explore Catalog"
+            },
+            "updatedAt": "2026-11-06T14:00:00.000Z"
+          }
+        ]
+      }
+    ],
+    "policies": [
+      {
+        "id": "5963f457-3f36-4d04-8cb9-bc1dfab2b304",
+        "slug": "privacy-policy",
+        "title": "Privacy Policy",
+        "content": "# Privacy Policy\n\nSpacefurnio respects your privacy...",
+        "publishedContent": "# Privacy Policy\n\nSpacefurnio respects your privacy...",
+        "versionNum": 2,
+        "publishedAt": "2026-11-06T14:00:00.000Z",
+        "updatedAt": "2026-11-06T14:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+#### 19.3 Get Single Published Page
+* **Endpoint:** `GET /api/cms/pages/:slug`
+* **Description:** Retrieves metadata and all active published sections for the specified page slug.
+* **Response (200 OK):**
+  ```json
+  {
+    "id": "e8e60408-724f-4a0b-a320-c75c8be0343a",
+    "slug": "home",
+    "title": "Home Page",
+    "seoMetadata": {
+      "title": "Spacefurnio | Artisanal Modern Furniture"
+    },
+    "status": "published",
+    "publishedAt": "2026-11-06T14:00:00.000Z",
+    "updatedAt": "2026-11-06T14:00:00.000Z",
+    "sections": [
+      {
+        "id": "home-hero",
+        "sectionKey": "hero",
+        "sortOrder": 0,
+        "data": {
+          "headline": "Crafted For Modern Sanctuaries"
+        },
+        "publishedData": {
+          "headline": "Crafted For Modern Sanctuaries"
+        },
+        "updatedAt": "2026-11-06T14:00:00.000Z"
+      }
+    ]
+  }
+  ```
+* **Response (404 Not Found):**
+  ```json
+  {
+    "message": "Page not found"
+  }
+  ```
+
+#### 19.4 List Published Policies
+* **Endpoint:** `GET /api/cms/policies`
+* **Description:** Returns an index of published policy documents with current version numbers.
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "slug": "privacy-policy",
+      "title": "Privacy Policy",
+      "versionNum": 2,
+      "publishedAt": "2026-11-06T14:00:00.000Z"
+    },
+    {
+      "slug": "terms",
+      "title": "Terms and Conditions",
+      "versionNum": 1,
+      "publishedAt": "2026-11-06T14:00:00.000Z"
+    }
+  ]
+  ```
+
+#### 19.5 Get Single Published Policy Content
+* **Endpoint:** `GET /api/cms/policies/:slug`
+* **Description:** Retrieves full published Markdown content for a single policy by slug.
+* **Response (200 OK):**
+  ```json
+  {
+    "id": "5963f457-3f36-4d04-8cb9-bc1dfab2b304",
+    "slug": "privacy-policy",
+    "title": "Privacy Policy",
+    "content": "# Privacy Policy\n\nSpacefurnio respects your privacy...",
+    "publishedContent": "# Privacy Policy\n\nSpacefurnio respects your privacy...",
+    "versionNum": 2,
+    "publishedAt": "2026-11-06T14:00:00.000Z",
+    "updatedAt": "2026-11-06T14:00:00.000Z"
+  }
+  ```
+* **Response (404 Not Found):**
+  ```json
+  {
+    "message": "Policy not found"
+  }
+  ```
+
+---
+
+### Admin CMS Endpoints (`/api/admin/cms`)
+
+All admin endpoints require an administrative Bearer JWT token in the `Authorization` header.
+
+#### 19.6 CMS Summary & Overview
+* **Endpoint:** `GET /api/admin/cms/summary`
+* **Permission:** `cms.read`
+* **Description:** Returns dirty page and policy counts, last publish timestamp, and the latest storefront build dispatch status.
+* **Response (200 OK):**
+  ```json
+  {
+    "dirtyPagesCount": 1,
+    "dirtyPoliciesCount": 0,
+    "lastPublishedAt": "2026-11-06T14:00:00.000Z",
+    "latestBuild": {
+      "id": "c1f7b0b6-7b83-424a-b50a-bc61aa52de44",
+      "triggerType": "publish",
+      "status": "triggered",
+      "triggeredBy": "8cf9a9cb-b286-4e5a-939e-d3a95c91b1d1",
+      "webhookUrlMasked": "https://api.cloudflare.com/.../abcd...wxyz",
+      "responseCode": 200,
+      "responseBody": "{\"job_id\":\"pages-build-12345\"}",
+      "errorMessage": null,
+      "startedAt": "2026-11-06T14:00:05.000Z",
+      "completedAt": "2026-11-06T14:00:08.000Z",
+      "triggeredByEmail": "admin@spacefurnio.com"
+    }
+  }
+  ```
+
+#### 19.7 List All Pages
+* **Endpoint:** `GET /api/admin/cms/pages`
+* **Permission:** `cms.read`
+* **Description:** Lists all CMS pages with unpublished change status and summary section counts.
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": "e8e60408-724f-4a0b-a320-c75c8be0343a",
+      "slug": "home",
+      "title": "Home Page",
+      "seoMetadata": {},
+      "status": "published",
+      "hasUnpublishedChanges": true,
+      "publishedAt": "2026-11-06T14:00:00.000Z",
+      "updatedAt": "2026-11-06T14:15:00.000Z",
+      "createdAt": "2026-11-01T10:00:00.000Z",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "id": "home-hero",
+          "sectionKey": "hero",
+          "sortOrder": 0,
+          "enabled": true,
+          "updatedAt": "2026-11-06T14:15:00.000Z"
+        }
+      ]
+    }
+  ]
+  ```
+
+#### 19.8 Get Page Details with Sections
+* **Endpoint:** `GET /api/admin/cms/pages/:slug`
+* **Permission:** `cms.read`
+* **Description:** Retrieves full page configuration including both draft and published data for all sections.
+* **Response (200 OK):**
+  ```json
+  {
+    "id": "e8e60408-724f-4a0b-a320-c75c8be0343a",
+    "slug": "home",
+    "title": "Home Page",
+    "seoMetadata": {},
+    "status": "published",
+    "hasUnpublishedChanges": true,
+    "publishedAt": "2026-11-06T14:00:00.000Z",
+    "updatedAt": "2026-11-06T14:15:00.000Z",
+    "createdAt": "2026-11-01T10:00:00.000Z",
+    "sections": [
+      {
+        "id": "home-hero",
+        "pageSlug": "home",
+        "sectionKey": "hero",
+        "sortOrder": 0,
+        "enabled": true,
+        "draftData": {
+          "headline": "Draft Hero Headline (Unpublished)"
+        },
+        "publishedData": {
+          "headline": "Published Hero Headline"
+        },
+        "updatedAt": "2026-11-06T14:15:00.000Z"
+      }
+    ]
+  }
+  ```
+
+#### 19.9 Update Section Draft Content
+* **Endpoint:** `PUT /api/admin/cms/pages/:slug/sections/:id`
+* **Permission:** `cms.write`
+* **Description:** Updates `draft_data` and visibility for a section, marks the parent page dirty (`has_unpublished_changes = true`), and records a snapshot in `cms_versions` (with 30-second deduplication).
+* **Body:**
+  ```json
+  {
+    "draftData": {
+      "headline": "Brand New Draft Headline",
+      "subtitle": "Curated for Modern Living"
+    },
+    "enabled": true,
+    "changeSummary": "Updated hero banner headline and subtitle"
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "section": {
+      "id": "home-hero",
+      "pageSlug": "home",
+      "sectionKey": "hero",
+      "sortOrder": 0,
+      "enabled": true,
+      "draftData": {
+        "headline": "Brand New Draft Headline",
+        "subtitle": "Curated for Modern Living"
+      },
+      "publishedData": {
+        "headline": "Published Hero Headline"
+      },
+      "updatedAt": "2026-11-06T14:20:00.000Z"
+    }
+  }
+  ```
+
+#### 19.10 Reorder Sections
+* **Endpoint:** `POST /api/admin/cms/pages/:slug/sections/reorder`
+* **Permission:** `cms.write`
+* **Description:** Updates `sort_order` sequence for child sections of a page and marks the page dirty.
+* **Body:**
+  ```json
+  {
+    "orders": [
+      { "id": "home-features", "sortOrder": 0 },
+      { "id": "home-hero", "sortOrder": 1 }
+    ]
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Sections reordered successfully"
+  }
+  ```
+
+#### 19.11 List Policies (Admin)
+* **Endpoint:** `GET /api/admin/cms/policies`
+* **Permission:** `cms.read`
+* **Description:** Lists all policy documents with draft and published content, version numbers, and unpublished dirty flags.
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": "5963f457-3f36-4d04-8cb9-bc1dfab2b304",
+      "slug": "privacy-policy",
+      "title": "Privacy Policy",
+      "draftContent": "# Privacy Policy\n\nDraft content revisions...",
+      "publishedContent": "# Privacy Policy\n\nLive published content...",
+      "versionNum": 2,
+      "hasUnpublishedChanges": true,
+      "publishedAt": "2026-11-06T14:00:00.000Z",
+      "updatedAt": "2026-11-06T14:25:00.000Z"
+    }
+  ]
+  ```
+
+#### 19.12 Get Single Policy (Admin)
+* **Endpoint:** `GET /api/admin/cms/policies/:slug`
+* **Permission:** `cms.read`
+* **Response (200 OK):**
+  ```json
+  {
+    "id": "5963f457-3f36-4d04-8cb9-bc1dfab2b304",
+    "slug": "privacy-policy",
+    "title": "Privacy Policy",
+    "draftContent": "# Privacy Policy\n\nDraft content revisions...",
+    "publishedContent": "# Privacy Policy\n\nLive published content...",
+    "versionNum": 2,
+    "hasUnpublishedChanges": true,
+    "publishedAt": "2026-11-06T14:00:00.000Z",
+    "updatedAt": "2026-11-06T14:25:00.000Z"
+  }
+  ```
+
+#### 19.13 Create Policy
+* **Endpoint:** `POST /api/admin/cms/policies`
+* **Permission:** `cms.write`
+* **Body:**
+  ```json
+  {
+    "slug": "warranty-policy",
+    "title": "Limited Lifetime Warranty",
+    "draftContent": "# Warranty Policy\n\nCoverage details..."
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "policy": {
+      "id": "97e64432-8df7-463e-a1d2-0fb3db092289",
+      "slug": "warranty-policy",
+      "title": "Limited Lifetime Warranty",
+      "draftContent": "# Warranty Policy\n\nCoverage details...",
+      "publishedContent": "",
+      "versionNum": 1,
+      "hasUnpublishedChanges": true,
+      "publishedAt": null,
+      "updatedAt": "2026-11-06T14:30:00.000Z"
+    }
+  }
+  ```
+
+#### 19.14 Update Policy Draft
+* **Endpoint:** `PUT /api/admin/cms/policies/:slug`
+* **Permission:** `cms.write`
+* **Body:**
+  ```json
+  {
+    "title": "Updated Warranty Policy",
+    "draftContent": "# Updated Policy Content",
+    "changeSummary": "Updated frame warranty clauses"
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "policy": {
+      "id": "97e64432-8df7-463e-a1d2-0fb3db092289",
+      "slug": "warranty-policy",
+      "title": "Updated Warranty Policy",
+      "draftContent": "# Updated Policy Content",
+      "publishedContent": "",
+      "versionNum": 1,
+      "hasUnpublishedChanges": true,
+      "publishedAt": null,
+      "updatedAt": "2026-11-06T14:32:00.000Z"
+    }
+  }
+  ```
+
+#### 19.15 Delete Policy
+* **Endpoint:** `DELETE /api/admin/cms/policies/:slug`
+* **Permission:** `cms.write`
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Policy deleted successfully"
+  }
+  ```
+
+#### 19.16 Get Version Snapshots
+* **Endpoint:** `GET /api/admin/cms/versions`
+* **Permission:** `cms.read`
+* **Query Parameters:**
+  * `scope` (optional): Filter by scope (e.g., `home`, `policies`, `publish`).
+  * `entityId` (optional): Filter by entity identifier (e.g., `home-hero`, `privacy-policy`).
+* **Description:** Retrieves the latest 50 snapshot records with author details.
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": 142,
+      "scope": "home",
+      "entityId": "home-hero",
+      "versionNum": 4,
+      "snapshot": {
+        "draftData": { "headline": "Brand New Draft Headline" },
+        "enabled": true,
+        "sectionKey": "hero",
+        "sortOrder": 0
+      },
+      "changeSummary": "Updated hero banner headline and subtitle",
+      "fieldPath": null,
+      "authorId": "8cf9a9cb-b286-4e5a-939e-d3a95c91b1d1",
+      "authorEmail": "admin@spacefurnio.com",
+      "createdAt": "2026-11-06T14:20:00.000Z"
+    }
+  ]
+  ```
+
+#### 19.17 Rollback Version
+* **Endpoint:** `POST /api/admin/cms/versions/:id/rollback`
+* **Permission:** `cms.write`
+* **Description:** Restores a section draft or policy content to the specified snapshot version and records a new rollback audit entry.
+* **Response (200 OK - Section Rollback):**
+  ```json
+  {
+    "success": true,
+    "message": "Section rolled back to version #4",
+    "section": {
+      "id": "home-hero",
+      "pageSlug": "home",
+      "sectionKey": "hero",
+      "sortOrder": 0,
+      "enabled": true,
+      "draftData": {
+        "headline": "Brand New Draft Headline"
+      },
+      "publishedData": {
+        "headline": "Published Hero Headline"
+      },
+      "updatedAt": "2026-11-06T14:35:00.000Z"
+    }
+  }
+  ```
+
+#### 19.18 Publish All Content
+* **Endpoint:** `POST /api/admin/cms/publish`
+* **Permission:** `cms.publish`
+* **Description:** Promotes all draft content across sections and policies into published state, resets unpublished change flags, increments policy versions, and inserts a baseline record in `cms_versions`.
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "publishedAt": "2026-11-06T14:40:00.000Z",
+    "message": "All storefront content published successfully"
+  }
+  ```
+
+#### 19.19 Trigger Storefront Build
+* **Endpoint:** `POST /api/admin/cms/build`
+* **Permission:** `cms.publish`
+* **Description:** Asynchronously dispatches the Cloudflare Pages deploy hook using `ctx.waitUntil` while enforcing a 60-second cooldown period.
+* **Response (200 OK - Webhook Triggered):**
+  ```json
+  {
+    "success": true,
+    "status": "pending",
+    "message": "Storefront build deploy hook triggered successfully",
+    "buildEvent": {
+      "id": "2dafb51a-7b3c-41c3-8f08-b80c10b1062b",
+      "triggerType": "manual",
+      "status": "pending",
+      "webhookUrlMasked": "https://api.cloudflare.com/.../abcd...wxyz",
+      "startedAt": "2026-11-06T14:41:00.000Z"
+    }
+  }
+  ```
+* **Response (200 OK - Local Fallback):**
+  ```json
+  {
+    "success": true,
+    "status": "skipped_local",
+    "message": "No deploy hook configured in environment. Build dispatch skipped in local/dev environment.",
+    "buildEvent": {
+      "id": "2dafb51a-7b3c-41c3-8f08-b80c10b1062b",
+      "triggerType": "manual",
+      "status": "skipped_local",
+      "webhookUrlMasked": null,
+      "startedAt": "2026-11-06T14:41:00.000Z",
+      "completedAt": "2026-11-06T14:41:00.000Z",
+      "errorMessage": "No deploy hook configured in environment bindings (CLOUDFLARE_PAGES_DEPLOY_HOOK or BUILD_WEBHOOK_URL)"
+    }
+  }
+  ```
+* **Response (429 Too Many Requests):**
+  ```json
+  {
+    "message": "A storefront build was triggered less than 60 seconds ago. Please wait before triggering another build.",
+    "cooldownRemainingSeconds": 45
+  }
+  ```
+
+#### 19.20 Publish and Build ("Update Site")
+* **Endpoint:** `POST /api/admin/cms/publish-and-build`
+* **Permission:** `cms.publish`
+* **Description:** Composite action that atomically publishes all pending draft content and triggers the storefront build deploy hook.
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "published": true,
+    "publishedAt": "2026-11-06T14:45:00.000Z",
+    "build": {
+      "success": true,
+      "status": "pending",
+      "message": "Storefront build deploy hook triggered successfully",
+      "buildEvent": {
+        "id": "8bb38054-ca7d-4185-9989-1306c5905d54",
+        "triggerType": "publish",
+        "status": "pending",
+        "webhookUrlMasked": "https://api.cloudflare.com/.../abcd...wxyz",
+        "startedAt": "2026-11-06T14:45:00.000Z"
+      }
+    }
+  }
+  ```
+
+#### 19.21 List Build Events
+* **Endpoint:** `GET /api/admin/cms/build-events`
+* **Permission:** `cms.read`
+* **Description:** Returns the 20 most recent deploy events with initiator details, masked webhook URLs, and HTTP response codes.
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": "8bb38054-ca7d-4185-9989-1306c5905d54",
+      "triggerType": "publish",
+      "status": "triggered",
+      "triggeredBy": "8cf9a9cb-b286-4e5a-939e-d3a95c91b1d1",
+      "webhookUrlMasked": "https://api.cloudflare.com/.../abcd...wxyz",
+      "responseCode": 200,
+      "responseBody": "{\"job_id\":\"pages-build-12345\"}",
+      "errorMessage": null,
+      "startedAt": "2026-11-06T14:45:00.000Z",
+      "completedAt": "2026-11-06T14:45:03.000Z",
+      "triggeredByEmail": "admin@spacefurnio.com"
+    }
+  ]
+  ```
 

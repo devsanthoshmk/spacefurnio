@@ -11,6 +11,7 @@ import { addressRouter } from './routes/addresses';
 import { couponRouter } from './routes/coupons';
 import { reviewRouter } from './routes/reviews';
 import { engagementRouter } from './routes/engagement';
+import { cmsRouter } from './routes/cms';
 import { Env } from './types';
 
 const { preflight, corsify } = cors({
@@ -28,6 +29,8 @@ const router = AutoRouter<any, [env: Env, ctx: ExecutionContext]>({
 
 router.all('/auth/*', authRouter.fetch);
 router.all('/api/admin/*', adminRouter.fetch);
+router.all('/api/cms/*', cmsRouter.fetch);
+router.all('/api/cms', cmsRouter.fetch);
 router.all('/api/products/*', productRouter.fetch);
 router.all('/api/categories/*', categoryRouter.fetch);
 router.all('/api/cart/*', cartRouter.fetch);

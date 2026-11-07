@@ -30,6 +30,11 @@ export const ADMIN_PERMISSIONS = {
   // Media & Assets
   'media.manage': 'Upload, manage, link, and audit product images and assets',
 
+  // Content Management System (CMS)
+  'cms.read': 'View site content drafts, published pages, and revision history',
+  'cms.write': 'Edit draft content for storefront pages, sections, and policies',
+  'cms.publish': 'Publish content to live site and trigger storefront rebuilds',
+
   // Analytics & Reporting
   'analytics.view': 'View sales dashboard KPIs, revenue trends, and operational summaries',
 
@@ -80,6 +85,9 @@ export const ADMIN_ROLE_PRESETS: Record<string, RolePreset> = {
       'reviews.write',
       'reviews.delete',
       'media.manage',
+      'cms.read',
+      'cms.write',
+      'cms.publish',
       'analytics.view',
       'settings.manage',
     ],
@@ -110,6 +118,7 @@ export const ADMIN_ROLE_PRESETS: Record<string, RolePreset> = {
       'marketing.coupons',
       'reviews.read',
       'reviews.write',
+      'cms.read',
     ],
   },
   catalog_inventory: {
@@ -126,6 +135,8 @@ export const ADMIN_ROLE_PRESETS: Record<string, RolePreset> = {
       'categories.manage',
       'media.manage',
       'reviews.read',
+      'cms.read',
+      'cms.write',
     ],
   },
   custom: {

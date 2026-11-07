@@ -1,6 +1,6 @@
 import type { AdminRole, AdminPermission } from '@/admin/types/admin'
 
-const ALL_PERMISSIONS: AdminPermission[] = [
+export const ALL_PERMISSIONS: AdminPermission[] = [
   'orders.read', 'orders.write', 'orders.fulfill', 'orders.cancel', 'orders.refund',
   'products.read', 'products.write', 'products.delete', 'products.bulk',
   'inventory.manage', 'categories.manage',
@@ -11,7 +11,36 @@ const ALL_PERMISSIONS: AdminPermission[] = [
   'analytics.view',
   'admins.manage',
   'settings.manage',
+  'cms.read', 'cms.write', 'cms.publish',
 ]
+
+export const PERMISSION_DESCRIPTIONS: Record<AdminPermission, string> = {
+  'orders.read': 'View customer orders, details, status history and receipts',
+  'orders.write': 'Update order status and customer shipping details',
+  'orders.fulfill': 'Manage shipments, carrier assignments, and tracking info',
+  'orders.cancel': 'Cancel pending or processing orders',
+  'orders.refund': 'Issue order refunds and manage return requests',
+  'products.read': 'View full catalog products, taxonomy, and pricing',
+  'products.write': 'Create and update products, images, and color variants',
+  'products.delete': 'Delete or archive catalog products',
+  'products.bulk': 'Perform bulk operations on catalog products',
+  'inventory.manage': 'Monitor stock levels and out of stock warnings',
+  'categories.manage': 'Manage categories, spaces, styles, rooms, and materials',
+  'customers.read': 'View customer directory, spending metrics, and order history',
+  'customers.write': 'Edit customer accounts and toggle active/disabled status',
+  'customers.delete': 'Delete or permanently purge customer data',
+  'marketing.coupons': 'Create, edit, toggle, and delete coupon codes',
+  'reviews.read': 'View customer ratings and product reviews',
+  'reviews.write': 'Create, edit, and moderate reviews',
+  'reviews.delete': 'Delete spam or inappropriate reviews',
+  'media.manage': 'Upload, manage, link, and audit product images and assets',
+  'analytics.view': 'View sales dashboard KPIs, revenue trends, and operational summaries',
+  'admins.manage': 'Invite admin team members, assign roles, and configure permissions',
+  'settings.manage': 'Configure store settings and operational policies',
+  'cms.read': 'View CMS pages, sections, policies, and version history',
+  'cms.write': 'Create, edit, and manage draft CMS pages, sections, and policies',
+  'cms.publish': 'Publish CMS content live and trigger site rebuilds',
+}
 
 export const ADMIN_ROLE_PRESETS: Record<AdminRole, AdminPermission[]> = {
   super_admin: ALL_PERMISSIONS,
@@ -26,6 +55,7 @@ export const ADMIN_ROLE_PRESETS: Record<AdminRole, AdminPermission[]> = {
     'media.manage',
     'analytics.view',
     'settings.manage',
+    'cms.read', 'cms.write', 'cms.publish',
   ],
   sales_fulfillment: [
     'orders.read', 'orders.write', 'orders.fulfill',
@@ -38,12 +68,14 @@ export const ADMIN_ROLE_PRESETS: Record<AdminRole, AdminPermission[]> = {
     'orders.read',
     'marketing.coupons',
     'reviews.read', 'reviews.write',
+    'cms.read',
   ],
   catalog_inventory: [
     'products.read', 'products.write', 'products.delete', 'products.bulk',
     'inventory.manage', 'categories.manage',
     'media.manage',
     'reviews.read',
+    'cms.read', 'cms.write',
   ],
   custom: [],
 }

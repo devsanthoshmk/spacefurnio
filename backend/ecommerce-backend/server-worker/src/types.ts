@@ -6,4 +6,6 @@ export type Env = {
     RESEND_API_KEY: string;
     JWT_SECRET: string;
     ASSETS?: Fetcher;
+    CLOUDFLARE_PAGES_DEPLOY_HOOK?: string;
+    BUILD_WEBHOOK_URL?: string;
 };

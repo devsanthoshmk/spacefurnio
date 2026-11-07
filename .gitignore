@@ -202,5 +202,6 @@ dist
 
 # OpenChamber test run artifacts
 .openchamber/
+.agent/
 
 

@@ -112,6 +112,12 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    label: 'CONTENT',
+    items: [
+      { label: 'Site Content', icon: 'pi pi-file-edit', route: '/admin/cms' },
+    ],
+  },
+  {
     label: 'SYSTEM',
     items: [
       { label: 'Media', icon: 'pi pi-image', route: '/admin/images' },

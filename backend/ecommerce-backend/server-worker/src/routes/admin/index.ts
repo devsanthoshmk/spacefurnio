@@ -7,6 +7,7 @@ import { adminReviewRouter } from './reviews';
 import { adminCouponRouter } from './coupons';
 import { adminImageRouter } from './images';
 import { adminTeamRouter } from './team';
+import { adminCmsRouter } from './cms';
 import { AdminAuthRequest } from '../../middleware/adminAuth';
 import { Env } from '../../types';
 
@@ -37,3 +38,6 @@ adminRouter.all('/images', adminImageRouter.fetch);
 
 adminRouter.all('/team/*', adminTeamRouter.fetch);
 adminRouter.all('/team', adminTeamRouter.fetch);
+
+adminRouter.all('/cms/*', adminCmsRouter.fetch);
+adminRouter.all('/cms', adminCmsRouter.fetch);

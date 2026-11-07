@@ -22,6 +22,7 @@ export type AdminPermission =
   | 'analytics.view'
   | 'admins.manage'
   | 'settings.manage'
+  | 'cms.read' | 'cms.write' | 'cms.publish'
 
 export interface AdminUser {
   id: string
@@ -602,3 +603,100 @@ export interface ApiError {
   message: string
   status?: number
 }
+
+// ─── CMS ────────────────────────────────────────────────────────────────────
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+export interface CmsPage {
+  id: string
+  slug: string
+  title: string
+  seo_metadata: Record<string, any>
+  status: 'draft' | 'published'
+  has_unpublished_changes: boolean
+  published_at: string | null
+  created_at: string
+  updated_at: string
+  sections_count?: number
+}
+
+export interface CmsSection {
+  id: string
+  page_slug: string
+  section_key: string
+  sort_order: number
+  enabled: boolean
+  draft_data: Record<string, any>
+  published_data: Record<string, any>
+  updated_at: string
+}
+
+export interface CmsPolicy {
+  id: string
+  slug: string
+  title: string
+  draft_content?: string
+  draftContent?: string
+  published_content?: string
+  publishedContent?: string
+  version_num?: number
+  versionNum?: number
+  has_unpublished_changes?: boolean
+  hasUnpublishedChanges?: boolean
+  published_at?: string | null
+  publishedAt?: string | null
+  updated_at?: string
+  updatedAt?: string
+}
+
+export interface CmsVersion {
+  id: number
+  scope: string
+  entity_id?: string
+  entityId?: string
+  version_num?: number
+  versionNum?: number
+  snapshot: Record<string, any>
+  change_summary?: string
+  changeSummary?: string
+  field_path?: string | null
+  fieldPath?: string | null
+  author_id?: string | null
+  authorId?: string | null
+  authorEmail?: string | null
+  created_at?: string
+  createdAt?: string
+}
+
+export interface CmsBuildEvent {
+  id: string
+  trigger_type?: 'manual' | 'publish'
+  triggerType?: 'manual' | 'publish'
+  status: 'pending' | 'triggered' | 'success' | 'failed' | 'skipped_local'
+  triggered_by?: string | null
+  triggeredBy?: string | null
+  triggeredByEmail?: string | null
+  webhook_url_masked?: string | null
+  webhookUrlMasked?: string | null
+  response_code?: number | null
+  responseCode?: number | null
+  response_body?: string | null
+  responseBody?: string | null
+  error_message?: string | null
+  errorMessage?: string | null
+  started_at?: string
+  startedAt?: string
+  completed_at?: string | null
+  completedAt?: string | null
+}
+
+export interface CmsSummary {
+  dirtyPagesCount: number
+  dirtyPoliciesCount: number
+  lastPublishedAt: string | null
+  latestBuild: CmsBuildEvent | null
+  totalPages?: number
+  totalSections?: number
+  totalPolicies?: number
+}
+

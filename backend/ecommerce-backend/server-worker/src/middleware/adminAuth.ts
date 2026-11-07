@@ -69,13 +69,13 @@ export async function authenticateAdmin(request: AdminAuthRequest, env: Env) {
   }
 }
 
-export const requireAdmin = async (request: AdminAuthRequest, env: Env) => {
+export const requireAdmin = async (request: AdminAuthRequest, env: Env, ctx?: ExecutionContext) => {
   const authResult = await authenticateAdmin(request, env);
   if (authResult) return authResult;
 };
 
 export const requirePermission = (...requiredPermissions: AdminPermission[]) => {
-  return async (request: AdminAuthRequest, env: Env) => {
+  return async (request: AdminAuthRequest, env: Env, ctx?: ExecutionContext) => {
     const authResult = await authenticateAdmin(request, env);
     if (authResult) return authResult;
 

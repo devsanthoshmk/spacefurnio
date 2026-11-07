@@ -50,6 +50,11 @@ pnpm db:studio   # Open Drizzle Studio UI
 - **Neon Data API**: Cart, wishlist, and user-scoped non-sensitive reads interact directly with Neon Data API from the frontend using backend-issued RS256 JWTs.
 - **Row Level Security (RLS)**: PostgreSQL RLS policies **must** strictly enforce user isolation using `auth.user_id()` or `current_setting('request.jwt.claim.sub', true)`.
 - **Sensitive Operations**: Orders, status updates, payments, and administrative actions must be processed via the backend Worker with elevated credentials and transactions.
+- **CMS Governance & SSG Staging**:
+  - Storefront catalog views (`/shop`, `/shop/product/:id`), cart, checkout, and orders are dynamic Client-Side Rendering (CSR) and strictly decoupled from CMS.
+  - Non-storefront pages (Home, About, Collabs, Portfolio, Contact, Footer, Policies) are managed via CMS tables in Primary DB (`DATABASE_URL`) with edits staged as drafts.
+  - Live site updates occur exclusively when publishing via admin ("Update Site"), which triggers the SSG prerendering pipeline (`scripts/prerender.js`) with a 60-second deploy cooldown.
+  - Domain rules: Consult `frontend/AGENTS.md` for page creation invariants; consult `backend/ecommerce-backend/AGENTS.md` for schema, seeding, and deploy hooks. Reference: `backend/ecommerce-backend/docs/CMS-ARCHITECTURE.md`.
 
 ---
 

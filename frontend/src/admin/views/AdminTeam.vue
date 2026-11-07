@@ -1083,6 +1083,15 @@ const PERMISSION_CATEGORIES: PermissionCategory[] = [
       'settings.manage',
     ],
   },
+  {
+    key: 'cms',
+    name: 'Content Management (CMS)',
+    permissions: [
+      'cms.read',
+      'cms.write',
+      'cms.publish',
+    ],
+  },
 ]
 
 const DEFAULT_PERMISSION_DESCRIPTIONS: Record<AdminPermission, string> = {
@@ -1108,6 +1117,9 @@ const DEFAULT_PERMISSION_DESCRIPTIONS: Record<AdminPermission, string> = {
   'analytics.view': 'View sales dashboard KPIs, revenue trends, and operational summaries',
   'admins.manage': 'Invite admin team members, assign roles, and configure permissions',
   'settings.manage': 'Configure store settings and operational policies',
+  'cms.read': 'View CMS pages, sections, policies, and version history',
+  'cms.write': 'Create, edit, and manage draft CMS pages, sections, and policies',
+  'cms.publish': 'Publish CMS content live and trigger site rebuilds',
 }
 
 // Filtered Team

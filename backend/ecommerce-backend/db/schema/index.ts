@@ -5,3 +5,4 @@ export * from './promotions';
 export * from './reviews';
 export * from './engagement';
 export * from './system';
+export * from './cms';

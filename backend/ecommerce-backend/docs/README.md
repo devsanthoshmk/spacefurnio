@@ -12,6 +12,8 @@
 ```
 docs/
 ├── README.md                          ← You are here (Index)
+├── API-DOCS.md                        ← Complete API reference for storefront, admin, and CMS
+├── CMS-ARCHITECTURE.md                ← CMS architectural model, SSG staging, schemas, and pipeline
 ├── FAQ.md                             ← Resolved queries and quick answers
 ├── architecture/
 │   └── ARCHITECTURE_STRATEGY.md       ← Core split-access model overview
@@ -35,6 +37,8 @@ docs/
 | I want to...                                | Go to                                    |
 |----------------------------------------------|------------------------------------------|
 | Understand the split-access data model       | [`architecture/ARCHITECTURE_STRATEGY.md`](./architecture/ARCHITECTURE_STRATEGY.md) |
+| Understand CMS architecture & SSG staging    | [`CMS-ARCHITECTURE.md`](./CMS-ARCHITECTURE.md) |
+| Look up RESTful and Admin API endpoints      | [`API-DOCS.md`](./API-DOCS.md) |
 | Set up Neon DB from scratch                  | [`guides/01-NEON-DB-SETUP.md`](./guides/01-NEON-DB-SETUP.md) |
 | Write a new DB table with Drizzle            | [`guides/02-DRIZZLE-ORM-GUIDE.md`](./guides/02-DRIZZLE-ORM-GUIDE.md) |
 | Add a new Worker route (sensitive op)        | [`guides/03-WORKERS-GUIDE.md`](./guides/03-WORKERS-GUIDE.md) |
