@@ -33,7 +33,8 @@ function maskWebhookUrl(url?: string): string | null {
 export async function syncActiveDeploymentStatus(
   sql: any,
   env: Env,
-  buildEvent: any
+  buildEvent: any,
+  fetchFn: typeof fetch = fetch
 ): Promise<any> {
   if (!buildEvent) return buildEvent;
   if (buildEvent.status !== 'triggered' && buildEvent.status !== 'pending') {
@@ -51,7 +52,8 @@ export async function syncActiveDeploymentStatus(
     }
   }
 
-  if (!deploymentId || !env.CLOUDFLARE_API_TOKEN) {
+  const apiToken = env.CLOUDFLARE_API_TOKEN;
+  if (!deploymentId || (!apiToken && fetchFn === fetch)) {
     return buildEvent;
   }
 
@@ -59,12 +61,12 @@ export async function syncActiveDeploymentStatus(
   const projectName = env.CLOUDFLARE_PAGES_PROJECT_NAME || 'spacefurnio';
 
   try {
-    const cfRes = await fetch(
+    const cfRes = await fetchFn(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments/${deploymentId}`,
       {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+          Authorization: `Bearer ${apiToken || 'mock-token'}`,
           'User-Agent': 'Spacefurnio-CMS-Worker/1.0',
         },
       }

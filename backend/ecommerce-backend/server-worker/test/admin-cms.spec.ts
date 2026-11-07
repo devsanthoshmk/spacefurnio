@@ -417,65 +417,60 @@ describe('CMS Public & Admin Endpoints, Edge Cases & Permissions', () => {
     it('syncActiveDeploymentStatus correctly syncs triggered event from Cloudflare Pages API', async () => {
       const { sql } = getDb(env);
 
-      // Mock fetch for Cloudflare Pages API response
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = vi.fn().mockImplementation(async (url: any, init?: any) => {
-        const urlStr = typeof url === 'string' ? url : url?.url || '';
-        if (urlStr.includes('/deployments/')) {
-          return new Response(
-            JSON.stringify({
-              result: {
-                id: 'mock-dep-123',
-                status: 'success',
-                latest_stage: { name: 'deploy', status: 'success' },
-              },
-              success: true,
-              errors: [],
-              messages: [],
-            }),
-            {
-              status: 200,
-              headers: { 'Content-Type': 'application/json' },
-            }
-          );
-        }
-        return originalFetch(url, init);
-      });
+      const mockFetch = (async () => {
+        return new Response(
+          JSON.stringify({
+            result: {
+              id: 'mock-dep-123',
+              status: 'success',
+              latest_stage: { name: 'deploy', status: 'success' },
+            },
+            success: true,
+            errors: [],
+            messages: [],
+          }),
+          {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }) as any;
 
-      try {
-        const testDepId = 'mock-dep-123';
-        const [insertedEvent] = await sql`
-          INSERT INTO cms_build_events (
-            trigger_type, status, triggered_by, webhook_url_masked,
-            response_code, response_body, started_at
-          ) VALUES (
-            'publish', 'triggered', ${testAdminId}, 'https://api.cloudflare.com/****',
-            200, ${JSON.stringify({ result: { id: testDepId } })}, NOW()
-          )
-          RETURNING
-            id, trigger_type as "triggerType", status,
-            triggered_by as "triggeredBy", webhook_url_masked as "webhookUrlMasked",
-            response_code as "responseCode", response_body as "responseBody",
-            started_at as "startedAt", completed_at as "completedAt"
-        `;
+      const testDepId = 'mock-dep-123';
+      const [insertedEvent] = await sql`
+        INSERT INTO cms_build_events (
+          trigger_type, status, triggered_by, webhook_url_masked,
+          response_code, response_body, started_at
+        ) VALUES (
+          'publish', 'triggered', ${testAdminId}, 'https://api.cloudflare.com/****',
+          200, ${JSON.stringify({ result: { id: testDepId } })}, NOW()
+        )
+        RETURNING
+          id, trigger_type as "triggerType", status,
+          triggered_by as "triggeredBy", webhook_url_masked as "webhookUrlMasked",
+          response_code as "responseCode", response_body as "responseBody",
+          started_at as "startedAt", completed_at as "completedAt"
+      `;
 
-        // 1. Sync through helper
-        const synced = await syncActiveDeploymentStatus(sql, env, insertedEvent);
-        expect(synced.status).toBe('success');
-        expect(synced.completedAt).toBeDefined();
+      // 1. Sync through helper with mockFetch
+      const synced = await syncActiveDeploymentStatus(
+        sql,
+        { ...env, CLOUDFLARE_API_TOKEN: 'mock-token' },
+        insertedEvent,
+        mockFetch
+      );
+      expect(synced.status).toBe('success');
+      expect(synced.completedAt).toBeDefined();
 
-        // 2. Verify database was updated
-        const [dbRow] = await sql`
-          SELECT status, completed_at as "completedAt" FROM cms_build_events WHERE id = ${insertedEvent.id}
-        `;
-        expect(dbRow.status).toBe('success');
-        expect(dbRow.completedAt).toBeDefined();
+      // 2. Verify database was updated
+      const [dbRow] = await sql`
+        SELECT status, completed_at as "completedAt" FROM cms_build_events WHERE id = ${insertedEvent.id}
+      `;
+      expect(dbRow.status).toBe('success');
+      expect(dbRow.completedAt).toBeDefined();
 
-        // Clean up test event
-        await sql`DELETE FROM cms_build_events WHERE id = ${insertedEvent.id}`;
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      // Clean up test event
+      await sql`DELETE FROM cms_build_events WHERE id = ${insertedEvent.id}`;
     });
 
     it('syncActiveDeploymentStatus ignores non-triggered/non-pending events', async () => {
