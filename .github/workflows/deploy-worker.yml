@@ -37,8 +37,30 @@ jobs:
         working-directory: backend/ecommerce-backend/server-worker
         run: pnpm build
 
+      - name: Setup test environment variables
+        working-directory: backend/ecommerce-backend/server-worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PRODUCTS_DATABASE_URL: ${{ secrets.PRODUCTS_DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RSA_PRIVATE_KEY_PEM: ${{ secrets.RSA_PRIVATE_KEY_PEM }}
+          RSA_PUBLIC_KEY_PEM: ${{ secrets.RSA_PUBLIC_KEY_PEM }}
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            cat << EOF > .dev.vars
+          DATABASE_URL="$DATABASE_URL"
+          PRODUCTS_DATABASE_URL="$PRODUCTS_DATABASE_URL"
+          JWT_SECRET="$JWT_SECRET"
+          RSA_PRIVATE_KEY_PEM="$RSA_PRIVATE_KEY_PEM"
+          RSA_PUBLIC_KEY_PEM="$RSA_PUBLIC_KEY_PEM"
+          EOF
+          fi
+
       - name: Run Vitest Suite
         working-directory: backend/ecommerce-backend/server-worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        if: env.DATABASE_URL != ''
         run: pnpm test --run
 
       - name: Deploy to Cloudflare Workers
