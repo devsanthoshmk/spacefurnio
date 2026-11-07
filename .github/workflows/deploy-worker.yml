@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend/ecommerce-backend/server-worker/**'
+      - 'backend/ecommerce-backend/**'
       - 'wrangler.jsonc'
       - '.github/workflows/deploy-worker.yml'
   workflow_dispatch:
@@ -29,8 +29,9 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        working-directory: backend/ecommerce-backend/server-worker
-        run: pnpm install
+        run: |
+          cd backend/ecommerce-backend && pnpm install
+          cd server-worker && pnpm install
 
       - name: Typecheck Worker
         working-directory: backend/ecommerce-backend/server-worker
