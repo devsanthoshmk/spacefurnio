@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'backend/ecommerce-backend/**'
+      - 'backend/ecommerce-backend/server-worker/**'
       - 'wrangler.jsonc'
       - '.github/workflows/deploy-worker.yml'
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: Build & Test Worker
+  build-test-deploy:
+    name: Build, Test & Deploy Worker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,16 +27,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        working-directory: backend/ecommerce-backend/server-worker
+        run: pnpm install
 
       - name: Typecheck Worker
-        run: pnpm --filter server-worker build
+        working-directory: backend/ecommerce-backend/server-worker
+        run: pnpm build
 
       - name: Run Vitest Suite
-        run: pnpm --filter server-worker test --run
+        working-directory: backend/ecommerce-backend/server-worker
+        run: pnpm test --run
 
       - name: Deploy to Cloudflare Workers
         if: env.CLOUDFLARE_API_TOKEN != ''
@@ -44,6 +46,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '23c1d5f8c743a085716fe51f52512bd7' }}
-          command: deploy
+          workingDirectory: 'backend/ecommerce-backend/server-worker'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
