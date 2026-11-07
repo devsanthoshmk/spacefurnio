@@ -323,7 +323,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import adminApi from '@/admin/api/adminApi'
 import { formatDateTime, formatRelativeTime } from '@/admin/utils/formatters'
 import AdminEmptyState from '@/admin/components/shared/AdminEmptyState.vue'
@@ -350,6 +350,7 @@ const triggering = ref(false)
 const errorMessage = ref<string | null>(null)
 const expandedIds = ref<Set<string>>(new Set())
 const copiedId = ref<string | null>(null)
+let autoRefreshTimer: ReturnType<typeof setInterval> | null = null
 
 // ─── Attribute Accessors ─────────────────────────────────────────────────────
 function getTriggerType(event: CmsBuildEvent): string {
@@ -487,6 +488,35 @@ async function copyPayload(id: string, text: string): Promise<void> {
 }
 
 // ─── API Interactions ────────────────────────────────────────────────────────
+function stopAutoRefresh(): void {
+  if (autoRefreshTimer) {
+    clearInterval(autoRefreshTimer)
+    autoRefreshTimer = null
+  }
+}
+
+function startAutoRefresh(): void {
+  if (autoRefreshTimer || !props.visible) return
+  autoRefreshTimer = setInterval(() => {
+    fetchBuildEvents()
+  }, 5000)
+}
+
+function checkAutoRefresh(): void {
+  if (!props.visible) {
+    stopAutoRefresh()
+    return
+  }
+  const hasActiveBuild = events.value.some(
+    (ev) => ev.status === 'pending' || ev.status === 'triggered',
+  )
+  if (hasActiveBuild) {
+    startAutoRefresh()
+  } else {
+    stopAutoRefresh()
+  }
+}
+
 async function fetchBuildEvents(): Promise<void> {
   loading.value = true
   errorMessage.value = null
@@ -502,14 +532,17 @@ async function fetchBuildEvents(): Promise<void> {
     } else {
       events.value = []
     }
+    checkAutoRefresh()
   } catch (err: unknown) {
     errorMessage.value = err instanceof Error ? err.message : 'Failed to fetch build events'
+    stopAutoRefresh()
   } finally {
     loading.value = false
   }
 }
 
 function close(): void {
+  stopAutoRefresh()
   emit('update:visible', false)
 }
 
@@ -533,6 +566,7 @@ watch(
         window.addEventListener('keydown', onKeydown)
       }
     } else {
+      stopAutoRefresh()
       if (typeof window !== 'undefined') {
         window.removeEventListener('keydown', onKeydown)
       }
@@ -549,7 +583,8 @@ onMounted(() => {
   }
 })
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
+  stopAutoRefresh()
   if (typeof window !== 'undefined') {
     window.removeEventListener('keydown', onKeydown)
   }

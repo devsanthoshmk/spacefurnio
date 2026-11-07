@@ -29,6 +29,96 @@ function maskWebhookUrl(url?: string): string | null {
   }
 }
 
+// Helper to sync active Cloudflare Pages deployment status
+export async function syncActiveDeploymentStatus(
+  sql: any,
+  env: Env,
+  buildEvent: any
+): Promise<any> {
+  if (!buildEvent) return buildEvent;
+  if (buildEvent.status !== 'triggered' && buildEvent.status !== 'pending') {
+    return buildEvent;
+  }
+
+  let deploymentId: string | null = null;
+  const rawBody = buildEvent.responseBody || buildEvent.response_body;
+  if (rawBody) {
+    try {
+      const parsed = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+      deploymentId = parsed?.result?.id || parsed?.id || null;
+    } catch {
+      deploymentId = null;
+    }
+  }
+
+  if (!deploymentId || !env.CLOUDFLARE_API_TOKEN) {
+    return buildEvent;
+  }
+
+  const accountId = env.CLOUDFLARE_ACCOUNT_ID || '23c1d5f8c743a085716fe51f52512bd7';
+  const projectName = env.CLOUDFLARE_PAGES_PROJECT_NAME || 'spacefurnio';
+
+  try {
+    const cfRes = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments/${deploymentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+          'User-Agent': 'Spacefurnio-CMS-Worker/1.0',
+        },
+      }
+    );
+
+    if (!cfRes.ok) {
+      return buildEvent;
+    }
+
+    const cfJson = (await cfRes.json()) as any;
+    const dep = cfJson?.result;
+    const stageStatus = dep?.latest_stage?.status;
+
+    if (stageStatus === 'success') {
+      const now = new Date();
+      await sql`
+        UPDATE cms_build_events
+        SET status = 'success',
+            completed_at = NOW()
+        WHERE id = ${buildEvent.id}
+      `;
+      return {
+        ...buildEvent,
+        status: 'success',
+        completedAt: now.toISOString(),
+      };
+    }
+
+    if (stageStatus === 'failure' || stageStatus === 'failed') {
+      const errorMessage = dep?.latest_stage?.name
+        ? `Deployment failed at stage: ${dep.latest_stage.name}`
+        : 'Cloudflare Pages deployment failed';
+      const now = new Date();
+      await sql`
+        UPDATE cms_build_events
+        SET status = 'failed',
+            completed_at = NOW(),
+            error_message = ${errorMessage}
+        WHERE id = ${buildEvent.id}
+      `;
+      return {
+        ...buildEvent,
+        status: 'failed',
+        errorMessage,
+        completedAt: now.toISOString(),
+      };
+    }
+  } catch (err: any) {
+    console.error('Failed to sync Cloudflare Pages deployment status:', err);
+  }
+
+  return buildEvent;
+}
+
 // Shared build dispatcher with 60-second cooldown and ctx.waitUntil execution
 async function dispatchBuild(
   env: Env,
@@ -128,11 +218,24 @@ async function dispatchBuild(
       const resText = await res.text();
       const finalStatus = res.ok ? 'triggered' : 'failed';
 
+      let responseBodyToSave = resText.slice(0, 1000);
+      if (res.ok) {
+        try {
+          const json = JSON.parse(resText);
+          const depId = json?.result?.id;
+          if (depId) {
+            responseBodyToSave = JSON.stringify({ result: { id: depId } });
+          }
+        } catch {
+          // Keep raw slice if not valid JSON
+        }
+      }
+
       await sql`
         UPDATE cms_build_events
         SET status = ${finalStatus},
             response_code = ${res.status},
-            response_body = ${resText.slice(0, 1000)},
+            response_body = ${responseBodyToSave},
             completed_at = NOW()
         WHERE id = ${buildEvent.id}
       `;
@@ -195,11 +298,15 @@ adminCmsRouter.get('/summary', requirePermission('cms.read'), async (request, en
       `,
     ]);
 
+    const latestBuild = latestBuilds[0]
+      ? await syncActiveDeploymentStatus(sql, env, latestBuilds[0])
+      : null;
+
     return {
       dirtyPagesCount: Number(dirtyPages[0]?.count || 0),
       dirtyPoliciesCount: Number(dirtyPolicies[0]?.count || 0),
       lastPublishedAt: lastPublished[0]?.lastPublishedAt || null,
-      latestBuild: latestBuilds[0] || null,
+      latestBuild,
     };
   } catch (err: any) {
     console.error('Failed to get CMS summary:', err);
@@ -1148,9 +1255,15 @@ adminCmsRouter.get('/build-events', requirePermission('cms.read'), async (reques
       LIMIT 20
     `;
 
-    return buildEvents;
+    const syncedBuildEvents = await Promise.all(
+      buildEvents.map((evt: any) => syncActiveDeploymentStatus(sql, env, evt))
+    );
+
+    return syncedBuildEvents;
   } catch (err: any) {
     console.error('Failed to list build events:', err);
     return error(500, { message: 'Failed to list build events', error: err?.message });
   }
 });
+
+export { dispatchBuild, dispatchBuild as dispatchBuildDeployHook };

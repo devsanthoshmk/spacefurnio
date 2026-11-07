@@ -135,8 +135,8 @@
         <AdminStatsCard
           title="Latest Build"
           :value="loading ? '...' : (summary?.latestBuild?.status || 'idle')"
-          :color="getBuildColor(summary?.latestBuild?.status)"
-          :icon="getBuildIcon(summary?.latestBuild?.status)"
+          :color="getBuildColor(summary?.latestBuild?.status, summary?.latestBuild)"
+          :icon="getBuildIcon(summary?.latestBuild?.status, summary?.latestBuild)"
         />
       </div>
 
@@ -514,6 +514,12 @@ const publishConfirmVisible = ref(false)
 const cooldownSeconds = ref(0)
 let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
+// ─── Build Polling & Status Tracking ─────────────────────────────────────────
+const previousBuildStatus = ref<string>('')
+let buildPollTimer: ReturnType<typeof setInterval> | null = null
+let pollCheckCount = 0
+const MAX_POLL_CHECKS = 36 // 3 minutes at 5s interval
+
 // ─── Modal Dialogs ──────────────────────────────────────────────────────────
 const diffViewerVisible = ref(false)
 const buildLogsOpen = ref(false)
@@ -551,6 +557,7 @@ onUnmounted(() => {
   if (cooldownInterval) {
     clearInterval(cooldownInterval)
   }
+  stopBuildPolling()
 })
 
 async function fetchSummaryAndData(): Promise<void> {
@@ -566,6 +573,7 @@ async function fetchSummaryAndData(): Promise<void> {
     if (summaryRes.status === 'fulfilled' && summaryRes.value) {
       summary.value = summaryRes.value
       syncCooldown(summary.value.latestBuild)
+      syncBuildPolling(summary.value.latestBuild)
     }
 
     if (pagesRes.status === 'fulfilled' && pagesRes.value) {
@@ -620,6 +628,65 @@ function startCooldownTimer(seconds: number): void {
       if (cooldownInterval) clearInterval(cooldownInterval)
     }
   }, 1000)
+}
+
+// ─── Build Polling Synchronization ──────────────────────────────────────────
+function stopBuildPolling(): void {
+  if (buildPollTimer) {
+    clearInterval(buildPollTimer)
+    buildPollTimer = null
+  }
+  pollCheckCount = 0
+}
+
+function startBuildPolling(): void {
+  if (buildPollTimer) return
+  pollCheckCount = 0
+  buildPollTimer = setInterval(async () => {
+    pollCheckCount++
+    if (pollCheckCount >= MAX_POLL_CHECKS) {
+      stopBuildPolling()
+      return
+    }
+    await fetchSummaryAndData()
+  }, 5000)
+}
+
+function syncBuildPolling(latestBuild: CmsBuildEvent | null | undefined): void {
+  const currentStatus = latestBuild?.status || ''
+  const prevStatus = previousBuildStatus.value
+
+  if (prevStatus === 'pending' || prevStatus === 'triggered') {
+    if (currentStatus === 'success') {
+      stopBuildPolling()
+      toast.add({
+        severity: 'success',
+        summary: 'Storefront Deployment Complete',
+        detail: 'Cloudflare Pages SSG build has finished successfully.',
+        life: 5000,
+      })
+    } else if (currentStatus === 'failed') {
+      stopBuildPolling()
+      const errorDetail =
+        latestBuild?.errorMessage ||
+        latestBuild?.error_message ||
+        'Cloudflare Pages build failed.'
+      toast.add({
+        severity: 'error',
+        summary: 'Deployment Failed',
+        detail: errorDetail,
+        life: 6000,
+      })
+    }
+  }
+
+  previousBuildStatus.value = currentStatus
+
+  if (currentStatus === 'pending' || currentStatus === 'triggered') {
+    startBuildPolling()
+  } else {
+    stopBuildPolling()
+  }
 }
 
 // ─── Navigation Handlers ────────────────────────────────────────────────────
@@ -802,33 +869,46 @@ function calcDuration(start?: string | null, end?: string | null): string {
   return `${sec}s`
 }
 
-function getBuildColor(status?: string): 'emerald' | 'blue' | 'amber' | 'red' | 'purple' {
+function isBuildTriggerActive(build?: CmsBuildEvent | null): boolean {
+  if (cooldownSeconds.value > 0) return true
+  const targetBuild = build ?? summary.value?.latestBuild
+  const startedAtStr = targetBuild?.started_at || targetBuild?.startedAt
+  if (!startedAtStr) return false
+  const startedAt = new Date(startedAtStr).getTime()
+  if (isNaN(startedAt)) return false
+  const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000)
+  return elapsedSeconds < 60
+}
+
+function getBuildColor(status?: string, build?: CmsBuildEvent | null): 'emerald' | 'blue' | 'red' | 'purple' {
   switch (status) {
     case 'success':
       return 'emerald'
     case 'pending':
-    case 'triggered':
       return 'blue'
-    case 'skipped_local':
-      return 'purple'
+    case 'triggered':
+      return isBuildTriggerActive(build) ? 'blue' : 'blue'
     case 'failed':
       return 'red'
+    case 'skipped_local':
+      return 'purple'
     default:
       return 'emerald'
   }
 }
 
-function getBuildIcon(status?: string): string {
+function getBuildIcon(status?: string, build?: CmsBuildEvent | null): string {
   switch (status) {
     case 'success':
       return 'pi pi-check-circle'
     case 'pending':
-    case 'triggered':
       return 'pi pi-spin pi-spinner'
-    case 'skipped_local':
-      return 'pi pi-info-circle'
+    case 'triggered':
+      return isBuildTriggerActive(build) ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'
     case 'failed':
       return 'pi pi-exclamation-triangle'
+    case 'skipped_local':
+      return 'pi pi-info-circle'
     default:
       return 'pi pi-cloud'
   }

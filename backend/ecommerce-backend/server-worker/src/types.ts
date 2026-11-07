@@ -8,4 +8,7 @@ export type Env = {
     ASSETS?: Fetcher;
     CLOUDFLARE_PAGES_DEPLOY_HOOK?: string;
     BUILD_WEBHOOK_URL?: string;
+    CLOUDFLARE_API_TOKEN?: string;
+    CLOUDFLARE_ACCOUNT_ID?: string;
+    CLOUDFLARE_PAGES_PROJECT_NAME?: string;
 };

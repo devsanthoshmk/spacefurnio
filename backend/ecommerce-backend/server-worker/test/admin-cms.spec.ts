@@ -2,6 +2,7 @@ import { env, SELF } from 'cloudflare:test';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { generateToken } from '../src/utils/jwks';
 import { getDb } from '../src/utils/db';
+import { syncActiveDeploymentStatus } from '../src/routes/admin/cms';
 
 describe('CMS Public & Admin Endpoints, Edge Cases & Permissions', () => {
   let adminToken: string;
@@ -411,6 +412,53 @@ describe('CMS Public & Admin Endpoints, Edge Cases & Permissions', () => {
       expect(events.length).toBeGreaterThanOrEqual(1);
       expect(events[0].id).toBeDefined();
       expect(events[0].status).toBeDefined();
+    });
+
+    it('syncActiveDeploymentStatus correctly syncs triggered event from Cloudflare Pages API', async () => {
+      const { sql } = getDb(env);
+
+      // Insert a triggered build event with a known deployment ID
+      const testDepId = 'bff62c89-1d95-4eef-b894-02bd8e39665b';
+      const [insertedEvent] = await sql`
+        INSERT INTO cms_build_events (
+          trigger_type, status, triggered_by, webhook_url_masked,
+          response_code, response_body, started_at
+        ) VALUES (
+          'publish', 'triggered', ${testAdminId}, 'https://api.cloudflare.com/****',
+          200, ${JSON.stringify({ result: { id: testDepId } })}, NOW()
+        )
+        RETURNING
+          id, trigger_type as "triggerType", status,
+          triggered_by as "triggeredBy", webhook_url_masked as "webhookUrlMasked",
+          response_code as "responseCode", response_body as "responseBody",
+          started_at as "startedAt", completed_at as "completedAt"
+      `;
+
+      // 1. Sync through helper
+      const synced = await syncActiveDeploymentStatus(sql, env, insertedEvent);
+      expect(synced.status).toBe('success');
+      expect(synced.completedAt).toBeDefined();
+
+      // 2. Verify database was updated
+      const [dbRow] = await sql`
+        SELECT status, completed_at as "completedAt" FROM cms_build_events WHERE id = ${insertedEvent.id}
+      `;
+      expect(dbRow.status).toBe('success');
+      expect(dbRow.completedAt).toBeDefined();
+
+      // Clean up test event
+      await sql`DELETE FROM cms_build_events WHERE id = ${insertedEvent.id}`;
+    });
+
+    it('syncActiveDeploymentStatus ignores non-triggered/non-pending events', async () => {
+      const { sql } = getDb(env);
+      const fakeEvent = {
+        id: 'fake-id',
+        status: 'success',
+        responseBody: JSON.stringify({ result: { id: 'any-id' } }),
+      };
+      const result = await syncActiveDeploymentStatus(sql, env, fakeEvent);
+      expect(result).toBe(fakeEvent);
     });
 
     it('POST & DELETE /api/admin/cms/policies creates and deletes a policy', async () => {
